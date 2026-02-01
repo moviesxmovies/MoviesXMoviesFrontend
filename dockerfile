@@ -9,6 +9,6 @@ FROM alpine:latest
 RUN apk add --no-cache coreutils
 
 WORKDIR /app
-COPY --from=build-stage /app/dist /app/build_files
+COPY --from=build-stage /app/dist /app/
 
-CMD ["sh", "-c", "mkdir -p /var/www/frontend && cp -rv /app/build_files/. /var/www/frontend/ && echo 'Sync complete' && tail -f /dev/null"]
+CMD ["sh", "-c", "echo 'Sync complete' && tail -f /dev/null"]
