@@ -6,8 +6,9 @@ COPY . .
 RUN npm run build
 
 FROM alpine:latest
-WORKDIR /var/www/frontend
+RUN apk add --no-cache coreutils
 
-COPY --from=build-stage /app/dist .
+WORKDIR /app
+COPY --from=build-stage /app/dist /app/build_files
 
-CMD ["sh", "-c", "echo 'Files served on /var/www/frontend' && tail -f /dev/null"]
+CMD ["sh", "-c", "mkdir -p /var/www/frontend && cp -rv /app/build_files/. /var/www/frontend/ && echo 'Sync complete' && tail -f /dev/null"]
