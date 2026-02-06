@@ -1,1 +1,53 @@
 @import "tailwindcss";
+@theme {
+  --color-text: var(--text);
+  --color-background: var(--background);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+
+  --font-heading: "Inter", sans-serif;
+  --font-body: "Inter", sans-serif;
+
+  --text-sm: 0.750rem;
+  --text-base: 1rem;
+  --text-xl: 1.333rem;
+  --text-2xl: 1.777rem;
+  --text-3xl: 2.369rem;
+  --text-4xl: 3.158rem;
+  --text-5xl: 4.210rem;
+
+  --font-weight-normal: 400;
+  --font-weight-bold: 700;
+}
+
+:root {
+  --text: #1f1f1f;
+  --background: #f2f2f2;
+  --primary: #2f27ce;
+  --secondary: #bcbbdd;
+  --accent: #bb3dff;
+}
+
+.dark {
+  --text: #e0e0e0;
+  --background: #0d0d0d;
+  --primary: #3a31d8;
+  --secondary: #232244;
+  --accent: #7e00c2;
+}
+
+@layer primevue {
+  :root {
+    --p-primary-color: var(--primary);
+    --p-primary-contrast-color: var(--background);
+    --p-content-background: var(--background);
+    --p-text-color: var(--text);
+  }
+
+  .dark {
+    --p-primary-color: var(--primary);
+    --p-content-background: var(--background);
+    --p-text-color: var(--text);
+  }
+}
