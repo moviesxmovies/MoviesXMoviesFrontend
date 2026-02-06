@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { useAuthStore } from '../stores/authStore';
 
 const refreshInstance = axios.create({
@@ -26,7 +26,7 @@ api.interceptors.request.use(async (config) => {
             } catch (error) {
                 authStore.logout();
                 window.location.href = '/auth/login';
-                return Promise.reject(error);
+                return Promise.reject(error instanceof Error ? error : new Error(String(error)));
             }
         } else {
             config.headers.Authorization = `Bearer ${authStore.token}`;

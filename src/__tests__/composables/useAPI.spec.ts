@@ -118,4 +118,20 @@ describe('API Interceptor', () => {
 
         expect(result).toBe(config);
     });
+
+    it('axios throws an error that is not an instance of Error', async () => {
+        authStore.token = 'expired-token';
+        authStore.refreshToken = 'bad-refresh';
+        vi.spyOn(authStore, 'isTokenExpired').mockReturnValue(true);
+        const logoutSpy = vi.spyOn(authStore, 'logout');
+
+        mockInstance.post.mockRejectedValueOnce('Some error string');
+
+        const interceptor = mockInstance.interceptors.request.use.mock.calls[0][0];
+
+        await expect(interceptor({ headers: {} })).rejects.toThrow('Some error string');
+
+        expect(logoutSpy).toHaveBeenCalled();
+        expect(locationMock.href).toBe('/auth/login');
+    });
 });
