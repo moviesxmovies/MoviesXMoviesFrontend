@@ -93,9 +93,19 @@ describe('Auth Store', () => {
     it('should return true if token error decoding', async () => {
         const store = useAuthStore();
         store.setTokens('expired-access', 'invalid-refresh');
-        vi.mocked(jwtDecode).mockImplementation(() => {throw new Error('Invalid token'); }
+        vi.mocked(jwtDecode).mockImplementation(() => { throw new Error('Invalid token'); }
         );
         expect(store.isTokenExpired()).toBe(true);
+    });
+
+    it('set tokens if not refresh token', () => {
+        const store = useAuthStore();
+        const accessToken = 'fake-access';
+
+        store.setTokens(accessToken);
+
+        expect(store.token).toBe(accessToken);
+        expect(store.refreshToken).toBeNull();
     });
     it('should clear all tokens and localStorage on logout', () => {
         const store = useAuthStore();
