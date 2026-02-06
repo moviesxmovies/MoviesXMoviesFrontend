@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { useAuthStore } from '../stores/authStore';
 
 const refreshInstance = axios.create({
