@@ -60,7 +60,7 @@ router.beforeEach((to, from, next) => {
     if (user.verified && !user.boarded && to.path !== '/onboarding') {
       return next('/onboarding');
     }
-    if (user.verified && user.boarded) {
+    if (user.verified && user.boarded && (to.path === '/login' || to.path === '/signup' || to.path === '/verify-email' || to.path === '/onboarding')) {
       return next('/');
     }
   }
