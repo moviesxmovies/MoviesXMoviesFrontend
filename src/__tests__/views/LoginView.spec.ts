@@ -53,7 +53,7 @@ describe('LoginView.vue', () => {
         await wrapper.find('button').trigger('click');
 
         expect(api.post).toHaveBeenCalled();
-        expect(mockPush).toHaveBeenCalledWith('/dashboard');
+        expect(mockPush).toHaveBeenCalledWith('/home');
     });
 
     it('should show error toast on 403 (Cloudflare/CSRF)', async () => {

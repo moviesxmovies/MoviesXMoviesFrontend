@@ -48,7 +48,7 @@ const handleLogin = async () => {
         authStore.setTokens(data.access, data.refresh);
         toast.add({ severity: 'success', summary: 'Success', detail: 'Session started', life: 3000 });
 
-        router.push('/dashboard');
+        router.push('/home');
     } catch (error: any) {
         const status = error.response?.status;
         let detail = "Can't connect to server";
