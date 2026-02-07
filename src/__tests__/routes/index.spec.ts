@@ -2,13 +2,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { router } from '../../router/index';
 import { useAuthStore } from '../../stores/authStore';
 
-vi.mock('../views/OnBoardingView.vue', () => ({ default: {} }));
-vi.mock('../views/VerifyEmail.vue', () => ({ default: {} }));
-vi.mock('../views/LoginView.vue', () => ({ default: {} }));
-vi.mock('../views/SignupView.vue', () => ({ default: {} }));
-vi.mock('../views/HomeView.vue', () => ({ default: {} }));
-vi.mock('../views/WelcomeView.vue', () => ({ default: {} }));
-vi.mock('../views/NotFoundView.vue', () => ({ default: {} }));
+vi.mock('../../views/OnBoardingView.vue', () => ({ default: {} }));
+vi.mock('../../views/VerifyEmail.vue', () => ({ default: {} }));
+vi.mock('../../views/LoginView.vue', () => ({ default: {} }));
+vi.mock('../../views/SignupView.vue', () => ({ default: {} }));
+vi.mock('../../views/HomeView.vue', () => ({ default: {} }));
+vi.mock('../../views/WelcomeView.vue', () => ({ default: {} }));
+vi.mock('../../views/NotFoundView.vue', () => ({ default: {} }));
 
 vi.mock('../../stores/authStore', () => ({
     useAuthStore: vi.fn()
