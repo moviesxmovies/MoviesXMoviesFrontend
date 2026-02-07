@@ -51,7 +51,7 @@ const handleLogin = async () => {
         router.push('/dashboard');
     } catch (error: any) {
         const status = error.response?.status;
-        let detail = 'Can´t connect to server';
+        let detail = "Can't connect to server";
 
         if (status === 401) detail = 'Incorrect username or password';
         if (status === 403) detail = 'Access denied (Check Cloudflare/CSRF)';
