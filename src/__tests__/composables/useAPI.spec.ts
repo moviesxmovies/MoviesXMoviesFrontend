@@ -105,7 +105,7 @@ describe('API Interceptor', () => {
         await expect(interceptor({ headers: {} })).rejects.toThrow('Refresh failed');
 
         expect(logoutSpy).toHaveBeenCalled();
-        expect(locationMock.href).toBe('/auth/login');
+        expect(locationMock.href).toBe('/login');
     });
 
     it('should return the config if there is no token', async () => {
@@ -132,6 +132,6 @@ describe('API Interceptor', () => {
         await expect(interceptor({ headers: {} })).rejects.toThrow('Some error string');
 
         expect(logoutSpy).toHaveBeenCalled();
-        expect(locationMock.href).toBe('/auth/login');
+        expect(locationMock.href).toBe('/login');
     });
 });
