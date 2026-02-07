@@ -25,7 +25,7 @@ api.interceptors.request.use(async (config) => {
                 config.headers.Authorization = `Bearer ${data.access}`;
             } catch (error) {
                 authStore.logout();
-                window.location.href = '/auth/login';
+                window.location.href = '/login';
                 return Promise.reject(error instanceof Error ? error : new Error(String(error)));
             }
         } else {
