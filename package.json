@@ -1,5 +1,5 @@
 {
-  "name": "pytobasevuevacio",
+  "name": "movies-x-movies-frontend",
   "version": "0.3.2",
   "private": true,
   "type": "module",
@@ -26,7 +26,8 @@
     "@primeuix/themes": "^2.0.3",
     "@primevue/forms": "^4.5.4",
     "@tailwindcss/vite": "^4.1.18",
-    "bcryptjs": "^3.0.3",
+    "axios": "^1.13.4",
+    "jwt-decode": "^4.0.0",
     "pinia": "^3.0.4",
     "primeflex": "^4.0.0",
     "primeicons": "^7.0.0",
@@ -37,7 +38,6 @@
   },
   "devDependencies": {
     "@tsconfig/node24": "^24.0.3",
-    "@types/bcryptjs": "^2.4.6",
     "@types/jsdom": "^27.0.0",
     "@types/node": "^24.10.9",
     "@vitejs/plugin-vue": "^6.0.2",

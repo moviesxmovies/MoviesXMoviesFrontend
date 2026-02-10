@@ -2,8 +2,7 @@ import { config } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { createRouter, createWebHistory } from 'vue-router'
 import PrimeVue from 'primevue/config'
-import { beforeEach } from 'vitest'
-import { vi } from 'vitest'
+import { beforeEach, vi } from 'vitest'
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
@@ -11,7 +10,7 @@ Object.defineProperty(window, 'matchMedia', {
     matches: false,
     media: query,
     onchange: null,
-    addListener: vi.fn(), 
+    addListener: vi.fn(),
     removeListener: vi.fn(),
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
@@ -26,7 +25,7 @@ const router = createRouter({
 beforeEach(() => {
   const pinia = createPinia()
   setActivePinia(pinia)
-  
+
   config.global.plugins = [pinia, router, PrimeVue]
   config.global.stubs = {
     'router-link': true,
