@@ -6,8 +6,8 @@
   --color-secondary: var(--secondary);
   --color-accent: var(--accent);
 
-  --font-heading: "Inter", sans-serif;
-  --font-body: "Inter", sans-serif;
+  --font-sans: "Inter", sans-serif;
+  --font-display: "Inter", sans-serif;
 
   --text-sm: 0.750rem;
   --text-base: 1rem;
