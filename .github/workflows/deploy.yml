@@ -21,6 +21,6 @@ jobs:
           script: |
             cd ${{ secrets.SSH_TARGET }}
             docker compose down web -v
-            rm -rf /var/www/moviesxmovies/app/*
+            sudo rm -rf /var/www/moviesxmovies/app/*
             docker compose up -d --no-deps web
             docker image prune -f
