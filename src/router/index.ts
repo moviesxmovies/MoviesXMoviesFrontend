@@ -45,6 +45,9 @@ export const router = createRouter({
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
   const user = authStore.user;
+  console.log(to)
+  console.log(from)
+
 
   // 1. No autenticado
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
