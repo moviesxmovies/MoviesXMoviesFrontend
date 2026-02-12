@@ -6,6 +6,8 @@ import { api } from '@/composables/useAPI';
 import { useRouter } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
 import { Button, Card, InputText, Password } from 'primevue';
+import { loginWithGoogle } from '@/composables/useOAUTH'
+
 const loginSchema = z.object({
     username: z.string().min(1, 'Username is required'),
     password: z.string().min(1, 'Password is required'),
@@ -85,6 +87,7 @@ const handleLogin = async () => {
                     </div>
 
                     <Button label="Login" icon="pi pi-sign-in" :loading="loading" @click="handleLogin" />
+                    <Button label="Login with Google" @click="loginWithGoogle" />
 
                 </div>
             </template>
