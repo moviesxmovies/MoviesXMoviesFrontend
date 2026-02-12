@@ -2,8 +2,11 @@ import { createRouter, createWebHistory } from 'vue-router';
 import type { RouteRecordRaw } from 'vue-router';
 import { useAuthStore } from '../stores/authStore';
 
-
 const routes: Array<RouteRecordRaw> = [
+  {
+    path: '/accounts/google/login/callback/',
+    component: () => import('../views/OnBoardingView.vue'),
+  },
   {
     path: '/onboarding',
     component: () => import('../views/OnBoardingView.vue'),
@@ -45,7 +48,6 @@ export const router = createRouter({
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
   const user = authStore.user;
-
 
   // 1. No autenticado
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
