@@ -2,41 +2,37 @@
 import { onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
+import { useToast } from 'primevue/usetoast';
+import { useAuthStore } from '@/stores/authStore';
 
 const route = useRoute();
 const router = useRouter();
+const toast = useToast();
+const authStore = useAuthStore();
 
 onMounted(async () => {
   const code = route.query.code;
-  console.log("Received code:", code);
 
-//   if (code) {
-//     try {
-//       const response = await axios.post(
-//         "http://localhost:8000/api/oauth/google/",
-//         {
-//           code: code,
-//         },
-//       );
+  if (code) {
+    try {
+      const { data } = await axios.post(import.meta.env.VITE_URL_PROTOCOL + "/api/oauth/google/", { code: code });
 
-//       // 3. ¡Éxito! Aquí recibes el JWT (access y refresh)
-//       const { access, refresh, user } = response.data;
+      authStore.setTokens(data.access, data.refresh);
+      toast.add({ severity: 'success', summary: 'Success', detail: 'Session started', life: 3000 });
 
-//       localStorage.setItem("access_token", access);
-//       localStorage.setItem("refresh_token", refresh);
-
-//       console.log("Usuario identificado:", user);
-
-//       // 4. Redirigir al home o al dashboard
-//       router.push({ name: "home" });
-//     } catch (error) {
-//       console.error("Error en el login social:", error.response?.data || error);
-//       router.push({ name: "login", query: { error: "failed_google_auth" } });
-//     }
-//   } else {
-//     // Si no hay código, algo salió mal en Google
-//     router.push({ name: "login" });
-//   }
+      router.push('/home');
+    } catch (error) {
+      const status = error.response?.status;
+      let detail = "Failed to authenticate with Google";
+      if (status === 400) {
+        detail = "Invalid Google OAuth code";
+      }
+      router.push("/login", { query: { error: "failed_google_auth" } });
+      toast.add({ severity: 'error', summary: 'Error', detail, life: 5000 });
+    }
+  } else {
+    router.push("/login");
+  }
 });
 </script>
 
