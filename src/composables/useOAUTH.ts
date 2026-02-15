@@ -1,6 +1,3 @@
-import axios from 'axios';
-import { useAuthStore } from '../stores/authStore';
-
 export const loginWithGoogle = () => {
   const googleAuthUrl = "https://accounts.google.com/o/oauth2/v2/auth";
   

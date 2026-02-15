@@ -5,7 +5,7 @@ import { useAuthStore } from '../stores/authStore';
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/accounts/google/login/callback/',
-    component: () => import('../views/OnBoardingView.vue'),
+    component: () => import('../views/OauthCallbackView.vue'),
   },
   {
     path: '/onboarding',
