@@ -46,11 +46,8 @@ const handleLogin = async () => {
     loading.value = true;
     try {
         const { data } = await api.post(import.meta.env.VITE_URL_PROTOCOL + '/api/auth/login/', form.value);
-
-        authStore.setTokens(data.access, data.refresh);
         toast.add({ severity: 'success', summary: 'Success', detail: 'Session started', life: 3000 });
-
-        router.push('/home');
+        authStore.handleLogin(data.access, data.refresh);
     } catch (error: any) {
         const status = error.response?.status;
         let detail = "Can't connect to server";

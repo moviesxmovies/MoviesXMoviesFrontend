@@ -12,26 +12,20 @@ const authStore = useAuthStore();
 
 onMounted(async () => {
   const code = route.query.code;
+  if (!code) return router.push("/login");
 
-  if (code) {
-    try {
-      const { data } = await axios.post(import.meta.env.VITE_URL_PROTOCOL + "/api/oauth/google/", { code: code });
-
-      authStore.setTokens(data.access, data.refresh);
-      toast.add({ severity: 'success', summary: 'Success', detail: 'Session started', life: 3000 });
-
-      router.push('/home');
-    } catch (error) {
-      const status = error.response?.status;
-      let detail = "Failed to authenticate with Google";
-      if (status === 400) {
-        detail = "Invalid Google OAuth code";
-      }
-      router.push("/login", { query: { error: "failed_google_auth" } });
-      toast.add({ severity: 'error', summary: 'Error', detail, life: 5000 });
+  try {
+    const { data } = await axios.post(import.meta.env.VITE_URL_PROTOCOL + "/api/oauth/google/", { code: code });
+    toast.add({ severity: 'success', summary: 'Success', detail: 'Session started', life: 3000 });
+    authStore.handleLogin(data.access, data.refresh);
+  } catch (error) {
+    const status = error.response?.status;
+    let detail = "Failed to authenticate with Google";
+    if (status === 400) {
+      detail = "Invalid Google OAuth code";
     }
-  } else {
-    router.push("/login");
+    router.push("/login", { query: { error: "failed_google_auth" } });
+    toast.add({ severity: 'error', summary: 'Error', detail, life: 5000 });
   }
 });
 </script>

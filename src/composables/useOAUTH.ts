@@ -9,8 +9,6 @@ export const loginWithGoogle = () => {
     access_type: "offline",
     prompt: "select_account", 
   };
-
-  const urlCompleta = `${googleAuthUrl}?${new URLSearchParams(params).toString()}`;
   
-  globalThis.location.href = urlCompleta;
+  globalThis.location.href = `${googleAuthUrl}?${new URLSearchParams(params).toString()}`;
 };
