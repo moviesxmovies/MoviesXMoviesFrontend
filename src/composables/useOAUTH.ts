@@ -3,7 +3,7 @@ export const loginWithGoogle = () => {
   
   const params = {
     client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID, 
-    redirect_uri: 'http://localhost:5173/accounts/google/login/callback/',
+    redirect_uri: import.meta.env.VITE_CALLBACK_URI+'/accounts/google/login/callback/',
     response_type: "code", 
     scope: "openid email profile",
     access_type: "offline",

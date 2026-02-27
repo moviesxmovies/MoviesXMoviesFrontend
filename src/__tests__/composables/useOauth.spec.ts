@@ -4,6 +4,7 @@ import { loginWithGoogle } from '../../composables/useOAUTH.ts';
 describe('loginWithGoogle', () => {
   beforeEach(() => {
     vi.stubEnv('VITE_GOOGLE_CLIENT_ID', 'test-client-id');
+    vi.stubEnv('VITE_CALLBACK_URI', 'http://localhost:5173');
 
     vi.stubGlobal('location', {
       href: ''

@@ -5,6 +5,8 @@ import axios from "axios";
 import { useToast } from 'primevue/usetoast';
 import { useAuthStore } from '@/stores/authStore';
 
+import ProgressSpinner from 'primevue/progressspinner';
+
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
@@ -32,7 +34,7 @@ onMounted(async () => {
 
 <template>
   <div class="flex flex-col items-center justify-center min-h-screen">
-    <h1 class="text-2xl font-bold mb-4">OAuth Callback</h1>
-    <p class="mb-4">Processing your authentication...</p>
+    <ProgressSpinner />
+    <p class="text-3xl">Loading...</p>
   </div>
 </template>
