@@ -1,126 +1,149 @@
-import { mount } from '@vue/test-utils';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createPinia, setActivePinia } from 'pinia';
-import PrimeVue from 'primevue/config';
-import ToastService from 'primevue/toastservice';
-import LoginView from '../../views/LoginView.vue';
-import { api } from '../../composables/useAPI';
-import { Button, InputText, Password } from 'primevue';
+import { mount, flushPromises } from "@vue/test-utils";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { createPinia, setActivePinia } from "pinia";
+import PrimeVue from "primevue/config";
+import ToastService from "primevue/toastservice";
+import LoginView from "../../views/LoginView.vue";
+import { api } from "../../composables/useAPI";
+import { Button, InputText, Password } from "primevue";
+import { useAuthStore } from '../../stores/authStore';
 
 let vi_storage: Record<string, string> = {};
-vi.stubGlobal('localStorage', {
-    getItem: vi.fn((key: string) => vi_storage[key] || null),
-    setItem: vi.fn((key: string, value: string) => { vi_storage[key] = value.toString(); }),
-    removeItem: vi.fn((key: string) => { delete vi_storage[key]; }),
-    clear: vi.fn(() => { vi_storage = {}; }),
+vi.stubGlobal("localStorage", {
+  getItem: vi.fn((key: string) => vi_storage[key] || null),
+  setItem: vi.fn((key: string, value: string) => {
+    vi_storage[key] = value.toString();
+  }),
+  removeItem: vi.fn((key: string) => {
+    delete vi_storage[key];
+  }),
+  clear: vi.fn(() => {
+    vi_storage = {};
+  }),
 });
 
-vi.mock('@/composables/useAPI', () => ({ api: { post: vi.fn() } }));
+vi.mock("@/composables/useAPI", () => ({ api: { post: vi.fn() } }));
 const mockPush = vi.fn();
-vi.mock('vue-router', () => ({ useRouter: () => ({ push: mockPush }) }));
+vi.mock("vue-router", () => ({ useRouter: () => ({ push: mockPush }) }));
 const mockToast = { add: vi.fn() };
-vi.mock('primevue/usetoast', () => ({ useToast: () => mockToast }));
+vi.mock("primevue/usetoast", () => ({ useToast: () => mockToast }));
+const mockHandleLogin = vi.fn();
+const mockSetTokens = vi.fn();
+vi.mock("@/stores/authStore", () => ({
+  useAuthStore: () => ({
+    token: null,
+    refreshToken: null,
+    handleLogin: mockHandleLogin,
+    setTokens: mockSetTokens,
+    isAuthenticated: false,
+  }),
+}));
 
-describe('LoginView.vue', () => {
-    beforeEach(() => {
-        setActivePinia(createPinia());
-        vi.clearAllMocks();
-        localStorage.clear();
+describe("LoginView.vue", () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+    vi.clearAllMocks();
+    localStorage.clear();
+  });
+
+  const factory = () => {
+    return mount(LoginView, {
+      global: {
+        plugins: [PrimeVue, ToastService],
+        components: { Button, InputText, Password },
+      },
+    });
+  };
+
+  it("should fill inputs and call api on success", async () => {
+    const wrapper = factory();
+
+    vi.mocked(api.post).mockResolvedValueOnce({
+      data: { access: "ok", refresh: "ok" },
     });
 
-    const factory = () => {
-        return mount(LoginView, {
-            global: {
-                plugins: [PrimeVue, ToastService],
-                components: { Button, InputText, Password }
-            }
-        });
-    };
+    
+    const usernameInput = wrapper.findComponent(InputText);
+    const passwordInput = wrapper.findComponent(Password);
 
-    it('should fill inputs and call api on success', async () => {
-        const wrapper = factory();
+    await usernameInput.setValue("my-user");
+    await passwordInput.find("input").setValue("my-password");
 
-        vi.mocked(api.post).mockResolvedValueOnce({
-            data: { access: 'ok', refresh: 'ok' }
-        });
+    await wrapper.find("button").trigger("click");
 
-        const usernameInput = wrapper.findComponent(InputText);
-        const passwordInput = wrapper.findComponent(Password);
+    await flushPromises();
 
-        await usernameInput.setValue('my-user');
-        await passwordInput.find('input').setValue('my-password');
+    expect(api.post).toHaveBeenCalled();
+    const authStore = useAuthStore();
+    expect(authStore.handleLogin).toHaveBeenCalledWith("ok", "ok");
+  });
 
-        await wrapper.find('button').trigger('click');
+  it("should show error toast on 403 (Cloudflare/CSRF)", async () => {
+    const wrapper = factory();
 
-        expect(api.post).toHaveBeenCalled();
-        expect(mockPush).toHaveBeenCalledWith('/home');
+    vi.mocked(api.post).mockRejectedValueOnce({
+      response: { status: 403 },
     });
 
-    it('should show error toast on 403 (Cloudflare/CSRF)', async () => {
-        const wrapper = factory();
+    await wrapper.findComponent(InputText).setValue("user");
+    await wrapper.findComponent(Password).find("input").setValue("pass");
+    await wrapper.find("button").trigger("click");
 
-        vi.mocked(api.post).mockRejectedValueOnce({
-            response: { status: 403 }
-        });
+    expect(mockToast.add).toHaveBeenCalledWith(
+      expect.objectContaining({
+        detail: "Access denied (Check Cloudflare/CSRF)",
+      }),
+    );
+  });
 
-        await wrapper.findComponent(InputText).setValue('user');
-        await wrapper.findComponent(Password).find('input').setValue('pass');
-        await wrapper.find('button').trigger('click');
+  it("should show error toast on 401 (Invalid credentials)", async () => {
+    const wrapper = factory();
 
-        expect(mockToast.add).toHaveBeenCalledWith(expect.objectContaining({
-            detail: 'Access denied (Check Cloudflare/CSRF)'
-        }));
+    vi.mocked(api.post).mockRejectedValueOnce({
+      response: { status: 401 },
     });
 
-    it('should show error toast on 401 (Invalid credentials)', async () => {
-        const wrapper = factory();
+    await wrapper.findComponent(InputText).setValue("user");
+    await wrapper.findComponent(Password).find("input").setValue("pass");
+    await wrapper.find("button").trigger("click");
 
-        vi.mocked(api.post).mockRejectedValueOnce({
-            response: { status: 401 }
-        });
+    expect(mockToast.add).toHaveBeenCalledWith(
+      expect.objectContaining({
+        detail: "Incorrect username or password",
+      }),
+    );
+  });
 
-        await wrapper.findComponent(InputText).setValue('user');
-        await wrapper.findComponent(Password).find('input').setValue('pass');
-        await wrapper.find('button').trigger('click');
+  it("should return if validation fails", async () => {
+    const wrapper = factory();
 
-        expect(mockToast.add).toHaveBeenCalledWith(expect.objectContaining({
-            detail: 'Incorrect username or password',
-        }));
-    });
+    await wrapper.find("button").trigger("click");
 
-    it('should return if validation fails', async () => {
-        const wrapper = factory();
+    expect(api.post).not.toHaveBeenCalled();
+  });
+  it("should clear username error when user types (@input)", async () => {
+    const wrapper = factory();
+    const vm = wrapper.vm as any;
+    await wrapper.find("button").trigger("click");
+    expect(vm.errors.username).toBeDefined();
 
-        await wrapper.find('button').trigger('click');
+    const usernameInput = wrapper.findComponent(InputText);
+    await usernameInput.setValue("admin");
 
-        expect(api.post).not.toHaveBeenCalled();
-    });
-    it('should clear username error when user types (@input)', async () => {
-        const wrapper = factory();
-        const vm = wrapper.vm as any;
-        await wrapper.find('button').trigger('click');
-        expect(vm.errors.username).toBeDefined();
+    await usernameInput.vm.$emit("input");
 
-        const usernameInput = wrapper.findComponent(InputText);
-        await usernameInput.setValue('admin');
+    expect(vm.errors.username).toBe("");
+  });
 
-        await usernameInput.vm.$emit('input');
+  it("should flatten Zod array errors into a single string (coverage for Array.isArray)", async () => {
+    const wrapper = factory();
+    const vm = wrapper.vm as any;
 
-        expect(vm.errors.username).toBe('');
-    });
+    await wrapper.find("button").trigger("click");
 
-    it('should flatten Zod array errors into a single string (coverage for Array.isArray)', async () => {
-        const wrapper = factory();
-        const vm = wrapper.vm as any;
-
-        await wrapper.find('button').trigger('click');
-
-        const usernameError = vm.errors.username;
-        expect(typeof usernameError).toBe('string');
-        expect(Array.isArray(usernameError)).toBe(false);
-        expect(usernameError).toBe('Username is required');
-    });
-
-
+    const usernameError = vm.errors.username;
+    expect(typeof usernameError).toBe("string");
+    expect(Array.isArray(usernameError)).toBe(false);
+    expect(usernameError).toBe("Username is required");
+  });
 });
-

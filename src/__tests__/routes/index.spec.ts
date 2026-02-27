@@ -114,6 +114,10 @@ describe('Router & LocalStorage Isolation', () => {
 
         expect(router.currentRoute.value.path).toBe('/signup');
 
+        await router.push('/accounts/google/login/callback/');
+
+        expect(router.currentRoute.value.path).toBe('/accounts/google/login/callback/');
+
         await router.push('/non-existent');
 
         expect(router.currentRoute.value.path).toBe('/non-existent');

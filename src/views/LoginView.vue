@@ -6,6 +6,9 @@ import { api } from '@/composables/useAPI';
 import { useRouter } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
 import { Button, Card, InputText, Password } from 'primevue';
+import { loginWithGoogle } from '@/composables/useOAUTH';
+import OauthButtonComponent from '@/components/oauthButtonComponent.vue';
+
 const loginSchema = z.object({
     username: z.string().min(1, 'Username is required'),
     password: z.string().min(1, 'Password is required'),
@@ -43,12 +46,9 @@ const handleLogin = async () => {
 
     loading.value = true;
     try {
-        const { data } = await api.post('/api/auth/login/', form.value);
-
-        authStore.setTokens(data.access, data.refresh);
+        const { data } = await api.post(import.meta.env.VITE_URL_PROTOCOL + '/api/auth/login/', form.value);
         toast.add({ severity: 'success', summary: 'Success', detail: 'Session started', life: 3000 });
-
-        router.push('/home');
+        authStore.handleLogin(data.access, data.refresh);
     } catch (error: any) {
         const status = error.response?.status;
         let detail = "Can't connect to server";
@@ -85,7 +85,7 @@ const handleLogin = async () => {
                     </div>
 
                     <Button label="Login" icon="pi pi-sign-in" :loading="loading" @click="handleLogin" />
-
+                    <OauthButtonComponent @click="loginWithGoogle" />
                 </div>
             </template>
         </Card>
