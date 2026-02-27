@@ -5,9 +5,7 @@ defineProps<{
     loading?: boolean
 }>();
 
-const emit = defineEmits<{
-    (e: 'click'): void
-}>();
+const emit = defineEmits<(e: 'click') => void>();
 
 const handleGoogleLogin = () => {
     emit('click');
