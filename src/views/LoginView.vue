@@ -24,7 +24,6 @@ const loading = ref(false);
 
 const toast = useToast();
 const authStore = useAuthStore();
-const router = useRouter();
 
 const validate = () => {
     const result = loginSchema.safeParse(form.value);

@@ -49,14 +49,12 @@ router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
   const user = authStore.user;
 
-  // 1. No autenticado
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     return next({ path: "/login" });
   }
 
-  // Redirects using jwt payload
-
   if (user) {
+    console.log(user);
     if (!user.verified && to.path !== "/verify-email") {
       return next("/verify-email");
     }
