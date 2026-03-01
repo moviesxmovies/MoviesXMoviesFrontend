@@ -54,7 +54,6 @@ router.beforeEach((to, from, next) => {
   }
 
   if (user) {
-    console.log(user);
     if (!user.verified && to.path !== "/verify-email") {
       return next("/verify-email");
     }

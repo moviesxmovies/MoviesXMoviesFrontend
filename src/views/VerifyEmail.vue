@@ -14,19 +14,13 @@ const loading = ref(false);
 const error = ref('');
 const toast = useToast();
 const router = useRouter();
-const cooldown = ref(0);
 
 const sendVerificationCode = async () => {
-    if (cooldown.value > 0) {
-        toast.add({ severity: 'warn', summary: 'Warning', detail: `Please wait ${cooldown.value} seconds before resending the code`, life: 3000 });
-        return;
-    }
-
     try {
         await api.post(import.meta.env.VITE_URL_PROTOCOL + '/api/auth/resend-verification-email/');
         toast.add({ severity: 'success', summary: 'Success', detail: 'Verification code sent to your email', life: 3000 });
     } catch (error: any) {
-        toast.add({ severity: 'error', summary: 'Error', detail: error.response?.data?.error || 'Failed to send verification code', life: 3000 });
+        toast.add({ severity: 'warn', summary: 'Warn', detail: error.response?.data?.error || 'Failed to send verification code', life: 3000 });
     }
 }
 

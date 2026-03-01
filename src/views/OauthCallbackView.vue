@@ -1,11 +1,11 @@
 <script setup>
 import { onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import axios from "axios";
 import { useToast } from 'primevue/usetoast';
 import { useAuthStore } from '@/stores/authStore';
 
 import ProgressSpinner from 'primevue/progressspinner';
+import { api } from "@/composables/useAPI";
 
 const route = useRoute();
 const router = useRouter();
@@ -17,7 +17,7 @@ onMounted(async () => {
   if (!code) return router.push("/login");
 
   try {
-    const { data } = await axios.post(import.meta.env.VITE_URL_PROTOCOL + "/api/oauth/google/", { code: code });
+    const { data } = await api.post(import.meta.env.VITE_URL_PROTOCOL + "/api/oauth/google/", { code: code });
     toast.add({ severity: 'success', summary: 'Success', detail: 'Session started', life: 3000 });
     authStore.handleLogin(data.access, data.refresh);
   } catch (error) {
