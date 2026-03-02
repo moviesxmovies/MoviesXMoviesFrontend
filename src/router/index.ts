@@ -14,7 +14,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/verify-email",
-    component: () => import("../views/VerifyEmail.vue"),
+    component: () => import("../views/VerifyEmailView.vue"),
     meta: { requiresAuth: true },
   },
   {
