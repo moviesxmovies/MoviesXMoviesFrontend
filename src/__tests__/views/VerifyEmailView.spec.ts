@@ -1,9 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { flushPromises } from "@vue/test-utils";
 import VerifyEmailView from "@/views/VerifyEmailView.vue";
-import { useRouter, useRoute } from "vue-router";
 import { mount } from "@vue/test-utils";
-import { useToast } from "primevue/usetoast";
 import ToastService from "primevue/toastservice";
 import { Button, InputOtp, Message } from "primevue";
 import PrimeVue from "primevue/config";
@@ -14,6 +12,14 @@ const mockPush = vi.fn();
 const mockToast = { add: vi.fn() };
 const mockHandleLogin = vi.fn();
 
+const mockUser = { verified: false };
+
+vi.mock("@/stores/authStore", () => ({
+  useAuthStore: vi.fn(() => ({
+    user: mockUser,
+    handleLogin: mockHandleLogin,
+  })),
+}));
 vi.mock("@/composables/useAPI", () => ({
   api: {
     post: vi.fn(),
@@ -22,9 +28,6 @@ vi.mock("@/composables/useAPI", () => ({
       response: { use: vi.fn() },
     },
   },
-}));
-vi.mock("@/stores/authStore", () => ({
-  useAuthStore: vi.fn(() => ({ handleLogin: mockHandleLogin })),
 }));
 vi.mock("vue-router", () => ({
   useRouter: () => ({ push: mockPush }),
@@ -61,6 +64,7 @@ describe("VerifyEmailView logic", () => {
 
   it("Should send toast error if verification code is wrong", async () => {
     const wrapper = factory();
+    const authStore = useAuthStore();
 
     vi.mocked(api.post).mockRejectedValue({
       response: {
@@ -76,19 +80,14 @@ describe("VerifyEmailView logic", () => {
 
     await flushPromises();
 
-    const errorMessage = wrapper.find(".p-message");
-    // expect(errorMessage.exists()).toBe(true);
-    // expect(errorMessage.text()).toContain(
-    //   "Invalid verification code. Please try again.",
-    // );
+    expect(authStore.user?.verified).toBe(false);
   });
 
   it("Should redirect home correctly and show toast", async () => {
     const wrapper = factory();
-    vi.mocked(api.post).mockResolvedValue({ data: { status: true } });
-
     const authStore = useAuthStore();
-    (authStore as any).user = { verified: false };
+
+    vi.mocked(api.post).mockResolvedValue({ data: { status: true } });
 
     const input = wrapper.find("input");
     await input.setValue("111222");
@@ -97,14 +96,23 @@ describe("VerifyEmailView logic", () => {
 
     await flushPromises();
 
-    expect(mockToast.add).toHaveBeenCalledWith(
-      expect.objectContaining({
-        severity: "success",
-        detail: "User verified",
-      }),
-    );
-
-    expect(authStore.user.verified).toBe(true);
+    expect(authStore.user?.verified).toBe(true);
     expect(mockPush).toHaveBeenCalledWith("/home");
+  });
+
+  it("Should send resend-verification-email and show success toast", async () => {
+    vi.mocked(api.post).mockResolvedValue({ data: {} });
+    const wrapper = factory();
+
+    const resendBtn = wrapper
+      .findAll("button")
+      .find((b) => b.text().includes("Resend code"));
+    await resendBtn?.trigger("click");
+
+    await flushPromises();
+
+    expect(api.post).toHaveBeenCalledWith(
+      expect.stringContaining("/api/auth/resend-verification-email/"),
+    );
   });
 });

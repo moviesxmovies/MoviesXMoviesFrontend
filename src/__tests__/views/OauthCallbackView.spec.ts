@@ -1,9 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { mount, flushPromises } from "@vue/test-utils";
-import { useRouter, useRoute } from "vue-router";
+import { useRoute } from "vue-router";
 import OauthCallback from "@/views/OauthCallbackView.vue";
-import { useAuthStore } from "../../stores/authStore";
-import { useToast } from "primevue/usetoast";
 import { api } from "@/composables/useAPI";
 
 const mockPush = vi.fn();
