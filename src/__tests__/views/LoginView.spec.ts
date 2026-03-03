@@ -6,7 +6,8 @@ import ToastService from "primevue/toastservice";
 import LoginView from "../../views/LoginView.vue";
 import { api } from "../../composables/useAPI";
 import { Button, InputText, Password } from "primevue";
-import { useAuthStore } from '../../stores/authStore';
+import { useAuthStore } from "../../stores/authStore";
+import i18n from "../../i18n";
 
 let vi_storage: Record<string, string> = {};
 vi.stubGlobal("localStorage", {
@@ -49,7 +50,7 @@ describe("LoginView.vue", () => {
   const factory = () => {
     return mount(LoginView, {
       global: {
-        plugins: [PrimeVue, ToastService],
+        plugins: [PrimeVue, ToastService, i18n],
         components: { Button, InputText, Password },
       },
     });
@@ -62,7 +63,6 @@ describe("LoginView.vue", () => {
       data: { access: "ok", refresh: "ok" },
     });
 
-    
     const usernameInput = wrapper.findComponent(InputText);
     const passwordInput = wrapper.findComponent(Password);
 

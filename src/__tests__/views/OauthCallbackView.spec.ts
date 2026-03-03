@@ -3,6 +3,9 @@ import { mount, flushPromises } from "@vue/test-utils";
 import { useRoute } from "vue-router";
 import OauthCallback from "@/views/OauthCallbackView.vue";
 import { api } from "@/composables/useAPI";
+import PrimeVue from "primevue/config";
+import ToastService from "primevue/toastservice";
+import i18n from "@/i18n";
 
 const mockPush = vi.fn();
 const mockToast = { add: vi.fn() };
@@ -39,10 +42,18 @@ describe("OauthCallback logic", () => {
     vi.stubEnv("VITE_URL_PROTOCOL", "http://localhost:8000");
   });
 
+  const factory = () => {
+    return mount(OauthCallback, {
+      global: {
+        plugins: [PrimeVue, ToastService, i18n],
+      },
+    });
+  };
+
   it("Should redirect to /login if URL doesn't return code", async () => {
     vi.mocked(useRoute).mockReturnValue({ query: {} } as any);
 
-    mount(OauthCallback);
+    factory();
 
     expect(mockPush).toHaveBeenCalledWith("/login");
     expect(api.post).not.toHaveBeenCalled();
@@ -57,7 +68,7 @@ describe("OauthCallback logic", () => {
       data: { access: "token-acc", refresh: "token-ref" },
     });
 
-    mount(OauthCallback);
+    factory();
     await flushPromises();
 
     expect(api.post).toHaveBeenCalledWith(
@@ -79,7 +90,7 @@ describe("OauthCallback logic", () => {
       response: { status: 400 },
     });
 
-    mount(OauthCallback);
+    factory();
     await flushPromises();
 
     expect(mockToast.add).toHaveBeenCalledWith(

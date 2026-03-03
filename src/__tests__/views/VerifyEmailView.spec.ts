@@ -7,6 +7,7 @@ import { Button, InputOtp, Message } from "primevue";
 import PrimeVue from "primevue/config";
 import { api } from "@/composables/useAPI";
 import { useAuthStore } from "../../stores/authStore";
+import i18n from "@/i18n";
 
 const mockPush = vi.fn();
 const mockToast = { add: vi.fn() };
@@ -43,7 +44,7 @@ describe("VerifyEmailView logic", () => {
   const factory = () => {
     return mount(VerifyEmailView, {
       global: {
-        plugins: [PrimeVue, ToastService],
+        plugins: [PrimeVue, ToastService, i18n],
         components: { InputOtp, Message, Button },
       },
     });
