@@ -9,7 +9,7 @@ export const useLangStore = defineStore('lang', {
         setLanguage(lang: string) {
             this.language = lang;
             // TODO: send to backend
-            (i18n.global.locale.value as any) = lang;
+            (i18n.global.locale.value as any) = lang.toLowerCase();
             localStorage.setItem('language', lang);
         }
     }
