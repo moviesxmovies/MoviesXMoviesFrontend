@@ -1,0 +1,19 @@
+{
+  "components": {
+    "oauthButton": "Sign in with {0}"
+  },
+  "home": {
+    "welcome": "Welcome to MoviesXMovies!"
+  },
+  "login": {
+    "title": "Login",
+    "username": "Username",
+    "password": "Password"
+  },
+  "verify": {
+    "title": "MOVIESXMOVIES",
+    "description": "We've sent a 6 digit code to your mail direction.",
+    "button": "VERIFY CODE",
+    "resend": "Haven't received the code? Resend code"
+  }
+}

@@ -6,9 +6,9 @@ import Material from '@primeuix/themes/material';
 import 'primeflex/primeflex.css'
 import 'primeflex/themes/primeone-light.css'
 import 'primeicons/primeicons.css'
-import { ToastService } from 'primevue'
-
+import i18n from './i18n'
 import App from './App.vue'
+import { ToastService } from 'primevue';
 
 const app = createApp(App)
 
@@ -17,6 +17,7 @@ app.use(PrimeVue, {
     preset: Material,
   },
 })
+app.use(i18n)
 app.use(createPinia())
 app.use(router)
 app.use(ToastService)

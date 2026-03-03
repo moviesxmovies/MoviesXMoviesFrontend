@@ -1,3 +1,7 @@
+<script setup lang="ts">
+
+</script>
+
 <template>
-    <h1 class="text-3xl font-bold">HOME</h1>
+    <h1 class="text-3xl font-bold">{{ $t('home.welcome') }}</h1>
 </template>
