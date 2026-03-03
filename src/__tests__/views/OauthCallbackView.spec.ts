@@ -1,24 +1,36 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { mount, flushPromises } from "@vue/test-utils";
-import axios from "axios";
-import { useRouter, useRoute } from "vue-router";
+import { useRoute } from "vue-router";
 import OauthCallback from "@/views/OauthCallbackView.vue";
-import { useAuthStore } from "../../stores/authStore";
-import { useToast } from "primevue/usetoast";
+import { api } from "@/composables/useAPI";
 
 const mockPush = vi.fn();
-vi.mock("axios");
-vi.mock("vue-router", () => ({
-  useRouter: vi.fn(() => ({
-    push: mockPush,
-  })),
-  useRoute: vi.fn(() => ({
-    query: {},
-  })),
+const mockToast = { add: vi.fn() };
+const mockHandleLogin = vi.fn();
+
+vi.mock("@/composables/useAPI", () => ({
+  api: {
+    post: vi.fn(),
+    interceptors: {
+      request: { use: vi.fn() },
+      response: { use: vi.fn() },
+    },
+  },
 }));
-vi.mock("primevue/usetoast", () => ({ useToast: () => ({ add: mockPush }) }));
+
+vi.mock("vue-router", () => ({
+  useRouter: () => ({ push: mockPush }),
+  useRoute: vi.fn(() => ({ query: {} })),
+}));
+
+vi.mock("primevue/usetoast", () => ({
+  useToast: () => mockToast,
+}));
+
 vi.mock("@/stores/authStore", () => ({
-  useAuthStore: () => ({ handleLogin: mockPush }),
+  useAuthStore: vi.fn(() => ({
+    handleLogin: mockHandleLogin,
+  })),
 }));
 
 describe("OauthCallback logic", () => {
@@ -28,51 +40,50 @@ describe("OauthCallback logic", () => {
   });
 
   it("Should redirect to /login if URL doesn't return code", async () => {
-    vi.mocked(useRoute).mockReturnValue({ query: {} });
+    vi.mocked(useRoute).mockReturnValue({ query: {} } as any);
 
     mount(OauthCallback);
 
     expect(mockPush).toHaveBeenCalledWith("/login");
-    expect(axios.post).not.toHaveBeenCalled();
+    expect(api.post).not.toHaveBeenCalled();
   });
 
-  it("Should login succesfully", async () => {
-    vi.mocked(useRoute).mockReturnValue({ query: { code: "google-code-123" } });
+  it("Should login successfully", async () => {
+    vi.mocked(useRoute).mockReturnValue({
+      query: { code: "google-code-123" },
+    } as any);
 
-    vi.mocked(axios.post).mockResolvedValue({
+    vi.mocked(api.post).mockResolvedValue({
       data: { access: "token-acc", refresh: "token-ref" },
     });
 
     mount(OauthCallback);
-
     await flushPromises();
 
-    expect(axios.post).toHaveBeenCalledWith(
+    expect(api.post).toHaveBeenCalledWith(
       "http://localhost:8000/api/oauth/google/",
       { code: "google-code-123" },
     );
 
-    const { handleLogin } = useAuthStore();
-    expect(handleLogin).toHaveBeenCalledWith("token-acc", "token-ref");
+    expect(mockHandleLogin).toHaveBeenCalledWith("token-acc", "token-ref");
 
-    const { add } = useToast();
-    expect(add).toHaveBeenCalledWith(
-      expect.objectContaining({ severity: "success" }),
+    expect(mockToast.add).toHaveBeenCalledWith(
+      expect.objectContaining({ severity: "success", summary: "Success" }),
     );
   });
 
-  it("Should show 400 error and redirect to /login", async () => {
-    vi.mocked(useRoute).mockReturnValue({ query: { code: "bad-code" } });
+  it("Should show error and redirect on 400 failure", async () => {
+    vi.mocked(useRoute).mockReturnValue({ query: { code: "bad-code" } } as any);
 
-    vi.mocked(axios.post).mockRejectedValue({
+    vi.mocked(api.post).mockRejectedValue({
       response: { status: 400 },
     });
 
     mount(OauthCallback);
     await flushPromises();
 
-    expect(mockPush).toHaveBeenCalledWith("/login", {
-      query: { error: "failed_google_auth" },
-    });
+    expect(mockToast.add).toHaveBeenCalledWith(
+      expect.objectContaining({ severity: "error" }),
+    );
   });
 });

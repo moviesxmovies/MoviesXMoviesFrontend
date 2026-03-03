@@ -3,7 +3,6 @@ import { ref } from 'vue';
 import { z } from 'zod';
 import { useAuthStore } from '@/stores/authStore';
 import { api } from '@/composables/useAPI';
-import { useRouter } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
 import { Button, Card, InputText, Password } from 'primevue';
 import { loginWithGoogle } from '@/composables/useOAUTH';
@@ -24,7 +23,6 @@ const loading = ref(false);
 
 const toast = useToast();
 const authStore = useAuthStore();
-const router = useRouter();
 
 const validate = () => {
     const result = loginSchema.safeParse(form.value);

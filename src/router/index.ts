@@ -14,7 +14,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/verify-email",
-    component: () => import("../views/VerifyEmail.vue"),
+    component: () => import("../views/VerifyEmailView.vue"),
     meta: { requiresAuth: true },
   },
   {
@@ -49,12 +49,9 @@ router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
   const user = authStore.user;
 
-  // 1. No autenticado
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     return next({ path: "/login" });
   }
-
-  // Redirects using jwt payload
 
   if (user) {
     if (!user.verified && to.path !== "/verify-email") {
