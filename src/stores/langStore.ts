@@ -1,5 +1,4 @@
 import i18n from '@/i18n';
-import type { Lang } from '@/types/Langs';
 import { defineStore } from 'pinia';
 
 export const useLangStore = defineStore('lang', {
@@ -7,10 +6,10 @@ export const useLangStore = defineStore('lang', {
         language: localStorage.getItem('language') || 'en'
     }),
     actions: {
-        setLanguage(lang: Lang) {
+        setLanguage(lang: string) {
             this.language = lang;
             // TODO: send to backend
-            i18n.global.locale.value = lang;
+            (i18n.global.locale.value as any) = lang;
             localStorage.setItem('language', lang);
         }
     }
