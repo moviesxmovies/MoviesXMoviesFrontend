@@ -6,7 +6,7 @@ import { api } from '@/composables/useAPI';
 import { useToast } from 'primevue/usetoast';
 import { Button, Card, InputText, Password } from 'primevue';
 import { loginWithGoogle } from '@/composables/useOAUTH';
-import OauthButtonComponent from '@/components/oauthButtonComponent.vue';
+import OauthButtonComponent from '@/components/common/oauthButtonComponent.vue';
 
 const loginSchema = z.object({
     username: z.string().min(1, 'Username is required'),
@@ -64,19 +64,19 @@ const handleLogin = async () => {
 <template>
     <div class="flex justify-content-center align-items-center min-h-screen bg-neutral-100">
         <Card style="width: 24rem">
-            <template #title> Login </template>
+            <template #title> {{ $t('login.title') }} </template>
             <template #content>
                 <div class="flex flex-column gap-4">
 
                     <div class="flex flex-column gap-1">
-                        <label for="username" class="font-semibold">Username</label>
+                        <label for="username" class="font-semibold">{{ $t('login.username') }}</label>
                         <InputText id="username" v-model="form.username" :class="{ 'p-invalid': errors.username }"
                             @input="errors.username = ''" />
                         <small v-if="errors.username" class="p-error">{{ errors.username }}</small>
                     </div>
 
                     <div class="flex flex-column gap-1">
-                        <label for="password" class="font-semibold">Password</label>
+                        <label for="password" class="font-semibold">{{ $t('login.password') }}</label>
                         <Password id="password" v-model="form.password" :class="{ 'p-invalid': errors.password }"
                             :feedback="false" toggleMask @input="errors.password = ''" />
                         <small v-if="errors.password" class="p-error">{{ errors.password }}</small>

@@ -83,7 +83,7 @@ const handleVerification = async () => {
         <h1
           class="text-accent text-xl sm:text-2xl font-black tracking-widest mb-2"
         >
-          MOVIESXMOVIES
+          {{ $t('verify.title') }}
         </h1>
         <div
           class="h-1 w-12 bg-gradient-to-r from-[#2f27ce] to-[#bb3dff] mx-auto rounded-full"
@@ -91,7 +91,7 @@ const handleVerification = async () => {
       </div>
       <div class="text-center mb-6 sm:mb-8">
         <p class="text-[#bcbbdd] text-sm sm:text-base">
-          We've sent a 6 digit code to your mail direction. Enter it below.
+          {{ $t('verify.description') }}
         </p>
       </div>
       <form
@@ -135,7 +135,7 @@ const handleVerification = async () => {
           @click="sendVerificationCode"
           class="mt-4 sm:mt-6 text-[#bcbbdd] text-xs hover:text-[#f2f2f2] transition-colors underline decoration-[#3a31d8]"
         >
-          Haven't received the code? Resend code
+          {{ $t('verify.resend') }}
         </Button>
       </form>
     </div>
