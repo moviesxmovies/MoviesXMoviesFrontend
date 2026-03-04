@@ -8,7 +8,7 @@ export const useLangStore = defineStore('lang', {
     actions: {
         setLanguage(lang: string) {
             this.language = lang;
-            // TODO: send to backend
+            // Method for sending to backend soon
             (i18n.global.locale.value as any) = lang.toLowerCase();
             localStorage.setItem('language', lang);
         }
