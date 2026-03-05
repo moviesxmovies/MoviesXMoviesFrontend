@@ -30,6 +30,13 @@ vi.mock("@/composables/useAPI", () => ({
     },
   },
 }));
+vi.mock("@/config", () => ({
+  config: {
+    googleClientId: "test-client-id",
+    callbackUri: "http://localhost:5173",
+    apiUrl: "http://localhost:8000/api",
+  },
+}));
 vi.mock("vue-router", () => ({
   useRouter: () => ({ push: mockPush }),
   useRoute: vi.fn(() => ({ query: {} })),
@@ -38,7 +45,6 @@ vi.mock("primevue/usetoast", () => ({ useToast: () => mockToast }));
 describe("VerifyEmailView logic", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.stubEnv("VITE_API_URL", "http://localhost:8000/api");
   });
 
   const factory = () => {

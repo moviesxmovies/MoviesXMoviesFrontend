@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { loginWithGoogle } from "../../composables/useOAUTH.ts";
 
-vi.mock('@/config', () => ({
+vi.mock("@/config", () => ({
   config: {
-    googleClientId: 'test-client-id',
-    callbackUri: 'http://localhost:5173',
-    apiUrl: 'http://localhost:8000',
-  }
-}))
+    googleClientId: "test-client-id",
+    callbackUri: "http://localhost:5173",
+    apiUrl: "http://localhost:8000/api",
+  },
+}));
 
 describe("loginWithGoogle", () => {
   beforeEach(() => {

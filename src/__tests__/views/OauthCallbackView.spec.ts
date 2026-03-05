@@ -11,6 +11,14 @@ const mockPush = vi.fn();
 const mockToast = { add: vi.fn() };
 const mockHandleLogin = vi.fn();
 
+vi.mock("@/config", () => ({
+  config: {
+    googleClientId: "test-client-id",
+    callbackUri: "http://localhost:5173",
+    apiUrl: "http://localhost:8000/api",
+  },
+}));
+
 vi.mock("@/composables/useAPI", () => ({
   api: {
     post: vi.fn(),
@@ -39,7 +47,6 @@ vi.mock("@/stores/authStore", () => ({
 describe("OauthCallback logic", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.stubEnv("VITE_API_URL", "http://localhost:8000/api");
   });
 
   const factory = () => {
