@@ -3,7 +3,8 @@
     "oauthButton": "Sign in with {0}"
   },
   "home": {
-    "welcome": "Welcome to MoviesXMovies!"
+    "welcome": "Welcome to MoviesXMovies!",
+    "linkText": "Click here to login"
   },
   "login": {
     "title": "Login",
