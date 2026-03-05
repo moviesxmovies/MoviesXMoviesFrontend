@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useToast } from 'primevue/usetoast';
@@ -20,13 +20,13 @@ onMounted(async () => {
     const { data } = await api.post(import.meta.env.VITE_URL_PROTOCOL + "/api/oauth/google/", { code: code });
     toast.add({ severity: 'success', summary: 'Success', detail: 'Session started', life: 3000 });
     authStore.handleLogin(data.access, data.refresh);
-  } catch (error) {
+  } catch (error: any) {
     const status = error.response?.status;
     let detail = "Failed to authenticate with Google";
     if (status === 400) {
       detail = "Invalid Google OAuth code";
     }
-    router.push("/login", { query: { error: "failed_google_auth" } });
+    router.push("/login");
     toast.add({ severity: 'error', summary: 'Error', detail, life: 5000 });
   }
 });
