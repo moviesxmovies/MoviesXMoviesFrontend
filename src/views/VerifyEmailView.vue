@@ -7,6 +7,7 @@ import { useToast } from "primevue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/authStore";
 import { api } from "@/composables/useAPI";
+import { config } from '@/config';
 
 const verificationCode = ref("");
 const authStore = useAuthStore();
@@ -18,7 +19,7 @@ const router = useRouter();
 const sendVerificationCode = async () => {
   try {
     await api.post(
-      import.meta.env.VITE_API_URL +
+      config.apiUrl +
         "/auth/resend-verification-email/",
     );
     toast.add({
@@ -48,7 +49,7 @@ const handleVerification = async () => {
 
   try {
     const { data } = await api.post(
-      import.meta.env.VITE_API_URL + "/auth/verify/",
+      config.apiUrl + "/auth/verify/",
       { verification_code: verificationCode.value },
     );
     if (data.status && authStore.user) {

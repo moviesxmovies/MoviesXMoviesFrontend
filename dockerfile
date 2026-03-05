@@ -6,9 +6,12 @@ COPY . .
 RUN npm run build
 
 FROM alpine:latest
-RUN apk add --no-cache coreutils
+RUN apk add --no-cache coreutils bash
 
 WORKDIR /app
 COPY --from=build-stage /app/dist /app/
 
-CMD ["sh", "-c", "echo 'Sync complete' && tail -f /dev/null"]
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+CMD ["/entrypoint.sh"]

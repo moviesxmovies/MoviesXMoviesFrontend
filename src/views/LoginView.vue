@@ -7,6 +7,7 @@ import { useToast } from 'primevue/usetoast';
 import { Button, Card, InputText, Password } from 'primevue';
 import { loginWithGoogle } from '@/composables/useOAUTH';
 import OauthButtonComponent from '@/components/common/oauthButtonComponent.vue';
+import { config } from '@/config';
 
 const loginSchema = z.object({
     username: z.string().min(1, 'Username is required'),
@@ -44,7 +45,7 @@ const handleLogin = async () => {
 
     loading.value = true;
     try {
-        const { data } = await api.post(import.meta.env.VITE_API_URL + '/auth/login/', form.value);
+        const { data } = await api.post(config.apiUrl + '/auth/login/', form.value);
         toast.add({ severity: 'success', summary: 'Success', detail: 'Session started', life: 3000 });
         authStore.handleLogin(data.access, data.refresh);
     } catch (error: any) {

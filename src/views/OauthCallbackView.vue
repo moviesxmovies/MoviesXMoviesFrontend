@@ -6,6 +6,7 @@ import { useAuthStore } from '@/stores/authStore';
 
 import ProgressSpinner from 'primevue/progressspinner';
 import { api } from "@/composables/useAPI";
+import { config } from '@/config';
 
 const route = useRoute();
 const router = useRouter();
@@ -17,7 +18,7 @@ onMounted(async () => {
   if (!code) return router.push("/login");
 
   try {
-    const { data } = await api.post(import.meta.env.VITE_API_URL + "/oauth/google/", { code: code });
+    const { data } = await api.post(config.apiUrl + "/oauth/google/", { code: code });
     toast.add({ severity: 'success', summary: 'Success', detail: 'Session started', life: 3000 });
     authStore.handleLogin(data.access, data.refresh);
   } catch (error: any) {

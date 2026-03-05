@@ -1,12 +1,13 @@
 import axios from 'axios';
 import { useAuthStore } from '../stores/authStore';
+import { config } from '@/config'
 
 const refreshInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_URL,
+    baseURL: config.apiUrl,
     withCredentials: true,
 });
 export const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL,
+    baseURL: config.apiUrl,
     withCredentials: true,
 });
 
