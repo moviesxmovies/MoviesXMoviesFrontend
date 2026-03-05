@@ -9,13 +9,13 @@
   --font-sans: "Inter", sans-serif;
   --font-display: "Inter", sans-serif;
 
-  --text-sm: 0.750rem;
+  --text-sm: 0.75rem;
   --text-base: 1rem;
   --text-xl: 1.333rem;
   --text-2xl: 1.777rem;
   --text-3xl: 2.369rem;
   --text-4xl: 3.158rem;
-  --text-5xl: 4.210rem;
+  --text-5xl: 4.21rem;
 
   --font-weight-normal: 400;
   --font-weight-bold: 700;
@@ -35,19 +35,4 @@
   --primary: #3a31d8;
   --secondary: #232244;
   --accent: #7e00c2;
-}
-
-@layer primevue {
-  :root {
-    --p-primary-color: var(--primary);
-    --p-primary-contrast-color: var(--background);
-    --p-content-background: var(--background);
-    --p-text-color: var(--text);
-  }
-
-  .dark {
-    --p-primary-color: var(--primary);
-    --p-content-background: var(--background);
-    --p-text-color: var(--text);
-  }
 }
