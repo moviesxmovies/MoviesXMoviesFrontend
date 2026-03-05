@@ -17,7 +17,7 @@ api.interceptors.request.use(async (config) => {
     if (authStore.token && authStore.refreshToken) {
         if (authStore.isTokenExpired()) {
             try {
-                const { data } = await refreshInstance.post('/api/auth/refresh/', {
+                const { data } = await refreshInstance.post('/auth/refresh/', {
                     refresh: authStore.refreshToken,
                 });
 

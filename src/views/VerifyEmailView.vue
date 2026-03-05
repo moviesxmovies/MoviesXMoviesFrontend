@@ -18,8 +18,8 @@ const router = useRouter();
 const sendVerificationCode = async () => {
   try {
     await api.post(
-      import.meta.env.VITE_URL_PROTOCOL +
-        "/api/auth/resend-verification-email/",
+      import.meta.env.VITE_API_URL +
+        "/auth/resend-verification-email/",
     );
     toast.add({
       severity: "success",
@@ -48,7 +48,7 @@ const handleVerification = async () => {
 
   try {
     const { data } = await api.post(
-      import.meta.env.VITE_URL_PROTOCOL + "/api/auth/verify/",
+      import.meta.env.VITE_API_URL + "/auth/verify/",
       { verification_code: verificationCode.value },
     );
     if (data.status && authStore.user) {

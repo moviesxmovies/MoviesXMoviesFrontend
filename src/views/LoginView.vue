@@ -44,7 +44,7 @@ const handleLogin = async () => {
 
     loading.value = true;
     try {
-        const { data } = await api.post(import.meta.env.VITE_URL_PROTOCOL + '/api/auth/login/', form.value);
+        const { data } = await api.post(import.meta.env.VITE_API_URL + '/auth/login/', form.value);
         toast.add({ severity: 'success', summary: 'Success', detail: 'Session started', life: 3000 });
         authStore.handleLogin(data.access, data.refresh);
     } catch (error: any) {

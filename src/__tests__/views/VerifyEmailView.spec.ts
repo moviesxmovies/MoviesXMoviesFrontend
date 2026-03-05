@@ -38,7 +38,7 @@ vi.mock("primevue/usetoast", () => ({ useToast: () => mockToast }));
 describe("VerifyEmailView logic", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.stubEnv("VITE_URL_PROTOCOL", "http://localhost:8000");
+    vi.stubEnv("VITE_API_URL", "http://localhost:8000/api");
   });
 
   const factory = () => {

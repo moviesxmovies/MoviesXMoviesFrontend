@@ -39,7 +39,7 @@ vi.mock("@/stores/authStore", () => ({
 describe("OauthCallback logic", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.stubEnv("VITE_URL_PROTOCOL", "http://localhost:8000");
+    vi.stubEnv("VITE_API_URL", "http://localhost:8000/api");
   });
 
   const factory = () => {
