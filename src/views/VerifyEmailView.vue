@@ -7,7 +7,7 @@ import { useToast } from "primevue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/authStore";
 import { api } from "@/composables/useAPI";
-import { config } from '@/config';
+import { config } from "@/config";
 
 const verificationCode = ref("");
 const authStore = useAuthStore();
@@ -18,10 +18,7 @@ const router = useRouter();
 
 const sendVerificationCode = async () => {
   try {
-    await api.post(
-      config.apiUrl +
-        "/auth/resend-verification-email/",
-    );
+    await api.post(config.apiUrl + "/auth/resend-verification-email/");
     toast.add({
       severity: "success",
       summary: "Success",
@@ -48,12 +45,14 @@ const handleVerification = async () => {
   error.value = "";
 
   try {
-    const { data } = await api.post(
-      config.apiUrl + "/auth/verify/",
-      { verification_code: verificationCode.value },
-    );
+    const { data } = await api.post(config.apiUrl + "/auth/verify/", {
+      verification_code: verificationCode.value,
+    });
     if (data.status && authStore.user) {
-      authStore.user.verified = true;
+      const refreshResponse = await api.post(config.apiUrl + "/auth/refresh/", {
+        refresh: authStore.refreshToken,
+      });
+      authStore.setTokens(refreshResponse.data.access);
       toast.add({
         severity: "success",
         summary: "Success",
@@ -84,7 +83,7 @@ const handleVerification = async () => {
         <h1
           class="text-accent text-xl sm:text-2xl font-black tracking-widest mb-2"
         >
-          {{ $t('verify.title') }}
+          {{ $t("verify.title") }}
         </h1>
         <div
           class="h-1 w-12 bg-gradient-to-r from-[#2f27ce] to-[#bb3dff] mx-auto rounded-full"
@@ -92,7 +91,7 @@ const handleVerification = async () => {
       </div>
       <div class="text-center mb-6 sm:mb-8">
         <p class="text-[#bcbbdd] text-sm sm:text-base">
-          {{ $t('verify.description') }}
+          {{ $t("verify.description") }}
         </p>
       </div>
       <form
@@ -136,7 +135,7 @@ const handleVerification = async () => {
           @click="sendVerificationCode"
           class="mt-4 sm:mt-6 text-[#bcbbdd] text-xs hover:text-[#f2f2f2] transition-colors underline decoration-[#3a31d8]"
         >
-          {{ $t('verify.resend') }}
+          {{ $t("verify.resend") }}
         </Button>
       </form>
     </div>

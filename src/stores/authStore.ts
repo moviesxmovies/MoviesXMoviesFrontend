@@ -43,6 +43,6 @@ export const useAuthStore = defineStore('auth', {
         handleLogin(access: string, refresh?: string) {
             this.setTokens(access, refresh);
             router.push('/home');
-        }
+        },
     }
 });
