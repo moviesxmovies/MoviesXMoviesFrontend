@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import Card from "@/components/layout/appCardComponent.vue";
+import Card from "@/components/appCardComponent.vue";
 import { zodResolver } from "@primevue/forms/resolvers/zod";
 import z from "zod";
 import { Form, FormField, type FormSubmitEvent } from "@primevue/forms";

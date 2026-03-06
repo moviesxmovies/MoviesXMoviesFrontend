@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Button } from "primevue";
 import { useRouter } from "vue-router";
-import Card from "@/components/layout/appCardComponent.vue";
+import Card from "@/components/appCardComponent.vue";
 const router = useRouter();
 </script>
 

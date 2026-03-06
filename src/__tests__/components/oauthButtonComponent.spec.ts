@@ -1,6 +1,6 @@
 import { mount } from "@vue/test-utils";
 import { describe, it, expect } from "vitest";
-import OauthButtonComponent from "@/components/common/oauthButtonComponent.vue";
+import OauthButtonComponent from "@/components/oauthButtonComponent.vue";
 import i18n from "@/i18n";
 
 describe("oauthButtonComponent", () => {

@@ -6,7 +6,7 @@ import { api } from '@/composables/useAPI';
 import { useToast } from 'primevue/usetoast';
 import { Button, Card, InputText, Password } from 'primevue';
 import { loginWithGoogle } from '@/composables/useOAUTH';
-import OauthButtonComponent from '@/components/common/oauthButtonComponent.vue';
+import OauthButtonComponent from '@/components/oauthButtonComponent.vue';
 import { config } from '@/config';
 
 const loginSchema = z.object({
