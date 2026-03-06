@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Button } from "primevue";
 import { useRouter } from "vue-router";
-import AppCardComponent from "@/components/layout/appCardComponent.vue";
+import Card from "@/components/layout/appCardComponent.vue";
 const router = useRouter();
 </script>
 
@@ -10,8 +10,8 @@ const router = useRouter();
     <h1 class="text-5xl">{{ $t("home.welcome") }}</h1>
   </div>
   <div class="flex m-auto justify-center max-w-md">
-    <AppCardComponent class="flex m-auto justify-center">
+    <Card class="flex m-auto justify-center">
       <Button @click="router.push('/login')">{{ $t("home.linkText") }}</Button>
-    </AppCardComponent>
+    </Card>
   </div>
 </template>
