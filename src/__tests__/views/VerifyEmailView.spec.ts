@@ -12,13 +12,15 @@ import i18n from "@/i18n";
 const mockPush = vi.fn();
 const mockToast = { add: vi.fn() };
 const mockHandleLogin = vi.fn();
-
-const mockUser = { verified: false };
+const mockUserContainer = { user: { verified: false } };
+const mockSetTokens = vi.fn();
 
 vi.mock("@/stores/authStore", () => ({
   useAuthStore: vi.fn(() => ({
-    user: mockUser,
+    get user() { return mockUserContainer.user; },
     handleLogin: mockHandleLogin,
+    setTokens: mockSetTokens,
+    refreshToken: "refresh-token",
   })),
 }));
 vi.mock("@/composables/useAPI", () => ({
@@ -91,16 +93,19 @@ describe("VerifyEmailView logic", () => {
   });
 
   it("Should redirect home correctly and show toast", async () => {
+    mockUserContainer.user = { verified: false };
+
+    vi.mocked(api.post)
+      .mockResolvedValueOnce({ data: { status: true } })
+      .mockResolvedValueOnce({ data: { refresh: "refresh-token" } })
+      .mockResolvedValueOnce({ data: { access: "access-token" } });
+
     const wrapper = factory();
     const authStore = useAuthStore();
 
-    vi.mocked(api.post).mockResolvedValue({ data: { status: true } });
-
     const input = wrapper.find("input");
     await input.setValue("111222");
-
     await wrapper.find("form").trigger("submit.prevent");
-
     await flushPromises();
 
     expect(authStore.user?.verified).toBe(true);

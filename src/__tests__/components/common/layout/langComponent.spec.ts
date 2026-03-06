@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
-import LangComponent from '@/components/layout/langComponent.vue'
+import LangComponent from '@/components/common/langComponent.vue'
 
 vi.mock('@/stores/langStore', () => ({
     useLangStore: () => ({

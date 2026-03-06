@@ -53,6 +53,7 @@ const handleVerification = async () => {
         refresh: authStore.refreshToken,
       });
       authStore.setTokens(refreshResponse.data.access);
+      authStore.user.verified = true;
       toast.add({
         severity: "success",
         summary: "Success",

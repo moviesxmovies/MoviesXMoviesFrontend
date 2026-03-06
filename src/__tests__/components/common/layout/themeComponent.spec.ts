@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { setActivePinia, createPinia } from 'pinia'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import ThemeToggle from '@/components/layout/themeComponent.vue'
+import ThemeToggle from '@/components/common/themeComponent.vue'
 
 const mockStore = {
   theme: 'light',
