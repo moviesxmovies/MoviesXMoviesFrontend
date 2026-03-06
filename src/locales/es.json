@@ -1,5 +1,46 @@
 {
+  "components": {
+    "selectLanguage": "Selecciona un idioma",
+    "oauthButton": "Iniciar sesión con {0}",
+    "changeTheme": "Cambiar tema",
+    "form": {
+      "requiredUsername": "El nombre de usuario es obligatorio",
+      "requiredPassword": "La contraseña es obligatoria",
+      "submit": "Iniciar sesión"
+    }
+  },
+  "login": {
+    "toast": {
+      "success": "Sesión iniciada",
+      "connectionError": "Error al iniciar sesión con {0}. Por favor, inténtalo de nuevo.",
+      "invalidCredentials": "Usuario o contraseña incorrectos",
+      "accessDenied": "Acceso denegado"
+    },
+    "title": "Iniciar sesión",
+    "username": "Usuario",
+    "password": "Contraseña"
+  },
+  "notFound": {
+    "title": "404 - No encontrado",
+    "description": "La página que buscas no existe.",
+    "linkText": "Volver al inicio"
+  },
+  "oauth": {
+    "toast": {
+      "success": "Sesión iniciada",
+      "connectionError": "Error al iniciar sesión con {0}. Por favor, inténtalo de nuevo.",
+      "invalidCode": "Código de {0} inválido"
+    },
+    "loading": "Cargando..."
+  },
   "home": {
-    "welcome": "¡Bienvenido a MoviesXMovies!"
+    "welcome": "¡Bienvenido a MoviesXMovies!",
+    "linkText": "Haz clic aquí para iniciar sesión"
+  },
+  "verify": {
+    "title": "MOVIESXMOVIES",
+    "description": "Hemos enviado un código de 6 dígitos a tu dirección de correo.",
+    "button": "VERIFICAR CÓDIGO",
+    "resend": "¿No has recibido el código? Reenviar código"
   }
 }
