@@ -10,10 +10,17 @@ import {
   InputIcon,
   InputText,
   Password,
+  useToast,
 } from "primevue";
 import { defineComponent, h } from "vue";
 import { api } from "@/composables/useAPI";
 import { config } from "@/config";
+import { useAuthStore } from "@/stores/authStore";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+const authStore = useAuthStore();
+const toast = useToast();
 
 const FieldMsg = defineComponent({
   props: { field: Object },
@@ -74,12 +81,61 @@ const schema = z
 
 const resolver = zodResolver(schema);
 
+interface RegisterPayload {
+  first_name: string;
+  last_name: string;
+  username: string;
+  email: string;
+  password: string;
+}
+
+interface LoginResponse {
+  access: string;
+  refresh: string;
+}
+
 const onFormSubmit = async ({
   valid,
   values,
 }: FormSubmitEvent<Record<string, any>>) => {
   if (!valid) return;
-  await api.post(config.apiUrl + "/auth/signup/", values);
+
+  try {
+    await registerUser(values as RegisterPayload);
+    await loginUser(values as RegisterPayload);
+
+    toast.add({
+      severity: "success",
+      summary: "Welcome!",
+      detail: "Your account has been created",
+      life: 3000,
+    });
+
+    router.push("/home");
+  } catch (error: any) {
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: error.response?.data?.detail || "Registration failed",
+      life: 5000,
+    });
+  }
+};
+
+const registerUser = async (values: RegisterPayload) => {
+  const { data } = await api.post(config.apiUrl + "/auth/signup/", values);
+  return data;
+};
+
+const loginUser = async (values: RegisterPayload) => {
+  const { data } = await api.post<LoginResponse>(
+    config.apiUrl + "/auth/login/",
+    {
+      username: values.username,
+      password: values.password,
+    },
+  );
+  authStore.handleLogin(data.access, data.refresh);
 };
 </script>
 
