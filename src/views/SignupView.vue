@@ -13,11 +13,13 @@ import {
   useToast,
 } from "primevue";
 import { defineComponent, h } from "vue";
-import { api } from "@/composables/useAPI";
-import { config } from "@/config";
 import { useAuthStore } from "@/stores/authStore";
 import { useRouter } from "vue-router";
-import type { LoginResponse, RegisterPayload } from "@/types";
+import type { LoginPayload, RegisterPayload } from "@/types";
+import {
+  handleLogin,
+  handleRegister,
+} from "@/repositories/auth/authRepository";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -89,8 +91,12 @@ const onFormSubmit = async ({
   if (!valid) return;
 
   try {
-    await registerUser(values as RegisterPayload);
-    await loginUser(values as RegisterPayload);
+    await handleRegister(values as RegisterPayload);
+    const loginValues = {
+      username: values.username,
+      password: values.password,
+    } as LoginPayload;
+    await handleLogin(loginValues);
 
     toast.add({
       severity: "success",
@@ -108,23 +114,6 @@ const onFormSubmit = async ({
       life: 5000,
     });
   }
-};
-
-const registerUser = async (values: RegisterPayload) => {
-  const { data } = await api.post(config.apiUrl + "/auth/signup/", values);
-  return data;
-};
-
-const loginUser = async (values: RegisterPayload) => {
-  const { data } = await api.post<LoginResponse>(
-    config.apiUrl + "/auth/login/",
-    {
-      username: values.username,
-      password: values.password,
-    },
-  );
-  authStore.setTokens(data.access, data.refresh);
-  router.push("/home");
 };
 </script>
 

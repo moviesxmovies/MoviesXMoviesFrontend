@@ -2,31 +2,29 @@
 import { onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useToast } from 'primevue/usetoast';
-import { useAuthStore } from '@/stores/authStore';
 
 import ProgressSpinner from 'primevue/progressspinner';
-import { api } from "@/composables/useAPI";
-import { config } from '@/config';
+import { oauthLogin } from "@/repositories/auth/authRepository";
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
-const authStore = useAuthStore();
 
 onMounted(async () => {
   const code = route.query.code;
   if (!code) return router.push("/login");
 
   try {
-    const { data } = await api.post(config.apiUrl + "/oauth/google/", { code: code });
-    toast.add({ severity: 'success', summary: 'Success', detail: 'Session started', life: 3000 });
-    authStore.setTokens(data.access, data.refresh);
+    await oauthLogin(code as string);
+    toast.add({ severity: 'success', summary: 'Success', detail: t('oauth.toast.success'), life: 3000 });
     router.push("/home");
   } catch (error: any) {
     const status = error.response?.status;
-    let detail = "Failed to authenticate with Google";
+    let detail = t('oauth.toast.connectionError', ['Google']);
     if (status === 400) {
-      detail = "Invalid Google OAuth code";
+      detail = t('oauth.toast.invalidCode', ['Google']);
     }
     router.push("/login");
     toast.add({ severity: 'error', summary: 'Error', detail, life: 5000 });
@@ -37,6 +35,6 @@ onMounted(async () => {
 <template>
   <div class="flex flex-col items-center justify-center min-h-screen">
     <ProgressSpinner />
-    <p class="text-3xl">Loading...</p>
+    <p class="text-3xl">{{ t('oauth.loading') }}</p>
   </div>
 </template>

@@ -1,15 +1,41 @@
 {
   "components": {
-    "oauthButton": "Sign in with {0}"
+    "selectLanguage": "Select a Language",
+    "oauthButton": "Sign in with {0}",
+    "changeTheme": "Change theme",
+    "form": {
+      "requiredUsername": "Username is required",
+      "requiredPassword": "Password is required",
+      "submit": "Login"
+    }
+  },
+  "login": {
+    "toast": {
+      "success": "Session started",
+      "connectionError": "Failed to log in with {0}. Please try again.",
+      "invalidCredentials": "Invalid username or password",
+      "accessDenied": "Access denied"
+    },
+    "title": "Login",
+    "username": "Username",
+    "password": "Password"
+  },
+  "notFound": {
+    "title": "404 - Not Found",
+    "description": "The page you are looking for does not exist.",
+    "linkText": "Go back to Home"
+  },
+  "oauth": {
+    "toast": {
+      "success": "Session started",
+      "connectionError": "Failed to log in with {0}. Please try again.",
+      "invalidCode": "Invalid {0} code"
+    },
+    "loading": "Loading..."
   },
   "home": {
     "welcome": "Welcome to MoviesXMovies!",
     "linkText": "Click here to login"
-  },
-  "login": {
-    "title": "Login",
-    "username": "Username",
-    "password": "Password"
   },
   "verify": {
     "title": "MOVIESXMOVIES",

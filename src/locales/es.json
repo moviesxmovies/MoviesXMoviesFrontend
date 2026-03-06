@@ -1,19 +1,5 @@
 {
-  "components": {
-    "oauthButton": "Entrar con {0}"
-  },
   "home": {
     "welcome": "¡Bienvenido a MoviesXMovies!"
-  },
-  "login": {
-    "title": "Login",
-    "username": "Nombre de usuario",
-    "password": "Contraseña"
-  },
-  "verify": {
-    "title": "MOVIESXMOVIES",
-    "description": "Hemos enviado un código de 6 dígitos a tu correo.",
-    "button": "VERIFICAR CÓDIGO",
-    "resend": "¿No has recibido el código? Reenviar código"
   }
 }
