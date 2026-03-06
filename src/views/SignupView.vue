@@ -12,6 +12,8 @@ import {
   Password,
 } from "primevue";
 import { defineComponent, h } from "vue";
+import { api } from "@/composables/useAPI";
+import { config } from "@/config";
 
 const FieldMsg = defineComponent({
   props: { field: Object },
@@ -36,6 +38,7 @@ const schema = z
     last_name: z.string().min(1, "Last name is required"),
     username: z.string().min(1, "Username is required"),
     email: z.string().min(1, "Email is required").email("Invalid email"),
+    confirm_password: z.string().min(1, "Please confirm your password"),
     password: z
       .string()
       .min(10, "At least 10 characters")
@@ -43,6 +46,14 @@ const schema = z
       .regex(/\d/, "Must include a number"),
   })
   .superRefine((data, ctx) => {
+    if (data.confirm_password !== data.password) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Passwords do not match",
+        path: ["confirm_password"],
+      });
+    }
+
     const pwd = data.password.toLowerCase();
     const checks = [
       { value: data.username, label: "username" },
@@ -63,12 +74,12 @@ const schema = z
 
 const resolver = zodResolver(schema);
 
-const onFormSubmit = ({
+const onFormSubmit = async ({
   valid,
   values,
 }: FormSubmitEvent<Record<string, any>>) => {
   if (!valid) return;
-  console.log(values);
+  await api.post(config.apiUrl + "/auth/signup/", values);
 };
 </script>
 
@@ -243,6 +254,29 @@ const onFormSubmit = ({
               </div>
             </template>
           </div>
+        </FormField>
+
+        <FormField
+          v-slot="$field"
+          name="confirm_password"
+          initialValue=""
+          class="flex flex-col gap-1"
+        >
+          <FloatLabel variant="over">
+            <Password
+              v-bind="$field"
+              id="confirm_password"
+              :feedback="false"
+              toggleMask
+              fluid
+              :class="{
+                'p-invalid': $field.invalid,
+                'p-valid': $field.dirty && !$field.invalid,
+              }"
+            />
+            <label for="confirm_password">Confirm Password</label>
+          </FloatLabel>
+          <FieldMsg :field="$field" />
         </FormField>
 
         <Button type="submit" label="Sign up" fluid />
