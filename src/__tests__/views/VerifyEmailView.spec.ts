@@ -11,14 +11,12 @@ import i18n from "@/i18n";
 
 const mockPush = vi.fn();
 const mockToast = { add: vi.fn() };
-const mockHandleLogin = vi.fn();
 const mockUserContainer = { user: { verified: false } };
 const mockSetTokens = vi.fn();
 
 vi.mock("@/stores/authStore", () => ({
   useAuthStore: vi.fn(() => ({
     get user() { return mockUserContainer.user; },
-    handleLogin: mockHandleLogin,
     setTokens: mockSetTokens,
     refreshToken: "refresh-token",
   })),

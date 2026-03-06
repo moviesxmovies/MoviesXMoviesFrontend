@@ -9,7 +9,7 @@ import i18n from "@/i18n";
 
 const mockPush = vi.fn();
 const mockToast = { add: vi.fn() };
-const mockHandleLogin = vi.fn();
+const mockSetTokens = vi.fn();
 
 vi.mock("@/config", () => ({
   config: {
@@ -40,7 +40,7 @@ vi.mock("primevue/usetoast", () => ({
 
 vi.mock("@/stores/authStore", () => ({
   useAuthStore: vi.fn(() => ({
-    handleLogin: mockHandleLogin,
+    setTokens: mockSetTokens,
   })),
 }));
 
@@ -83,7 +83,7 @@ describe("OauthCallback logic", () => {
       { code: "google-code-123" },
     );
 
-    expect(mockHandleLogin).toHaveBeenCalledWith("token-acc", "token-ref");
+    expect(mockSetTokens).toHaveBeenCalledWith("token-acc", "token-ref");
 
     expect(mockToast.add).toHaveBeenCalledWith(
       expect.objectContaining({ severity: "success", summary: "Success" }),

@@ -17,6 +17,7 @@ import { api } from "@/composables/useAPI";
 import { config } from "@/config";
 import { useAuthStore } from "@/stores/authStore";
 import { useRouter } from "vue-router";
+import type { LoginResponse, RegisterPayload } from "@/types";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -81,19 +82,6 @@ const schema = z
 
 const resolver = zodResolver(schema);
 
-interface RegisterPayload {
-  first_name: string;
-  last_name: string;
-  username: string;
-  email: string;
-  password: string;
-}
-
-interface LoginResponse {
-  access: string;
-  refresh: string;
-}
-
 const onFormSubmit = async ({
   valid,
   values,
@@ -135,7 +123,8 @@ const loginUser = async (values: RegisterPayload) => {
       password: values.password,
     },
   );
-  authStore.handleLogin(data.access, data.refresh);
+  authStore.setTokens(data.access, data.refresh);
+  router.push("/home");
 };
 </script>
 

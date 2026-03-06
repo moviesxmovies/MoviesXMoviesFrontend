@@ -39,10 +39,6 @@ export const useAuthStore = defineStore('auth', {
             this.refreshToken = null;
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
-        },
-        handleLogin(access: string, refresh?: string) {
-            this.setTokens(access, refresh);
-            router.push('/home');
-        },
+        }
     }
 });

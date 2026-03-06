@@ -28,13 +28,11 @@ const mockPush = vi.fn();
 vi.mock("vue-router", () => ({ useRouter: () => ({ push: mockPush }) }));
 const mockToast = { add: vi.fn() };
 vi.mock("primevue/usetoast", () => ({ useToast: () => mockToast }));
-const mockHandleLogin = vi.fn();
 const mockSetTokens = vi.fn();
 vi.mock("@/stores/authStore", () => ({
   useAuthStore: () => ({
     token: null,
     refreshToken: null,
-    handleLogin: mockHandleLogin,
     setTokens: mockSetTokens,
     isAuthenticated: false,
   }),
@@ -75,7 +73,7 @@ describe("LoginView.vue", () => {
 
     expect(api.post).toHaveBeenCalled();
     const authStore = useAuthStore();
-    expect(authStore.handleLogin).toHaveBeenCalledWith("ok", "ok");
+    expect(authStore.setTokens).toHaveBeenCalledWith("ok", "ok");
   });
 
   it("should show error toast on 403 (Cloudflare/CSRF)", async () => {

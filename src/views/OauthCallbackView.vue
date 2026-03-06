@@ -20,7 +20,8 @@ onMounted(async () => {
   try {
     const { data } = await api.post(config.apiUrl + "/oauth/google/", { code: code });
     toast.add({ severity: 'success', summary: 'Success', detail: 'Session started', life: 3000 });
-    authStore.handleLogin(data.access, data.refresh);
+    authStore.setTokens(data.access, data.refresh);
+    router.push("/home");
   } catch (error: any) {
     const status = error.response?.status;
     let detail = "Failed to authenticate with Google";

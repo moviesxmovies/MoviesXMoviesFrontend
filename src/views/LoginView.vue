@@ -47,7 +47,7 @@ const handleLogin = async () => {
     try {
         const { data } = await api.post(config.apiUrl + '/auth/login/', form.value);
         toast.add({ severity: 'success', summary: 'Success', detail: 'Session started', life: 3000 });
-        authStore.handleLogin(data.access, data.refresh);
+        authStore.setTokens(data.access, data.refresh);
     } catch (error: any) {
         const status = error.response?.status;
         let detail = "Can't connect to server";
