@@ -5,7 +5,7 @@ export const schema = z
     first_name: z.string().min(1, "First name is required"),
     last_name: z.string().min(1, "Last name is required"),
     username: z.string().min(1, "Username is required"),
-    email: z.string().min(1, "Email is required").email("Invalid email"),
+    email: z.email("Invalid email").min(1, "Email is required"),
     confirm_password: z.string().min(1, "Please confirm your password"),
     password: z
       .string()
@@ -16,7 +16,7 @@ export const schema = z
   .superRefine((data, ctx) => {
     if (data.confirm_password !== data.password) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "Passwords do not match",
         path: ["confirm_password"],
       });
@@ -29,10 +29,11 @@ export const schema = z
       { value: data.last_name, label: "last name" },
       { value: data.email, label: "email" },
     ];
+
     for (const { value, label } of checks) {
-      if (value && pwd === value.toLowerCase()) {
+      if (value?.toLowerCase() === pwd) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: `Password cannot be the same as your ${label}`,
           path: ["password"],
         });
