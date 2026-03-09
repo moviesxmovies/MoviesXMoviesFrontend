@@ -7,9 +7,11 @@ import PrimeVue from "primevue/config";
 import ToastService from "primevue/toastservice";
 import i18n from "@/i18n";
 
-const mockPush = vi.fn();
-const mockToast = { add: vi.fn() };
-const mockSetTokens = vi.fn();
+const { mockSetTokens, mockPush, mockToast } = vi.hoisted(() => ({
+  mockSetTokens: vi.fn(),
+  mockPush: vi.fn(),
+  mockToast: { add: vi.fn() },
+}));
 
 vi.mock("@/config", () => ({
   config: {

@@ -23,12 +23,21 @@ vi.stubGlobal("localStorage", {
   }),
 });
 
+const { mockSetTokens, mockPush, mockToast } = vi.hoisted(() => ({
+  mockSetTokens: vi.fn(),
+  mockPush: vi.fn(),
+  mockToast: { add: vi.fn() },
+}));
+
 vi.mock("@/composables/useAPI", () => ({ api: { post: vi.fn() } }));
-const mockPush = vi.fn();
-vi.mock("vue-router", () => ({ useRouter: () => ({ push: mockPush }) }));
-const mockToast = { add: vi.fn() };
+vi.mock("vue-router", async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useRouter: () => ({ push: mockPush }),
+  };
+});
 vi.mock("primevue/usetoast", () => ({ useToast: () => mockToast }));
-const mockSetTokens = vi.fn();
 vi.mock("@/stores/authStore", () => ({
   useAuthStore: () => ({
     token: null,
@@ -89,7 +98,7 @@ describe("LoginView.vue", () => {
 
     expect(mockToast.add).toHaveBeenCalledWith(
       expect.objectContaining({
-        detail: "Access denied (Check Cloudflare/CSRF)",
+        detail: "Access denied",
       }),
     );
   });
@@ -107,7 +116,7 @@ describe("LoginView.vue", () => {
 
     expect(mockToast.add).toHaveBeenCalledWith(
       expect.objectContaining({
-        detail: "Incorrect username or password",
+        detail: "Invalid username or password",
       }),
     );
   });

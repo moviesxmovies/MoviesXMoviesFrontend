@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 import { jwtDecode } from 'jwt-decode';
 import type { JWTPayload } from '../types';
-import { router } from '@/router';
 
 export const useAuthStore = defineStore('auth', {
     state: () => ({
