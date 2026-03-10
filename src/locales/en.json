@@ -53,9 +53,48 @@
     "linkText": "Click here to login"
   },
   "verify": {
+    "toast": {
+      "success": "Email verified successfully",
+      "error": "Verification failed. Please try again.",
+      "invalidCode": "Invalid verification code",
+      "resendSuccess": "Verification code resent to your email",
+      "resendError": "Failed to resend verification code. Please try again."
+    },
     "title": "MOVIESXMOVIES",
     "description": "We've sent a 6 digit code to your mail direction.",
     "button": "VERIFY CODE",
     "resend": "Haven't received the code? Resend code"
+  },
+  "schema": {
+    "username": {
+      "required": "Username is required"
+    },
+    "firstName": {
+      "required": "First name is required"
+    },
+    "lastName": {
+      "required": "Last name is required"
+    },
+    "email": {
+      "required": "Email is required",
+      "invalid": "Invalid email address"
+    },
+    "password": {
+      "required": "Password is required",
+      "minLength": "At least 10 characters",
+      "upperCase": "Password must include an uppercase letter",
+      "number": "Password must include a number"
+    },
+    "confirmPassword": {
+      "required": "Confirm password is required",
+      "mismatch": "Passwords do not match"
+    },
+    "checks": {
+      "username": "username",
+      "first_name": "first name",
+      "last_name": "last name",
+      "email": "email",
+      "samePasswordAs": "Password cannot be the same as your {0}"
+    }
   }
 }
