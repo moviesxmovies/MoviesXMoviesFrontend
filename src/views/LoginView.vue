@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { z } from 'zod';
 import { useToast } from 'primevue/usetoast';
 import { Button, Card, InputText, Password } from 'primevue';
@@ -9,6 +9,13 @@ import { handleLogin } from '@/repositories/auth/authRepository';
 import { router } from '@/router';
 import type { LoginPayload } from '@/types';
 import { useI18n } from 'vue-i18n';
+import { useThemeStore } from '@/stores/themeStore';
+
+const themeStore = useThemeStore();
+
+onMounted(() => {
+  themeStore.loadTheme();
+});
 
 const { t } = useI18n();
 const loginSchema = z.object({

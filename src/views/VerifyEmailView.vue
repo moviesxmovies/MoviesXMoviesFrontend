@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import InputOtp from "primevue/inputotp";
 import Button from "primevue/button";
 import Message from "primevue/message";
@@ -8,6 +8,7 @@ import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/authStore";
 import { api } from "@/composables/useAPI";
 import { config } from "@/config";
+import { useThemeStore } from "@/stores/themeStore";
 
 const verificationCode = ref("");
 const authStore = useAuthStore();
@@ -15,6 +16,12 @@ const loading = ref(false);
 const error = ref("");
 const toast = useToast();
 const router = useRouter();
+
+const themeStore = useThemeStore();
+
+onMounted(() => {
+  themeStore.loadTheme();
+});
 
 const sendVerificationCode = async () => {
   try {
@@ -78,7 +85,7 @@ const handleVerification = async () => {
 <template>
   <div class="min-h-screen flex items-center justify-center px-4">
     <div
-      class="w-full max-w-md bg-[#1f1f1f] rounded-2xl p-6 sm:p-8 border border-[#232244] shadow-2xl"
+      class="w-full max-w-md rounded-2xl p-6 sm:p-8 border border-[#232244] shadow-2xl"
     >
       <div class="text-center mb-6 sm:mb-8">
         <h1

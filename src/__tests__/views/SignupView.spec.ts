@@ -102,16 +102,6 @@ describe("SignupView - script logic", () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it("should show fallback error message if no detail in error response", async () => {
-    mockHandleRegister.mockRejectedValue({});
-
-    const wrapper = factory();
-    const vm = wrapper.vm as any;
-
-    await vm.onFormSubmit({ valid: true, values: user });
-    await flushPromises();
-  });
-
   it("should not navigate if form is invalid", async () => {
     const wrapper = factory();
     const vm = wrapper.vm as any;

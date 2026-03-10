@@ -11,8 +11,8 @@ import {
   Password,
   useToast,
 } from "primevue";
-import { defineComponent, h } from "vue";
-import { useAuthStore } from "@/stores/authStore";
+import { defineComponent, h, onMounted } from "vue";
+import { useThemeStore } from "@/stores/themeStore";
 import { useRouter } from "vue-router";
 import type { LoginPayload, RegisterPayload } from "@/types";
 import {
@@ -21,9 +21,13 @@ import {
 } from "@/repositories/auth/authRepository";
 import { schema } from "@/schemas/signUpSchema";
 
+const themeStore = useThemeStore();
 const router = useRouter();
-const authStore = useAuthStore();
 const toast = useToast();
+
+onMounted(() => {
+  themeStore.loadTheme();
+});
 
 const FieldMsg = defineComponent({
   props: { field: Object },
@@ -81,6 +85,7 @@ defineExpose({ onFormSubmit });
 <template>
   <div class="flex flex-col items-center justify-center min-h-screen">
     <Card class="text-center p-8 max-w-xl">
+      <img src="/favicon.svg" alt="Logo" class="m-auto mb-6 w-16 h-16" />
       <Form
         :resolver="resolver"
         @submit="onFormSubmit"
@@ -283,15 +288,74 @@ defineExpose({ onFormSubmit });
 <style scoped>
 :deep(.p-invalid.p-inputtext) {
   border-color: #ef4444 !important;
+  box-shadow: 0 0 0 1px #ef4444 !important;
 }
 :deep(.p-valid.p-inputtext) {
   border-color: #22c55e !important;
+  box-shadow: 0 0 0 1px #22c55e !important;
 }
 :deep(.p-invalid .p-password-input) {
   border-color: #ef4444 !important;
+  box-shadow: 0 0 0 1px #ef4444 !important;
 }
 :deep(.p-valid .p-password-input) {
   border-color: #22c55e !important;
+  box-shadow: 0 0 0 1px #22c55e !important;
+}
+
+/* Card bg and text */
+:deep(.p-card) {
+  background-color: var(--background);
+  color: var(--text);
+  border: 1px solid var(--secondary);
+}
+
+/* Labels */
+:deep(.p-float-label label) {
+  color: var(--text);
+  opacity: 0.7;
+}
+
+:deep(.p-float-label:has(input:focus) label),
+:deep(.p-float-label:has(input:not(:placeholder-shown)) label) {
+  color: var(--primary);
+  opacity: 1;
+}
+
+/* Inputs */
+:deep(.p-inputtext) {
+  background-color: var(--background);
+  color: var(--text);
+  border-color: var(--secondary);
+}
+
+:deep(.p-inputtext:focus) {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 1px var(--primary) !important;
+}
+
+/* Password input */
+:deep(.p-password-input) {
+  background-color: var(--background);
+  color: var(--text);
+  border-color: var(--secondary);
+}
+
+:deep(.p-password-input:focus) {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 1px var(--primary) !important;
+}
+
+/* Submit button */
+:deep(.p-button) {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+}
+
+:deep(.p-button:hover) {
+  background-color: var(--accent);
+  border-color: var(--accent);
 }
 
 .field-msg {
