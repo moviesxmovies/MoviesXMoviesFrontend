@@ -75,6 +75,7 @@ const onFormSubmit = async ({
     });
   }
 };
+defineExpose({ onFormSubmit });
 </script>
 
 <template>

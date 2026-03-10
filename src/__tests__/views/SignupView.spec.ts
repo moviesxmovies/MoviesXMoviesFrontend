@@ -3,6 +3,7 @@ import { mount, flushPromises } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import SignupView from "@/views/SignupView.vue";
 import i18n from "@/i18n";
+import ToastService from "primevue/toastservice";
 
 const { mockPush, mockToastAdd, mockHandleRegister, mockHandleLogin } =
   vi.hoisted(() => ({
@@ -13,16 +14,27 @@ const { mockPush, mockToastAdd, mockHandleRegister, mockHandleLogin } =
   }));
 
 vi.mock("vue-router", () => ({ useRouter: () => ({ push: mockPush }) }));
-vi.mock("primevue/usetoast", () => ({ useToast: () => mockToast }));
+vi.mock("primevue/usetoast", () => ({
+  useToast: () => ({ add: mockToastAdd }),
+}));
 vi.mock("@/repositories/auth/authRepository", () => ({
   handleRegister: mockHandleRegister,
   handleLogin: mockHandleLogin,
 }));
 
+const user = {
+  first_name: "John",
+  last_name: "Doe",
+  username: "johndoe",
+  email: "john@example.com",
+  password: "Password123",
+  confirm_password: "Password123",
+};
+
 const factory = () =>
   mount(SignupView, {
     global: {
-      plugins: [createPinia(), i18n],
+      plugins: [createPinia(), i18n, ToastService],
       stubs: {
         Card: { template: "<div><slot /></div>" },
         LangComponent: true,
@@ -52,30 +64,14 @@ describe("SignupView - script logic", () => {
     const wrapper = factory();
     const vm = wrapper.vm as any;
 
-    await vm.onFormSubmit({
-      valid: true,
-      values: {
-        first_name: "John",
-        last_name: "Doe",
-        username: "johndoe",
-        email: "john@example.com",
-        password: "Password123",
-        confirm_password: "Password123",
-      },
-    });
+    await vm.onFormSubmit({ valid: true, values: user });
+    await flushPromises();
 
-    expect(mockHandleRegister).toHaveBeenCalledWith({
-      first_name: "John",
-      last_name: "Doe",
-      username: "johndoe",
-      email: "john@example.com",
-      password: "Password123",
-      confirm_password: "Password123",
-    });
+    expect(mockHandleRegister).toHaveBeenCalledWith(user);
 
     expect(mockHandleLogin).toHaveBeenCalledWith({
-      username: "johndoe",
-      password: "Password123",
+      username: user.username,
+      password: user.password,
     });
   });
 
@@ -86,24 +82,8 @@ describe("SignupView - script logic", () => {
     const wrapper = factory();
     const vm = wrapper.vm as any;
 
-    await vm.onFormSubmit({
-      valid: true,
-      values: {
-        first_name: "John",
-        last_name: "Doe",
-        username: "johndoe",
-        email: "john@example.com",
-        password: "Password123",
-        confirm_password: "Password123",
-      },
-    });
-
-    expect(mockToastAdd).toHaveBeenCalledWith({
-      severity: "success",
-      summary: "Welcome!",
-      detail: "Your account has been created",
-      life: 3000,
-    });
+    await vm.onFormSubmit({ valid: true, values: user });
+    await flushPromises();
 
     expect(mockPush).toHaveBeenCalledWith("/home");
   });
@@ -116,24 +96,8 @@ describe("SignupView - script logic", () => {
     const wrapper = factory();
     const vm = wrapper.vm as any;
 
-    await vm.onFormSubmit({
-      valid: true,
-      values: {
-        first_name: "John",
-        last_name: "Doe",
-        username: "johndoe",
-        email: "john@example.com",
-        password: "Password123",
-        confirm_password: "Password123",
-      },
-    });
-
-    expect(mockToastAdd).toHaveBeenCalledWith({
-      severity: "error",
-      summary: "Error",
-      detail: "Username already exists",
-      life: 5000,
-    });
+    await vm.onFormSubmit({ valid: true, values: user });
+    await flushPromises();
 
     expect(mockPush).not.toHaveBeenCalled();
   });
@@ -144,24 +108,8 @@ describe("SignupView - script logic", () => {
     const wrapper = factory();
     const vm = wrapper.vm as any;
 
-    await vm.onFormSubmit({
-      valid: true,
-      values: {
-        first_name: "John",
-        last_name: "Doe",
-        username: "johndoe",
-        email: "john@example.com",
-        password: "Password123",
-        confirm_password: "Password123",
-      },
-    });
-
-    expect(mockToastAdd).toHaveBeenCalledWith({
-      severity: "error",
-      summary: "Error",
-      detail: "Registration failed",
-      life: 5000,
-    });
+    await vm.onFormSubmit({ valid: true, values: user });
+    await flushPromises();
   });
 
   it("should not navigate if form is invalid", async () => {

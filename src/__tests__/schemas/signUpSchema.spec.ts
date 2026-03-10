@@ -69,7 +69,7 @@ describe("Signup schema", () => {
   it("Should fail if password is equal to username", () => {
     const result = schema.safeParse({
       ...validData,
-      password: "johndoe",
+      password: validData.username,
     });
     const errors = result.error?.flatten().fieldErrors;
     expect(errors?.password).toBeDefined();
@@ -77,7 +77,7 @@ describe("Signup schema", () => {
   it("Should fail if password is equal to first_name", () => {
     const result = schema.safeParse({
       ...validData,
-      password: "John",
+      password: validData.first_name,
     });
     const errors = result.error?.flatten().fieldErrors;
     expect(errors?.password).toBeDefined();
@@ -85,7 +85,7 @@ describe("Signup schema", () => {
   it("Should fail if password is equal to last_name", () => {
     const result = schema.safeParse({
       ...validData,
-      password: "Doe",
+      password: validData.last_name,
     });
     const errors = result.error?.flatten().fieldErrors;
     expect(errors?.password).toBeDefined();
@@ -93,7 +93,7 @@ describe("Signup schema", () => {
   it("Should fail if password is equal to email", () => {
     const result = schema.safeParse({
       ...validData,
-      password: "john@example.com",
+      password: validData.email,
     });
     const errors = result.error?.flatten().fieldErrors;
     expect(errors?.password).toBeDefined();
