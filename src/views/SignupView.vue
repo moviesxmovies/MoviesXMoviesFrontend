@@ -20,6 +20,9 @@ import {
   handleRegister,
 } from "@/repositories/auth/authRepository";
 import { schema } from "@/schemas/signUpSchema";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const themeStore = useThemeStore();
 const router = useRouter();
@@ -64,8 +67,8 @@ const onFormSubmit = async ({
 
     toast.add({
       severity: "success",
-      summary: "Welcome!",
-      detail: "Your account has been created",
+      summary: "Success",
+      detail: t("signup.toast.success"),
       life: 3000,
     });
 
@@ -74,7 +77,7 @@ const onFormSubmit = async ({
     toast.add({
       severity: "error",
       summary: "Error",
-      detail: error.response?.data?.detail || "Registration failed",
+      detail: error.response?.data?.detail || t("signup.toast.failed"),
       life: 5000,
     });
   }
@@ -119,7 +122,7 @@ defineExpose({ onFormSubmit });
                   "
                 />
               </IconField>
-              <label for="first_name">First Name</label>
+              <label for="first_name">{{ $t("signup.firstName") }}</label>
             </FloatLabel>
             <FieldMsg :field="$field" />
           </FormField>
@@ -151,7 +154,7 @@ defineExpose({ onFormSubmit });
                   "
                 />
               </IconField>
-              <label for="last_name">Last Name</label>
+              <label for="last_name">{{ $t("signup.lastName") }}</label>
             </FloatLabel>
             <FieldMsg :field="$field" />
           </FormField>
@@ -184,7 +187,7 @@ defineExpose({ onFormSubmit });
                 "
               />
             </IconField>
-            <label for="username">Username</label>
+            <label for="username">{{ $t("signup.username") }}</label>
           </FloatLabel>
           <FieldMsg :field="$field" />
         </FormField>
@@ -216,7 +219,7 @@ defineExpose({ onFormSubmit });
                 "
               />
             </IconField>
-            <label for="email">Email</label>
+            <label for="email">{{ $t("signup.email") }}</label>
           </FloatLabel>
           <FieldMsg :field="$field" />
         </FormField>
@@ -239,7 +242,7 @@ defineExpose({ onFormSubmit });
                 'p-valid': $field.dirty && !$field.invalid,
               }"
             />
-            <label for="password">Password</label>
+            <label for="password">{{ $t("signup.password") }}</label>
           </FloatLabel>
 
           <div v-if="$field.dirty" class="flex flex-col gap-1 mt-1">
@@ -274,13 +277,21 @@ defineExpose({ onFormSubmit });
                 'p-valid': $field.dirty && !$field.invalid,
               }"
             />
-            <label for="confirm_password">Confirm Password</label>
+            <label for="confirm_password">{{ $t("signup.confirmPassword") }}</label>
           </FloatLabel>
           <FieldMsg :field="$field" />
         </FormField>
 
         <Button type="submit" label="Sign up" fluid />
       </Form>
+      <Button
+        variant="link"
+        label="Link"
+        @click="router.push('/login')"
+        class="mt-4 sm:mt-6 text-s underline"
+      >
+        {{ $t("signup.login") }}
+      </Button>
     </Card>
   </div>
 </template>
@@ -344,18 +355,6 @@ defineExpose({ onFormSubmit });
 :deep(.p-password-input:focus) {
   border-color: var(--primary) !important;
   box-shadow: 0 0 0 1px var(--primary) !important;
-}
-
-/* Submit button */
-:deep(.p-button) {
-  background-color: var(--primary);
-  border-color: var(--primary);
-  color: #ffffff;
-}
-
-:deep(.p-button:hover) {
-  background-color: var(--accent);
-  border-color: var(--accent);
 }
 
 .field-msg {

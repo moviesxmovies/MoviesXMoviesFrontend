@@ -9,6 +9,20 @@
       "submit": "Login"
     }
   },
+  "signup": {
+    "toast": {
+      "success": "Your account has been created",
+      "failed": "Registration failed"
+    },
+    "title": "Sign Up",
+    "username": "Username",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "login": "Already have an account? Login here"
+  },
   "login": {
     "toast": {
       "success": "Session started",
@@ -18,7 +32,8 @@
     },
     "title": "Login",
     "username": "Username",
-    "password": "Password"
+    "password": "Password",
+    "signup": "Don't have an account? Sign up here"
   },
   "notFound": {
     "title": "404 - Not Found",
