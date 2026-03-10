@@ -1,0 +1,46 @@
+{
+  "components": {
+    "selectLanguage": "Sprache auswählen",
+    "oauthButton": "Mit {0} anmelden",
+    "changeTheme": "Thema ändern",
+    "form": {
+      "requiredUsername": "Benutzername ist erforderlich",
+      "requiredPassword": "Passwort ist erforderlich",
+      "submit": "Anmelden"
+    }
+  },
+  "login": {
+    "toast": {
+      "success": "Sitzung gestartet",
+      "connectionError": "Anmeldung mit {0} fehlgeschlagen. Bitte versuche es erneut.",
+      "invalidCredentials": "Ungültiger Benutzername oder Passwort",
+      "accessDenied": "Zugriff verweigert"
+    },
+    "title": "Anmelden",
+    "username": "Benutzername",
+    "password": "Passwort"
+  },
+  "notFound": {
+    "title": "404 - Nicht gefunden",
+    "description": "Die gesuchte Seite existiert nicht.",
+    "linkText": "Zurück zur Startseite"
+  },
+  "oauth": {
+    "toast": {
+      "success": "Sitzung gestartet",
+      "connectionError": "Anmeldung mit {0} fehlgeschlagen. Bitte versuche es erneut.",
+      "invalidCode": "Ungültiger {0}-Code"
+    },
+    "loading": "Laden..."
+  },
+  "home": {
+    "welcome": "Willkommen bei MoviesXMovies!",
+    "linkText": "Hier klicken, um sich anzumelden"
+  },
+  "verify": {
+    "title": "MOVIESXMOVIES",
+    "description": "Wir haben einen 6-stelligen Code an deine E-Mail-Adresse gesendet.",
+    "button": "CODE BESTÄTIGEN",
+    "resend": "Keinen Code erhalten? Code erneut senden"
+  }
+}

@@ -5,7 +5,7 @@ import { useLangStore } from "@/stores/langStore";
 
 const langStore = useLangStore();
 const selectedCountry = ref<string | null>(null);
-const countries = ref<string[]>(["ES", "US"]);
+const countries = ref<string[]>(["ES", "US", "FR", "DE"]);
 
 const getFlagUrl = (lang: string) => `https://flagcdn.com/w20/${lang.toLowerCase()}.png`;
 </script>
@@ -16,7 +16,7 @@ const getFlagUrl = (lang: string) => `https://flagcdn.com/w20/${lang.toLowerCase
       v-model="selectedCountry"
       :options="countries"
       optionLabel="name"
-      placeholder="Select a Country"
+      :placeholder="$t('components.selectLanguage')"
       class="w-full md:w-64 custom-select"
       @change="langStore.setLanguage(selectedCountry || 'US')"
     >

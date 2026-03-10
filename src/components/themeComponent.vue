@@ -1,4 +1,3 @@
-
 <script setup lang="ts">
 import { useThemeStore } from "@/stores/themeStore";
 import { computed, onMounted } from "vue";
@@ -20,7 +19,7 @@ const isDark = computed(() => themeStore.theme === "dark");
       borderColor: 'color-mix(in srgb, var(--text) 15%, transparent)',
       background: 'color-mix(in srgb, var(--text) 5%, transparent)',
     }"
-    aria-label="Change theme"
+    :aria-label="$t('components.changeTheme')"
   >
     <svg
       class="absolute h-5 w-5 transition-all duration-500"

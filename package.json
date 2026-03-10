@@ -1,6 +1,6 @@
 {
   "name": "movies-x-movies-frontend",
-  "version": "0.6.5",
+  "version": "0.7.18",
   "private": true,
   "type": "module",
   "engines": {
@@ -35,7 +35,7 @@
     "vue": "^3.5.25",
     "vue-i18n": "^11.2.8",
     "vue-router": "^4.6.3",
-    "zod": "^4.3.5"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@tsconfig/node24": "^24.0.3",

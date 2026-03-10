@@ -7,9 +7,11 @@ import PrimeVue from "primevue/config";
 import ToastService from "primevue/toastservice";
 import i18n from "@/i18n";
 
-const mockPush = vi.fn();
-const mockToast = { add: vi.fn() };
-const mockHandleLogin = vi.fn();
+const { mockSetTokens, mockPush, mockToast } = vi.hoisted(() => ({
+  mockSetTokens: vi.fn(),
+  mockPush: vi.fn(),
+  mockToast: { add: vi.fn() },
+}));
 
 vi.mock("@/config", () => ({
   config: {
@@ -40,7 +42,7 @@ vi.mock("primevue/usetoast", () => ({
 
 vi.mock("@/stores/authStore", () => ({
   useAuthStore: vi.fn(() => ({
-    handleLogin: mockHandleLogin,
+    setTokens: mockSetTokens,
   })),
 }));
 
@@ -83,7 +85,7 @@ describe("OauthCallback logic", () => {
       { code: "google-code-123" },
     );
 
-    expect(mockHandleLogin).toHaveBeenCalledWith("token-acc", "token-ref");
+    expect(mockSetTokens).toHaveBeenCalledWith("token-acc", "token-ref");
 
     expect(mockToast.add).toHaveBeenCalledWith(
       expect.objectContaining({ severity: "success", summary: "Success" }),

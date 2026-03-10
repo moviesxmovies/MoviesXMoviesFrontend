@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import InputOtp from "primevue/inputotp";
 import Button from "primevue/button";
 import Message from "primevue/message";
@@ -7,7 +7,8 @@ import { useToast } from "primevue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/authStore";
 import { api } from "@/composables/useAPI";
-import { config } from '@/config';
+import { config } from "@/config";
+import { useThemeStore } from "@/stores/themeStore";
 
 const verificationCode = ref("");
 const authStore = useAuthStore();
@@ -16,12 +17,15 @@ const error = ref("");
 const toast = useToast();
 const router = useRouter();
 
+const themeStore = useThemeStore();
+
+onMounted(() => {
+  themeStore.loadTheme();
+});
+
 const sendVerificationCode = async () => {
   try {
-    await api.post(
-      config.apiUrl +
-        "/auth/resend-verification-email/",
-    );
+    await api.post(config.apiUrl + "/auth/resend-verification-email/");
     toast.add({
       severity: "success",
       summary: "Success",
@@ -48,11 +52,14 @@ const handleVerification = async () => {
   error.value = "";
 
   try {
-    const { data } = await api.post(
-      config.apiUrl + "/auth/verify/",
-      { verification_code: verificationCode.value },
-    );
+    const { data } = await api.post(config.apiUrl + "/auth/verify/", {
+      verification_code: verificationCode.value,
+    });
     if (data.status && authStore.user) {
+      const refreshResponse = await api.post(config.apiUrl + "/auth/refresh/", {
+        refresh: authStore.refreshToken,
+      });
+      authStore.setTokens(refreshResponse.data.access);
       authStore.user.verified = true;
       toast.add({
         severity: "success",
@@ -78,13 +85,13 @@ const handleVerification = async () => {
 <template>
   <div class="min-h-screen flex items-center justify-center px-4">
     <div
-      class="w-full max-w-md bg-[#1f1f1f] rounded-2xl p-6 sm:p-8 border border-[#232244] shadow-2xl"
+      class="w-full max-w-md rounded-2xl p-6 sm:p-8 border border-[#232244] shadow-2xl"
     >
       <div class="text-center mb-6 sm:mb-8">
         <h1
           class="text-accent text-xl sm:text-2xl font-black tracking-widest mb-2"
         >
-          {{ $t('verify.title') }}
+          {{ $t("verify.title") }}
         </h1>
         <div
           class="h-1 w-12 bg-gradient-to-r from-[#2f27ce] to-[#bb3dff] mx-auto rounded-full"
@@ -92,7 +99,7 @@ const handleVerification = async () => {
       </div>
       <div class="text-center mb-6 sm:mb-8">
         <p class="text-[#bcbbdd] text-sm sm:text-base">
-          {{ $t('verify.description') }}
+          {{ $t("verify.description") }}
         </p>
       </div>
       <form
@@ -136,7 +143,7 @@ const handleVerification = async () => {
           @click="sendVerificationCode"
           class="mt-4 sm:mt-6 text-[#bcbbdd] text-xs hover:text-[#f2f2f2] transition-colors underline decoration-[#3a31d8]"
         >
-          {{ $t('verify.resend') }}
+          {{ $t("verify.resend") }}
         </Button>
       </form>
     </div>
