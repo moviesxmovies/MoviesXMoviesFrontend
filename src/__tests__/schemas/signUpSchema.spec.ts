@@ -125,7 +125,7 @@ describe("Signup schema", () => {
   it("Should fail if email is invalid", () => {
     const result = schema.safeParse({ ...validData, email: "notanemail" });
     const errors = result.error?.flatten().fieldErrors;
-    expect(errors?.email).toContain("Invalid email");
+    expect(errors?.email).toContain("Invalid email address");
   });
 
   it("Should fail if confirm_password is missing", () => {
@@ -143,12 +143,12 @@ describe("Signup schema", () => {
   it("Should fail if password has no uppercase letter", () => {
     const result = schema.safeParse({ ...validData, password: "password123" });
     const errors = result.error?.flatten().fieldErrors;
-    expect(errors?.password).toContain("Must include an uppercase letter");
+    expect(errors?.password).toContain("Password must include an uppercase letter");
   });
 
   it("Should fail if password has no number", () => {
     const result = schema.safeParse({ ...validData, password: "PasswordABC" });
     const errors = result.error?.flatten().fieldErrors;
-    expect(errors?.password).toContain("Must include a number");
+    expect(errors?.password).toContain("Password must include a number");
   });
 });

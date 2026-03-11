@@ -6,16 +6,13 @@ import { useToast } from 'primevue/usetoast';
 import ProgressSpinner from 'primevue/progressspinner';
 import { oauthLogin } from "@/repositories/auth/authRepository";
 import { useI18n } from 'vue-i18n';
-import { useThemeStore } from '@/stores/themeStore';
 
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
-const themeStore = useThemeStore();
 
 onMounted(async () => {
-  themeStore.loadTheme();
   const code = route.query.code;
   if (!code) return router.push("/login");
 

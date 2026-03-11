@@ -11,7 +11,6 @@ export const api = axios.create({
     withCredentials: true,
 });
 
-
 api.interceptors.request.use(async (config) => {
     const authStore = useAuthStore();
 

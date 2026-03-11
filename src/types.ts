@@ -4,6 +4,7 @@ export interface JWTPayload {
   verified: boolean;
   exp: number; 
   user_id: number;
+  preferred_language: string;
 }
 
 export interface AuthResponse {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import InputOtp from "primevue/inputotp";
 import Button from "primevue/button";
 import Message from "primevue/message";
@@ -8,8 +8,9 @@ import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/authStore";
 import { api } from "@/composables/useAPI";
 import { config } from "@/config";
-import { useThemeStore } from "@/stores/themeStore";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const verificationCode = ref("");
 const authStore = useAuthStore();
 const loading = ref(false);
@@ -17,26 +18,20 @@ const error = ref("");
 const toast = useToast();
 const router = useRouter();
 
-const themeStore = useThemeStore();
-
-onMounted(() => {
-  themeStore.loadTheme();
-});
-
 const sendVerificationCode = async () => {
   try {
     await api.post(config.apiUrl + "/auth/resend-verification-email/");
     toast.add({
       severity: "success",
       summary: "Success",
-      detail: "Verification code sent to your email",
+      detail: t("verify.toast.resendSuccess"),
       life: 3000,
     });
   } catch (error: any) {
     toast.add({
       severity: "warn",
       summary: "Warn",
-      detail: error.response?.data?.error || "Failed to send verification code",
+      detail: error.response?.data?.error || t("verify.toast.resendError"),
       life: 3000,
     });
   }
@@ -44,7 +39,7 @@ const sendVerificationCode = async () => {
 
 const handleVerification = async () => {
   if (verificationCode.value.length !== 6) {
-    error.value = "Please enter the full 6-digit code.";
+    error.value = t("verify.toast.inocrrectLength");
     return;
   }
 
@@ -55,26 +50,21 @@ const handleVerification = async () => {
     const { data } = await api.post(config.apiUrl + "/auth/verify/", {
       verification_code: verificationCode.value,
     });
-    if (data.status && authStore.user) {
-      const refreshResponse = await api.post(config.apiUrl + "/auth/refresh/", {
-        refresh: authStore.refreshToken,
-      });
-      authStore.setTokens(refreshResponse.data.access);
-      authStore.user.verified = true;
+    if (data.status) {
       toast.add({
         severity: "success",
         summary: "Success",
-        detail: "User verified",
+        detail: t("verify.toast.success"),
         life: 3000,
       });
-      router.push("/home");
+      authStore.logout();
+      router.push("/login");
     }
   } catch (error: any) {
     toast.add({
       severity: "error",
       summary: "Error",
-      detail:
-        error.response?.data?.message || "Failed to send verification code",
+      detail: error.response?.data?.message || t("verify.toast.invalidCode"),
       life: 3000,
     });
   }
@@ -85,7 +75,7 @@ const handleVerification = async () => {
 <template>
   <div class="min-h-screen flex items-center justify-center px-4">
     <div
-      class="w-full max-w-md rounded-2xl p-6 sm:p-8 border border-[#232244] shadow-2xl"
+      class="w-full max-w-md bg-[#1f1f1f] rounded-2xl p-6 sm:p-8 border border-[#232244] shadow-2xl"
     >
       <div class="text-center mb-6 sm:mb-8">
         <h1

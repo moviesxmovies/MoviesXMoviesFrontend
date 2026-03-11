@@ -4,15 +4,8 @@ import { useRouter } from "vue-router";
 import Card from "@/components/appCardComponent.vue";
 import LangComponent from "@/components/langComponent.vue";
 import ThemeComponent from "@/components/themeComponent.vue";
-import { useThemeStore } from "@/stores/themeStore";
-import { onMounted } from "vue";
 
 const router = useRouter();
-const themeStore = useThemeStore();
-
-onMounted(() => {
-  themeStore.loadTheme();
-});
 </script>
 
 <template>

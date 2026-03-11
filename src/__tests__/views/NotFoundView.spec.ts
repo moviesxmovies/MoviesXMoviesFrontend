@@ -1,40 +1,25 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, vi, expect } from "vitest";
 import { mount, flushPromises } from "@vue/test-utils";
-import { createPinia, setActivePinia } from "pinia";
 import NotFoundView from "@/views/NotFoundView.vue";
+import PrimeVue from "primevue/config";
 import i18n from "@/i18n";
 
+const mockPush = vi.fn();
+vi.mock("vue-router", () => ({
+  useRouter: () => ({ push: mockPush }),
+}));
+
 describe("NotFoundView", () => {
-  beforeEach(() => {
-    setActivePinia(createPinia());
-    document.documentElement.className = "";
-  });
-
-  it("should call loadTheme on mount", async () => {
-    mount(NotFoundView, {
+  it("Should redirect home when button clicked", async () => {
+    const wrapper = mount(NotFoundView, {
       global: {
-        plugins: [createPinia(), i18n],
+        plugins: [PrimeVue, i18n],
       },
     });
 
+    await wrapper.find("button").trigger("click");
     await flushPromises();
 
-    expect(document.documentElement.classList.contains("dark")).toBe(false);
-  });
-
-  it("should apply dark theme on mount if stored", async () => {
-    localStorage.setItem("theme", "dark");
-
-    mount(NotFoundView, {
-      global: {
-        plugins: [createPinia(), i18n],
-      },
-    });
-
-    await flushPromises();
-
-    expect(document.documentElement.classList.contains("dark")).toBe(true);
-
-    localStorage.removeItem("theme");
+    expect(mockPush).toHaveBeenCalledWith("/home");
   });
 });
