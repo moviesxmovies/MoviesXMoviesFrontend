@@ -11,8 +11,7 @@ import {
   Password,
   useToast,
 } from "primevue";
-import { defineComponent, h, onMounted } from "vue";
-import { useThemeStore } from "@/stores/themeStore";
+import { defineComponent, h } from "vue";
 import { useRouter } from "vue-router";
 import type { LoginPayload, RegisterPayload } from "@/types";
 import {
@@ -24,13 +23,8 @@ import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 
-const themeStore = useThemeStore();
 const router = useRouter();
 const toast = useToast();
-
-onMounted(() => {
-  themeStore.loadTheme();
-});
 
 const FieldMsg = defineComponent({
   props: { field: Object },
