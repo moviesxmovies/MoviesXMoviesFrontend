@@ -31,10 +31,10 @@ describe("LangComponent", () => {
 
   it("contains ES and US countries", () => {
     const wrapper = factory();
-    expect(wrapper.vm.countries).toContain("ES");
-    expect(wrapper.vm.countries).toContain("US");
-    expect(wrapper.vm.countries).toContain("FR");
-    expect(wrapper.vm.countries).toContain("DE");
+    expect(wrapper.vm.countries).toContainEqual({ label: "ES", value: "es" });
+    expect(wrapper.vm.countries).toContainEqual({ label: "US", value: "en" });
+    expect(wrapper.vm.countries).toContainEqual({ label: "FR", value: "fr" });
+    expect(wrapper.vm.countries).toContainEqual({ label: "DE", value: "de" });
     expect(wrapper.vm.countries).toHaveLength(4);
   });
 

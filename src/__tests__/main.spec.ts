@@ -21,6 +21,17 @@ vi.mock('pinia', async (importOriginal) => {
     };
 });
 
+vi.mock("@/stores/langStore", () => ({
+  useLangStore: vi.fn(() => ({
+    init: vi.fn(),
+    fetchLanguage: vi.fn(),
+  })),
+}))
+
+vi.mock("@/stores/themeStore", () => ({
+  useThemeStore: vi.fn(() => ({ loadTheme: vi.fn() })),
+}))
+
 vi.mock('../../src/router/index', () => ({
     router: { name: 'MockedRouter' }
 }));
