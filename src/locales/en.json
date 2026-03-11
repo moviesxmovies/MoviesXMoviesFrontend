@@ -55,7 +55,7 @@
   "verify": {
     "toast": {
       "success": "Email verified successfully",
-      "error": "Verification failed. Please try again.",
+      "inocrrectLength": "Please enter the full 6-digit code.",
       "invalidCode": "Invalid verification code",
       "resendSuccess": "Verification code resent to your email",
       "resendError": "Failed to resend verification code. Please try again."

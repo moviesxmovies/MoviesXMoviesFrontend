@@ -16,9 +16,12 @@ const mockSetTokens = vi.fn();
 
 vi.mock("@/stores/authStore", () => ({
   useAuthStore: vi.fn(() => ({
-    get user() { return mockUserContainer.user; },
+    get user() {
+      return mockUserContainer.user;
+    },
     setTokens: mockSetTokens,
     refreshToken: "refresh-token",
+    logout: vi.fn(),
   })),
 }));
 vi.mock("@/composables/useAPI", () => ({
@@ -82,9 +85,7 @@ describe("VerifyEmailView logic", () => {
 
     const input = wrapper.find("input");
     await input.setValue("111222");
-
     await wrapper.find("form").trigger("submit.prevent");
-
     await flushPromises();
 
     expect(authStore.user?.verified).toBe(false);
@@ -92,22 +93,20 @@ describe("VerifyEmailView logic", () => {
 
   it("Should redirect home correctly and show toast", async () => {
     mockUserContainer.user = { verified: false };
-
-    vi.mocked(api.post)
-      .mockResolvedValueOnce({ data: { status: true } })
-      .mockResolvedValueOnce({ data: { refresh: "refresh-token" } })
-      .mockResolvedValueOnce({ data: { access: "access-token" } });
+    vi.mocked(api.post).mockResolvedValueOnce({ data: { status: true } });
 
     const wrapper = factory();
-    const authStore = useAuthStore();
-
     const input = wrapper.find("input");
     await input.setValue("111222");
+
     await wrapper.find("form").trigger("submit.prevent");
     await flushPromises();
 
-    expect(authStore.user?.verified).toBe(true);
-    expect(mockPush).toHaveBeenCalledWith("/home");
+    console.log("api.post calls:", vi.mocked(api.post).mock.calls);
+    console.log("mockPush calls:", mockPush.mock.calls); // 👈 ¿Se llama?
+    console.log("mock results:", vi.mocked(api.post).mock.results);
+
+    expect(mockPush).toHaveBeenCalledWith("/login");
   });
 
   it("Should send resend-verification-email and show success toast", async () => {

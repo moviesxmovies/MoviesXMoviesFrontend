@@ -39,7 +39,7 @@ const sendVerificationCode = async () => {
 
 const handleVerification = async () => {
   if (verificationCode.value.length !== 6) {
-    error.value = t("verify.toast.invalidCode");
+    error.value = t("verify.toast.inocrrectLength");
     return;
   }
 
@@ -64,7 +64,7 @@ const handleVerification = async () => {
     toast.add({
       severity: "error",
       summary: "Error",
-      detail: error.response?.data?.message || t("verify.toast.error"),
+      detail: error.response?.data?.message || t("verify.toast.invalidCode"),
       life: 3000,
     });
   }
