@@ -6,20 +6,29 @@ export const useLangStore = defineStore("lang", {
   state: () => ({
     language: localStorage.getItem("language") || "en",
   }),
-  getters: {
-    getLanguage: (state) => state.language,
-  },
   actions: {
-    async setLanguage(lang: string) {
+    setLanguage(lang: string) {
       this.language = lang;
-      const { status } = await api.post("/user/preferred-language", {
-        preferred_language: lang,
-      });
-      if (status !== 200) {
-        return;
-      }
       (i18n.global.locale.value as any) = lang.toLowerCase();
       localStorage.setItem("language", lang);
+    },
+
+    async changeLanguage(lang: string) {
+      const { status } = await api.post("/users/preferred-language/", {
+        preferred_language: lang,
+      });
+      if (status !== 200) return;
+      this.setLanguage(lang);
+    },
+
+    async fetchLanguage() {
+      const { data, status } = await api.get("/users/preferred-language/");
+      const lang =
+        status === 200
+          ? data.preferred_language
+          : localStorage.getItem("language") || "en";
+
+      this.setLanguage(lang);
     },
   },
 });

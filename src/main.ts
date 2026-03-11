@@ -33,9 +33,6 @@ const langStore = useLangStore(pinia);
 const themeStore = useThemeStore(pinia);
 
 themeStore.loadTheme();
-//langStore.getLanguage;
+langStore.fetchLanguage();
 
 app.mount("#app");
-
-
-
