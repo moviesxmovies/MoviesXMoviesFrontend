@@ -86,7 +86,7 @@
       "number": "Password must include a number"
     },
     "confirmPassword": {
-      "required": "Confirm password is required",
+      "required": "Please confirm your password",
       "mismatch": "Passwords do not match"
     },
     "checks": {
