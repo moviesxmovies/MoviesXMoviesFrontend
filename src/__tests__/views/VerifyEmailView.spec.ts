@@ -9,10 +9,14 @@ import { api } from "@/composables/useAPI";
 import { useAuthStore } from "../../stores/authStore";
 import i18n from "@/i18n";
 
-const mockPush = vi.fn();
-const mockToast = { add: vi.fn() };
+const { mockSetTokens, mockPush, mockToast, mockPost } = vi.hoisted(() => ({
+  mockSetTokens: vi.fn(),
+  mockPush: vi.fn(),
+  mockToast: { add: vi.fn() },
+  mockPost: vi.fn(),
+}));
+
 const mockUserContainer = { user: { verified: false } };
-const mockSetTokens = vi.fn();
 
 vi.mock("@/stores/authStore", () => ({
   useAuthStore: vi.fn(() => ({
@@ -24,15 +28,7 @@ vi.mock("@/stores/authStore", () => ({
     logout: vi.fn(),
   })),
 }));
-vi.mock("@/composables/useAPI", () => ({
-  api: {
-    post: vi.fn(),
-    interceptors: {
-      request: { use: vi.fn() },
-      response: { use: vi.fn() },
-    },
-  },
-}));
+vi.mock("@/composables/useAPI", () => ({ api: { post: mockPost } }));
 vi.mock("@/config", () => ({
   config: {
     googleClientId: "test-client-id",
@@ -44,7 +40,9 @@ vi.mock("vue-router", () => ({
   useRouter: () => ({ push: mockPush }),
   useRoute: vi.fn(() => ({ query: {} })),
 }));
-vi.mock("primevue/usetoast", () => ({ useToast: () => mockToast }));
+vi.mock("primevue/usetoast", () => ({
+  useToast: () => mockToast,
+}));
 describe("VerifyEmailView logic", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -59,7 +57,7 @@ describe("VerifyEmailView logic", () => {
     });
   };
 
-  it("Should send toast error if verification code not 6 digits", async () => {
+  it("Should show error if verification code not 6 digits", async () => {
     const wrapper = factory();
 
     await wrapper.find("input").setValue("123");
@@ -72,7 +70,7 @@ describe("VerifyEmailView logic", () => {
     );
   });
 
-  it("Should send toast error if verification code is wrong", async () => {
+  it("Should show toast if verification code is wrong", async () => {
     const wrapper = factory();
     const authStore = useAuthStore();
 
@@ -101,10 +99,6 @@ describe("VerifyEmailView logic", () => {
 
     await wrapper.find("form").trigger("submit.prevent");
     await flushPromises();
-
-    console.log("api.post calls:", vi.mocked(api.post).mock.calls);
-    console.log("mockPush calls:", mockPush.mock.calls); // 👈 ¿Se llama?
-    console.log("mock results:", vi.mocked(api.post).mock.results);
 
     expect(mockPush).toHaveBeenCalledWith("/login");
   });
