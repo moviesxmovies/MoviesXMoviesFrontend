@@ -80,13 +80,13 @@ describe("useLangStore", () => {
   });
 
   it("Should get language from localStorage when api fails", async () => {
-    localStorageMock.getItem.mockReturnValue("zh");
+    localStorageMock.getItem.mockReturnValue("de");
     mockGet.mockResolvedValueOnce({ status: 401, data: {} });
     const store = useLangStore();
 
     await store.fetchLanguage();
 
-    expect(store.language).toBe("zh");
+    expect(store.language).toBe("de");
   });
 
   it("Should get default language when api fails and localStorage is empty", async () => {

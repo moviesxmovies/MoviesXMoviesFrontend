@@ -1,7 +1,7 @@
 import { api } from "@/composables/useAPI";
 import i18n from "@/i18n";
 import {
-  defaultLanguage,
+  DEFAULT_LANGUAGE,
   getValidLocale,
 } from "@/repositories/i18n/i18nRepository";
 import { defineStore } from "pinia";
@@ -31,11 +31,11 @@ export const useLangStore = defineStore("lang", {
         if (status === 200 && data.preferred_language) {
           this.setLanguage(data.preferred_language);
         } else {
-          await this.changeLanguage(this.language ?? defaultLanguage);
+          await this.changeLanguage(this.language ?? DEFAULT_LANGUAGE);
         }
       } catch (error) {
         console.error(error);
-        this.setLanguage(this.language ?? defaultLanguage);
+        this.setLanguage(this.language ?? DEFAULT_LANGUAGE);
       }
     },
   },

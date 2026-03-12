@@ -1,6 +1,6 @@
 import { availableCountries } from "@/types";
 
-export const defaultLanguage = "en";
+export const DEFAULT_LANGUAGE = "en";
 
 export const getValidLocale = () => {
   const languageObtained =
@@ -8,6 +8,5 @@ export const getValidLocale = () => {
   const exists = availableCountries.some(
     ({ value }) => value === languageObtained,
   );
-  console.log(exists, languageObtained);
-  return exists ? languageObtained : defaultLanguage;
+  return exists ? languageObtained : DEFAULT_LANGUAGE;
 };
