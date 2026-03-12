@@ -2,15 +2,11 @@
 import { ref } from "vue";
 import Select from "primevue/select";
 import { useLangStore } from "@/stores/langStore";
+import { availableCountries } from "@/types";
 
 const langStore = useLangStore();
-const selectedCountry = ref<{ label: string, value: string} | null>(null);
-const countries = ref([
-  { label: "ES", value: "es" },
-  { label: "US", value: "en" },
-  { label: "FR", value: "fr" },
-  { label: "DE", value: "de" },
-]);
+const selectedCountry = ref<{ label: string; value: string } | null>(null);
+const countries = ref(availableCountries);
 
 const getFlagUrl = (label: string) =>
   `https://flagcdn.com/w20/${label.toLowerCase()}.png`;
