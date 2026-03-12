@@ -47,6 +47,7 @@ describe("useLangStore", () => {
     expect(store.language).toBe("en");
   });
 
+  // SetLenguage
   it("setLanguage changes the language", () => {
     const store = useLangStore();
     store.setLanguage("es");
@@ -66,6 +67,7 @@ describe("useLangStore", () => {
     expect(i18n.default.global.locale.value).toBe("de");
   });
 
+  // ChangeLanguage
   it("Should return 200 when changing language", async () => {
     mockPost.mockResolvedValueOnce({ status: 200 });
     const store = useLangStore();
@@ -77,6 +79,52 @@ describe("useLangStore", () => {
       preferred_language: "fr",
     });
     expect(spy).toHaveBeenCalledWith("fr");
+  });
+
+  // GetLanguage
+  it("Should set language if API returns it (Success Case)", async () => {
+    mockGet.mockResolvedValueOnce({ 
+      status: 200, 
+      data: { preferred_language: "fr" } 
+    });
+    
+    const store = useLangStore();
+    const spy = vi.spyOn(store, "setLanguage");
+
+    await store.fetchLanguage();
+
+    expect(spy).toHaveBeenCalledWith("fr");
+    expect(store.language).toBe("fr");
+  });
+
+  it("Should call changeLanguage with local detected language if API has no language", async () => {
+    mockGet.mockResolvedValueOnce({ 
+      status: 200, 
+      data: { preferred_language: null } 
+    });
+    
+    const store = useLangStore();
+    store.language = 'es'; 
+    const spy = vi.spyOn(store, "changeLanguage");
+
+    await store.fetchLanguage();
+
+    expect(spy).toHaveBeenCalledWith("es");
+  });
+
+  it("Should fallback to current language and log error on API catch", async () => {
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    mockGet.mockRejectedValueOnce(new Error("Network Error"));
+    
+    const store = useLangStore();
+    store.language = 'de';
+    const spy = vi.spyOn(store, "setLanguage");
+
+    await store.fetchLanguage();
+
+    expect(consoleSpy).toHaveBeenCalled();
+    expect(spy).toHaveBeenCalledWith("de");
+    consoleSpy.mockRestore();
   });
 
   it("Should get language from localStorage when api fails", async () => {
@@ -92,6 +140,16 @@ describe("useLangStore", () => {
   it("Should get default language when api fails and localStorage is empty", async () => {
     localStorageMock.getItem.mockReturnValue(null);
     mockGet.mockResolvedValueOnce({ status: 503, data: {} });
+    const store = useLangStore();
+
+    await store.fetchLanguage();
+
+    expect(store.language).toBe("en");
+  });
+
+  it("Should get default language when language is not in available languages", async () => {
+    localStorageMock.getItem.mockReturnValue("ch");
+    mockGet.mockResolvedValueOnce({ status: 401, data: {} });
     const store = useLangStore();
 
     await store.fetchLanguage();
