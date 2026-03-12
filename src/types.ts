@@ -2,7 +2,7 @@ export interface JWTPayload {
   username: string;
   boarded: boolean;
   verified: boolean;
-  exp: number; 
+  exp: number;
   user_id: number;
   preferred_language: string;
 }
@@ -29,3 +29,10 @@ export interface LoginResponse {
   access: string;
   refresh: string;
 }
+
+export const availableCountries = [
+  { label: "ES", value: "es" },
+  { label: "US", value: "en" },
+  { label: "FR", value: "fr" },
+  { label: "DE", value: "de" },
+];

@@ -1,34 +1,42 @@
 import { api } from "@/composables/useAPI";
 import i18n from "@/i18n";
+import {
+  defaultLanguage,
+  getValidLocale,
+} from "@/repositories/i18n/i18nRepository";
 import { defineStore } from "pinia";
 
 export const useLangStore = defineStore("lang", {
   state: () => ({
-    language: localStorage.getItem("language") || "en",
+    language: getValidLocale(),
   }),
   actions: {
     setLanguage(lang: string) {
       this.language = lang;
-      (i18n.global.locale.value as any) = lang.toLowerCase();
+      (i18n.global.locale.value as any) = lang;
       localStorage.setItem("language", lang);
     },
 
     async changeLanguage(lang: string) {
-      const { status } = await api.post("/users/preferred-language/", {
+      api.post("/users/preferred-language/", {
         preferred_language: lang,
       });
-      if (status !== 200) return;
       this.setLanguage(lang);
     },
 
     async fetchLanguage() {
-      const { data, status } = await api.get("/users/preferred-language/");
-      const lang =
-        status === 200
-          ? data.preferred_language
-          : localStorage.getItem("language") || "en";
+      try {
+        const { data, status } = await api.get("/users/preferred-language/");
 
-      this.setLanguage(lang);
+        if (status === 200 && data.preferred_language) {
+          this.setLanguage(data.preferred_language);
+        } else {
+          await this.changeLanguage(this.language ?? defaultLanguage);
+        }
+      } catch (error) {
+        console.error(error);
+        this.setLanguage(this.language ?? defaultLanguage);
+      }
     },
   },
 });
