@@ -2,9 +2,12 @@
 import Card from "@/components/appCardComponent.vue";
 import { api } from "@/composables/useAPI";
 import { config } from "@/config";
+import { useLangStore } from "@/stores/langStore";
 import Step1 from "@/views/signup/step1.vue";
 import Step2 from "@/views/signup/step2.vue";
 import { reactive, ref, type Component } from "vue";
+
+const useLang = useLangStore();
 
 const steps: Record<number, Component> = {
   1: Step1,
@@ -36,10 +39,17 @@ const handleForm = async () => {
   form.append("first_name", formData.first_name);
   form.append("last_name", formData.last_name);
   if (formData.image) {
-    form.append("image", formData.image);
+    form.append(
+      "picture",
+      formData.image as Blob,
+      (formData.image as File).name,
+    );
   }
 
-  await api.post(config.apiUrl + "/auth/signup/", form);
+  await api.post(
+    config.apiUrl + "/auth/signup/?lang=" + useLang.language,
+    form,
+  );
 };
 </script>
 
