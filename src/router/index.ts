@@ -23,7 +23,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/signup",
-    component: () => import("../views/SignupView.vue"),
+    component: () => import("../views/NewSignupView.vue"),
   },
   {
     path: "/home",

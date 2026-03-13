@@ -2,6 +2,7 @@ import { api } from "@/composables/useAPI";
 import { config } from "@/config";
 import { useAuthStore } from "@/stores/authStore";
 import type { LoginPayload, RegisterPayload } from "@/types";
+import { defineComponent, h } from "vue";
 
 const authStore = useAuthStore();
 
@@ -30,3 +31,19 @@ export const oauthLogin = async (code: string) => {
   }
 };
 
+export const FieldMsg = defineComponent({
+  props: { field: Object },
+  setup(props) {
+    return () => {
+      const f = props.field as any;
+      if (!f?.dirty) return null;
+
+      if (f.invalid) {
+        return h("div", { class: "field-msg error" }, [
+          h("i", { class: "pi pi-times-circle msg-icon" }),
+          f.error?.message,
+        ]);
+      }
+    };
+  },
+});

@@ -13,11 +13,12 @@ export interface AuthResponse {
 }
 
 export interface RegisterPayload {
-  first_name: string;
-  last_name: string;
-  username: string;
   email: string;
   password: string;
+  confirm_password: string;
+  first_name: string;
+  last_name: string;
+  image: File | null;
 }
 
 export interface LoginPayload {
