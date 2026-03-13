@@ -20,7 +20,7 @@ const router = useRouter();
 
 const sendVerificationCode = async () => {
   try {
-    await api.post(config.apiUrl + "/auth/resend-verification-email/");
+    await api.post("/auth/resend-verification-email/");
     toast.add({
       severity: "success",
       summary: "Success",
@@ -47,7 +47,7 @@ const handleVerification = async () => {
   error.value = "";
 
   try {
-    const { data } = await api.post(config.apiUrl + "/auth/verify/", {
+    const { data } = await api.post("/auth/verify/", {
       verification_code: verificationCode.value,
     });
     if (data.status) {

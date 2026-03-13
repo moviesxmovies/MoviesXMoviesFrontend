@@ -33,7 +33,7 @@ describe("AuthRepository", () => {
 
     const result = await handleRegister(userData);
 
-    expect(api.post).toHaveBeenCalledWith(config.apiUrl + "/auth/signup/", userData);
+    expect(api.post).toHaveBeenCalledWith("/auth/signup/", userData);
     expect(result).toEqual({ ...userData });
   });
 });

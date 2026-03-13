@@ -46,10 +46,7 @@ const handleForm = async () => {
     );
   }
 
-  await api.post(
-    config.apiUrl + "/auth/signup/?lang=" + useLang.language,
-    form,
-  );
+  await api.post("/auth/signup/?lang=" + useLang.language, form);
 };
 </script>
 
