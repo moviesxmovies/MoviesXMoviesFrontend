@@ -80,7 +80,7 @@ const onFileSelect = (event: FileUploadSelectEvent) => {
           v-else
           :src="imagePreview"
           alt="Avatar"
-          class="w-24 h-24 rounded-full object-cover border-2"
+          class="w-24 h-24 rounded-full object-cover border-2 m-auto"
           style="border-color: var(--primary)"
         />
 
@@ -96,6 +96,8 @@ const onFileSelect = (event: FileUploadSelectEvent) => {
       <FileUpload
         ref="fileUploadRef"
         mode="basic"
+        :auto="true"
+        chooseLabel=""
         accept="image/png, image/jpeg"
         :maxFileSize="1000000"
         :multiple="false"

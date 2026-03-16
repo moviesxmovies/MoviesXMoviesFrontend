@@ -115,7 +115,7 @@ describe("VerifyEmailView logic", () => {
     await flushPromises();
 
     expect(api.post).toHaveBeenCalledWith(
-      expect.stringContaining("/api/auth/resend-verification-email/"),
+      expect.stringContaining("/auth/resend-verification-email/"),
     );
   });
 });

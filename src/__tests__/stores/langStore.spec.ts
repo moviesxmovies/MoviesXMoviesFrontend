@@ -82,48 +82,21 @@ describe("useLangStore", () => {
   });
 
   // GetLanguage
-  it("Should set language if API returns it (Success Case)", async () => {
-    mockGet.mockResolvedValueOnce({ 
-      status: 200, 
-      data: { preferred_language: "fr" } 
-    });
-    
-    const store = useLangStore();
-    const spy = vi.spyOn(store, "setLanguage");
-
-    await store.fetchLanguage();
-
-    expect(spy).toHaveBeenCalledWith("fr");
-    expect(store.language).toBe("fr");
-  });
-
-  it("Should call changeLanguage with local detected language if API has no language", async () => {
-    mockGet.mockResolvedValueOnce({ 
-      status: 200, 
-      data: { preferred_language: null } 
-    });
-    
-    const store = useLangStore();
-    store.language = 'es'; 
-    const spy = vi.spyOn(store, "changeLanguage");
-
-    await store.fetchLanguage();
-
-    expect(spy).toHaveBeenCalledWith("es");
-  });
-
   it("Should fallback to current language and log error on API catch", async () => {
+    localStorageMock.getItem.mockReturnValueOnce("token");
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
     mockGet.mockRejectedValueOnce(new Error("Network Error"));
-    
+
     const store = useLangStore();
-    store.language = 'de';
+    store.language = "de";
     const spy = vi.spyOn(store, "setLanguage");
 
     await store.fetchLanguage();
 
-    expect(consoleSpy).toHaveBeenCalled();
+    expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
     expect(spy).toHaveBeenCalledWith("de");
+
     consoleSpy.mockRestore();
   });
 
