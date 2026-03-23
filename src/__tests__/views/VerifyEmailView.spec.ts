@@ -1,13 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { flushPromises, mount } from "@vue/test-utils";
 import ToastService from "primevue/toastservice";
-import { Button, InputOtp, Message } from "primevue";
 import PrimeVue from "primevue/config";
 import { useAuthStore } from "../../stores/authStore";
 import { api } from "../../composables/useAPI";
 import i18n from "../../i18n";
 import VerifyEmailView from "../../views/VerifyEmailView.vue";
-import { refreshToken } from "../../repositories/auth/authRepository";
 
 const { mockSetTokens, mockPush, mockToast, mockPost } = vi.hoisted(() => ({
   mockSetTokens: vi.fn(),
@@ -52,7 +50,6 @@ describe("VerifyEmailView logic", () => {
     return mount(VerifyEmailView, {
       global: {
         plugins: [PrimeVue, ToastService, i18n],
-        components: { InputOtp, Message, Button },
       },
     });
   };
@@ -87,21 +84,24 @@ describe("VerifyEmailView logic", () => {
     expect(authStore.user?.verified).toBe(false);
   });
 
-  // it("Should redirect home correctly after correct code", async () => {
-  //   mockUserContainer.user = { verified: false };
-  //   vi.mocked(api.post).mockResolvedValueOnce({
-  //     data: { status: true },
-  //   });
+  it("Should redirect home correctly after correct code", async () => {
+    mockUserContainer.user = { verified: false };
+    vi.mocked(api.post).mockResolvedValueOnce({
+      data: { status: true, refresh_token: "mock-refresh-token" },
+    });
 
-  //   const wrapper = factory();
-  //   const input = wrapper.find("input");
-  //   await input.setValue("111222");
+    vi.mocked(api.post).mockResolvedValueOnce({
+      data: { access: "mock-access-token" },
+    });
 
-  //   await wrapper.find("form").trigger("submit.prevent");
-  //   await flushPromises();
+    const wrapper = factory();
+    const input = wrapper.find("input");
+    await input.setValue("111222");
+    await wrapper.find("form").trigger("submit.prevent");
+    await flushPromises();
 
-  //   expect(mockPush).toHaveBeenCalledWith("/home");
-  // });
+    expect(mockPush).toHaveBeenCalledWith("/home");
+  });
 
   it("Should send resend-verification-email and show success toast", async () => {
     vi.mocked(api.post).mockResolvedValue({ data: {} });

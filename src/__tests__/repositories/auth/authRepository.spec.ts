@@ -1,10 +1,23 @@
-import { vi, describe, it, expect } from "vitest";
-import { api } from "@/composables/useAPI";
-import { handleRegister } from "@/repositories/auth/authRepository";
-import { config } from "@/config";
+import { vi, describe, it, expect, beforeEach } from "vitest";
+import { handleRegister, handleLogin, oauthLogin, refreshToken } from "../../../repositories/auth/authRepository";
+import { useAuthStore } from "../../../stores/authStore";
+
+const { mockPost, mockSetTokens } = vi.hoisted(() => ({
+  mockPost: vi.fn(),
+  mockSetTokens: vi.fn(),
+}));
+
+vi.mock("@/composables/useAPI", () => ({
+  api: {
+    post: mockPost,
+  },
+}));
 
 vi.mock("@/stores/authStore", () => ({
-  useAuthStore: vi.fn(),
+  useAuthStore: vi.fn(() => ({
+    setTokens: mockSetTokens,
+    logout: vi.fn(),
+  })),
 }));
 
 vi.mock("@/config", () => ({
@@ -13,14 +26,13 @@ vi.mock("@/config", () => ({
   },
 }));
 
-vi.mock("@/composables/useAPI", () => ({
-  api: {
-    post: vi.fn(),
-  },
-}));
-
 describe("AuthRepository", () => {
-  it("register calls API with correct parameters", async () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  // handleRegister
+  it("handleRegister calls API with correct parameters and returns data", async () => {
     const userData = {
       first_name: "John",
       last_name: "Doe",
@@ -28,12 +40,72 @@ describe("AuthRepository", () => {
       email: "john.doe@example.com",
       password: "Password123!",
     };
-
-    vi.mocked(api.post).mockResolvedValue({ data: { ...userData } });
+    mockPost.mockResolvedValueOnce({ data: userData });
 
     const result = await handleRegister(userData);
 
-    expect(api.post).toHaveBeenCalledWith("/auth/signup/", userData);
-    expect(result).toEqual({ ...userData });
+    expect(mockPost).toHaveBeenCalledWith("/auth/signup/", userData);
+    expect(result).toEqual(userData);
+  });
+
+  it("handleRegister throws when API fails", async () => {
+    mockPost.mockRejectedValueOnce(new Error("Network error"));
+
+    await expect(handleRegister({} as any)).rejects.toThrow("Network error");
+  });
+
+  // handleLogin
+  it("handleLogin calls API with correct parameters and sets tokens", async () => {
+    mockPost.mockResolvedValueOnce({ data: { access: "access-token", refresh: "refresh-token" } });
+
+    await handleLogin({ username: "johndoe", password: "Password123!" });
+
+    expect(mockPost).toHaveBeenCalledWith("/auth/login/", {
+      username: "johndoe",
+      password: "Password123!",
+    });
+    expect(mockSetTokens).toHaveBeenCalledWith("access-token", "refresh-token");
+  });
+
+  it("handleLogin throws when API fails", async () => {
+    mockPost.mockRejectedValueOnce(new Error("Invalid credentials"));
+
+    await expect(handleLogin({ username: "johndoe", password: "wrong" })).rejects.toThrow(
+      "Invalid credentials"
+    );
+  });
+
+  // oauthLogin
+  it("oauthLogin calls API with correct code and sets tokens", async () => {
+    mockPost.mockResolvedValueOnce({ data: { access: "access-token", refresh: "refresh-token" } });
+
+    await oauthLogin("oauth-code-123");
+
+    expect(mockPost).toHaveBeenCalledWith("/oauth/google/", { code: "oauth-code-123" });
+    expect(mockSetTokens).toHaveBeenCalledWith("access-token", "refresh-token");
+  });
+
+  it("oauthLogin throws when API fails", async () => {
+    mockPost.mockRejectedValueOnce(new Error("OAuth error"));
+
+    await expect(oauthLogin("bad-code")).rejects.toThrow("OAuth error");
+  });
+
+  // refreshToken
+  it("refreshToken calls API with correct token and sets tokens", async () => {
+    mockPost.mockResolvedValueOnce({ data: { access: "new-access-token" } });
+
+    await refreshToken("my-refresh-token");
+
+    expect(mockPost).toHaveBeenCalledWith("/auth/refresh/", {
+      refresh_token: "my-refresh-token",
+    });
+    expect(mockSetTokens).toHaveBeenCalledWith("new-access-token", "my-refresh-token");
+  });
+
+  it("refreshToken throws when API fails", async () => {
+    mockPost.mockRejectedValueOnce(new Error("Token expired"));
+
+    await expect(refreshToken("bad-token")).rejects.toThrow("Token expired");
   });
 });

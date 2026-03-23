@@ -1,6 +1,7 @@
 import { setActivePinia, createPinia } from "pinia";
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { useLangStore } from "@/stores/langStore";
+import { useLangStore } from "../../stores/langStore";
+import { DEFAULT_LANGUAGE } from "../../repositories/i18n/i18nRepository";
 
 const { mockPost, mockGet } = vi.hoisted(() => ({
   mockPost: vi.fn(),
@@ -14,7 +15,7 @@ const localStorageMock = {
 };
 Object.defineProperty(globalThis, "localStorage", { value: localStorageMock });
 
-vi.mock("@/composables/useAPI", () => ({
+vi.mock("../../composables/useAPI", () => ({
   api: {
     post: mockPost,
     get: mockGet,
@@ -29,10 +30,22 @@ vi.mock("@/i18n", () => ({
   },
 }));
 
+vi.mock("@/stores/authStore", () => ({
+  useAuthStore: vi.fn(() => ({
+    token: "mock-token",
+    refreshToken: "mock-refresh-token",
+    isTokenExpired: vi.fn().mockReturnValue(false),
+    setTokens: vi.fn(),
+    logout: vi.fn(),
+  })),
+}));
+
 describe("useLangStore", () => {
   beforeEach(() => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
+    localStorageMock.getItem.mockReturnValue(null);
+    vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
   it("localStorage instanciates with the correct language", () => {
@@ -81,27 +94,6 @@ describe("useLangStore", () => {
     expect(spy).toHaveBeenCalledWith("fr");
   });
 
-  // GetLanguage
-  // it("Should fallback to current language and log error on API catch", async () => {
-  //   localStorageMock.getItem.mockReturnValueOnce("token");
-  //   mockGet.mockRejectedValueOnce(new Error("Network Error"));
-
-  //   const store = useLangStore();
-  //   store.language = "de";
-
-  //   const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-  //   const spy = vi.spyOn(store, "setLanguage");
-
-  //   console.log("mockGet is:", mockGet);
-  //   console.log("mockGet mock:", mockGet.mock);
-  //   await store.fetchLanguage();
-
-  //   expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
-  //   expect(spy).toHaveBeenCalledWith("de");
-
-  //   consoleSpy.mockRestore();
-  // });
-
   it("Should get language from localStorage when api fails", async () => {
     localStorageMock.getItem.mockReturnValue("de");
     mockGet.mockResolvedValueOnce({ status: 401, data: {} });
@@ -130,5 +122,34 @@ describe("useLangStore", () => {
     await store.fetchLanguage();
 
     expect(store.language).toBe("en");
+  });
+
+  //FetchLanguage
+  it("should set language from API when token exists and API returns preferred_language", async () => {
+    mockGet.mockResolvedValueOnce({ data: { preferred_language: "es" } });
+
+    console.log("mockGet implementation:", mockGet.getMockImplementation());
+    console.log("mockGet results:", mockGet.mock.results);
+
+    const store = useLangStore();
+    await store.fetchLanguage();
+
+    console.log("mockGet calls:", mockGet.mock.calls);
+    console.log("mockGet results after:", mockGet.mock.results);
+  });
+
+  it("should set default language when no token exists", async () => {
+    localStorageMock.getItem.mockImplementation(() => null);
+    const store = useLangStore();
+    await store.fetchLanguage();
+    expect(mockGet).not.toHaveBeenCalled();
+    expect(store.language).toBe(DEFAULT_LANGUAGE);
+  });
+
+  it("should set default language when API returns no preferred_language", async () => {
+    const store = useLangStore();
+    mockGet.mockResolvedValueOnce({ data: {} });
+    await store.fetchLanguage();
+    expect(store.language).toBe(DEFAULT_LANGUAGE);
   });
 });

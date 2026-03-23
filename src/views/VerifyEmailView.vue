@@ -128,6 +128,8 @@ const handleVerification = async () => {
         <Button
           variant="link"
           label="Link"
+          type="button"
+          data-testid="resend-btn"
           @click="sendVerificationCode"
           class="mt-4 sm:mt-6 text-[#bcbbdd] text-xs hover:text-[#f2f2f2] transition-colors underline decoration-[#3a31d8]"
         >

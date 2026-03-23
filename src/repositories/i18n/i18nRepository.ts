@@ -4,7 +4,7 @@ export const DEFAULT_LANGUAGE = "en";
 
 export const getValidLocale = () => {
   const languageObtained =
-    localStorage.getItem("locale") || navigator.language?.split("-")[0];
+    localStorage.getItem("language") || navigator.language?.split("-")[0];
   const exists = availableCountries.some(
     ({ value }) => value === languageObtained,
   );
