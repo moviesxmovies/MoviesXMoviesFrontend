@@ -188,3 +188,24 @@ const onFileSelect = (event: FileUploadSelectEvent) => {
     </Form>
   </div>
 </template>
+
+<style scoped>
+.field-msg {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  animation: fadeIn 0.15s ease;
+}
+.field-msg.error {
+  color: #ef4444;
+}
+.field-msg.success {
+  color: #22c55e;
+}
+
+.msg-icon {
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+</style>

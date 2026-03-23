@@ -1,5 +1,4 @@
 import { api } from "@/composables/useAPI";
-import { config } from "@/config";
 import { useAuthStore } from "@/stores/authStore";
 import type { LoginPayload, RegisterPayload } from "@/types";
 import { defineComponent, h } from "vue";
@@ -47,3 +46,12 @@ export const FieldMsg = defineComponent({
     };
   },
 });
+
+export const refreshToken = async (refresh_token: string) => {
+  try {
+    const { data } = await api.post("/auth/refresh/", { refresh_token });
+    authStore.setTokens(data.access, refresh_token);
+  } catch (error: any) {
+    throw error;
+  }
+};

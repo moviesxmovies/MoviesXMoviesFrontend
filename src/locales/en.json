@@ -1,4 +1,8 @@
 {
+  "toast": {
+    "success": "Operation successful",
+    "error": "An error occurred"
+  },
   "components": {
     "selectLanguage": "Select a Language",
     "oauthButton": "Sign in with {0}",

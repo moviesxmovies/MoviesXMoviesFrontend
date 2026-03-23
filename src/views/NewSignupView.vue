@@ -1,11 +1,9 @@
 <script lang="ts" setup>
-import Card from "@/components/appCardComponent.vue";
-import ProgressBar from "@/components/progressBar.vue";
 import { api } from "@/composables/useAPI";
 import { useLangStore } from "@/stores/langStore";
 import Step1 from "@/views/signup/step1.vue";
 import Step2 from "@/views/signup/step2.vue";
-import { useToast } from "primevue";
+import { ProgressBar, useToast } from "primevue";
 import { reactive, ref, type Component } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
@@ -82,22 +80,9 @@ const signup = async (form: FormData) => {
        style="background-color: var(--background)">
 
     <div class="w-full max-w-md">
-      <div class="mb-6">
-        <div class="flex justify-between text-xs mb-2"
-             style="color: var(--text); opacity: 0.5">
-          <span>{{ $t("signup.step") }} {{ currentStep }} / {{ Object.keys(steps).length }}</span>
-          <span>{{ Math.round((currentStep / Object.keys(steps).length) * 100) }}%</span>
-        </div>
-        <div class="w-full h-1 rounded-full overflow-hidden"
-             style="background-color: var(--secondary)">
-          <div
-            class="h-full rounded-full transition-all duration-500 ease-in-out"
-            style="background-color: var(--primary)"
-            :style="{ width: `${(currentStep / Object.keys(steps).length) * 100}%` }"
-          />
-        </div>
+      <div class="mb-4">
+        <ProgressBar :value="currentStep*100/Object.keys(steps).length">{{  }}</ProgressBar>
       </div>
-
       <div class="rounded-2xl border p-8 shadow-sm"
            style="background-color: var(--background); border-color: var(--secondary)">
         <keep-alive>
