@@ -73,6 +73,8 @@ const signup = async (form: FormData) => {
     });
   }
 };
+
+defineExpose({ currentStep, formData, next, handleForm });
 </script>
 
 <template>
