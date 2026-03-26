@@ -21,7 +21,6 @@ const authStore = useAuthStore();
         <div class="nav-right">
             <LangComponent />
             <ThemeComponent />
-
             <button class="btn-ghost" @click="router.push('/profile')" v-if="authStore.isAuthenticated">
                 {{ $t("home.profile") }}
             </button>
