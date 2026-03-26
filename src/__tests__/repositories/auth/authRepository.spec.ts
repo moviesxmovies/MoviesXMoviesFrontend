@@ -1,6 +1,6 @@
 import { vi, describe, it, expect, beforeEach } from "vitest";
-import { handleRegister, handleLogin, oauthLogin, refreshToken } from "../../../repositories/auth/authRepository";
-import { useAuthStore } from "../../../stores/authStore";
+import { handleRegister, handleLogin, oauthLogin, refreshToken, FieldMsg } from "../../../repositories/auth/authRepository";
+import { mount } from "@vue/test-utils";
 
 const { mockPost, mockSetTokens } = vi.hoisted(() => ({
   mockPost: vi.fn(),
@@ -107,5 +107,109 @@ describe("AuthRepository", () => {
     mockPost.mockRejectedValueOnce(new Error("Token expired"));
 
     await expect(refreshToken("bad-token")).rejects.toThrow("Token expired");
+  });
+});
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function mountFieldMsg(field: Record<string, any> | undefined) {
+  return mount(FieldMsg, { props: { field } });
+}
+
+// ── Tests ─────────────────────────────────────────────────────────────────────
+
+describe("FieldMsg", () => {
+  describe("when field is undefined / null", () => {
+    it("renders nothing when field is undefined", () => {
+      const wrapper = mountFieldMsg(undefined);
+      expect(wrapper.html()).toBe("");
+    });
+
+    it("renders nothing when field is null", () => {
+      const wrapper = mountFieldMsg(undefined); // null cast as undefined
+      expect(wrapper.html()).toBe("");
+    });
+  });
+
+  describe("when field.dirty is false", () => {
+    it("renders nothing when dirty=false and invalid=false", () => {
+      const wrapper = mountFieldMsg({ dirty: false, invalid: false, error: null });
+      expect(wrapper.html()).toBe("");
+    });
+
+    it("renders nothing when dirty=false even if there is an error", () => {
+      const wrapper = mountFieldMsg({ dirty: false, invalid: true, error: { message: "Required" } });
+      expect(wrapper.html()).toBe("");
+    });
+  });
+
+  describe("when field.dirty is true and field.invalid is true", () => {
+    it("renders a div.field-msg.error", () => {
+      const wrapper = mountFieldMsg({ dirty: true, invalid: true, error: { message: "Invalid email" } });
+      const div = wrapper.find("div.field-msg.error");
+      expect(div.exists()).toBe(true);
+    });
+
+    it("renders the error icon inside the div", () => {
+      const wrapper = mountFieldMsg({ dirty: true, invalid: true, error: { message: "Required" } });
+      expect(wrapper.find("i.pi.pi-times-circle.msg-icon").exists()).toBe(true);
+    });
+
+    it("renders the error message text", () => {
+      const wrapper = mountFieldMsg({ dirty: true, invalid: true, error: { message: "Field is required" } });
+      expect(wrapper.text()).toContain("Field is required");
+    });
+
+    it("renders nothing for the message when error is null", () => {
+      const wrapper = mountFieldMsg({ dirty: true, invalid: true, error: null });
+      const div = wrapper.find("div.field-msg.error");
+      expect(div.exists()).toBe(true);
+      // icon exists but no text beyond it
+      expect(div.text()).toBe("");
+    });
+
+    it("renders nothing for the message when error.message is undefined", () => {
+      const wrapper = mountFieldMsg({ dirty: true, invalid: true, error: {} });
+      expect(wrapper.find("div.field-msg.error").exists()).toBe(true);
+      expect(wrapper.text()).toBe("");
+    });
+  });
+
+  describe("when field.dirty is true and field.invalid is false", () => {
+    it("renders nothing (valid dirty field shows no message)", () => {
+      const wrapper = mountFieldMsg({ dirty: true, invalid: false, error: null });
+      expect(wrapper.html()).toBe("");
+    });
+  });
+
+  describe("reactivity – field prop changes", () => {
+    it("shows error message after field becomes dirty+invalid", async () => {
+      const wrapper = mountFieldMsg({ dirty: false, invalid: false, error: null });
+      expect(wrapper.html()).toBe("");
+
+      await wrapper.setProps({ field: { dirty: true, invalid: true, error: { message: "Too short" } } });
+
+      expect(wrapper.find("div.field-msg.error").exists()).toBe(true);
+      expect(wrapper.text()).toContain("Too short");
+    });
+
+    it("hides error message after field becomes valid", async () => {
+      const wrapper = mountFieldMsg({ dirty: true, invalid: true, error: { message: "Required" } });
+      expect(wrapper.find("div.field-msg.error").exists()).toBe(true);
+
+      await wrapper.setProps({ field: { dirty: true, invalid: false, error: null } });
+
+      expect(wrapper.html()).toBe("");
+    });
+
+    it("updates message text when error changes", async () => {
+      const wrapper = mountFieldMsg({ dirty: true, invalid: true, error: { message: "Too short" } });
+      expect(wrapper.text()).toContain("Too short");
+
+      await wrapper.setProps({ field: { dirty: true, invalid: true, error: { message: "Invalid format" } } });
+
+      expect(wrapper.text()).toContain("Invalid format");
+      expect(wrapper.text()).not.toContain("Too short");
+    });
   });
 });
