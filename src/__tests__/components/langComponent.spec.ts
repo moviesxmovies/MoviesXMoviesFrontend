@@ -54,9 +54,9 @@ describe("LangComponent", () => {
     vi.clearAllMocks();
   });
 
-  it("SelectedCountry is null by default", () => {
+  it("SelectedCountry has EN by default", () => {
     const wrapper = factory();
-    expect(wrapper.vm.selectedCountry).toBeNull();
+    expect(wrapper.vm.selectedCountry).toEqual({ label: "EN", value: "en" });
   });
 
   it("contains ES and US countries", () => {
@@ -120,7 +120,7 @@ describe("LangComponent", () => {
   describe("v-model", () => {
     it("updates selectedCountry when an option is clicked", async () => {
       const wrapper = factory();
-      expect((wrapper.vm as any).selectedCountry).toBeNull();
+      expect((wrapper.vm as any).selectedCountry).toEqual({ label: "EN", value: "en" });
 
       await wrapper.find("[data-testid='select-option']").trigger("click");
 
@@ -129,10 +129,10 @@ describe("LangComponent", () => {
       expect((wrapper.vm as any).selectedCountry).toHaveProperty("label");
     });
 
-    it("shows placeholder when no country is selected", () => {
+    it("shows image when no country is selected", () => {
       const wrapper = factory();
       const valueSlot = wrapper.find("[data-testid='select-value']");
-      expect(valueSlot.find("span").exists()).toBe(true);
+      expect(valueSlot.find("img").exists()).toBe(true);
     });
 
     it("shows flag and label when a country is selected", async () => {
@@ -141,7 +141,6 @@ describe("LangComponent", () => {
 
       const valueSlot = wrapper.find("[data-testid='select-value']");
       expect(valueSlot.find("img").exists()).toBe(true);
-      expect(valueSlot.find("span").text()).not.toBe("");
     });
   });
 });

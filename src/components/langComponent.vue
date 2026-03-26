@@ -5,7 +5,14 @@ import { useLangStore } from "@/stores/langStore";
 import { availableCountries } from "@/types";
 
 const langStore = useLangStore();
-const selectedCountry = ref<{ label: string; value: string } | null>(null);
+const selectedCountry = ref<{ label: string; value: string } | null>(
+  langStore.language
+    ? {
+        label: langStore.language.toUpperCase(),
+        value: langStore.language,
+      }
+    : null,
+);
 const countries = ref(availableCountries);
 
 const getFlagUrl = (label: string) =>
@@ -30,7 +37,6 @@ const getFlagUrl = (label: string) =>
             class="rounded-sm shadow-sm"
             style="width: 20px"
           />
-          <span class="text-white">{{ slotProps.value.label }}</span>
         </div>
         <span v-else class="text-[#bcbbdd]">
           {{ slotProps.placeholder }}

@@ -26,17 +26,19 @@ export const useLangStore = defineStore("lang", {
 
     async fetchLanguage() {
       try {
-        const { data, status } = await api.get("/users/preferred-language/");
+        const token = localStorage.getItem("token");
 
-        if (status === 200 && data.preferred_language) {
-          this.setLanguage(data.preferred_language);
-        } else {
-          await this.changeLanguage(this.language ?? DEFAULT_LANGUAGE);
+        if (token) {
+          const { data } = await api.get("/users/preferred-language/");
+          if (data?.preferred_language) {
+            this.setLanguage(data.preferred_language);
+            return;
+          }
         }
       } catch (error) {
         console.error(error);
-        this.setLanguage(this.language ?? DEFAULT_LANGUAGE);
       }
+      this.setLanguage(this.language ?? DEFAULT_LANGUAGE);
     },
   },
 });

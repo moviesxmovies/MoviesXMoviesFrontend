@@ -1,114 +1,164 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { mount, flushPromises } from "@vue/test-utils";
-import { createPinia, setActivePinia } from "pinia";
-import SignupView from "@/views/SignupView.vue";
-import i18n from "@/i18n";
-import ToastService from "primevue/toastservice";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import SignupView from "../../views/SignupView.vue";
+import Step1 from "../../views/signup/step1.vue";
+import Step2 from "../../views/signup/step2.vue";
 
-const { mockPush, mockToastAdd, mockHandleRegister, mockHandleLogin } =
-  vi.hoisted(() => ({
-    mockPush: vi.fn(),
-    mockToastAdd: vi.fn(),
-    mockHandleRegister: vi.fn(),
-    mockHandleLogin: vi.fn(),
-  }));
-
-vi.mock("vue-router", () => ({ useRouter: () => ({ push: mockPush }) }));
-vi.mock("primevue/usetoast", () => ({
-  useToast: () => ({ add: mockToastAdd }),
-}));
-vi.mock("@/repositories/auth/authRepository", () => ({
-  handleRegister: mockHandleRegister,
-  handleLogin: mockHandleLogin,
+const { mockPost, mockPush, mockToastAdd } = vi.hoisted(() => ({
+  mockPost: vi.fn(),
+  mockPush: vi.fn(),
+  mockToastAdd: vi.fn(),
 }));
 
-const user = {
-  first_name: "John",
-  last_name: "Doe",
-  username: "johndoe",
-  email: "john@example.com",
-  password: "Password123",
-  confirm_password: "Password123",
-};
+vi.mock("@/composables/useAPI", () => ({
+  api: { post: mockPost },
+}));
+
+vi.mock("@/stores/langStore", () => ({
+  useLangStore: vi.fn(() => ({ language: "en" })),
+}));
+
+vi.mock("vue-router", () => ({
+  useRouter: vi.fn(() => ({ push: mockPush })),
+}));
+
+vi.mock("vue-i18n", () => ({
+  useI18n: vi.fn(() => ({ t: (key: string) => key })),
+}));
+
+vi.mock("primevue", () => ({
+  useToast: vi.fn(() => ({ add: mockToastAdd })),
+  ProgressBar: { template: "<div><slot /></div>" },
+}));
+
+vi.mock("@/views/signup/step1.vue", () => ({
+  default: {
+    template: '<div data-testid="step1" />',
+    emits: ["next", "back"],
+  },
+}));
+
+vi.mock("@/views/signup/step2.vue", () => ({
+  default: {
+    template: '<div data-testid="step2" />',
+    emits: ["next", "back"],
+  },
+}));
 
 const factory = () =>
-  mount(SignupView, {
-    global: {
-      plugins: [createPinia(), i18n, ToastService],
-      stubs: {
-        Card: { template: "<div><slot /></div>" },
-        LangComponent: true,
-        ThemeComponent: true,
-      },
-    },
-  });
+  mount(SignupView, { global: { stubs: { teleport: true } } });
 
-describe("SignupView - script logic", () => {
+describe("SignupView", () => {
   beforeEach(() => {
-    setActivePinia(createPinia());
     vi.clearAllMocks();
   });
 
-  it("should not submit if form is invalid", async () => {
+  it("should render step 1 initially", () => {
     const wrapper = factory();
-    await wrapper.find('[type="submit"]').trigger("click");
-    await flushPromises();
-
-    expect(mockHandleRegister).not.toHaveBeenCalled();
+    expect(wrapper.findComponent({ name: "Step1" })).toBeTruthy();
   });
 
-  it("should call handleRegister and handleLogin with correct values on valid submit", async () => {
-    mockHandleRegister.mockResolvedValue({});
-    mockHandleLogin.mockResolvedValue({});
-
+  it("should advance to step 2 when next is emitted", async () => {
     const wrapper = factory();
-    const vm = wrapper.vm as any;
-
-    await vm.onFormSubmit({ valid: true, values: user });
+    await wrapper.findComponent(Step1).vm.$emit("next");
     await flushPromises();
-
-    expect(mockHandleRegister).toHaveBeenCalledWith(user);
-
-    expect(mockHandleLogin).toHaveBeenCalledWith({
-      username: user.username,
-      password: user.password,
-    });
+    expect(wrapper.findComponent(Step2).exists()).toBe(true);
   });
 
-  it("should show success toast and navigate to /home on success", async () => {
-    mockHandleRegister.mockResolvedValue({});
-    mockHandleLogin.mockResolvedValue({});
-
+  it("should go back to step 1 when back is emitted on step 2", async () => {
     const wrapper = factory();
-    const vm = wrapper.vm as any;
+    await wrapper.vm.next();
+    wrapper.vm.currentStep--;
+    await flushPromises();
+    expect(wrapper.find('[data-testid="step1"]').exists()).toBe(true);
+  });
 
-    await vm.onFormSubmit({ valid: true, values: user });
+  it("should call signup API with correct FormData on handleForm", async () => {
+    mockPost.mockResolvedValueOnce({});
+    const wrapper = factory();
+
+    wrapper.vm.formData.username = "johndoe";
+    wrapper.vm.formData.email = "john@example.com";
+    wrapper.vm.formData.password = "Password123!";
+    wrapper.vm.formData.confirm_password = "Password123!";
+    wrapper.vm.formData.first_name = "John";
+    wrapper.vm.formData.last_name = "Doe";
+
+    await wrapper.vm.handleForm();
     await flushPromises();
 
+    expect(mockPost).toHaveBeenCalledWith(
+      "/auth/signup/?lang=en",
+      expect.any(FormData),
+    );
+  });
+
+  it("should redirect to /home on successful signup", async () => {
+    mockPost.mockResolvedValueOnce({});
+    const wrapper = factory();
+    await wrapper.vm.handleForm();
+    await flushPromises();
     expect(mockPush).toHaveBeenCalledWith("/home");
   });
 
-  it("should show error toast if registration fails", async () => {
-    mockHandleRegister.mockRejectedValue({
-      response: { data: { detail: "Username already exists" } },
-    });
-
+  it("should show success toast on successful signup", async () => {
+    mockPost.mockResolvedValueOnce({});
     const wrapper = factory();
-    const vm = wrapper.vm as any;
-
-    await vm.onFormSubmit({ valid: true, values: user });
+    await wrapper.vm.handleForm();
     await flushPromises();
-
-    expect(mockPush).not.toHaveBeenCalled();
+    expect(mockToastAdd).toHaveBeenCalledWith(
+      expect.objectContaining({ severity: "success" }),
+    );
   });
 
-  it("should not navigate if form is invalid", async () => {
+  it("should show error toast when API fails", async () => {
+    mockPost.mockRejectedValueOnce({
+      response: { data: { detail: "Email already exists" } },
+    });
     const wrapper = factory();
-    const vm = wrapper.vm as any;
+    await wrapper.vm.handleForm();
+    await flushPromises();
+    expect(mockToastAdd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        severity: "error",
+        detail: "Email already exists",
+      }),
+    );
+  });
 
-    await vm.onFormSubmit({ valid: false, values: {} });
+  it("should show fallback error toast when API fails without detail", async () => {
+    mockPost.mockRejectedValueOnce({});
+    const wrapper = factory();
+    await wrapper.vm.handleForm();
+    await flushPromises();
+    expect(mockToastAdd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        severity: "error",
+        detail: "signup.toast.failed",
+      }),
+    );
+  });
 
-    expect(mockPush).not.toHaveBeenCalled();
-    expect(mockHandleRegister).not.toHaveBeenCalled();
+  it("should append image to FormData when image is set", async () => {
+    mockPost.mockResolvedValueOnce({});
+    const wrapper = factory();
+    const file = new File(["img"], "avatar.png", { type: "image/png" });
+    wrapper.vm.formData.image = file;
+    await wrapper.vm.handleForm();
+    await flushPromises();
+
+    const formData = mockPost.mock.calls[0][1] as FormData;
+    expect(formData.get("picture")).toBeInstanceOf(File);
+  });
+
+  it("should not append image to FormData when image is null", async () => {
+    mockPost.mockResolvedValueOnce({});
+    const wrapper = factory();
+    wrapper.vm.formData.image = null;
+    await wrapper.vm.handleForm();
+    await flushPromises();
+
+    const formData = mockPost.mock.calls[0][1] as FormData;
+    expect(formData.get("picture")).toBeNull();
   });
 });

@@ -81,7 +81,7 @@ describe("OauthCallback logic", () => {
     await flushPromises();
 
     expect(api.post).toHaveBeenCalledWith(
-      "http://localhost:8000/api/oauth/google/",
+      "/oauth/google/",
       { code: "google-code-123" },
     );
 

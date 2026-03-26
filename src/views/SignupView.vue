@@ -1,64 +1,61 @@
 <script lang="ts" setup>
-import Card from "@/components/appCardComponent.vue";
-import { zodResolver } from "@primevue/forms/resolvers/zod";
-import { Form, FormField, type FormSubmitEvent } from "@primevue/forms";
-import {
-  Button,
-  FloatLabel,
-  IconField,
-  InputIcon,
-  InputText,
-  Password,
-  useToast,
-} from "primevue";
-import { defineComponent, h } from "vue";
-import { useRouter } from "vue-router";
-import type { LoginPayload, RegisterPayload } from "@/types";
-import {
-  handleLogin,
-  handleRegister,
-} from "@/repositories/auth/authRepository";
-import { schema } from "@/schemas/signUpSchema";
+import { api } from "@/composables/useAPI";
+import { useLangStore } from "@/stores/langStore";
+import Step1 from "@/views/signup/step1.vue";
+import Step2 from "@/views/signup/step2.vue";
+import { ProgressBar, useToast } from "primevue";
+import { reactive, ref, type Component } from "vue";
 import { useI18n } from "vue-i18n";
+import { useRouter } from "vue-router";
 
 const { t } = useI18n();
-
+const useLang = useLangStore();
 const router = useRouter();
 const toast = useToast();
 
-const FieldMsg = defineComponent({
-  props: { field: Object },
-  setup(props) {
-    return () => {
-      const f = props.field as any;
-      if (!f?.dirty) return null;
-
-      if (f.invalid) {
-        return h("div", { class: "field-msg error" }, [
-          h("i", { class: "pi pi-times-circle msg-icon" }),
-          f.error?.message,
-        ]);
-      }
-    };
-  },
+const steps: Record<number, Component> = {
+  1: Step1,
+  2: Step2,
+};
+const currentStep = ref<number>(1);
+const formData = reactive({
+  username: "",
+  email: "",
+  password: "",
+  confirm_password: "",
+  first_name: "",
+  last_name: "",
+  image: null as File | null,
 });
 
-const resolver = zodResolver(schema);
+const next = () => {
+  return currentStep.value < Object.keys(steps).length
+    ? currentStep.value++
+    : handleForm();
+};
 
-const onFormSubmit = async ({
-  valid,
-  values,
-}: FormSubmitEvent<Record<string, any>>) => {
-  if (!valid) return;
+const handleForm = async () => {
+  const form = new FormData();
+  form.append("username", formData.username);
+  form.append("email", formData.email);
+  form.append("password", formData.password);
+  form.append("confirm_password", formData.confirm_password);
+  form.append("first_name", formData.first_name);
+  form.append("last_name", formData.last_name);
+  if (formData.image) {
+    form.append(
+      "picture",
+      formData.image as Blob,
+      (formData.image as File).name,
+    );
+  }
 
+  await signup(form);
+};
+
+const signup = async (form: FormData) => {
   try {
-    await handleRegister(values as RegisterPayload);
-    const loginValues = {
-      username: values.username,
-      password: values.password,
-    } as LoginPayload;
-    await handleLogin(loginValues);
-
+    await api.post("/auth/signup/?lang=" + useLang.language, form);
     toast.add({
       severity: "success",
       summary: "Success",
@@ -76,308 +73,73 @@ const onFormSubmit = async ({
     });
   }
 };
-defineExpose({ onFormSubmit });
+
+defineExpose({ currentStep, formData, next, handleForm });
 </script>
 
 <template>
-  <div class="flex flex-col items-center justify-center min-h-screen">
-    <Card class="text-center p-8 max-w-xl">
-      <img src="/favicon.svg" alt="Logo" class="m-auto mb-6 w-16 h-16" />
-      <Form
-        :resolver="resolver"
-        @submit="onFormSubmit"
-        class="flex flex-col gap-6 w-full sm:w-80"
-      >
-        <div class="flex gap-3">
-          <FormField
-            v-slot="$field"
-            name="first_name"
-            initialValue=""
-            class="flex flex-col gap-1 flex-1"
-          >
-            <FloatLabel variant="over">
-              <IconField>
-                <InputText
-                  v-bind="$field"
-                  id="first_name"
-                  type="text"
-                  fluid
-                  :class="{
-                    'p-invalid': $field.invalid,
-                    'p-valid': $field.dirty && !$field.invalid,
-                  }"
-                />
-                <InputIcon
-                  v-if="$field.dirty"
-                  :class="
-                    $field.invalid
-                      ? 'pi pi-times-circle text-red-500'
-                      : 'pi pi-check-circle text-green-500'
-                  "
-                />
-              </IconField>
-              <label for="first_name">{{ $t("signup.firstName") }}</label>
-            </FloatLabel>
-            <FieldMsg :field="$field" />
-          </FormField>
+  <div class="min-h-screen flex flex-col items-center justify-center px-4"
+       style="background-color: var(--background)">
 
-          <FormField
-            v-slot="$field"
-            name="last_name"
-            initialValue=""
-            class="flex flex-col gap-1 flex-1"
-          >
-            <FloatLabel variant="over">
-              <IconField>
-                <InputText
-                  v-bind="$field"
-                  id="last_name"
-                  type="text"
-                  fluid
-                  :class="{
-                    'p-invalid': $field.invalid,
-                    'p-valid': $field.dirty && !$field.invalid,
-                  }"
-                />
-                <InputIcon
-                  v-if="$field.dirty"
-                  :class="
-                    $field.invalid
-                      ? 'pi pi-times-circle text-red-500'
-                      : 'pi pi-check-circle text-green-500'
-                  "
-                />
-              </IconField>
-              <label for="last_name">{{ $t("signup.lastName") }}</label>
-            </FloatLabel>
-            <FieldMsg :field="$field" />
-          </FormField>
-        </div>
+    <div class="w-full max-w-md">
+      <div class="mb-4">
+        <ProgressBar :value="currentStep*100/Object.keys(steps).length">{{  }}</ProgressBar>
+      </div>
+      <div class="rounded-2xl border p-8 shadow-sm"
+           style="background-color: var(--background); border-color: var(--secondary)">
+        <keep-alive>
+          <component
+            :is="steps[currentStep]"
+            v-model="formData"
+            @next="next"
+            @back="currentStep--"
+          />
+        </keep-alive>
+      </div>
 
-        <FormField
-          v-slot="$field"
-          name="username"
-          initialValue=""
-          class="flex flex-col gap-1"
-        >
-          <FloatLabel variant="over">
-            <IconField>
-              <InputText
-                v-bind="$field"
-                id="username"
-                type="text"
-                fluid
-                :class="{
-                  'p-invalid': $field.invalid,
-                  'p-valid': $field.dirty && !$field.invalid,
-                }"
-              />
-              <InputIcon
-                v-if="$field.dirty"
-                :class="
-                  $field.invalid
-                    ? 'pi pi-times-circle text-red-500'
-                    : 'pi pi-check-circle text-green-500'
-                "
-              />
-            </IconField>
-            <label for="username">{{ $t("signup.username") }}</label>
-          </FloatLabel>
-          <FieldMsg :field="$field" />
-        </FormField>
-
-        <FormField
-          v-slot="$field"
-          name="email"
-          initialValue=""
-          class="flex flex-col gap-1"
-        >
-          <FloatLabel variant="over">
-            <IconField>
-              <InputText
-                v-bind="$field"
-                id="email"
-                type="email"
-                fluid
-                :class="{
-                  'p-invalid': $field.invalid,
-                  'p-valid': $field.dirty && !$field.invalid,
-                }"
-              />
-              <InputIcon
-                v-if="$field.dirty"
-                :class="
-                  $field.invalid
-                    ? 'pi pi-times-circle text-red-500'
-                    : 'pi pi-check-circle text-green-500'
-                "
-              />
-            </IconField>
-            <label for="email">{{ $t("signup.email") }}</label>
-          </FloatLabel>
-          <FieldMsg :field="$field" />
-        </FormField>
-
-        <FormField
-          v-slot="$field"
-          name="password"
-          initialValue=""
-          class="flex flex-col gap-1"
-        >
-          <FloatLabel variant="over">
-            <Password
-              v-bind="$field"
-              id="password"
-              :feedback="false"
-              toggleMask
-              fluid
-              :class="{
-                'p-invalid': $field.invalid,
-                'p-valid': $field.dirty && !$field.invalid,
-              }"
-            />
-            <label for="password">{{ $t("signup.password") }}</label>
-          </FloatLabel>
-
-          <div v-if="$field.dirty" class="flex flex-col gap-1 mt-1">
-            <template v-if="$field.invalid">
-              <div
-                v-for="(error, i) of $field.errors"
-                :key="i"
-                class="field-msg error"
-              >
-                <i class="pi pi-times-circle msg-icon" />
-                {{ error.message }}
-              </div>
-            </template>
-          </div>
-        </FormField>
-
-        <FormField
-          v-slot="$field"
-          name="confirm_password"
-          initialValue=""
-          class="flex flex-col gap-1"
-        >
-          <FloatLabel variant="over">
-            <Password
-              v-bind="$field"
-              id="confirm_password"
-              :feedback="false"
-              toggleMask
-              fluid
-              :class="{
-                'p-invalid': $field.invalid,
-                'p-valid': $field.dirty && !$field.invalid,
-              }"
-            />
-            <label for="confirm_password">{{ $t("signup.confirmPassword") }}</label>
-          </FloatLabel>
-          <FieldMsg :field="$field" />
-        </FormField>
-
-        <Button type="submit" label="Sign up" fluid />
-      </Form>
-      <Button
-        variant="link"
-        label="Link"
-        @click="router.push('/login')"
-        class="mt-4 sm:mt-6 text-s underline"
-      >
-        {{ $t("signup.login") }}
-      </Button>
-    </Card>
+    </div>
   </div>
 </template>
 
 <style scoped>
-:deep(.p-invalid.p-inputtext) {
-  border-color: #ef4444 !important;
-  box-shadow: 0 0 0 1px #ef4444 !important;
-}
-:deep(.p-valid.p-inputtext) {
-  border-color: #22c55e !important;
-  box-shadow: 0 0 0 1px #22c55e !important;
-}
-:deep(.p-invalid .p-password-input) {
-  border-color: #ef4444 !important;
-  box-shadow: 0 0 0 1px #ef4444 !important;
-}
-:deep(.p-valid .p-password-input) {
-  border-color: #22c55e !important;
-  box-shadow: 0 0 0 1px #22c55e !important;
-}
-
-/* Card bg and text */
-:deep(.p-card) {
-  background-color: var(--background);
-  color: var(--text);
-  border: 1px solid var(--secondary);
-}
-
-/* Labels */
-:deep(.p-float-label label) {
-  color: var(--text);
-  opacity: 0.7;
-}
-
-:deep(.p-float-label:has(input:focus) label),
-:deep(.p-float-label:has(input:not(:placeholder-shown)) label) {
-  color: var(--primary);
-  opacity: 1;
-}
-
-/* Inputs */
 :deep(.p-inputtext) {
-  background-color: var(--background);
-  color: var(--text);
-  border-color: var(--secondary);
+  background-color: var(--background) !important;
+  color: var(--text) !important;
+  border-color: var(--secondary) !important;
 }
-
 :deep(.p-inputtext:focus) {
   border-color: var(--primary) !important;
   box-shadow: 0 0 0 1px var(--primary) !important;
 }
-
-/* Password input */
 :deep(.p-password-input) {
-  background-color: var(--background);
-  color: var(--text);
-  border-color: var(--secondary);
+  background-color: var(--background) !important;
+  color: var(--text) !important;
+  border-color: var(--secondary) !important;
 }
-
 :deep(.p-password-input:focus) {
   border-color: var(--primary) !important;
   box-shadow: 0 0 0 1px var(--primary) !important;
 }
-
-.field-msg {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.78rem;
-  animation: fadeIn 0.15s ease;
+:deep(.p-float-label label) {
+  color: var(--text);
+  opacity: 0.6;
 }
-.field-msg.error {
-  color: #ef4444;
+:deep(.p-invalid .p-inputtext),
+:deep(.p-invalid.p-inputtext) {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 1px #ef4444 !important;
 }
-.field-msg.success {
-  color: #22c55e;
+:deep(.p-valid .p-inputtext),
+:deep(.p-valid.p-inputtext) {
+  border-color: #22c55e !important;
+  box-shadow: 0 0 0 1px #22c55e !important;
 }
-
-.msg-icon {
-  font-size: 0.85rem;
-  flex-shrink: 0;
+:deep(.p-button) {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: #fff !important;
 }
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-3px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+:deep(.p-button:hover) {
+  opacity: 0.9;
 }
 </style>

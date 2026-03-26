@@ -1,13 +1,13 @@
 import { api } from "@/composables/useAPI";
-import { config } from "@/config";
 import { useAuthStore } from "@/stores/authStore";
 import type { LoginPayload, RegisterPayload } from "@/types";
+import { defineComponent, h } from "vue";
 
 const authStore = useAuthStore();
 
 export const handleLogin = async (values: LoginPayload) => {
   try {
-    const { data } = await api.post(config.apiUrl + "/auth/login/", values);
+    const { data } = await api.post("/auth/login/", values);
     authStore.setTokens(data.access, data.refresh);
   } catch (error: any) {
     throw error;
@@ -15,13 +15,13 @@ export const handleLogin = async (values: LoginPayload) => {
 };
 
 export const handleRegister = async (values: RegisterPayload) => {
-  const { data } = await api.post(config.apiUrl + "/auth/signup/", values);
+  const { data } = await api.post("/auth/signup/", values);
   return data;
 };
 
 export const oauthLogin = async (code: string) => {
   try {
-    const { data } = await api.post(config.apiUrl + "/oauth/google/", {
+    const { data } = await api.post("/oauth/google/", {
       code: code,
     });
     authStore.setTokens(data.access, data.refresh);
@@ -30,3 +30,28 @@ export const oauthLogin = async (code: string) => {
   }
 };
 
+export const FieldMsg = defineComponent({
+  props: { field: Object },
+  setup(props) {
+    return () => {
+      const f = props.field as any;
+      if (!f?.dirty) return null;
+
+      if (f.invalid) {
+        return h("div", { class: "field-msg error" }, [
+          h("i", { class: "pi pi-times-circle msg-icon" }),
+          f.error?.message,
+        ]);
+      }
+    };
+  },
+});
+
+export const refreshToken = async (refresh_token: string) => {
+  try {
+    const { data } = await api.post("/auth/refresh/", { refresh_token });
+    authStore.setTokens(data.access, refresh_token);
+  } catch (error: any) {
+    throw error;
+  }
+};

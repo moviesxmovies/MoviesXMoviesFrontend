@@ -5,14 +5,12 @@ import Button from "primevue/button";
 import Message from "primevue/message";
 import { useToast } from "primevue";
 import { useRouter } from "vue-router";
-import { useAuthStore } from "@/stores/authStore";
 import { api } from "@/composables/useAPI";
-import { config } from "@/config";
 import { useI18n } from "vue-i18n";
+import { refreshToken } from "@/repositories/auth/authRepository";
 
 const { t } = useI18n();
 const verificationCode = ref("");
-const authStore = useAuthStore();
 const loading = ref(false);
 const error = ref("");
 const toast = useToast();
@@ -20,17 +18,17 @@ const router = useRouter();
 
 const sendVerificationCode = async () => {
   try {
-    await api.post(config.apiUrl + "/auth/resend-verification-email/");
+    await api.post("/auth/resend-verification-email/");
     toast.add({
       severity: "success",
-      summary: "Success",
+      summary: t("toast.success"),
       detail: t("verify.toast.resendSuccess"),
       life: 3000,
     });
   } catch (error: any) {
     toast.add({
       severity: "warn",
-      summary: "Warn",
+      summary: t("toast.warn"),
       detail: error.response?.data?.error || t("verify.toast.resendError"),
       life: 3000,
     });
@@ -39,7 +37,7 @@ const sendVerificationCode = async () => {
 
 const handleVerification = async () => {
   if (verificationCode.value.length !== 6) {
-    error.value = t("verify.toast.inocrrectLength");
+    error.value = t("verify.toast.incorrectLength");
     return;
   }
 
@@ -47,23 +45,23 @@ const handleVerification = async () => {
   error.value = "";
 
   try {
-    const { data } = await api.post(config.apiUrl + "/auth/verify/", {
+    const { data } = await api.post("/auth/verify/", {
       verification_code: verificationCode.value,
     });
     if (data.status) {
       toast.add({
         severity: "success",
-        summary: "Success",
+        summary: t("toast.success"),
         detail: t("verify.toast.success"),
         life: 3000,
       });
-      authStore.logout();
-      router.push("/login");
+      await refreshToken(data.refresh_token);
+      router.push("/home");
     }
   } catch (error: any) {
     toast.add({
       severity: "error",
-      summary: "Error",
+      summary: t("toast.error"),
       detail: error.response?.data?.message || t("verify.toast.invalidCode"),
       life: 3000,
     });
@@ -130,6 +128,8 @@ const handleVerification = async () => {
         <Button
           variant="link"
           label="Link"
+          type="button"
+          data-testid="resend-btn"
           @click="sendVerificationCode"
           class="mt-4 sm:mt-6 text-[#bcbbdd] text-xs hover:text-[#f2f2f2] transition-colors underline decoration-[#3a31d8]"
         >
