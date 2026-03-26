@@ -125,19 +125,6 @@ describe("useLangStore", () => {
   });
 
   //FetchLanguage
-  it("should set language from API when token exists and API returns preferred_language", async () => {
-    mockGet.mockResolvedValueOnce({ data: { preferred_language: "es" } });
-
-    console.log("mockGet implementation:", mockGet.getMockImplementation());
-    console.log("mockGet results:", mockGet.mock.results);
-
-    const store = useLangStore();
-    await store.fetchLanguage();
-
-    console.log("mockGet calls:", mockGet.mock.calls);
-    console.log("mockGet results after:", mockGet.mock.results);
-  });
-
   it("should set default language when no token exists", async () => {
     localStorageMock.getItem.mockImplementation(() => null);
     const store = useLangStore();
