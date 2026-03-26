@@ -14,10 +14,10 @@ const isDark = computed(() => themeStore.theme === "dark");
 <template>
   <button
     @click="themeStore.toggleTheme()"
-    class="max-w-16 relative inline-flex h-10 w-10 items-center justify-center rounded-lg border transition-all active:scale-95"
+    class="max-w-16 relative inline-flex h-10 w-10 items-center justify-center rounded-lg border transition-all active:scale-95 hover:border-primary hover:bg-secondary focus:outline-none  disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-100 hover:cursor-pointer"
     :style="{
       borderColor: 'color-mix(in srgb, var(--text) 15%, transparent)',
-      background: 'color-mix(in srgb, var(--text) 5%, transparent)',
+      background: 'color-mix(in srgb, var(--text) 15%, transparent)',
     }"
     :aria-label="$t('components.changeTheme')"
   >

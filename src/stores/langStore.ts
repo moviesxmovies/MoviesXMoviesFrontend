@@ -18,9 +18,12 @@ export const useLangStore = defineStore("lang", {
     },
 
     async changeLanguage(lang: string) {
-      api.post("/users/preferred-language/", {
-        preferred_language: lang,
-      });
+      const token = localStorage.getItem("token");
+      if (token) {
+        api.post("/users/preferred-language/", {
+          preferred_language: lang,
+        });
+      }
       this.setLanguage(lang);
     },
 

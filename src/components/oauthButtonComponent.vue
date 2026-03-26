@@ -17,7 +17,7 @@ const handleGoogleLogin = () => {
     @click="handleGoogleLogin"
     :loading="loading"
     :aria-label="$t('components.oauthButton', ['Google'])"
-    class="w-full flex items-center justify-center gap-3 py-2.5 px-4 bg-white border border-gray-300 hover:bg-gray-50 transition-colors duration-200 rounded-md shadow-sm"
+    class="w-full flex items-center justify-center gap-3 py-2 px-4 bg-white border border-gray-300 hover:bg-gray-50 hover:-translate-y-1 hover:shadow-md hover:cursor-pointer transition-all duration-200 rounded-md shadow-sm"
     unstyled
   >
     <div class="flex items-center justify-center">
