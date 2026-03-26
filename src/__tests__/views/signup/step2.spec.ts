@@ -1,70 +1,14 @@
 import { mount } from "@vue/test-utils";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import SignUpStep2 from "@/views/signup/step2.vue";
-
-// ── Mocks ────────────────────────────────────────────────────────────────────
+import PrimeVue from "primevue/config";
+import { Form, FormField } from "@primevue/forms";
 
 vi.mock("@/repositories/auth/authRepository", () => ({
   FieldMsg: {
     name: "FieldMsg",
     template: '<span class="field-msg">{{ field?.errors?.[0]?.message }}</span>',
     props: ["field"],
-  },
-}));
-
-vi.mock("primevue", () => ({
-  Button: {
-    name: "Button",
-    template: '<button :type="type || \'button\'" v-bind="$attrs" @click="$emit(\'click\')">{{ label }}</button>',
-    props: ["type", "label", "fluid", "outlined"],
-    emits: ["click"],
-  },
-  FloatLabel: {
-    name: "FloatLabel",
-    template: "<div><slot /></div>",
-    props: ["variant"],
-  },
-  IconField: {
-    name: "IconField",
-    template: "<div><slot /></div>",
-  },
-  InputIcon: {
-    name: "InputIcon",
-    template: "<i />",
-    props: ["class", "style"],
-  },
-  InputText: {
-    name: "InputText",
-    template: '<input v-bind="$attrs" @input="$emit(\'update:modelValue\', $event.target.value)" />',
-    props: ["fluid"],
-    emits: ["update:modelValue"],
-  },
-  FileUpload: {
-    name: "FileUpload",
-    template: '<div><input type="file" data-testid="file-input" /></div>',
-    props: ["mode", "auto", "chooseLabel", "accept", "maxFileSize", "multiple"],
-    emits: ["select"],
-  },
-}));
-
-vi.mock("@primevue/forms", () => ({
-  Form: {
-    name: "Form",
-    template: '<form @submit.prevent="handleSubmit"><slot /></form>',
-    props: ["resolver"],
-    emits: ["submit"],
-    setup(_: any, { emit }: any) {
-      const handleSubmit = () => emit("submit", { valid: true, values: {} });
-      return { handleSubmit };
-    },
-  },
-  FormField: {
-    name: "FormField",
-    template: '<div><slot :field="fieldState" /></div>',
-    props: ["name", "initialValue"],
-    setup() {
-      return { fieldState: { invalid: false, dirty: false, errors: [] } };
-    },
   },
 }));
 
@@ -76,7 +20,11 @@ vi.mock("@/schemas/signUpSchema", () => ({
   step2Schema: {},
 }));
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+const globalConfig = {
+  plugins: [PrimeVue],
+  components: { Form, FormField },
+  mocks: { $t: (key: string) => key },
+};
 
 const defaultModelValue = {
   username: "testuser",
@@ -98,9 +46,7 @@ function mountComponent(modelValue = defaultModelValue) {
   });
 }
 
-// ── Tests ─────────────────────────────────────────────────────────────────────
-
-describe("SignUpStep2 – rendering", () => {
+describe("SignUpStep2 rendering", () => {
   it("renders title and subtitle i18n keys", () => {
     const wrapper = mountComponent();
     expect(wrapper.text()).toContain("signup.profileTitle");
@@ -135,11 +81,8 @@ describe("SignUpStep2 – rendering", () => {
   });
 });
 
-// ── Avatar / image preview ────────────────────────────────────────────────────
-
-describe("SignUpStep2 – image preview", () => {
+describe("SignUpStep2 image preview", () => {
   beforeEach(() => {
-    // JSDOM does not implement createObjectURL
     global.URL.createObjectURL = vi.fn(() => "blob:mock-url");
   });
 
@@ -176,9 +119,7 @@ describe("SignUpStep2 – image preview", () => {
   });
 });
 
-// ── onFileSelect emits ────────────────────────────────────────────────────────
-
-describe("SignUpStep2 – onFileSelect emits", () => {
+describe("SignUpStep2 onFileSelect emits", () => {
   beforeEach(() => {
     global.URL.createObjectURL = vi.fn(() => "blob:mock-url");
   });
@@ -220,9 +161,7 @@ describe("SignUpStep2 – onFileSelect emits", () => {
   });
 });
 
-// ── onFormSubmit emits ────────────────────────────────────────────────────────
-
-describe("SignUpStep2 – onFormSubmit emits", () => {
+describe("SignUpStep2 onFormSubmit emits", () => {
   it('emits "next" when form is valid', async () => {
     const wrapper = mountComponent();
 
@@ -249,9 +188,7 @@ describe("SignUpStep2 – onFormSubmit emits", () => {
   });
 });
 
-// ── Back button ───────────────────────────────────────────────────────────────
-
-describe("SignUpStep2 – back button", () => {
+describe("SignUpStep2 back button", () => {
   it('emits "back" when the Back button is clicked', async () => {
     const wrapper = mountComponent();
     const buttons = wrapper.findAllComponents({ name: "Button" });
@@ -274,9 +211,7 @@ describe("SignUpStep2 – back button", () => {
   });
 });
 
-// ── triggerUpload ─────────────────────────────────────────────────────────────
-
-describe("SignUpStep2 – triggerUpload", () => {
+describe("SignUpStep2 triggerUpload", () => {
   it("calls click() on the hidden file input when the avatar area is clicked", async () => {
     const wrapper = mountComponent();
     const fileInput = wrapper.find('input[type="file"]');
@@ -288,9 +223,7 @@ describe("SignUpStep2 – triggerUpload", () => {
   });
 });
 
-// ── Props ─────────────────────────────────────────────────────────────────────
-
-describe("SignUpStep2 – props", () => {
+describe("SignUpStep2 props", () => {
   it("mounts without errors with a full modelValue", () => {
     const wrapper = mountComponent({
       ...defaultModelValue,

@@ -1,8 +1,8 @@
-import { mount, flushPromises } from "@vue/test-utils";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { mount } from "@vue/test-utils";
+import { describe, it, expect, vi } from "vitest";
+import PrimeVue from "primevue/config";
+import { Form, FormField } from "@primevue/forms";
 import SignUpStep1 from "@/views/signup/step1.vue";
-
-// ── Mocks ────────────────────────────────────────────────────────────────────
 
 vi.mock("@/composables/useOAUTH", () => ({
   loginWithGoogle: vi.fn(),
@@ -24,80 +24,15 @@ vi.mock("@/components/oauthButtonComponent.vue", () => ({
   },
 }));
 
-// Stub PrimeVue components so we can interact with native inputs
-vi.mock("primevue", () => ({
-  Button: {
-    name: "Button",
-    template: '<button :type="type" v-bind="$attrs">{{ label }}</button>',
-    props: ["type", "label", "fluid"],
-  },
-  FloatLabel: {
-    name: "FloatLabel",
-    template: "<div><slot /></div>",
-    props: ["variant"],
-  },
-  IconField: {
-    name: "IconField",
-    template: "<div><slot /></div>",
-  },
-  InputIcon: {
-    name: "InputIcon",
-    template: "<i />",
-    props: ["class", "style"],
-  },
-  InputText: {
-    name: "InputText",
-    template: '<input v-bind="$attrs" @input="$emit(\'update:modelValue\', $event.target.value)" />',
-    props: ["fluid"],
-    emits: ["update:modelValue"],
-  },
-  Password: {
-    name: "Password",
-    template: '<input type="password" v-bind="$attrs" @input="$emit(\'update:modelValue\', $event.target.value)" />',
-    props: ["feedback", "toggleMask", "fluid"],
-    emits: ["update:modelValue"],
-  },
-}));
-
-// Stub @primevue/forms
-vi.mock("@primevue/forms", () => ({
-  Form: {
-    name: "Form",
-    template: '<form @submit.prevent="handleSubmit"><slot /></form>',
-    props: ["resolver"],
-    emits: ["submit"],
-    setup(props: any, { emit }: any) {
-      const handleSubmit = () => {
-        // Simulate form validation and emit
-        emit("submit", { valid: true, values: {} });
-      };
-      return { handleSubmit };
-    },
-  },
-  FormField: {
-    name: "FormField",
-    template: '<div><slot :field="fieldState" /></div>',
-    props: ["name", "initialValue"],
-    setup() {
-      const fieldState = {
-        invalid: false,
-        dirty: false,
-        errors: [],
-      };
-      return { fieldState };
-    },
-  },
-}));
-
-vi.mock("@primevue/forms/resolvers/zod", () => ({
-  zodResolver: vi.fn(() => vi.fn()),
-}));
-
 vi.mock("@/schemas/signUpSchema", () => ({
   step1Schema: {},
 }));
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+const globalConfig = {
+  plugins: [PrimeVue],
+  components: { Form, FormField },
+  mocks: { $t: (key: string) => key },
+};
 
 const defaultModelValue = {
   username: "",
@@ -109,21 +44,20 @@ const defaultModelValue = {
 function mountComponent(modelValue = defaultModelValue) {
   return mount(SignUpStep1, {
     props: { modelValue },
-    global: {
-      mocks: {
-        $t: (key: string) => key, // i18n passthrough
-      },
-    },
+    global: globalConfig,
   });
 }
 
-// ── Tests ────────────────────────────────────────────────────────────────────
-
-describe("SignUpStep1 – rendering", () => {
-  it("renders four form fields (username, email, password, confirm_password)", () => {
+describe("SignUpStep1 rendering", () => {
+  it("renders i18n keys for title and subtitle", () => {
     const wrapper = mountComponent();
-    // Each FormField renders a wrapping div; we look for named slots via props
-    const formFields = wrapper.findAllComponents({ name: "FormField" });
+    expect(wrapper.text()).toContain("signup.createAccount");
+    expect(wrapper.text()).toContain("signup.step1Subtitle");
+  });
+
+  it("renders four FormField components (username, email, password, confirm_password)", () => {
+    const wrapper = mountComponent();
+    const formFields = wrapper.findAllComponents(FormField);
     const names = formFields.map((f) => f.props("name"));
     expect(names).toContain("username");
     expect(names).toContain("email");
@@ -131,11 +65,11 @@ describe("SignUpStep1 – rendering", () => {
     expect(names).toContain("confirm_password");
   });
 
-  it("renders the submit button with correct label key", () => {
+  it("renders a submit button with the correct label in the DOM", () => {
     const wrapper = mountComponent();
-    const btn = wrapper.findComponent({ name: "Button" });
-    expect(btn.props("label")).toBe("signup.next");
-    expect(btn.props("type") ?? btn.attributes("type")).toBe("submit");
+    const btn = wrapper.find('button[type="submit"]');
+    expect(btn.exists()).toBe(true);
+    expect(btn.text()).toContain("signup.next");
   });
 
   it("renders the OAuth button", () => {
@@ -147,11 +81,21 @@ describe("SignUpStep1 – rendering", () => {
     const wrapper = mountComponent();
     expect(wrapper.text()).toContain("signup.or");
   });
+
+  it("renders username and email as native text inputs in the DOM", () => {
+    const wrapper = mountComponent();
+    expect(wrapper.find("input#username").exists()).toBe(true);
+    expect(wrapper.find("input#email").exists()).toBe(true);
+  });
+
+  it("renders at least two password inputs (password + confirm_password)", () => {
+    const wrapper = mountComponent();
+    const passwordInputs = wrapper.findAll('input[type="password"]');
+    expect(passwordInputs.length).toBeGreaterThanOrEqual(2);
+  });
 });
 
-// ── Emit tests ────────────────────────────────────────────────────────────────
-
-describe("SignUpStep1 – emits", () => {
+describe("SignUpStep1 emits", () => {
   it('emits "update:modelValue" and "next" when form submits with valid data', async () => {
     const wrapper = mountComponent();
     const formValues = {
@@ -161,9 +105,7 @@ describe("SignUpStep1 – emits", () => {
       confirm_password: "Secret123!",
     };
 
-    // Override the Form stub to emit valid data
-    const form = wrapper.findComponent({ name: "Form" });
-    await form.vm.$emit("submit", { valid: true, values: formValues });
+    await wrapper.findComponent(Form).vm.$emit("submit", { valid: true, values: formValues });
 
     expect(wrapper.emitted("update:modelValue")).toBeTruthy();
     expect(wrapper.emitted("update:modelValue")![0][0]).toEqual(formValues);
@@ -173,8 +115,7 @@ describe("SignUpStep1 – emits", () => {
   it('does NOT emit "next" when form submits with invalid data', async () => {
     const wrapper = mountComponent();
 
-    const form = wrapper.findComponent({ name: "Form" });
-    await form.vm.$emit("submit", { valid: false, values: {} });
+    await wrapper.findComponent(Form).vm.$emit("submit", { valid: false, values: {} });
 
     expect(wrapper.emitted("next")).toBeFalsy();
     expect(wrapper.emitted("update:modelValue")).toBeFalsy();
@@ -183,16 +124,28 @@ describe("SignUpStep1 – emits", () => {
   it('does NOT emit "update:modelValue" when valid is false', async () => {
     const wrapper = mountComponent();
 
-    const form = wrapper.findComponent({ name: "Form" });
-    await form.vm.$emit("submit", { valid: false, values: { username: "x" } });
+    await wrapper.findComponent(Form).vm.$emit("submit", { valid: false, values: { username: "x" } });
 
     expect(wrapper.emitted("update:modelValue")).toBeUndefined();
   });
+
+  it("passes through arbitrary extra values untouched", async () => {
+    const wrapper = mountComponent();
+    const values = {
+      username: "bob",
+      email: "bob@test.com",
+      password: "P@ss!",
+      confirm_password: "P@ss!",
+      extra: "data",
+    };
+
+    await wrapper.findComponent(Form).vm.$emit("submit", { valid: true, values });
+
+    expect(wrapper.emitted("update:modelValue")![0][0]).toMatchObject({ extra: "data" });
+  });
 });
 
-// ── OAuth tests ───────────────────────────────────────────────────────────────
-
-describe("SignUpStep1 – OAuth", () => {
+describe("SignUpStep1 OAuth", () => {
   it("calls loginWithGoogle when the OAuth button is clicked", async () => {
     const { loginWithGoogle } = await import("@/composables/useOAUTH");
     const wrapper = mountComponent();
@@ -203,44 +156,14 @@ describe("SignUpStep1 – OAuth", () => {
   });
 });
 
-// ── onFormSubmit logic (unit) ─────────────────────────────────────────────────
-
-describe("SignUpStep1 – onFormSubmit logic", () => {
-  it("emits both events with the received values when valid=true", async () => {
-    const wrapper = mountComponent();
-    const values = { username: "alice", email: "alice@test.com", password: "Passw0rd!", confirm_password: "Passw0rd!" };
-
-    await wrapper.findComponent({ name: "Form" }).vm.$emit("submit", { valid: true, values });
-
-    expect(wrapper.emitted("update:modelValue")![0][0]).toStrictEqual(values);
-    expect(wrapper.emitted("next")!.length).toBe(1);
-  });
-
-  it("emits neither event when valid=false regardless of values", async () => {
-    const wrapper = mountComponent();
-    const values = { username: "alice", email: "alice@test.com", password: "Passw0rd!", confirm_password: "Passw0rd!" };
-
-    await wrapper.findComponent({ name: "Form" }).vm.$emit("submit", { valid: false, values });
-
-    expect(wrapper.emitted("update:modelValue")).toBeUndefined();
-    expect(wrapper.emitted("next")).toBeUndefined();
-  });
-
-  it("passes through arbitrary extra values untouched", async () => {
-    const wrapper = mountComponent();
-    const values = { username: "bob", email: "bob@test.com", password: "P@ss!", confirm_password: "P@ss!", extra: "data" };
-
-    await wrapper.findComponent({ name: "Form" }).vm.$emit("submit", { valid: true, values });
-
-    expect(wrapper.emitted("update:modelValue")![0][0]).toMatchObject({ extra: "data" });
-  });
-});
-
-// ── Props ─────────────────────────────────────────────────────────────────────
-
-describe("SignUpStep1 – props", () => {
-  it("accepts a modelValue prop without errors", () => {
-    const wrapper = mountComponent({ username: "prefilled", email: "pre@test.com", password: "", confirm_password: "" });
+describe("SignUpStep1 props", () => {
+  it("accepts a prefilled modelValue without errors", () => {
+    const wrapper = mountComponent({
+      username: "prefilled",
+      email: "pre@test.com",
+      password: "",
+      confirm_password: "",
+    });
     expect(wrapper.exists()).toBe(true);
   });
 });
