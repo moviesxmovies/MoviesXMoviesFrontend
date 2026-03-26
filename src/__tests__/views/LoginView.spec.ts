@@ -1,156 +1,344 @@
 import { mount, flushPromises } from "@vue/test-utils";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { createPinia, setActivePinia } from "pinia";
 import PrimeVue from "primevue/config";
 import ToastService from "primevue/toastservice";
+import { Form, FormField } from "@primevue/forms";
 import LoginView from "../../views/LoginView.vue";
 import { api } from "../../composables/useAPI";
-import { Button, InputText, Password } from "primevue";
-import { useAuthStore } from "../../stores/authStore";
-import i18n from "../../i18n";
 
-let vi_storage: Record<string, string> = {};
-vi.stubGlobal("localStorage", {
-  getItem: vi.fn((key: string) => vi_storage[key] || null),
-  setItem: vi.fn((key: string, value: string) => {
-    vi_storage[key] = value.toString();
-  }),
-  removeItem: vi.fn((key: string) => {
-    delete vi_storage[key];
-  }),
-  clear: vi.fn(() => {
-    vi_storage = {};
-  }),
-});
-
-const { mockSetTokens, mockPush, mockToast } = vi.hoisted(() => ({
+const { mockSetTokens, mockPost, mockPush, mockToastAdd } = vi.hoisted(() => ({
   mockSetTokens: vi.fn(),
+  mockPost: vi.fn(),
   mockPush: vi.fn(),
-  mockToast: { add: vi.fn() },
+  mockToastAdd: vi.fn(),
 }));
 
-vi.mock("@/composables/useAPI", () => ({ api: { post: vi.fn() } }));
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal();
-  return {
-    ...actual,
-    useRouter: () => ({ push: mockPush }),
-  };
-});
-vi.mock("primevue/usetoast", () => ({ useToast: () => mockToast }));
+vi.mock("vue-router", () => ({
+  useRouter: () => ({ push: mockPush }),
+}));
+
+const mockUserContainer = { user: { verified: false } };
+
 vi.mock("@/stores/authStore", () => ({
-  useAuthStore: () => ({
-    token: null,
-    refreshToken: null,
+  useAuthStore: vi.fn(() => ({
+    get user() {
+      return mockUserContainer.user;
+    },
     setTokens: mockSetTokens,
-    isAuthenticated: false,
-  }),
+    refreshToken: "refresh-token",
+    logout: vi.fn(),
+  })),
 }));
 
-describe("LoginView.vue", () => {
-  beforeEach(() => {
-    setActivePinia(createPinia());
-    vi.clearAllMocks();
-    localStorage.clear();
+vi.mock("@/config", () => ({
+  config: {
+    googleClientId: "test-client-id",
+    callbackUri: "http://localhost:5173",
+    apiUrl: "http://localhost:8000/api",
+  },
+}));
+
+vi.mock("@/composables/useAPI", () => ({ api: { post: mockPost } }));
+
+vi.mock("@/composables/useOAUTH", () => ({
+  loginWithGoogle: vi.fn(),
+}));
+
+vi.mock("@/repositories/auth/authRepository", () => ({
+  FieldMsg: {
+    name: "FieldMsg",
+    template:
+      '<span class="field-msg">{{ field?.errors?.[0]?.message }}</span>',
+    props: ["field"],
+  },
+}));
+
+vi.mock("@/components/oauthButtonComponent.vue", () => ({
+  default: {
+    name: "OauthButtonComponent",
+    template:
+      '<button data-testid="oauth-btn" @click="$emit(\'click\')">Google</button>',
+    emits: ["click"],
+  },
+}));
+
+vi.mock("@/schemas/loginSchema", () => ({
+  loginSchema: {},
+}));
+
+vi.mock("primevue/usetoast", () => ({
+  useToast: () => mockToastAdd,
+}));
+
+vi.mock("vue-i18n", () => ({
+  useI18n: () => ({ t: (key: string) => key }),
+}));
+
+const globalConfig = {
+  plugins: [PrimeVue, ToastService],
+  components: { Form, FormField },
+  mocks: { $t: (key: string) => key },
+};
+
+function mountComponent() {
+  return mount(LoginView, { global: globalConfig });
+}
+
+const validValues = { username: "testuser", password: "Secret1234" };
+
+describe("LoginView rendering", () => {
+  it("renders title and subtitle i18n keys", () => {
+    const wrapper = mountComponent();
+    expect(wrapper.text()).toContain("login.title");
+    expect(wrapper.text()).toContain("login.subtitle");
   });
 
-  const factory = () => {
-    return mount(LoginView, {
-      global: {
-        plugins: [PrimeVue, ToastService, i18n],
-        components: { Button, InputText, Password },
-      },
-    });
-  };
+  it("renders username and password FormFields", () => {
+    const wrapper = mountComponent();
+    const fields = wrapper.findAllComponents(FormField);
+    const names = fields.map((f) => f.props("name"));
+    expect(names).toContain("username");
+    expect(names).toContain("password");
+  });
 
-  it("should fill inputs and call api on success", async () => {
-    const wrapper = factory();
+  it("renders a submit button", () => {
+    const wrapper = mountComponent();
+    expect(wrapper.find('button[type="submit"]').exists()).toBe(true);
+  });
 
-    vi.mocked(api.post).mockResolvedValueOnce({
-      data: { access: "ok", refresh: "ok" },
-    });
+  it("renders the forgot password button", () => {
+    const wrapper = mountComponent();
+    expect(wrapper.text()).toContain("login.forgotPassword");
+  });
 
-    const usernameInput = wrapper.findComponent(InputText);
-    const passwordInput = wrapper.findComponent(Password);
+  it("renders the OAuth button", () => {
+    const wrapper = mountComponent();
+    expect(wrapper.find('[data-testid="oauth-btn"]').exists()).toBe(true);
+  });
 
-    await usernameInput.setValue("my-user");
-    await passwordInput.find("input").setValue("my-password");
+  it("renders the signup link", () => {
+    const wrapper = mountComponent();
+    expect(wrapper.text()).toContain("login.signup");
+  });
+});
 
-    await wrapper.find("button").trigger("click");
+describe("LoginView login() success", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
+  it("calls handleLogin with the form values", async () => {
+    const wrapper = mountComponent();
+    await wrapper
+      .findComponent(Form)
+      .vm.$emit("submit", { valid: true, values: validValues });
     await flushPromises();
 
-    expect(api.post).toHaveBeenCalled();
-    const authStore = useAuthStore();
-    expect(authStore.setTokens).toHaveBeenCalledWith("ok", "ok");
+    expect(mockHandleLogin).toHaveBeenCalledWith(validValues);
   });
 
-  it("should show error toast on 403 (Cloudflare/CSRF)", async () => {
-    const wrapper = factory();
+  it("shows a success toast after login", async () => {
+    const wrapper = mountComponent();
+    wrapper
+      .findComponent(Form)
+      .vm.$emit("submit", { valid: true, values: validValues });
+    await flushPromises();
 
-    vi.mocked(api.post).mockRejectedValueOnce({
-      response: { status: 403 },
+    expect(mockToastAdd).toHaveBeenCalledWith(
+      expect.objectContaining({ severity: "success" }),
+    );
+  });
+
+  it("redirects to /home after successful login", async () => {
+    vi.mocked(api.post).mockResolvedValueOnce({
+      data: {
+        status: true,
+        access_token: "mock-access",
+        refresh_token: "mock-refresh",
+      },
     });
+    const wrapper = mountComponent();
+    await wrapper.find("form").trigger("submit.prevent");
+    await flushPromises();
 
-    await wrapper.findComponent(InputText).setValue("user");
-    await wrapper.findComponent(Password).find("input").setValue("pass");
-    await wrapper.find("button").trigger("click");
+    expect(mockPush).toHaveBeenCalledWith("/home");
+  });
 
-    expect(mockToast.add).toHaveBeenCalledWith(
+  it("sets loading to false after success", async () => {
+    const wrapper = mountComponent();
+    wrapper
+      .findComponent(Form)
+      .vm.$emit("submit", { valid: true, values: validValues });
+    await flushPromises();
+
+    const submitBtn = wrapper.find('button[type="submit"]');
+    expect(submitBtn.attributes("disabled")).toBeUndefined();
+  });
+});
+
+describe("LoginView login() with invalid form", () => {
+  beforeEach(() => {
+    mockHandleLogin.mockClear();
+    mockPush.mockClear();
+  });
+
+  it("does not call handleLogin when valid=false", async () => {
+    const wrapper = mountComponent();
+    wrapper
+      .findComponent(Form)
+      .vm.$emit("submit", { valid: false, values: validValues });
+    await flushPromises();
+
+    expect(mockHandleLogin).not.toHaveBeenCalled();
+  });
+
+  it("does not redirect when valid=false", async () => {
+    const wrapper = mountComponent();
+    wrapper
+      .findComponent(Form)
+      .vm.$emit("submit", { valid: false, values: validValues });
+    await flushPromises();
+
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  it("does not show a toast when valid=false", async () => {
+    const wrapper = mountComponent();
+    wrapper
+      .findComponent(Form)
+      .vm.$emit("submit", { valid: false, values: validValues });
+    await flushPromises();
+
+    expect(mockToastAdd).not.toHaveBeenCalled();
+  });
+});
+
+describe("LoginView login() error handling", () => {
+  beforeEach(() => {
+    mockToastAdd.mockClear();
+    mockPush.mockClear();
+  });
+
+  it("shows invalidCredentials toast on 401", async () => {
+    mockHandleLogin.mockRejectedValue({ response: { status: 401 } });
+    const wrapper = mountComponent();
+    wrapper
+      .findComponent(Form)
+      .vm.$emit("submit", { valid: true, values: validValues });
+    await flushPromises();
+
+    expect(mockToastAdd).toHaveBeenCalledWith(
       expect.objectContaining({
-        detail: "Access denied",
+        severity: "error",
+        detail: "login.toast.invalidCredentials",
       }),
     );
   });
 
-  it("should show error toast on 401 (Invalid credentials)", async () => {
-    const wrapper = factory();
+  it("shows accessDenied toast on 403", async () => {
+    const err = new Error("Forbidden") as any;
+    err.response = { status: 403 };
+    mockHandleLogin.mockRejectedValue(err);
+    const wrapper = mountComponent();
+    wrapper
+      .findComponent(Form)
+      .vm.$emit("submit", { valid: true, values: validValues });
+    await flushPromises();
 
-    vi.mocked(api.post).mockRejectedValueOnce({
-      response: { status: 401 },
-    });
-
-    await wrapper.findComponent(InputText).setValue("user");
-    await wrapper.findComponent(Password).find("input").setValue("pass");
-    await wrapper.find("button").trigger("click");
-
-    expect(mockToast.add).toHaveBeenCalledWith(
+    expect(mockToastAdd).toHaveBeenCalledWith(
       expect.objectContaining({
-        detail: "Invalid username or password",
+        severity: "error",
+        detail: "login.toast.accessDenied",
       }),
     );
   });
 
-  it("should return if validation fails", async () => {
-    const wrapper = factory();
+  it("shows connectionError toast on unknown error", async () => {
+    mockHandleLogin.mockRejectedValue({ response: { status: 500 } });
+    const wrapper = mountComponent();
+    wrapper
+      .findComponent(Form)
+      .vm.$emit("submit", { valid: true, values: validValues });
+    await flushPromises();
 
-    await wrapper.find("button").trigger("click");
-
-    expect(api.post).not.toHaveBeenCalled();
-  });
-  it("should clear username error when user types (@input)", async () => {
-    const wrapper = factory();
-    const vm = wrapper.vm as any;
-    await wrapper.find("button").trigger("click");
-    expect(vm.errors.username).toBeDefined();
-
-    const usernameInput = wrapper.findComponent(InputText);
-    await usernameInput.setValue("admin");
-
-    await usernameInput.vm.$emit("input");
-
-    expect(vm.errors.username).toBe("");
+    expect(mockToastAdd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        severity: "error",
+        detail: "login.toast.connectionError",
+      }),
+    );
   });
 
-  it("should flatten Zod array errors into a single string (coverage for Array.isArray)", async () => {
-    const wrapper = factory();
-    const vm = wrapper.vm as any;
+  it("shows connectionError toast when there is no response", async () => {
+    mockHandleLogin.mockRejectedValue(new Error("Network error"));
+    const wrapper = mountComponent();
+    wrapper
+      .findComponent(Form)
+      .vm.$emit("submit", { valid: true, values: validValues });
+    await flushPromises();
 
-    await wrapper.find("button").trigger("click");
+    expect(mockToastAdd).toHaveBeenCalledWith(
+      expect.objectContaining({ severity: "error" }),
+    );
+  });
 
-    const usernameError = vm.errors.username;
-    expect(typeof usernameError).toBe("string");
-    expect(Array.isArray(usernameError)).toBe(false);
-    expect(usernameError).toBe("Username is required");
+  it("does not redirect on error", async () => {
+    mockHandleLogin.mockRejectedValue({ response: { status: 401 } });
+    const wrapper = mountComponent();
+    wrapper
+      .findComponent(Form)
+      .vm.$emit("submit", { valid: true, values: validValues });
+    await flushPromises();
+
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  it("sets loading to false after error", async () => {
+    mockHandleLogin.mockRejectedValue({ response: { status: 401 } });
+    const wrapper = mountComponent();
+    wrapper
+      .findComponent(Form)
+      .vm.$emit("submit", { valid: true, values: validValues });
+    await flushPromises();
+
+    const submitBtn = wrapper.find('button[type="submit"]');
+    expect(submitBtn.attributes("disabled")).toBeUndefined();
+  });
+});
+
+describe("LoginView – navigation", () => {
+  it("navigates to /forgot-password when the forgot password button is clicked", async () => {
+    mockPush.mockClear();
+    const wrapper = mountComponent();
+    const forgotBtn = wrapper
+      .findAll("button[type='button']")
+      .find((b) => b.text().includes("login.forgotPassword"));
+
+    forgotBtn.trigger("click");
+
+    expect(mockPush).toHaveBeenCalledWith("/forgot-password");
+  });
+
+  it("navigates to /signup when the signup link is clicked", async () => {
+    mockPush.mockClear();
+    const wrapper = mountComponent();
+    const signupBtn = wrapper
+      .findAll("button[type='button']")
+      .find((b) => b.text().includes("login.signup"));
+
+    signupBtn.trigger("click");
+
+    expect(mockPush).toHaveBeenCalledWith("/signup");
+  });
+});
+
+describe("LoginView – OAuth", () => {
+  it("calls loginWithGoogle when the OAuth button is clicked", async () => {
+    const { loginWithGoogle } = await import("@/composables/useOAUTH");
+    const wrapper = mountComponent();
+
+    await wrapper.find('[data-testid="oauth-btn"]').trigger("click");
+
+    expect(loginWithGoogle).toHaveBeenCalledTimes(1);
   });
 });

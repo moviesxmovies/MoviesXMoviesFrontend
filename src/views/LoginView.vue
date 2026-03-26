@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { useToast } from "primevue/usetoast";
 import {
   Button,
   FloatLabel,
@@ -8,21 +7,23 @@ import {
   InputIcon,
   InputText,
   Password,
+  useToast,
 } from "primevue";
 import { loginWithGoogle } from "@/composables/useOAUTH";
 import OauthButtonComponent from "@/components/oauthButtonComponent.vue";
 import { FieldMsg, handleLogin } from "@/repositories/auth/authRepository";
-import { router } from "@/router";
 import type { LoginPayload } from "@/types";
 import { useI18n } from "vue-i18n";
 import { Form, FormField, type FormSubmitEvent } from "@primevue/forms";
 import { zodResolver } from "@primevue/forms/resolvers/zod";
 import { loginSchema } from "@/schemas/loginSchema";
+import { useRouter } from "vue-router";
 
 const { t } = useI18n();
 const resolver = zodResolver(loginSchema);
 const loading = ref(false);
 const toast = useToast();
+const router = useRouter();
 
 const login = async ({
   valid,
@@ -41,13 +42,12 @@ const login = async ({
     });
     router.push("/home");
   } catch (error: any) {
-    const status = error.response?.status;
-    let detail = t("login.toast.connectionError", ["Google"]);
-
-    if (status === 401) detail = t("login.toast.invalidCredentials");
-    if (status === 403) detail = t("login.toast.accessDenied");
-
-    toast.add({ severity: "error", summary: "Error", detail, life: 5000 });
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: error.response?.data?.detail,
+      life: 5000,
+    });
   } finally {
     loading.value = false;
   }
@@ -55,17 +55,11 @@ const login = async ({
 </script>
 
 <template>
-  <div
-    class="min-h-screen flex flex-col items-center justify-center px-4"
-    style="background-color: var(--background)"
-  >
+  <div class="min-h-screen flex flex-col items-center justify-center px-4">
     <div
-      class="w-full max-w-sm rounded-2xl border p-8 flex flex-col gap-6"
-      style="
-        background-color: var(--background);
-        border-color: var(--secondary);
-      "
+      class="relative w-full max-w-sm rounded-2xl border p-8 flex flex-col gap-6 rounded-2xl border p-8 bg-background/80 border-primary/40"
     >
+      <div class="absolute -inset-4 -z-10 blur-3xl bg-accent/50" />
       <div class="text-center">
         <img src="/favicon.svg" alt="Logo" class="w-16 h-16 m-auto" />
         <h2 class="text-xl font-semibold mt-3" style="color: var(--text)">
