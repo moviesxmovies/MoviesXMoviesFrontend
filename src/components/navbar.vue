@@ -23,7 +23,7 @@ const route = useRoute();
             <LangComponent />
             <ThemeComponent />
             <button class="btn-ghost" @click="router.push('/profile')" v-if="authStore.isAuthenticated">
-                {{ $t("home.profile") }}
+                <span class="pi pi-user"></span>
             </button>
             <button class="btn-ghost" @click="router.push('/login')" v-else-if="route.name !== 'login'">
                 {{ $t("home.login") }}
@@ -51,6 +51,7 @@ const route = useRoute();
     display: flex;
     align-items: center;
     gap: 10px;
+    justify-items: center;
 }
 
 .logo-icon {
@@ -63,6 +64,7 @@ const route = useRoute();
     justify-content: center;
     flex-shrink: 0;
     padding: 3px;
+    
 }
 
 .logo-text {
@@ -71,6 +73,8 @@ const route = useRoute();
     letter-spacing: 0.04em;
     color: var(--text);
     line-height: 1;
+    margin-top: 3px;
+
 }
 
 .logo-x {

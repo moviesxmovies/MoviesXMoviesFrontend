@@ -56,7 +56,7 @@ function handleKeydown(e: KeyboardEvent) {
           <div class="input-row">
             <input v-model="email" class="email-input" :class="{ 'email-input--error': emailError }" type="email"
               :placeholder="$t('home.emailPlaceholder') || 'Enter your email...'" @keydown="handleKeydown" />
-            <button class="btn-signup" @click="handleSignup">
+            <button class="btn-signup transition-all" @click="handleSignup">
               {{ $t("home.signupBtn") || "Sign up" }}
             </button>
           </div>
@@ -343,7 +343,6 @@ a:hover {
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
-  transition: opacity 0.15s, transform 0.1s;
 }
 
 .btn-signup:hover {
