@@ -3,7 +3,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { createRouter, createWebHistory } from 'vue-router'
 import PrimeVue from 'primevue/config'
 import { beforeEach, vi } from 'vitest'
-
+import i18n from '@/i18n' 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation(query => ({
@@ -26,7 +26,7 @@ beforeEach(() => {
   const pinia = createPinia()
   setActivePinia(pinia)
 
-  config.global.plugins = [pinia, router, PrimeVue]
+  config.global.plugins = [pinia, router, PrimeVue, i18n]
   config.global.stubs = {
     'router-link': true,
     'router-view': true

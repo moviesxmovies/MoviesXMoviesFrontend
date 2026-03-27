@@ -35,7 +35,14 @@
   },
   "home": {
     "welcome": "¡Bienvenido a MoviesXMovies!",
-    "linkText": "Haz clic aquí para iniciar sesión"
+    "login": "Iniciar sesión",
+    "emailPlaceholder": "Introduce tu correo electrónico",
+    "signupBtn": "Regístrate",
+    "orContinue": "o continúa con",
+    "badge": "En línea",
+    "feature1": "Comparte tus películas favoritas",
+    "feature2": "Obtén recomendaciones de películas",
+    "feature3": "Crea tus propias listas de películas."
   },
   "verify": {
     "title": "MOVIESXMOVIES",

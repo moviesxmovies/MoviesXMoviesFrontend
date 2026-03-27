@@ -1,9 +1,16 @@
 import { defineStore } from "pinia";
 
 export const useThemeStore = defineStore("theme", {
-  state: () => ({
-    theme: localStorage.getItem("theme") || "light",
-  }),
+  state: () => {
+    let theme = "light";
+    try {
+      theme = localStorage.getItem("theme") || "light";
+    } catch {
+      // Testing environment without localStorage, or SSR. Default to light theme, which is fine.
+    }
+    return { theme };
+  },
+
   actions: {
     toggleTheme() {
       this.theme = this.theme === "light" ? "dark" : "light";
