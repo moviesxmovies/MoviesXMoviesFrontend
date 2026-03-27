@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import InputOtp from "primevue/inputotp";
 import Button from "primevue/button";
 import Message from "primevue/message";
@@ -16,6 +16,7 @@ const loading = ref(false);
 const error = ref("");
 const toast = useToast();
 const router = useRouter();
+let authTimer: ReturnType<typeof setTimeout>;
 
 const sendVerificationCode = async () => {
   try {
@@ -66,9 +67,24 @@ const handleVerification = async () => {
       detail: error.response?.data?.message || t("verify.toast.invalidCode"),
       life: 3000,
     });
+  } finally {
+    loading.value = false;
   }
-  loading.value = false;
 };
+
+onMounted(() => {
+  if (route.query.code) {
+    loading.value = true;
+    authTimer = setTimeout(() => {
+      handleVerification();
+    }, 500);
+    loading.value = false;
+  }
+});
+
+onUnmounted(() => {
+  clearTimeout(authTimer);
+});
 </script>
 
 <template>
@@ -121,10 +137,13 @@ const handleVerification = async () => {
         <Button
           type="submit"
           :loading="loading"
+          :disabled="loading"
           class="w-full py-3 sm:py-4 rounded-xl font-bold text-white transition-transform active:scale-95 overflow-hidden border-none text-sm sm:text-base"
           style="background: linear-gradient(135deg, #2f27ce 0%, #bb3dff 100%)"
         >
-          <span class="tracking-wide">VERIFY CODE</span>
+          <span class="tracking-wide">{{
+            loading ? "VERIFYING..." : "VERIFY CODE"
+          }}</span>
         </Button>
         <Button
           variant="link"
