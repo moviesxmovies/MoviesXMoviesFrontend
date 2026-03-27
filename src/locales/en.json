@@ -54,7 +54,14 @@
   },
   "home": {
     "welcome": "Welcome to MoviesXMovies!",
-    "linkText": "Click here to login"
+    "login": "Login",
+    "emailPlaceholder": "Enter your email",
+    "signupBtn": "Sign up",
+    "orContinue": "or continue with",
+    "badge": "Online",
+    "feature1": "Share your favorite movies",
+    "feature2": "Get movie recommendations",
+    "feature3": "Create your own movie lists."
   },
   "verify": {
     "toast": {

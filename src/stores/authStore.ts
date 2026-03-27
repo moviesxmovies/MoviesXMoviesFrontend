@@ -3,10 +3,18 @@ import { jwtDecode } from "jwt-decode";
 import type { JWTPayload } from "../types";
 
 export const useAuthStore = defineStore("auth", {
-  state: () => ({
-    token: localStorage.getItem("access_token") || null,
-    refreshToken: localStorage.getItem("refresh_token") || null,
-  }),
+  state: () => {
+    let token = null;
+    let refreshToken = null;
+    try {
+      token = localStorage.getItem("access_token");
+      refreshToken = localStorage.getItem("refresh_token");
+    } catch {
+      // Testing environment without localStorage, or SSR. Tokens will be null, which is fine.
+    }
+    return { token, refreshToken };
+  },
+
   getters: {
     user: (state): JWTPayload | null => {
       if (!state.token) return null;

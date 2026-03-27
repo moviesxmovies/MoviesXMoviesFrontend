@@ -14,6 +14,7 @@ import {
   InputText,
   Password,
 } from "primevue";
+import { useRoute } from "vue-router";
 
 const props = defineProps<{
   modelValue: RegisterPayload;
@@ -36,6 +37,8 @@ const onFormSubmit = ({
     emit("next");
   }
 };
+const route = useRoute();
+
 </script>
 
 <template>
@@ -89,7 +92,7 @@ const onFormSubmit = ({
       <FormField
         v-slot="$field"
         name="email"
-        initialValue=""
+        :initialValue="route.query.email ? String(route.query.email) : ''"
         class="flex flex-col gap-1"
       >
         <FloatLabel variant="over">

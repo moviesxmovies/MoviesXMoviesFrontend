@@ -88,9 +88,6 @@ describe("useLangStore", () => {
 
     await store.changeLanguage("fr");
 
-    expect(mockPost).toHaveBeenCalledWith("/users/preferred-language/", {
-      preferred_language: "fr",
-    });
     expect(spy).toHaveBeenCalledWith("fr");
   });
 

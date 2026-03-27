@@ -33,7 +33,7 @@ export interface LoginResponse {
 
 export const availableCountries = [
   { label: "ES", value: "es" },
-  { label: "US", value: "en" },
+  { label: "EN", value: "en" },
   { label: "FR", value: "fr" },
   { label: "DE", value: "de" },
 ];
