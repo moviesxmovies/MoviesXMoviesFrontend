@@ -60,7 +60,7 @@ vi.mock("@primevue/forms", () => ({
   FormField: {
     name: "FormField",
     template:
-      '<div><slot :field="{ invalid: false, dirty: false, errors: [] }" /></div>',
+      '<div><slot v-bind="{ invalid: false, dirty: false, errors: [] }" /></div>',
     props: ["name", "initialValue"],
   },
 }));
@@ -87,21 +87,25 @@ function mountComponent() {
 
 function mountWithFieldState(
   name: string,
-  state: { dirty: boolean; invalid: boolean },
+  state: { dirty: boolean; invalid: boolean; errors?: any[] },
 ) {
   return mount(LoginView, {
     global: {
       ...globalConfig,
-      components: {
+      stubs: {
         FormField: {
-          name: "FormField",
-          template: '<div><slot :field="fieldState" /></div>',
+          template: '<div><slot v-bind="fieldState" /></div>',
           props: ["name", "initialValue"],
-          setup(props: any) {
+          setup(props) {
             const fieldState =
               props.name === name
-                ? { ...state, errors: [] }
+                ? {
+                    dirty: state.dirty,
+                    invalid: state.invalid,
+                    errors: state.errors || [],
+                  }
                 : { dirty: false, invalid: false, errors: [] };
+
             return { fieldState };
           },
         },
@@ -324,5 +328,66 @@ describe("LoginView OAuth", () => {
     await wrapper.find('[data-testid="oauth-btn"]').trigger("click");
 
     expect(mockLoginWithGoogle).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("LoginView Validation UI", () => {
+  describe("Username field states", () => {
+    it("shows invalid class and error icon when dirty and invalid", () => {
+      const wrapper = mountWithFieldState("username", {
+        dirty: true,
+        invalid: true,
+      });
+
+      const input = wrapper.find("#username");
+      expect(input.classes()).toContain("p-invalid");
+
+      const icon = wrapper.find(".pi-times-circle");
+      expect(icon.exists()).toBe(true);
+    });
+
+    it("shows valid class and check icon when dirty and valid", () => {
+      const wrapper = mountWithFieldState("username", {
+        dirty: true,
+        invalid: false,
+      });
+
+      const input = wrapper.find("#username");
+      expect(input.classes()).toContain("p-valid");
+
+      const icon = wrapper.find(".pi-check-circle");
+      expect(icon.exists()).toBe(true);
+    });
+  });
+
+  describe("Password field errors", () => {
+    it("renders the list of error messages when dirty and invalid", () => {
+      const errorList = [
+        { message: "password.too_short" },
+        { message: "password.no_number" },
+      ];
+
+      const wrapper = mountWithFieldState("password", {
+        dirty: true,
+        invalid: true,
+        errors: errorList,
+      });
+
+      expect(wrapper.text()).toContain("password.too_short");
+      expect(wrapper.text()).toContain("password.no_number");
+
+      const errorIcons = wrapper.findAll(".pi-times-circle");
+      expect(errorIcons.length).toBeGreaterThanOrEqual(2);
+    });
+
+    it("does not show errors when field is pristine (not dirty)", () => {
+      const wrapper = mountWithFieldState("password", {
+        dirty: false,
+        invalid: true,
+        errors: [{ message: "Some error" }],
+      });
+
+      expect(wrapper.text()).not.toContain("Some error");
+    });
   });
 });
