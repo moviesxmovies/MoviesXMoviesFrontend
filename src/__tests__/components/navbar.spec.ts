@@ -91,7 +91,8 @@ describe("NavbarComponent", () => {
     const wrapper = factory(true);
     const buttons = wrapper.findAll(".btn-ghost");
     expect(buttons).toHaveLength(1);
-    expect(buttons[0].text()).toContain("profile");
+    expect(buttons[0].find("span").classes()).toContain("pi");
+    expect(buttons[0].find("span").classes()).toContain("pi-user");
   });
 
   it("does not show login button when authenticated", () => {
