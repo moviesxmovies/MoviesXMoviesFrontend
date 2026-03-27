@@ -29,6 +29,7 @@ function handleKeydown(e: KeyboardEvent) {
 
 <template>
   <div class="page">
+    <div class="nav-spacer h-13"></div>
 
     <!-- HERO -->
     <main class="hero">
