@@ -20,7 +20,15 @@ export const step1Schema = z
     if (data.username.toLowerCase() === data.password.toLowerCase()) {
       ctx.addIssue({
         code: "custom",
-        message: t("schema.checks.samePasswordAs", [t("schema.checks.username")]),
+        message: t("schema.checks.samePasswordAs", [
+          t("schema.checks.username"),
+        ]),
+        path: ["password"],
+      });
+    } else if (data.email.toLowerCase() === data.password.toLowerCase()) {
+      ctx.addIssue({
+        code: "custom",
+        message: t("schema.checks.samePasswordAs", [t("schema.checks.email")]),
         path: ["password"],
       });
     }

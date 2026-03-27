@@ -1,156 +1,393 @@
 import { mount, flushPromises } from "@vue/test-utils";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { createPinia, setActivePinia } from "pinia";
 import PrimeVue from "primevue/config";
-import ToastService from "primevue/toastservice";
-import LoginView from "../../views/LoginView.vue";
-import { api } from "../../composables/useAPI";
-import { Button, InputText, Password } from "primevue";
-import { useAuthStore } from "../../stores/authStore";
-import i18n from "../../i18n";
+import LoginView from "@/views/LoginView.vue"; // adjust path as needed
 
-let vi_storage: Record<string, string> = {};
-vi.stubGlobal("localStorage", {
-  getItem: vi.fn((key: string) => vi_storage[key] || null),
-  setItem: vi.fn((key: string, value: string) => {
-    vi_storage[key] = value.toString();
-  }),
-  removeItem: vi.fn((key: string) => {
-    delete vi_storage[key];
-  }),
-  clear: vi.fn(() => {
-    vi_storage = {};
-  }),
-});
+const { mockHandleLogin, mockToastAdd, mockPush, mockLoginWithGoogle } =
+  vi.hoisted(() => ({
+    mockHandleLogin: vi.fn(),
+    mockToastAdd: vi.fn(),
+    mockPush: vi.fn(),
+    mockLoginWithGoogle: vi.fn(),
+  }));
 
-const { mockSetTokens, mockPush, mockToast } = vi.hoisted(() => ({
-  mockSetTokens: vi.fn(),
-  mockPush: vi.fn(),
-  mockToast: { add: vi.fn() },
+// ── Mocks ─────────────────────────────────────────────────────────────────────
+
+vi.mock("@/repositories/auth/authRepository", () => ({
+  handleLogin: mockHandleLogin,
+  FieldMsg: {
+    name: "FieldMsg",
+    template: "<span />",
+    props: ["field"],
+  },
 }));
 
-vi.mock("@/composables/useAPI", () => ({ api: { post: vi.fn() } }));
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal();
+vi.mock("primevue", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("primevue")>();
   return {
     ...actual,
-    useRouter: () => ({ push: mockPush }),
+    useToast: () => ({ add: mockToastAdd }),
   };
 });
-vi.mock("primevue/usetoast", () => ({ useToast: () => mockToast }));
-vi.mock("@/stores/authStore", () => ({
-  useAuthStore: () => ({
-    token: null,
-    refreshToken: null,
-    setTokens: mockSetTokens,
-    isAuthenticated: false,
-  }),
+
+vi.mock("vue-router", () => ({
+  useRouter: () => ({ push: mockPush }),
 }));
 
-describe("LoginView.vue", () => {
-  beforeEach(() => {
-    setActivePinia(createPinia());
-    vi.clearAllMocks();
-    localStorage.clear();
+vi.mock("@/composables/useOAUTH", () => ({
+  loginWithGoogle: mockLoginWithGoogle,
+}));
+
+vi.mock("@/schemas/loginSchema", () => ({
+  loginSchema: {},
+}));
+
+vi.mock("@primevue/forms/resolvers/zod", () => ({
+  zodResolver: vi.fn(() => vi.fn()),
+}));
+
+vi.mock("vue-i18n", () => ({
+  useI18n: () => ({ t: (key: string) => key }),
+}));
+
+vi.mock("@primevue/forms", () => ({
+  Form: {
+    name: "Form",
+    template: "<form @submit.prevent><slot /></form>",
+    props: ["resolver"],
+    emits: ["submit"],
+  },
+  FormField: {
+    name: "FormField",
+    template:
+      '<div><slot v-bind="{ invalid: false, dirty: false, errors: [] }" /></div>',
+    props: ["name", "initialValue"],
+  },
+}));
+
+vi.mock("@/components/oauthButtonComponent.vue", () => ({
+  default: {
+    name: "OauthButtonComponent",
+    template:
+      '<button data-testid="oauth-btn" @click="$emit(\'click\')">Google</button>',
+    emits: ["click"],
+  },
+}));
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+const globalConfig = {
+  plugins: [PrimeVue],
+  mocks: { $t: (key: string) => key },
+};
+
+function mountComponent() {
+  return mount(LoginView, { global: globalConfig });
+}
+
+function mountWithFieldState(
+  name: string,
+  state: { dirty: boolean; invalid: boolean; errors?: any[] },
+) {
+  return mount(LoginView, {
+    global: {
+      ...globalConfig,
+      stubs: {
+        FormField: {
+          template: '<div><slot v-bind="fieldState" /></div>',
+          props: ["name", "initialValue"],
+          setup(props) {
+            const fieldState =
+              props.name === name
+                ? {
+                    dirty: state.dirty,
+                    invalid: state.invalid,
+                    errors: state.errors || [],
+                  }
+                : { dirty: false, invalid: false, errors: [] };
+
+            return { fieldState };
+          },
+        },
+      },
+    },
+  });
+}
+
+const validValues = { username: "testuser", password: "Secret123!" };
+
+async function submitForm(
+  wrapper: ReturnType<typeof mountComponent>,
+  valid = true,
+) {
+  await wrapper
+    .findComponent({ name: "Form" })
+    .vm.$emit("submit", { valid, values: validValues });
+  await flushPromises();
+}
+
+// ── Tests ─────────────────────────────────────────────────────────────────────
+
+describe("LoginView rendering", () => {
+  it("renders title and subtitle i18n keys", () => {
+    const wrapper = mountComponent();
+    expect(wrapper.text()).toContain("login.title");
+    expect(wrapper.text()).toContain("login.subtitle");
   });
 
-  const factory = () => {
-    return mount(LoginView, {
-      global: {
-        plugins: [PrimeVue, ToastService, i18n],
-        components: { Button, InputText, Password },
-      },
-    });
+  it("renders username and password FormFields", () => {
+    const wrapper = mountComponent();
+    const fields = wrapper.findAllComponents({ name: "FormField" });
+    const names = fields.map((f) => f.props("name"));
+    expect(names).toContain("username");
+    expect(names).toContain("password");
+  });
+
+  it("renders a submit button", () => {
+    const wrapper = mountComponent();
+    expect(wrapper.find('button[type="submit"]').exists()).toBe(true);
+  });
+
+  it("renders the forgot password button", () => {
+    const wrapper = mountComponent();
+    expect(wrapper.text()).toContain("login.forgotPassword");
+  });
+
+  it("renders the OAuth button", () => {
+    const wrapper = mountComponent();
+    expect(wrapper.find('[data-testid="oauth-btn"]').exists()).toBe(true);
+  });
+
+  it("renders the signup link", () => {
+    const wrapper = mountComponent();
+    expect(wrapper.text()).toContain("login.signup");
+  });
+});
+
+// ── login() – happy path ──────────────────────────────────────────────────────
+
+describe("LoginView login() success", () => {
+  beforeEach(() => {
+    mockHandleLogin.mockResolvedValue(undefined);
+    mockToastAdd.mockClear();
+    mockPush.mockClear();
+  });
+
+  it("calls handleLogin with the form values", async () => {
+    const wrapper = mountComponent();
+    await submitForm(wrapper);
+
+    expect(mockHandleLogin).toHaveBeenCalledWith(validValues);
+  });
+
+  it("shows a success toast", async () => {
+    const wrapper = mountComponent();
+    await submitForm(wrapper);
+
+    expect(mockToastAdd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        severity: "success",
+        detail: "login.toast.success",
+      }),
+    );
+  });
+
+  it("redirects to /home", async () => {
+    const wrapper = mountComponent();
+    await submitForm(wrapper);
+
+    expect(mockPush).toHaveBeenCalledWith("/home");
+  });
+});
+
+// ── login() – invalid form ────────────────────────────────────────────────────
+
+describe("LoginView login() invalid form", () => {
+  beforeEach(() => {
+    mockHandleLogin.mockClear();
+    mockToastAdd.mockClear();
+    mockPush.mockClear();
+  });
+
+  it("does not call handleLogin when valid=false", async () => {
+    const wrapper = mountComponent();
+    await submitForm(wrapper, false);
+
+    expect(mockHandleLogin).not.toHaveBeenCalled();
+  });
+
+  it("does not redirect when valid=false", async () => {
+    const wrapper = mountComponent();
+    await submitForm(wrapper, false);
+
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  it("does not show a toast when valid=false", async () => {
+    const wrapper = mountComponent();
+    await submitForm(wrapper, false);
+
+    expect(mockToastAdd).not.toHaveBeenCalled();
+  });
+});
+
+// ── login() – error handling ──────────────────────────────────────────────────
+
+describe("LoginView login() error handling", () => {
+  beforeEach(() => {
+    mockToastAdd.mockClear();
+    mockPush.mockClear();
+  });
+
+  const makeAxiosError = (status: number, detail: string) => {
+    const err = new Error() as any;
+    err.response = { status, data: { detail } };
+    return err;
   };
 
-  it("should fill inputs and call api on success", async () => {
-    const wrapper = factory();
+  it("shows the API detail message on error", async () => {
+    mockHandleLogin.mockRejectedValue(
+      makeAxiosError(401, "Invalid credentials"),
+    );
+    const wrapper = mountComponent();
+    await submitForm(wrapper);
 
-    vi.mocked(api.post).mockResolvedValueOnce({
-      data: { access: "ok", refresh: "ok" },
-    });
-
-    const usernameInput = wrapper.findComponent(InputText);
-    const passwordInput = wrapper.findComponent(Password);
-
-    await usernameInput.setValue("my-user");
-    await passwordInput.find("input").setValue("my-password");
-
-    await wrapper.find("button").trigger("click");
-
-    await flushPromises();
-
-    expect(api.post).toHaveBeenCalled();
-    const authStore = useAuthStore();
-    expect(authStore.setTokens).toHaveBeenCalledWith("ok", "ok");
-  });
-
-  it("should show error toast on 403 (Cloudflare/CSRF)", async () => {
-    const wrapper = factory();
-
-    vi.mocked(api.post).mockRejectedValueOnce({
-      response: { status: 403 },
-    });
-
-    await wrapper.findComponent(InputText).setValue("user");
-    await wrapper.findComponent(Password).find("input").setValue("pass");
-    await wrapper.find("button").trigger("click");
-
-    expect(mockToast.add).toHaveBeenCalledWith(
+    expect(mockToastAdd).toHaveBeenCalledWith(
       expect.objectContaining({
-        detail: "Access denied",
+        severity: "error",
+        detail: "Invalid credentials",
       }),
     );
   });
 
-  it("should show error toast on 401 (Invalid credentials)", async () => {
-    const wrapper = factory();
+  it("shows undefined detail when error has no response body", async () => {
+    mockHandleLogin.mockRejectedValue(new Error("Network error"));
+    const wrapper = mountComponent();
+    await submitForm(wrapper);
 
-    vi.mocked(api.post).mockRejectedValueOnce({
-      response: { status: 401 },
-    });
-
-    await wrapper.findComponent(InputText).setValue("user");
-    await wrapper.findComponent(Password).find("input").setValue("pass");
-    await wrapper.find("button").trigger("click");
-
-    expect(mockToast.add).toHaveBeenCalledWith(
-      expect.objectContaining({
-        detail: "Invalid username or password",
-      }),
+    expect(mockToastAdd).toHaveBeenCalledWith(
+      expect.objectContaining({ severity: "error", detail: undefined }),
     );
   });
 
-  it("should return if validation fails", async () => {
-    const wrapper = factory();
+  it("does not redirect on error", async () => {
+    mockHandleLogin.mockRejectedValue(makeAxiosError(401, "Unauthorized"));
+    const wrapper = mountComponent();
+    await submitForm(wrapper);
 
-    await wrapper.find("button").trigger("click");
-
-    expect(api.post).not.toHaveBeenCalled();
-  });
-  it("should clear username error when user types (@input)", async () => {
-    const wrapper = factory();
-    const vm = wrapper.vm as any;
-    await wrapper.find("button").trigger("click");
-    expect(vm.errors.username).toBeDefined();
-
-    const usernameInput = wrapper.findComponent(InputText);
-    await usernameInput.setValue("admin");
-
-    await usernameInput.vm.$emit("input");
-
-    expect(vm.errors.username).toBe("");
+    expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it("should flatten Zod array errors into a single string (coverage for Array.isArray)", async () => {
-    const wrapper = factory();
-    const vm = wrapper.vm as any;
+  it("always shows an error toast regardless of status code", async () => {
+    for (const status of [400, 401, 403, 500]) {
+      mockToastAdd.mockClear();
+      mockHandleLogin.mockRejectedValue(
+        makeAxiosError(status, `Error ${status}`),
+      );
+      const wrapper = mountComponent();
+      await submitForm(wrapper);
 
-    await wrapper.find("button").trigger("click");
+      expect(mockToastAdd).toHaveBeenCalledWith(
+        expect.objectContaining({ severity: "error" }),
+      );
+    }
+  });
+});
 
-    const usernameError = vm.errors.username;
-    expect(typeof usernameError).toBe("string");
-    expect(Array.isArray(usernameError)).toBe(false);
-    expect(usernameError).toBe("Username is required");
+// ── Navigation ────────────────────────────────────────────────────────────────
+
+describe("LoginView navigation", () => {
+  beforeEach(() => mockPush.mockClear());
+
+  it("navigates to /forgot-password", async () => {
+    const wrapper = mountComponent();
+    const btn = wrapper
+      .findAll("button[type='button']")
+      .find((b) => b.text().includes("login.forgotPassword"));
+    await btn!.trigger("click");
+
+    expect(mockPush).toHaveBeenCalledWith("/forgot-password");
+  });
+
+  it("navigates to /signup", async () => {
+    const wrapper = mountComponent();
+    const btn = wrapper
+      .findAll("button[type='button']")
+      .find((b) => b.text().includes("login.signup"));
+    await btn!.trigger("click");
+
+    expect(mockPush).toHaveBeenCalledWith("/signup");
+  });
+});
+
+// ── OAuth ─────────────────────────────────────────────────────────────────────
+
+describe("LoginView OAuth", () => {
+  it("calls loginWithGoogle when the OAuth button is clicked", async () => {
+    const wrapper = mountComponent();
+    await wrapper.find('[data-testid="oauth-btn"]').trigger("click");
+
+    expect(mockLoginWithGoogle).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("LoginView Validation UI", () => {
+  describe("Username field states", () => {
+    it("shows invalid class and error icon when dirty and invalid", () => {
+      const wrapper = mountWithFieldState("username", {
+        dirty: true,
+        invalid: true,
+      });
+
+      const input = wrapper.find("#username");
+      expect(input.classes()).toContain("p-invalid");
+
+      const icon = wrapper.find(".pi-times-circle");
+      expect(icon.exists()).toBe(true);
+    });
+
+    it("shows valid class and check icon when dirty and valid", () => {
+      const wrapper = mountWithFieldState("username", {
+        dirty: true,
+        invalid: false,
+      });
+
+      const input = wrapper.find("#username");
+      expect(input.classes()).toContain("p-valid");
+
+      const icon = wrapper.find(".pi-check-circle");
+      expect(icon.exists()).toBe(true);
+    });
+  });
+
+  describe("Password field errors", () => {
+    it("renders the list of error messages when dirty and invalid", () => {
+      const errorList = [
+        { message: "password.too_short" },
+        { message: "password.no_number" },
+      ];
+
+      const wrapper = mountWithFieldState("password", {
+        dirty: true,
+        invalid: true,
+        errors: errorList,
+      });
+
+      expect(wrapper.text()).toContain("password.too_short");
+      expect(wrapper.text()).toContain("password.no_number");
+
+      const errorIcons = wrapper.findAll(".pi-times-circle");
+      expect(errorIcons.length).toBeGreaterThanOrEqual(2);
+    });
+
+    it("does not show errors when field is pristine (not dirty)", () => {
+      const wrapper = mountWithFieldState("password", {
+        dirty: false,
+        invalid: true,
+        errors: [{ message: "Some error" }],
+      });
+
+      expect(wrapper.text()).not.toContain("Some error");
+    });
   });
 });

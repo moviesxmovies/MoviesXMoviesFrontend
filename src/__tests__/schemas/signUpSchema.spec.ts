@@ -98,6 +98,14 @@ describe("Signup schema", () => {
     const errors = result.error?.flatten().fieldErrors;
     expect(errors?.password).toBeDefined();
   });
+  it("Should fail if password is equal to email in step 1", () => {
+    const result = step1Schema.safeParse({
+      ...validData,
+      password: validData.email,
+    });
+    const errors = result.error?.flatten().fieldErrors;
+    expect(errors?.password).toBeDefined();
+  });
   it("Should fail if first_name is missing", () => {
     const result = step2Schema.safeParse({ ...validData, first_name: "" });
     const errors = result.error?.flatten().fieldErrors;
