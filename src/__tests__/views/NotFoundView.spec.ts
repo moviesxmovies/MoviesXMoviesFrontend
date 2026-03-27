@@ -20,6 +20,6 @@ describe("NotFoundView", () => {
     await wrapper.find("button").trigger("click");
     await flushPromises();
 
-    expect(mockPush).toHaveBeenCalledWith("/home");
+    expect(mockPush).toHaveBeenCalledWith("/");
   });
 });
