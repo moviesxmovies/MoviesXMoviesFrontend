@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import InputOtp from "primevue/inputotp";
 import Button from "primevue/button";
 import Message from "primevue/message";
 import { useToast } from "primevue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { api } from "@/composables/useAPI";
 import { useI18n } from "vue-i18n";
 import { refreshToken } from "@/repositories/auth/authRepository";
 
 const { t } = useI18n();
-const verificationCode = ref("");
+const route = useRoute();
+const verificationCode = ref(route.query.code ? String(route.query.code) : "");
 const loading = ref(false);
 const error = ref("");
 const toast = useToast();

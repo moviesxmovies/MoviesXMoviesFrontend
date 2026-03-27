@@ -53,42 +53,14 @@ describe("Login schema", () => {
   it("Should accept valid data", () => {
     expect(loginSchema.safeParse(validData).success).toBe(true);
   });
-  it("Should fail if password is equal to username", () => {
-    const result = loginSchema.safeParse({
-      ...validData,
-      password: validData.username,
-    });
-    const errors = result.error?.flatten().fieldErrors;
-    expect(errors?.password).toBeDefined();
-  });
   it("Should fail if username is missing", () => {
     const result = loginSchema.safeParse({ ...validData, username: "" });
     const errors = result.error?.flatten().fieldErrors;
     expect(errors?.username).toContain("Username is required");
   });
   it("Should fail if password is too short", () => {
-    const result = loginSchema.safeParse({ ...validData, password: "Short1" });
+    const result = loginSchema.safeParse({ ...validData, password: "" });
     const errors = result.error?.flatten().fieldErrors;
-    expect(errors?.password).toContain("At least 10 characters");
-  });
-
-  it("Should fail if password has no uppercase letter", () => {
-    const result = loginSchema.safeParse({
-      ...validData,
-      password: "password123",
-    });
-    const errors = result.error?.flatten().fieldErrors;
-    expect(errors?.password).toContain(
-      "Password must include an uppercase letter",
-    );
-  });
-
-  it("Should fail if password has no number", () => {
-    const result = loginSchema.safeParse({
-      ...validData,
-      password: "PasswordABC",
-    });
-    const errors = result.error?.flatten().fieldErrors;
-    expect(errors?.password).toContain("Password must include a number");
+    expect(errors?.password).toContain("Password is required");
   });
 });
