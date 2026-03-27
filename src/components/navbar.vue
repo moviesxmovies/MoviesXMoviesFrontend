@@ -41,9 +41,10 @@ const route = useRoute();
     align-items: center;
     justify-content: space-between;
     padding: 0.3rem 2rem;
-    position: sticky;
+    position: fixed;
     top: 0;
     z-index: 10;
+    width: 100%;
 }
 
 .nav-logo {
