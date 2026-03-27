@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@custom-variant dark (&:where(.dark, .dark *));
 @theme {
   --color-text: var(--text);
   --color-background: var(--background);

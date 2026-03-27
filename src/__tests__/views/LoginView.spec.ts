@@ -53,13 +53,14 @@ vi.mock("vue-i18n", () => ({
 vi.mock("@primevue/forms", () => ({
   Form: {
     name: "Form",
-    template: '<form @submit.prevent><slot /></form>',
+    template: "<form @submit.prevent><slot /></form>",
     props: ["resolver"],
     emits: ["submit"],
   },
   FormField: {
     name: "FormField",
-    template: '<div><slot :field="{ invalid: false, dirty: false, errors: [] }" /></div>',
+    template:
+      '<div><slot :field="{ invalid: false, dirty: false, errors: [] }" /></div>',
     props: ["name", "initialValue"],
   },
 }));
@@ -67,7 +68,8 @@ vi.mock("@primevue/forms", () => ({
 vi.mock("@/components/oauthButtonComponent.vue", () => ({
   default: {
     name: "OauthButtonComponent",
-    template: '<button data-testid="oauth-btn" @click="$emit(\'click\')">Google</button>',
+    template:
+      '<button data-testid="oauth-btn" @click="$emit(\'click\')">Google</button>',
     emits: ["click"],
   },
 }));
@@ -83,9 +85,37 @@ function mountComponent() {
   return mount(LoginView, { global: globalConfig });
 }
 
+function mountWithFieldState(
+  name: string,
+  state: { dirty: boolean; invalid: boolean },
+) {
+  return mount(LoginView, {
+    global: {
+      ...globalConfig,
+      components: {
+        FormField: {
+          name: "FormField",
+          template: '<div><slot :field="fieldState" /></div>',
+          props: ["name", "initialValue"],
+          setup(props: any) {
+            const fieldState =
+              props.name === name
+                ? { ...state, errors: [] }
+                : { dirty: false, invalid: false, errors: [] };
+            return { fieldState };
+          },
+        },
+      },
+    },
+  });
+}
+
 const validValues = { username: "testuser", password: "Secret123!" };
 
-async function submitForm(wrapper: ReturnType<typeof mountComponent>, valid = true) {
+async function submitForm(
+  wrapper: ReturnType<typeof mountComponent>,
+  valid = true,
+) {
   await wrapper
     .findComponent({ name: "Form" })
     .vm.$emit("submit", { valid, values: validValues });
@@ -151,7 +181,10 @@ describe("LoginView login() success", () => {
     await submitForm(wrapper);
 
     expect(mockToastAdd).toHaveBeenCalledWith(
-      expect.objectContaining({ severity: "success", detail: "login.toast.success" })
+      expect.objectContaining({
+        severity: "success",
+        detail: "login.toast.success",
+      }),
     );
   });
 
@@ -209,12 +242,17 @@ describe("LoginView login() error handling", () => {
   };
 
   it("shows the API detail message on error", async () => {
-    mockHandleLogin.mockRejectedValue(makeAxiosError(401, "Invalid credentials"));
+    mockHandleLogin.mockRejectedValue(
+      makeAxiosError(401, "Invalid credentials"),
+    );
     const wrapper = mountComponent();
     await submitForm(wrapper);
 
     expect(mockToastAdd).toHaveBeenCalledWith(
-      expect.objectContaining({ severity: "error", detail: "Invalid credentials" })
+      expect.objectContaining({
+        severity: "error",
+        detail: "Invalid credentials",
+      }),
     );
   });
 
@@ -224,7 +262,7 @@ describe("LoginView login() error handling", () => {
     await submitForm(wrapper);
 
     expect(mockToastAdd).toHaveBeenCalledWith(
-      expect.objectContaining({ severity: "error", detail: undefined })
+      expect.objectContaining({ severity: "error", detail: undefined }),
     );
   });
 
@@ -239,12 +277,14 @@ describe("LoginView login() error handling", () => {
   it("always shows an error toast regardless of status code", async () => {
     for (const status of [400, 401, 403, 500]) {
       mockToastAdd.mockClear();
-      mockHandleLogin.mockRejectedValue(makeAxiosError(status, `Error ${status}`));
+      mockHandleLogin.mockRejectedValue(
+        makeAxiosError(status, `Error ${status}`),
+      );
       const wrapper = mountComponent();
       await submitForm(wrapper);
 
       expect(mockToastAdd).toHaveBeenCalledWith(
-        expect.objectContaining({ severity: "error" })
+        expect.objectContaining({ severity: "error" }),
       );
     }
   });
