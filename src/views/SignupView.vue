@@ -4,9 +4,9 @@ import { useLangStore } from "@/stores/langStore";
 import Step1 from "@/views/signup/step1.vue";
 import Step2 from "@/views/signup/step2.vue";
 import { ProgressBar, useToast } from "primevue";
-import { onMounted, reactive, ref, watch, type Component } from "vue";
+import { reactive, ref, type Component } from "vue";
 import { useI18n } from "vue-i18n";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 
 const { t } = useI18n();
 const useLang = useLangStore();

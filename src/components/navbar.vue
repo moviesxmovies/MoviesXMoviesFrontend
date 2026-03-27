@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import LangComponent from "./langComponent.vue";
 import ThemeComponent from "./themeComponent.vue";
 import { useAuthStore } from "@/stores/authStore";
 const router = useRouter();
 const authStore = useAuthStore();
+const route = useRoute();
 </script>
 
 <template>
@@ -12,7 +13,7 @@ const authStore = useAuthStore();
         <div class="nav-logo">
             <span class="logo-icon">
 
-                <img src="/favicon.svg"></img>
+                <img src="/favicon.svg" alt="logo"></img>
 
             </span>
             <span class="logo-text">Movies<span class="logo-x">×</span>Movies</span>
@@ -24,7 +25,7 @@ const authStore = useAuthStore();
             <button class="btn-ghost" @click="router.push('/profile')" v-if="authStore.isAuthenticated">
                 {{ $t("home.profile") }}
             </button>
-            <button class="btn-ghost" @click="router.push('/login')" v-else>
+            <button class="btn-ghost" @click="router.push('/login')" v-else-if="route.name !== 'login'">
                 {{ $t("home.login") }}
             </button>
 
