@@ -55,3 +55,13 @@ export const refreshToken = async (refresh_token: string) => {
     throw error;
   }
 };
+
+export const forgotPassword = async (email: string) => {
+  const lang = authStore.user?.preferred_language || "en";
+  try {
+    const { data } = await api.get("/auth/forgot-password/", { params: { email, lang } });
+    return data.status;
+  } catch (error: any) {
+    throw error;
+  }
+};

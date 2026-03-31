@@ -27,6 +27,10 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/SignupView.vue"),
   },
   {
+    path: '/password-reset',
+    component: () => import("../views/ForgotPasswordView.vue"),
+  },
+  {
     path: "/home",
     component: () => import("../views/HomeView.vue"),
     meta: { requiresAuth: true },
