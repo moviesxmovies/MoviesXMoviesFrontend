@@ -153,7 +153,7 @@ const login = async ({
               cursor: pointer;
               padding: 0;
             "
-            @click="router.push('/password-reset')"
+            @click="router.push('/forgot-password')"
           >
             {{ $t("login.forgotPassword") }}
           </button>
