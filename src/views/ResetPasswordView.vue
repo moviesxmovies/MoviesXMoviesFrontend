@@ -5,12 +5,13 @@ import { Form, FormField, type FormSubmitEvent } from "@primevue/forms";
 import { zodResolver } from "@primevue/forms/resolvers/zod";
 import { Button, FloatLabel, Password, useToast } from "primevue";
 import { useI18n } from "vue-i18n";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 const resolver = zodResolver(resetPasswordSchema);
 const toast = useToast();
 const { t } = useI18n();
 const route = useRoute();
+const router = useRouter();
 
 const handleSubmit = async ({
   valid,
@@ -19,14 +20,19 @@ const handleSubmit = async ({
   if (!valid) {
     return;
   }
-  console.log("values: ", values);
   try {
-    const data = await resetPassword(
+    const status = await resetPassword(
       values.forgot_password_code,
       values.password,
       values.email,
     );
-    console.log("data: " + data);
+    toast.add({
+      severity: "success",
+      summary: t("toast.success"),
+      detail: status,
+      life: 3000,
+    });
+    router.push("/login");
   } catch (error: any) {
     toast.add({
       severity: "error",

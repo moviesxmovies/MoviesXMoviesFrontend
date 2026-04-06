@@ -52,6 +52,17 @@
     },
     "loading": "Loading..."
   },
+  "forgotPassword": {
+    "toast": {
+      "success": "Password reset email sent",
+      "error": "Failed to send password reset email. Please try again."
+    },
+    "title": "Forgot Password",
+    "description": "Enter your email address and we'll send you a link to reset your password.",
+    "resetPassword": "Reset Password",
+    "rememberPassword": "Remember your password? Login here",
+    "backToLogin": "Back to Login"
+  },
   "home": {
     "welcome": "Welcome to MoviesXMovies!",
     "login": "Login",
