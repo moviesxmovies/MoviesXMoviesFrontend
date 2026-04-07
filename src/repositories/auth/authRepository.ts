@@ -62,6 +62,7 @@ export const refreshToken = async () => {
 };
 
 export const forgotPassword = async (email: string) => {
+  const authStore = useAuthStore();
   const lang = authStore.user?.preferred_language || "en";
   try {
     const { data } = await api.get("/auth/forgot-password/", {

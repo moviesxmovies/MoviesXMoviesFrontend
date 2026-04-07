@@ -11,10 +11,11 @@ import {
 import { api } from "@/composables/useAPI";
 import { mount } from "@vue/test-utils";
 
-const { mockPost, mockSetTokens, mockLogout } = vi.hoisted(() => ({
+const { mockPost, mockSetTokens, mockLogout, mockGet } = vi.hoisted(() => ({
   mockPost: vi.fn(),
   mockSetTokens: vi.fn(),
   mockLogout: vi.fn(),
+  mockGet: vi.fn(),
 }));
 const mockStoreState = {
   refreshToken: "",
