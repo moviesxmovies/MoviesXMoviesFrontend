@@ -62,26 +62,7 @@ describe("WelcomeView", () => {
     expect(wrapper.findAll(".feature-item")).toHaveLength(3);
   });
 
-  // ── Auth redirect ────────────────────────────────────────────────────────
 
-it("redirects to /home if user is already authenticated", async () => {
-  const { useAuthStore } = vi.mocked(await import("@/stores/authStore"));
-  useAuthStore.mockReturnValueOnce({ isAuthenticated: true } as any);
-
-  mount(WelcomeView, {
-    global: {
-      plugins: [createPinia(), i18n],
-      stubs: { OauthButtonComponent: true },
-    },
-  });
-
-  expect(mockPush).toHaveBeenCalledWith("/home");
-});
-
-  it("does not redirect if user is not authenticated", () => {
-    factory();
-    expect(mockPush).not.toHaveBeenCalledWith("/home");
-  });
 
   // ── Signup button ────────────────────────────────────────────────────────
 

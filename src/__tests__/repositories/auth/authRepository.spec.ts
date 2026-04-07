@@ -2,11 +2,14 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 import { handleRegister, handleLogin, oauthLogin, refreshToken, FieldMsg } from "../../../repositories/auth/authRepository";
 import { mount } from "@vue/test-utils";
 
-const { mockPost, mockSetTokens } = vi.hoisted(() => ({
+const { mockPost, mockSetTokens, mockLogout } = vi.hoisted(() => ({
   mockPost: vi.fn(),
   mockSetTokens: vi.fn(),
+  mockLogout: vi.fn(),
 }));
-
+const mockStoreState = {
+  refreshToken: "",
+};
 vi.mock("@/composables/useAPI", () => ({
   api: {
     post: mockPost,
@@ -16,7 +19,9 @@ vi.mock("@/composables/useAPI", () => ({
 vi.mock("@/stores/authStore", () => ({
   useAuthStore: vi.fn(() => ({
     setTokens: mockSetTokens,
-    logout: vi.fn(),
+    logout: mockLogout,
+    get refreshToken() { return mockStoreState.refreshToken },
+    set refreshToken(val) { mockStoreState.refreshToken = val }
   })),
 }));
 
@@ -29,6 +34,7 @@ vi.mock("@/config", () => ({
 describe("AuthRepository", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockStoreState.refreshToken = "";
   });
 
   // handleRegister
@@ -91,22 +97,23 @@ describe("AuthRepository", () => {
     await expect(oauthLogin("bad-code")).rejects.toThrow("OAuth error");
   });
 
-  // refreshToken
   it("refreshToken calls API with correct token and sets tokens", async () => {
     mockPost.mockResolvedValueOnce({ data: { access: "new-access-token" } });
 
-    await refreshToken("my-refresh-token");
+    mockStoreState.refreshToken = "my-refresh-token";
+
+    await refreshToken();
 
     expect(mockPost).toHaveBeenCalledWith("/auth/refresh/", {
-      refresh_token: "my-refresh-token",
+      refresh: "my-refresh-token",
     });
-    expect(mockSetTokens).toHaveBeenCalledWith("new-access-token", "my-refresh-token");
+    expect(mockSetTokens).toHaveBeenCalledWith("new-access-token");
   });
 
   it("refreshToken throws when API fails", async () => {
     mockPost.mockRejectedValueOnce(new Error("Token expired"));
 
-    await expect(refreshToken("bad-token")).rejects.toThrow("Token expired");
+    await expect(refreshToken()).rejects.toThrow("Token expired");
   });
 });
 
