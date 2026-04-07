@@ -1,14 +1,19 @@
 <script setup lang="ts">
+import { Button, Card } from "primevue";
 import { useRouter } from "vue-router";
 const router = useRouter();
 </script>
 
 <template>
-  <div class="card">
-    <h2>{{ $t("checkEmail.title") }}</h2>
-    <p>{{ $t("checkEmail.description") }}</p>
-    <button @click="router.push('/login')">
-      {{ $t("checkEmail.button") }}
-    </button>
-  </div>
+  <Card class="card">
+    <template #title>{{ $t("checkEmail.title") }}</template>
+    <template #content>
+      <p>{{ $t("checkEmail.description") }}</p>
+    </template>
+    <template #footer>
+      <Button @click="router.push('/login')">
+        {{ $t("checkEmail.button") }}
+      </Button>
+    </template>
+  </Card>
 </template>
