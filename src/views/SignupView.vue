@@ -28,8 +28,6 @@ const formData = reactive({
   image: null as File | null,
 });
 
-
-
 const next = () => {
   return currentStep.value < Object.keys(steps).length
     ? currentStep.value++

@@ -9,7 +9,7 @@ const router = useRouter();
     style="
       background: var(--background);
       color: var(--text);
-      font-family: &quot;DM Sans&quot;, sans-serif;
+      font-family: 'DM Sans', sans-serif;
     "
   >
     <div class="nav-spacer h-13"></div>
@@ -69,7 +69,7 @@ const router = useRouter();
             background: var(--primary);
             border: none;
             color: #f2f2f2;
-            font-family: &quot;DM Sans&quot;, sans-serif;
+            font-family: 'DM Sans', sans-serif;
           "
           @click="router.push('/login')"
         >

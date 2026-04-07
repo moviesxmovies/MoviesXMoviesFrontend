@@ -46,10 +46,10 @@ const route = useRoute();
     <div class="text-center">
       <img src="/favicon.svg" alt="Logo" class="w-16 h-16 m-auto" />
       <h2 class="text-xl font-semibold" style="color: var(--text)">
-        {{ $t("signup.createAccount") }}
+        {{ $t("signup.title") }}
       </h2>
       <p class="text-sm mt-1" style="color: var(--text); opacity: 0.5">
-        {{ $t("signup.step1Subtitle") }}
+        {{ $t("signup.step1.subtitle") }}
       </p>
     </div>
 
@@ -181,7 +181,7 @@ const route = useRoute();
         <FieldMsg :field="$field" />
       </FormField>
 
-      <Button type="submit" :label="$t('signup.next')" fluid class="mt-2" />
+      <Button type="submit" :label="$t('next')" fluid class="mt-2" />
     </Form>
 
     <div class="relative flex items-center gap-3">

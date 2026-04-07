@@ -141,7 +141,7 @@ const handleSubmit = async ({
 
         <Button
           type="submit"
-          :label="$t('signup.next')"
+          :label="$t('next')"
           icon="pi pi-check"
           fluid
           class="mt-2"

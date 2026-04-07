@@ -180,7 +180,6 @@ const login = async ({
       <OauthButtonComponent @click="loginWithGoogle" />
 
       <p class="text-center text-xs" style="color: var(--text); opacity: 0.5">
-        {{ $t("login.noAccount") }}
         <button
           type="button"
           class="transition-opacity hover:opacity-100"

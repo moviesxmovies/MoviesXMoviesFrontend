@@ -1,4 +1,6 @@
 {
+  "next": "Next",
+  "back": "Back",
   "toast": {
     "success": "Operation successful",
     "error": "An error occurred"
@@ -18,26 +20,34 @@
       "success": "Your account has been created",
       "failed": "Registration failed"
     },
+    "step1": {
+      "subtitle": "Create your account to start sharing your favorite movies."
+    },
+    "step2": {
+      "title": "Create your profile",
+      "subtitle": "Set up your profile.",
+      "image": "Profile picture"
+    },
     "title": "Sign Up",
     "username": "Username",
     "firstName": "First Name",
     "lastName": "Last Name",
     "email": "Email",
+    "or": "or continue with",
     "password": "Password",
     "confirmPassword": "Confirm Password",
     "login": "Already have an account? Login here"
   },
   "login": {
     "toast": {
-      "success": "Session started",
-      "connectionError": "Failed to log in with {0}. Please try again.",
-      "invalidCredentials": "Invalid username or password",
-      "accessDenied": "Access denied"
+      "success": "Session started"
     },
     "title": "Login",
+    "subtitle": "Enter your credentials to log in.",
     "username": "Username",
     "password": "Password",
-    "signup": "Don't have an account? Sign up here"
+    "signup": "Don't have an account? Sign up here",
+    "forgotPassword": "Forgot your password?"
   },
   "notFound": {
     "title": "404 - Not Found",
@@ -54,7 +64,6 @@
   },
   "forgotPassword": {
     "toast": {
-      "success": "Password reset email sent",
       "error": "Failed to send password reset email. Please try again."
     },
     "title": "Forgot Password",
@@ -62,6 +71,16 @@
     "resetPassword": "Reset Password",
     "rememberPassword": "Remember your password? Login here",
     "backToLogin": "Back to Login"
+  },
+  "resetPassword": {
+    "toast": {
+      "error": "Failed to reset password. Please try again."
+    },
+    "title": "Reset Password",
+    "description": "Enter your new password below.",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "submit": "Reset Password"
   },
   "home": {
     "welcome": "Welcome to MoviesXMovies!",
@@ -121,5 +140,10 @@
     "forgotPasswordCode": {
       "required": "Password reset code is required"
     }
+  },
+  "checkEmail": {
+    "title": "Check your email",
+    "description": "We've sent a password reset code to your email address. Please enter the code below to reset your password.",
+    "button": "Go to login"
   }
 }
