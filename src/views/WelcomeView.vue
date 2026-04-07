@@ -2,15 +2,10 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import OauthButtonComponent from "@/components/oauthButtonComponent.vue";
-import { useAuthStore } from "@/stores/authStore";
 
 const router = useRouter();
 const email = ref("");
 const emailError = ref(false);
-const authStore = useAuthStore();
-if (authStore.isAuthenticated) {
-  router.push("/home");
-}
 
 function handleSignup() {
   if (!email.value.trim() || !email.value.includes("@")) {

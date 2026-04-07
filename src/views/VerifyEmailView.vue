@@ -55,7 +55,7 @@ const handleVerification = async () => {
         detail: t("verify.toast.success"),
         life: 3000,
       });
-      await refreshToken(data.refresh_token);
+      await refreshToken();
       router.push("/home");
     }
   } catch (error: any) {

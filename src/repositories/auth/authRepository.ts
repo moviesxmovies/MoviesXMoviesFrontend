@@ -47,10 +47,10 @@ export const FieldMsg = defineComponent({
   },
 });
 
-export const refreshToken = async (refresh_token: string) => {
+export const refreshToken = async () => {
   try {
-    const { data } = await api.post("/auth/refresh/", { refresh_token });
-    authStore.setTokens(data.access, refresh_token);
+    const { data } = await api.post("/auth/refresh/", { 'refresh': authStore.refreshToken });
+    authStore.setTokens(data.access);
   } catch (error: any) {
     throw error;
   }

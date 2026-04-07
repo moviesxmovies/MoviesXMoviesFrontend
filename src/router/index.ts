@@ -6,6 +6,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/accounts/google/login/callback/",
     component: () => import("../views/OauthCallbackView.vue"),
+    meta: { forbiddenWhenAuthenticated: true },
   },
   {
     path: "/onboarding",
@@ -21,10 +22,13 @@ const routes: Array<RouteRecordRaw> = [
     path: "/login",
     component: () => import("../views/LoginView.vue"),
     name: "login",
+    meta: { forbiddenWhenAuthenticated: true },
   },
   {
     path: "/signup",
     component: () => import("../views/SignupView.vue"),
+    name: "signup",
+    meta: { forbiddenWhenAuthenticated: true },
   },
   {
     path: "/home",
@@ -34,6 +38,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
     component: () => import("../views/WelcomeView.vue"),
+    meta: { forbiddenWhenAuthenticated: true },
   },
   {
     path: "/:pathMatch(.*)*",
@@ -52,6 +57,10 @@ router.beforeEach((to, from, next) => {
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     return next({ path: "/login" });
+  }
+
+  if (to.meta.forbiddenWhenAuthenticated && authStore.isAuthenticated) {
+    return next("/home");
   }
 
   if (user) {
