@@ -49,8 +49,8 @@ function mountComponent(modelValue = defaultModelValue) {
 describe("SignUpStep2 rendering", () => {
   it("renders title and subtitle i18n keys", () => {
     const wrapper = mountComponent();
-    expect(wrapper.text()).toContain("signup.profileTitle");
-    expect(wrapper.text()).toContain("signup.step2Subtitle");
+    expect(wrapper.text()).toContain("signup.step2.title");
+    expect(wrapper.text()).toContain("signup.step2.subtitle");
   });
 
   it("shows the camera placeholder when no image is selected", () => {
@@ -71,8 +71,8 @@ describe("SignUpStep2 rendering", () => {
     const wrapper = mountComponent();
     const buttons = wrapper.findAllComponents({ name: "Button" });
     const labels = buttons.map((b) => b.props("label"));
-    expect(labels).toContain("signup.back");
-    expect(labels).toContain("signup.signUp");
+    expect(labels).toContain("back");
+    expect(labels).toContain("signup.title");
   });
 
   it("renders the hidden FileUpload component", () => {
@@ -192,7 +192,7 @@ describe("SignUpStep2 back button", () => {
   it('emits "back" when the Back button is clicked', async () => {
     const wrapper = mountComponent();
     const buttons = wrapper.findAllComponents({ name: "Button" });
-    const backBtn = buttons.find((b) => b.props("label") === "signup.back");
+    const backBtn = buttons.find((b) => b.props("label") === "back");
 
     await backBtn!.trigger("click");
 
@@ -203,7 +203,7 @@ describe("SignUpStep2 back button", () => {
   it('does NOT emit "next" when Back is clicked', async () => {
     const wrapper = mountComponent();
     const buttons = wrapper.findAllComponents({ name: "Button" });
-    const backBtn = buttons.find((b) => b.props("label") === "signup.back");
+    const backBtn = buttons.find((b) => b.props("label") === "back");
 
     await backBtn!.trigger("click");
 

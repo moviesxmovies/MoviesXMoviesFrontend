@@ -37,3 +37,9 @@ export const availableCountries = [
   { label: "FR", value: "fr" },
   { label: "DE", value: "de" },
 ];
+
+export interface ForgotPasswordPayload {
+  forgot_password_code: string;
+  new_password: string;
+  email: string;
+}

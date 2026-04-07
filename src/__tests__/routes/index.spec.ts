@@ -9,6 +9,9 @@ vi.mock('../../views/SignupView.vue', () => ({ default: {} }));
 vi.mock('../../views/HomeView.vue', () => ({ default: {} }));
 vi.mock('../../views/WelcomeView.vue', () => ({ default: {} }));
 vi.mock('../../views/NotFoundView.vue', () => ({ default: {} }));
+vi.mock('../../views/ForgotPasswordView.vue', () => ({ default: {} }));
+vi.mock('../../views/ResetPasswordView.vue', () => ({ default: {} }));
+vi.mock('../../views/CheckEmailView.vue', () => ({ default: {} }));
 
 vi.mock('../../stores/authStore', () => ({
     useAuthStore: vi.fn()
@@ -122,5 +125,16 @@ describe('Router & LocalStorage Isolation', () => {
 
         expect(router.currentRoute.value.path).toBe('/non-existent');
 
+        await router.push('/forgot-password');
+
+        expect(router.currentRoute.value.path).toBe('/forgot-password');
+
+        await router.push('/reset-password');
+
+        expect(router.currentRoute.value.path).toBe('/reset-password');
+
+        await router.push('/check-email');
+
+        expect(router.currentRoute.value.path).toBe('/check-email');
     });
 });

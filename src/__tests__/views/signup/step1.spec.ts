@@ -51,8 +51,8 @@ function mountComponent(modelValue = defaultModelValue) {
 describe("SignUpStep1 rendering", () => {
   it("renders i18n keys for title and subtitle", () => {
     const wrapper = mountComponent();
-    expect(wrapper.text()).toContain("signup.createAccount");
-    expect(wrapper.text()).toContain("signup.step1Subtitle");
+    expect(wrapper.text()).toContain("signup.title");
+    expect(wrapper.text()).toContain("signup.step1.subtitle");
   });
 
   it("renders four FormField components (username, email, password, confirm_password)", () => {
@@ -69,7 +69,7 @@ describe("SignUpStep1 rendering", () => {
     const wrapper = mountComponent();
     const btn = wrapper.find('button[type="submit"]');
     expect(btn.exists()).toBe(true);
-    expect(btn.text()).toContain("signup.next");
+    expect(btn.text()).toContain("next");
   });
 
   it("renders the OAuth button", () => {
