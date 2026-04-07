@@ -172,13 +172,6 @@ const steps = [
     pointer-events: none;
 }
 
-.step-card.visible-boarding {
-    transform: translateX(-50%) scale(1);
-}
-
-.step-card.hidden-boarding {
-    transform: translateX(-50%) scale(0.92);
-}
 
 /* ── Card UI ── */
 .card-inner {
@@ -223,15 +216,6 @@ const steps = [
     transition: max-height 0.4s ease, opacity 0.3s ease 0.1s;
 }
 
-.btn-visible {
-    min-height: 65px;
-    opacity: 1;
-}
-
-.btn-hidden {
-    max-height: 0;
-    opacity: 0;
-}
 
 /* ── Botón personalizado ── */
 .button-wrapper :deep(.p-button) {
@@ -256,8 +240,11 @@ const steps = [
     transform: translateY(0px) scale(0.98);
 }
 
+
 .btn-visible {
-    max-height: 60px;
+    min-height: 65px;
+
+    max-height: 65px;
     max-width: 150px;
     opacity: 1;
 }
