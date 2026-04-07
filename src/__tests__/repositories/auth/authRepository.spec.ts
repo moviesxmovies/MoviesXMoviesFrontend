@@ -141,7 +141,7 @@ describe("AuthRepository", () => {
       params: {
         email: "john.doe@example.com",
         lang: "en",
-        _t: Date.now(),
+        _t: expect.any(Number),
       },
     });
     expect(result).toEqual("Code sent to your mail");
