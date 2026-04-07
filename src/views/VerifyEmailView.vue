@@ -2,14 +2,15 @@
 import VerifyCodeComponent from "@/components/verifyCodeComponent.vue";
 import { api } from "@/composables/useAPI";
 import { refreshToken } from "@/repositories/auth/authRepository";
-import { router } from "@/router";
 import { useToast } from "primevue";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { useRouter } from "vue-router";
 
 const { t } = useI18n();
 const toast = useToast();
 const loading = ref(false);
+const router = useRouter();
 
 const sendVerificationCode = async () => {
   try {
