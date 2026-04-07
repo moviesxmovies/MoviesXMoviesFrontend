@@ -3,10 +3,11 @@ import { useAuthStore } from "@/stores/authStore";
 import type { LoginPayload, RegisterPayload } from "@/types";
 import { defineComponent, h } from "vue";
 
-const authStore = useAuthStore();
 
 export const handleLogin = async (values: LoginPayload) => {
   try {
+    const authStore = useAuthStore();
+
     const { data } = await api.post("/auth/login/", values);
     authStore.setTokens(data.access, data.refresh);
   } catch (error: any) {
@@ -21,6 +22,8 @@ export const handleRegister = async (values: RegisterPayload) => {
 
 export const oauthLogin = async (code: string) => {
   try {
+    const authStore = useAuthStore();
+
     const { data } = await api.post("/oauth/google/", {
       code: code,
     });
@@ -49,6 +52,8 @@ export const FieldMsg = defineComponent({
 
 export const refreshToken = async () => {
   try {
+    const authStore = useAuthStore();
+
     const { data } = await api.post("/auth/refresh/", { 'refresh': authStore.refreshToken });
     authStore.setTokens(data.access);
   } catch (error: any) {
