@@ -45,86 +45,131 @@ const handleSubmit = async ({
 </script>
 
 <template>
-  <Form
-    @submit="handleSubmit"
-    :resolver="resolver"
-    class="flex flex-col gap-4 w-full"
-  >
-    <h2 class="text-2xl font-bold mb-4">{{ $t("resetPassword.title") }}</h2>
-    <p class="mb-6">{{ $t("resetPassword.description") }}</p>
-    <FormField
-      name="email"
-      :initialValue="(route.query.email as string) ?? ''"
-      v-slot="{}"
+  <div class="min-h-screen flex flex-col items-center justify-center px-4">
+    <div
+      class="relative w-full max-w-sm rounded-2xl border p-8 flex flex-col gap-6 bg-background/80 border-primary/40"
     >
-    </FormField>
-    <FormField
-      name="forgot_password_code"
-      :initialValue="(route.query.code as string) ?? ''"
-      v-slot="{}"
-    >
-    </FormField>
-    <FormField
-      v-slot="$field"
-      name="password"
-      initialValue=""
-      class="flex flex-col gap-1"
-    >
-      <FloatLabel variant="over">
-        <Password
-          v-bind="$field"
-          id="password"
-          :feedback="false"
-          toggleMask
-          fluid
-          :class="{
-            'p-invalid': $field?.invalid,
-            'p-valid': $field?.dirty && !$field?.invalid,
-          }"
-        />
-        <label for="password">{{ $t("signup.password") }}</label>
-      </FloatLabel>
-      <div
-        v-if="$field?.dirty && $field?.invalid"
-        class="flex flex-col gap-1 mt-1"
-      >
-        <div
-          v-for="(error, i) of $field?.errors"
-          :key="i"
-          class="flex items-center gap-1.5 text-xs"
-          style="color: #ef4444"
-        >
-          <i class="pi pi-times-circle text-xs" />
-          {{ error.message }}
-        </div>
+      <div class="absolute -inset-4 -z-10 blur-3xl bg-accent/50" />
+
+      <div class="text-center">
+        <img src="/favicon.svg" alt="Logo" class="w-16 h-16 m-auto" />
+        <h2 class="text-xl font-semibold mt-3" style="color: var(--text)">
+          {{ $t("resetPassword.title") }}
+        </h2>
+        <p class="text-sm mt-1" style="color: var(--text); opacity: 0.5">
+          {{ $t("resetPassword.description") }}
+        </p>
       </div>
-    </FormField>
 
-    <FormField
-      v-slot="$field"
-      name="confirm_password"
-      initialValue=""
-      class="flex flex-col gap-1"
-    >
-      <FloatLabel variant="over">
-        <Password
-          v-bind="$field"
-          id="confirm_password"
-          :feedback="false"
-          toggleMask
-          fluid
-          :class="{
-            'p-invalid': $field?.invalid,
-            'p-valid': $field?.dirty && !$field?.invalid,
-          }"
+      <Form
+        @submit="handleSubmit"
+        :resolver="resolver"
+        class="flex flex-col gap-4 w-full"
+      >
+        <FormField
+          name="email"
+          :initialValue="(route.query.email as string) ?? ''"
+          v-slot="{}"
         />
-        <label for="confirm_password">{{ $t("signup.confirmPassword") }}</label>
-      </FloatLabel>
-      <FieldMsg :field="$field" />
-    </FormField>
+        <FormField
+          name="forgot_password_code"
+          :initialValue="(route.query.code as string) ?? ''"
+          v-slot="{}"
+        />
 
-    <Button type="submit" :label="$t('signup.next')" fluid class="mt-2" />
-  </Form>
+        <FormField
+          v-slot="$field"
+          name="password"
+          initialValue=""
+          class="flex flex-col gap-1"
+        >
+          <FloatLabel variant="over">
+            <Password
+              v-bind="$field"
+              id="password"
+              :feedback="false"
+              toggleMask
+              fluid
+              :class="{
+                'p-invalid': $field?.invalid,
+                'p-valid': $field?.dirty && !$field?.invalid,
+              }"
+            />
+            <label for="password">{{ $t("signup.password") }}</label>
+          </FloatLabel>
+
+          <div
+            v-if="$field?.dirty && $field?.invalid"
+            class="flex flex-col gap-1 mt-1"
+          >
+            <div
+              v-for="(error, i) of $field?.errors"
+              :key="i"
+              class="flex items-center gap-1.5 text-xs"
+              style="color: #ef4444"
+            >
+              <i class="pi pi-times-circle text-xs" />
+              {{ error.message }}
+            </div>
+          </div>
+        </FormField>
+
+        <FormField
+          v-slot="$field"
+          name="confirm_password"
+          initialValue=""
+          class="flex flex-col gap-1"
+        >
+          <FloatLabel variant="over">
+            <Password
+              v-bind="$field"
+              id="confirm_password"
+              :feedback="false"
+              toggleMask
+              fluid
+              :class="{
+                'p-invalid': $field?.invalid,
+                'p-valid': $field?.dirty && !$field?.invalid,
+              }"
+            />
+            <label for="confirm_password">{{
+              $t("signup.confirmPassword")
+            }}</label>
+          </FloatLabel>
+          <FieldMsg :field="$field" />
+        </FormField>
+
+        <Button
+          type="submit"
+          :label="$t('signup.next')"
+          icon="pi pi-check"
+          fluid
+          class="mt-2"
+        />
+      </Form>
+
+      <p class="text-center text-xs" style="color: var(--text); opacity: 0.5">
+        {{ $t("forgotPassword.rememberPassword") }}
+        <button
+          type="button"
+          class="transition-opacity hover:opacity-100"
+          style="
+            color: var(--primary);
+            opacity: 0.8;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+          "
+          @click="router.push('/login')"
+        >
+          {{ $t("forgotPassword.backToLogin") }}
+        </button>
+      </p>
+    </div>
+  </div>
 </template>
 
 <style scoped>
