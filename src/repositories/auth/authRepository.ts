@@ -59,16 +59,26 @@ export const refreshToken = async (refresh_token: string) => {
 export const forgotPassword = async (email: string) => {
   const lang = authStore.user?.preferred_language || "en";
   try {
-    const { data } = await api.get("/auth/forgot-password/", { params: { email, lang } });
+    const { data } = await api.get("/auth/forgot-password/", {
+      params: { email, lang, _t: Date.now() },
+    });
     return data.status;
   } catch (error: any) {
     throw error;
   }
 };
 
-export const resetPassword = async (forgot_password_code: string, new_password: string, email: string) => {
+export const resetPassword = async (
+  forgot_password_code: string,
+  new_password: string,
+  email: string,
+) => {
   try {
-    const { data } = await api.post("/auth/forgot-password/", { forgot_password_code, new_password, email });
+    const { data } = await api.post("/auth/forgot-password/", {
+      forgot_password_code,
+      new_password,
+      email,
+    });
     return data.status;
   } catch (error: any) {
     throw error;
