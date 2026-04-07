@@ -18,7 +18,7 @@ export const useLangStore = defineStore("lang", {
     },
 
     async changeLanguage(lang: string) {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("access_token");
       if (token) {
         api.post("/users/preferred-language/", {
           preferred_language: lang,
@@ -29,7 +29,7 @@ export const useLangStore = defineStore("lang", {
 
     async fetchLanguage() {
       try {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("access_token");
 
         if (token) {
           const { data } = await api.get("/users/preferred-language/");
