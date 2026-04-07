@@ -23,7 +23,7 @@ const navigate = (path: string) => {
     <nav class="nav">
         <div class="nav-logo" @click="router.push('/')" style="cursor: pointer;">
             <span class="logo-icon">
-                <img src="/favicon.svg" />
+                <img src="/favicon.svg" alt="Logo"/>
             </span>
             <span class="logo-text">Movies<span class="logo-x">×</span>Movies</span>
         </div>
