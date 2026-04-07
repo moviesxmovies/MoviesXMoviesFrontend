@@ -117,6 +117,9 @@
       "last_name": "last name",
       "email": "email",
       "samePasswordAs": "Password cannot be the same as your {0}"
+    },
+    "forgotPasswordCode": {
+      "required": "Password reset code is required"
     }
   }
 }
