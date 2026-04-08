@@ -7,6 +7,7 @@ import { useToast } from "primevue";
 import { useI18n } from "vue-i18n";
 import StarsComponent from "@/components/starsComponent.vue";
 import { useLangStore } from "@/stores/langStore";
+import ActionsComponent from "@/components/actionsComponent.vue";
 
 const { t } = useI18n();
 const toast = useToast();
@@ -67,7 +68,7 @@ watch(
   () => langStore.language,
   async (newLang, oldLang) => {
     if (newLang !== oldLang) {
-      console.log(`Idioma cambiado a ${newLang}. Recargando películas...`);
+      movies.value = [];
       await fetchMovies();
     }
   },
@@ -76,13 +77,22 @@ watch(
 
 <template>
   <div class="min-h-screen">
-    <div v-if="loading || actualMovie" class="mt-30">
-      <MovieComponent
-        :movie="actualMovie || ({} as Movie)"
-        :loading="loading"
-      />
-      <div class="flex justify-center mt-6">
+    <div v-if="loading || actualMovie" class="mt-30 relative overflow-visible">
+      <div class="w-full max-w-sm m-auto rounded-2xl relative">
+        <MovieComponent
+          id="mainSwipe"
+          :movie="actualMovie || ({} as Movie)"
+          :loading="loading"
+        />
+        <ActionsComponent
+          :loading="loading"
+          :movieSlug="actualMovie?.slug || ''"
+          @showNextMovie="showNextRecommendedMovie"
+        />
+      </div>
+      <div class="flex justify-center mt-4">
         <StarsComponent
+          id="stars"
           :loading="loading"
           :movieSlug="actualMovie?.slug || ''"
           @showNextMovie="showNextRecommendedMovie"

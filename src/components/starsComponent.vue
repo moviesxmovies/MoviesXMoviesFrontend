@@ -55,7 +55,7 @@ const rateMovie = async (rating: number) => {
   <div
     ref="starsContainer"
     :class="[
-      'touch-none select-none flex justify-center mt-6 transition-opacity duration-300',
+      'touch-none select-none flex justify-center transition-opacity duration-300',
       loading || submittingRating
         ? 'opacity-40 pointer-events-none'
         : 'opacity-100',
@@ -69,7 +69,7 @@ const rateMovie = async (rating: number) => {
       v-for="i in 5"
       :key="i"
       :class="[
-        'text-3xl mx-2 transition-colors duration-200',
+        'text-5xl mx-2 transition-colors duration-200',
         !loading && !submittingRating ? 'cursor-pointer' : 'cursor-default',
         i <= focusedRating
           ? 'pi pi-star-fill text-accent'

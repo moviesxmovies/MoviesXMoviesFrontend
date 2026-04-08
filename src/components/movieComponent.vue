@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { Movie } from "@/types";
 import { Skeleton } from "primevue";
+import { Transition } from "vue";
 
 const props = defineProps<{
   movie: Movie;
@@ -11,13 +12,28 @@ const props = defineProps<{
 <template>
   <div class="movie-card flex items-center justify-center">
     <div
-      class="relative w-full max-w-sm aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl flex flex-col group"
+      v-show="!loading"
+      class="absolute inset-0 -z-1 flex items-center justify-center"
+    >
+      <Transition name="fade-glow">
+        <img
+          :key="movie.cover"
+          :src="movie.cover"
+          :alt="movie.title"
+          class="w-full max-w-sm aspect-[2/3] object-cover blur-[200px] scale-110 pointer-events-none transition-all duration-1000"
+          aria-hidden="true"
+        />
+      </Transition>
+    </div>
+
+    <div
+      class="relative w-full max-w-sm aspect-[2/3] rounded-t-2xl overflow-hidden flex flex-col group"
       style="background: #0a0a0a"
     >
       <template v-if="loading">
         <Skeleton width="100%" height="100%" class="absolute inset-0" />
 
-        <div class="relative z-10 p-4 flex justify-center">
+        <div class="relative p-4 flex justify-center">
           <Skeleton width="70%" height="1.75rem" borderRadius="8px" />
         </div>
 
@@ -42,7 +58,7 @@ const props = defineProps<{
           class="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black to-transparent"
         ></div>
 
-        <div class="relative z-10 p-4 text-center">
+        <div class="relative p-4 text-center">
           <span
             class="text-xl font-bold tracking-tight text-white drop-shadow-md"
           >
@@ -70,5 +86,16 @@ const props = defineProps<{
 
 .movie-card {
   font-family: "DM Sans", sans-serif;
+}
+
+.fade-glow-enter-active,
+.fade-glow-leave-active {
+  transition: opacity 1.5s ease;
+  position: absolute;
+}
+
+.fade-glow-enter-from,
+.fade-glow-leave-to {
+  opacity: 0;
 }
 </style>

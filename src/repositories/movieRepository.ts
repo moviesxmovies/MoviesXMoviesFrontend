@@ -17,3 +17,11 @@ export const submitRating = async (movieSlug: string, rating: number) => {
     throw error;
   }
 };
+
+export const setAsNotSeen = async (movieSlug: string) => {
+  try {
+    await api.post(`/movies/${movieSlug}/unseen/`);
+  } catch (error: any) {
+    throw error;
+  }
+};
