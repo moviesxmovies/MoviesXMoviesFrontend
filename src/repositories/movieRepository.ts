@@ -9,3 +9,11 @@ export const getRecommendedMovies = async () => {
     throw error;
   }
 };
+
+export const submitRating = async (movieSlug: string, rating: number) => {
+  try {
+    await api.post(`/movies/${movieSlug}/ratings/`, { rating });
+  } catch (error: any) {
+    throw error;
+  }
+};
