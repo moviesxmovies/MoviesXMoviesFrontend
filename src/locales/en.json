@@ -93,6 +93,16 @@
     "feature2": "Get movie recommendations",
     "feature3": "Create your own movie lists."
   },
+  "onboarding": {
+    "step1": "Let's get you started with a quick tour",
+    "step2": "Rate movies clicking on the stars",
+    "step3": "Add new movies to your lists",
+    "step4": "Mark movies as  unseen",
+    "step5": "You want speed? Swipe left or right to rate movies and up or down to add them to your lists or mark them as unseen",
+    "finish": "Get Started",
+    "continue": "Continue",
+    "skip": "Skip"
+  },
   "verify": {
     "toast": {
       "success": "Email verified successfully",

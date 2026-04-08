@@ -87,16 +87,16 @@ describe('Router & LocalStorage Isolation', () => {
         } as any);
 
         await router.push('/login');
-        expect(router.currentRoute.value.path).toBe('/');
+        expect(router.currentRoute.value.path).toBe('/home');
 
         await router.push('/signup');
-        expect(router.currentRoute.value.path).toBe('/');
+        expect(router.currentRoute.value.path).toBe('/home');
 
         await router.push('/verify-email');
-        expect(router.currentRoute.value.path).toBe('/');
+        expect(router.currentRoute.value.path).toBe('/home');
 
         await router.push('/onboarding');
-        expect(router.currentRoute.value.path).toBe('/');
+        expect(router.currentRoute.value.path).toBe('/home');
     });
 
     it('should allow access to public routes without authentication', async () => {

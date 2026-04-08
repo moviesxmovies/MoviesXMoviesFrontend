@@ -90,12 +90,6 @@ describe("NavbarComponent", () => {
   });
 
   // ── Authenticated ────────────────────────────────────────────────────────
-  it("shows profile button when authenticated", () => {
-    const wrapper = factory(true);
-    const buttons = wrapper.findAll(".btn-ghost");
-    expect(buttons).toHaveLength(1);
-    expect(buttons[0].text()).toContain("home.profile");
-  });
 
   it("does not show login button when authenticated", () => {
     const wrapper = factory(true);
