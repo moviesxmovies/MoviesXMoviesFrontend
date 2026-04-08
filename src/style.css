@@ -36,3 +36,16 @@
   --secondary: #232244;
   --accent: #7e00c2;
 }
+
+.p-skeleton {
+    background-color: #1a1a1a !important;
+}
+
+.p-skeleton::after {
+    background: linear-gradient(
+        90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.1), 
+        transparent
+    ) !important;
+}

@@ -72,6 +72,7 @@ interface Platform {
   name: string;
   slug: string;
   url: null;
+  image: string | null;
 }
 
 interface Genre {
