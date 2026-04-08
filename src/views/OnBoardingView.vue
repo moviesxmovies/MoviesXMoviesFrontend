@@ -80,6 +80,7 @@ const steps = [
                             </span>
                         </div>
                         <Button
+                            
                             :label="currentStep === steps.length - 1 ? $t('onboarding.finish') : $t('onboarding.continue')"
                             class="pointer-events-auto" @click="handleContinue" />
                     </div>

@@ -74,16 +74,28 @@ describe("Onboarding Component", () => {
         expect(spy).toHaveBeenCalledWith('stars');
     });
 
-    it("go to latest step", async () => {
-    for (let i = 0; i < 4; i++) {
-        // Buscamos el componente Button de PrimeVue que esté dentro del paso actual
-        const currentStepWrapper = wrapper.findAll('.step-card')[i];
-        const btn = currentStepWrapper.getComponent(Button); 
-        
-        await btn.trigger('click');
-        await wrapper.vm.$nextTick();
-    }
-});
+    it("go to latest step and verifies final state", async () => {
+        for (let i = 0; i < 4; i++) {
+            const currentStepWrapper = wrapper.findAll('.step-card')[i];
+            const btn = currentStepWrapper.getComponent(Button);
+
+            await btn.trigger('click');
+            await wrapper.vm.$nextTick();
+        }
+
+
+        const finalStep = wrapper.findAll('.step-card')[4];
+        expect(finalStep.classes()).toContain('current-step');
+
+        const finishBtn = finalStep.getComponent(Button);
+
+        await finishBtn.trigger('click');
+
+        await flushPromises();
+
+        expect(completeBoarding).toHaveBeenCalledTimes(1);
+        expect(mockRouter.push).toHaveBeenCalledWith('/');
+    });
 
     it("calls completeBoarding when clicking skip", async () => {
         const skipBtn = wrapper.find('.skip-button');
@@ -103,7 +115,6 @@ describe("Onboarding Component", () => {
         await skipBtn.trigger('click');
 
         await flushPromises();
-        // Verificamos que no redirigió
         expect(mockRouter.push).not.toHaveBeenCalled();
     });
 });
