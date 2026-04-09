@@ -65,7 +65,7 @@ const rateMovie = async (rating: number) => {
       v-for="i in 5"
       :key="i"
       :class="[
-        'text-5xl mx-2 transition-colors duration-200 star-icon',
+        'text-5xl mx-2 transition-all duration-200 star-icon',
         !loading ? 'cursor-pointer' : 'cursor-default',
         i <= focusedRating
           ? 'pi pi-star-fill text-accent'
@@ -77,3 +77,26 @@ const rateMovie = async (rating: number) => {
     />
   </div>
 </template>
+
+<style scoped>
+@media (hover: hover) {
+  .star-icon:hover,
+  .star-icon.text-accent {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 10px var(--accent));
+    transition:
+      transform 0.2s ease,
+      filter 0.2s ease;
+  }
+
+  .star-icon:hover {
+    cursor: pointer;
+    color: var(--accent) !important;
+  }
+}
+
+.pi-star-fill {
+  transform: scale(1.1);
+  display: inline-block; 
+}
+</style>

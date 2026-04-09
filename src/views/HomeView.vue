@@ -1,6 +1,9 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from "vue";
-import { getRecommendedMovies } from "@/repositories/movieRepository";
+import {
+  getRecommendedMovies,
+  setAsNotSeen,
+} from "@/repositories/movieRepository";
 import type { Movie } from "@/types";
 import MovieComponent from "@/components/movieComponent.vue";
 import { useToast } from "primevue";
@@ -8,13 +11,21 @@ import { useI18n } from "vue-i18n";
 import StarsComponent from "@/components/starsComponent.vue";
 import { useLangStore } from "@/stores/langStore";
 import ActionsComponent from "@/components/actionsComponent.vue";
+import DraggeableComponent from "@/components/draggeableComponent.vue";
 
+const PREDICTED_COLORS: Record<string, string> = {
+  right: "var(--accent)",
+  left: "var(--primary)",
+  up: "var(--primary)",
+  down: "#6b7280",
+};
 const { t } = useI18n();
 const toast = useToast();
 const loading = ref(false);
 const movies = ref<Movie[]>([] as Movie[]);
 const movieIndex = ref(0);
 const langStore = useLangStore();
+const direction = ref<string>("");
 
 const actualMovie = computed(() => {
   return movies.value.length > 0 ? movies.value[movieIndex.value] : null;
@@ -77,22 +88,69 @@ watch(
     }
   },
 );
+
+const glowStyle = computed(() => {
+  const color = PREDICTED_COLORS[direction.value || ""] || "transparent";
+  const isActive = !!direction.value;
+
+  return {
+    // We use a very soft border to define the edge of the neon
+    border: isActive ? `2px solid ${color}` : "2px solid transparent",
+    // Multiple shadows create the "glow" depth without looking like a solid block
+    boxShadow: isActive
+      ? `0 0 40px -10px ${color}, 0 0 100px -20px ${color}`
+      : "none",
+    // Very subtle inner glow
+    backgroundColor: isActive ? `${color}` : "transparent",
+    opacity: isActive ? 0.7 : 0,
+    // Adding a slight scale effect makes it feel alive
+    transform: isActive ? "scale(1.02)" : "scale(1)",
+    filter: "blur(2px)", // Softens the edges even more
+  };
+});
+
+const markAsNotSeen = async () => {
+  loading.value = true;
+  if (actualMovie.value) {
+    await setAsNotSeen(actualMovie.value.slug);
+  }
+  loading.value = false;
+  showNextRecommendedMovie();
+};
 </script>
 
 <template>
   <div class="min-h-screen">
     <div v-if="loading || actualMovie" class="mt-30 relative overflow-visible">
-      <div class="w-full max-w-sm m-auto rounded-2xl relative" id="mainSwipe">
-        <MovieComponent
-          :movie="actualMovie || ({} as Movie)"
-          :loading="loading"
-        />
-        <ActionsComponent
-          :loading="loading"
-          :movieSlug="actualMovie?.slug || ''"
-          @showNextMovie="showNextRecommendedMovie"
-          @setLoading="setLoading"
-        />
+      <DraggeableComponent
+        :swipeThreshold="100"
+        @right="showNextRecommendedMovie"
+        @left="showNextRecommendedMovie"
+        @up="showNextRecommendedMovie"
+        @down="markAsNotSeen"
+        v-model:direction="direction"
+      >
+        <div class="w-full max-w-sm m-auto rounded-2xl relative" id="mainSwipe">
+          <MovieComponent
+            class="select-none"
+            :movie="actualMovie || ({} as Movie)"
+            :loading="loading"
+          />
+          <ActionsComponent
+            class="select-none"
+            :loading="loading"
+            @markAsNotSeen="markAsNotSeen"
+          />
+        </div>
+      </DraggeableComponent>
+      <div
+        class="absolute inset-0 pointer-events-none flex items-center justify-center"
+        style="z-index: 0"
+      >
+        <div
+          class="w-full max-w-sm aspect-[2/3] rounded-3xl transition-all duration-500 ease-out"
+          :style="glowStyle"
+        ></div>
       </div>
       <div class="flex justify-center mt-4">
         <StarsComponent
