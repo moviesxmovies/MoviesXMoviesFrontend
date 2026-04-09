@@ -5,12 +5,10 @@ import { getRecommendedMovies } from "@/repositories/movieRepository";
 import { setActivePinia, createPinia } from 'pinia';
 import { useLangStore } from "@/stores/langStore";
 
-// 1. Mocks de dependencias externas
 vi.mock("@/repositories/movieRepository", () => ({
   getRecommendedMovies: vi.fn(),
 }));
 
-// Mock de PrimeVue Toast
 const mockAddToast = vi.fn();
 vi.mock("primevue", () => ({
   useToast: () => ({
@@ -18,7 +16,6 @@ vi.mock("primevue", () => ({
   }),
 }));
 
-// Mock de i18n
 vi.mock("vue-i18n", () => ({
   useI18n: () => ({
     t: (key: string) => key,
@@ -54,11 +51,9 @@ describe("HomeView", () => {
   it("fetches movies on mount and displays the first one", async () => {
     const wrapper = mountWrapper();
     
-    // Esperamos a que se resuelvan las promesas del onMounted
     await flushPromises();
 
     expect(getRecommendedMovies).toHaveBeenCalledTimes(1);
-    // Verificamos que el componente hijo reciba la primera película
     const movieComp = wrapper.findComponent({ name: "MovieComponent" });
     expect(movieComp.props("movie")).toEqual(mockMovies[0]);
   });
@@ -67,11 +62,9 @@ describe("HomeView", () => {
     const wrapper = mountWrapper();
     await flushPromises();
 
-    // El hijo emite el evento para avanzar
     const actionsComp = wrapper.findComponent({ name: "ActionsComponent" });
     await actionsComp.vm.$emit("showNextMovie");
 
-    // Ahora el MovieComponent debería tener la segunda película
     const movieComp = wrapper.findComponent({ name: "MovieComponent" });
     expect(movieComp.props("movie")).toEqual(mockMovies[1]);
   });
@@ -80,12 +73,10 @@ describe("HomeView", () => {
     const wrapper = mountWrapper();
     await flushPromises();
 
-    // Avanzamos hasta la última película (tenemos 3, estamos en índice 0)
     const actionsComp = wrapper.findComponent({ name: "ActionsComponent" });
-    await actionsComp.vm.$emit("showNextMovie"); // índice 1
-    await actionsComp.vm.$emit("showNextMovie"); // índice 2
+    await actionsComp.vm.$emit("showNextMovie"); 
+    await actionsComp.vm.$emit("showNextMovie"); 
 
-    // Al estar cerca del final, debería volver a disparar fetchMovies
     expect(getRecommendedMovies).toHaveBeenCalledTimes(2);
   });
 
@@ -95,11 +86,9 @@ describe("HomeView", () => {
     
     const langStore = useLangStore();
     
-    // Simulamos cambio de idioma en el store
     langStore.language = "es";
     await flushPromises();
 
-    // Debería haberse llamado una vez por el mount y otra por el watch del lang
     expect(getRecommendedMovies).toHaveBeenCalledTimes(2);
   });
 
