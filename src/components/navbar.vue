@@ -23,7 +23,7 @@ const navigate = (path: string) => {
     <nav class="nav">
         <div class="nav-logo" @click="router.push('/')" style="cursor: pointer;">
             <span class="logo-icon">
-                <img src="/favicon.svg" alt="Logo"/>
+                <img src="/favicon.svg" alt="Logo" />
             </span>
             <span class="logo-text">Movies<span class="logo-x">×</span>Movies</span>
         </div>
@@ -32,7 +32,7 @@ const navigate = (path: string) => {
             <LangComponent />
             <ThemeComponent />
             <button class="btn-ghost" @click="router.push('/profile')" v-if="authStore.isAuthenticated">
-                {{ $t("home.profile") }}
+                <span class="pi pi-user"></span>
             </button>
             <button class="btn-ghost" @click="router.push('/login')" v-else>
                 {{ $t("home.login") }}
@@ -54,7 +54,8 @@ const navigate = (path: string) => {
                     </div>
                     <LangComponent />
                     <button class="btn-ghost" @click="navigate('/profile')" v-if="authStore.isAuthenticated">
-                        {{ $t("home.profile") }}
+                        <span class="pi pi-user"></span>
+
                     </button>
                     <button class="btn-ghost" @click="navigate('/login')" v-else>
                         {{ $t("home.login") }}
