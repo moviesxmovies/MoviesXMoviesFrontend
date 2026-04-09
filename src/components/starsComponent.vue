@@ -1,15 +1,13 @@
 <script lang="ts" setup>
-import { submitRating } from "@/repositories/movieRepository";
 import { ref } from "vue";
 
 const focusedRating = ref(0);
 const starsContainer = ref<HTMLElement | null>(null);
 const props = defineProps<{
-  movieSlug: string;
   loading: boolean;
 }>();
 
-const emit = defineEmits(["showNextMovie", "setLoading"]);
+const emit = defineEmits(["rateMovie"]);
 
 const handleMouseEnter = (rating: number) => {
   focusedRating.value = rating;
@@ -40,11 +38,7 @@ const handleTouchMove = (event: TouchEvent) => {
 };
 
 const rateMovie = async (rating: number) => {
-  if (rating === 0) return;
-  emit("setLoading", true);
-  await submitRating(props.movieSlug, rating);
-  emit("setLoading", false);
-  emit("showNextMovie");
+  emit("rateMovie", rating);
   handleMouseLeave();
 };
 </script>
@@ -68,7 +62,7 @@ const rateMovie = async (rating: number) => {
         'text-5xl mx-2 transition-all duration-200 star-icon',
         !loading ? 'cursor-pointer' : 'cursor-default',
         i <= focusedRating
-          ? 'pi pi-star-fill text-accent'
+          ? 'pi pi-star-fill text-accent focused-rating'
           : 'pi pi-star text-primary',
       ]"
       @mouseenter="!loading && handleMouseEnter(i)"
@@ -79,24 +73,18 @@ const rateMovie = async (rating: number) => {
 </template>
 
 <style scoped>
-@media (hover: hover) {
-  .star-icon:hover,
-  .star-icon.text-accent {
-    transform: scale(1.15);
-    filter: drop-shadow(0 0 10px var(--accent));
-    transition:
-      transform 0.2s ease,
-      filter 0.2s ease;
-  }
-
-  .star-icon:hover {
-    cursor: pointer;
-    color: var(--accent) !important;
-  }
+.focused-rating {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 10px var(--accent));
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
+  cursor: pointer;
+  color: var(--accent) !important;
 }
 
 .pi-star-fill {
   transform: scale(1.1);
-  display: inline-block; 
+  display: inline-block;
 }
 </style>

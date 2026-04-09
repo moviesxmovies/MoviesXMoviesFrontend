@@ -3,6 +3,7 @@ import { computed, onMounted, ref, watch } from "vue";
 import {
   getRecommendedMovies,
   setAsNotSeen,
+  submitRating,
 } from "@/repositories/movieRepository";
 import type { Movie } from "@/types";
 import MovieComponent from "@/components/movieComponent.vue";
@@ -36,13 +37,9 @@ onMounted(async () => {
   prefetchImage(movieIndex.value);
 });
 
-const setLoading = (value: boolean) => {
-  loading.value = value;
-};
-
 const fetchMovies = async () => {
   if (loading.value) return;
-  if (movies.value.length === 0) setLoading(true);
+  if (movies.value.length === 0) loading.value = true;
   try {
     movies.value = await getRecommendedMovies();
     movieIndex.value = 0;
@@ -54,7 +51,7 @@ const fetchMovies = async () => {
       life: 3000,
     });
   } finally {
-    setLoading(false);
+    loading.value = false;
   }
 };
 
@@ -104,7 +101,6 @@ const glowStyle = computed(() => {
     backgroundColor: isActive ? `${color}` : "transparent",
     opacity: isActive ? 0.7 : 0,
     // Adding a slight scale effect makes it feel alive
-    transform: isActive ? "scale(1.02)" : "scale(1)",
     filter: "blur(2px)", // Softens the edges even more
   };
 });
@@ -117,6 +113,16 @@ const markAsNotSeen = async () => {
   loading.value = false;
   showNextRecommendedMovie();
 };
+
+const rateMovie = async (rating: number) => {
+  if (rating === 0) return;
+  loading.value = true;
+  if (actualMovie.value) {
+    await submitRating(actualMovie.value.slug, rating);
+  }
+  loading.value = false;
+  showNextRecommendedMovie();
+};
 </script>
 
 <template>
@@ -124,8 +130,8 @@ const markAsNotSeen = async () => {
     <div v-if="loading || actualMovie" class="mt-30 relative overflow-visible">
       <DraggeableComponent
         :swipeThreshold="100"
-        @right="showNextRecommendedMovie"
-        @left="showNextRecommendedMovie"
+        @right="rateMovie(5)"
+        @left="rateMovie(1)"
         @up="showNextRecommendedMovie"
         @down="markAsNotSeen"
         v-model:direction="direction"
@@ -148,7 +154,7 @@ const markAsNotSeen = async () => {
         style="z-index: 0"
       >
         <div
-          class="w-full max-w-sm aspect-[2/3] rounded-3xl transition-all duration-500 ease-out"
+          class="w-full max-w-sm aspect-[3/5] mb-18 rounded-3xl transition-all duration-500 ease-out"
           :style="glowStyle"
         ></div>
       </div>
@@ -156,9 +162,7 @@ const markAsNotSeen = async () => {
         <StarsComponent
           id="stars"
           :loading="loading"
-          :movieSlug="actualMovie?.slug || ''"
-          @showNextMovie="showNextRecommendedMovie"
-          @setLoading="setLoading"
+          @rateMovie="rateMovie"
         />
       </div>
     </div>
