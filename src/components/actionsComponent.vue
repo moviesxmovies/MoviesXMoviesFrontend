@@ -51,15 +51,23 @@ const markAsNotSeen = async () => {
 </template>
 
 <style scoped>
-#more-info .animate-boarding {
+#more-info.animate-boarding,
+#unseen-button.animate-boarding,
+#add-to-list-button.animate-boarding {
+  position: relative;
   z-index: 1001;
+  animation: button-pulse 0.8s alternate infinite ease-in-out;
 }
 
-#unseen-button .animate-boarding {
-  z-index: 1001;
-}
-
-#add-to-list-button .animate-boarding {
-  z-index: 1001;
+@keyframes button-pulse {
+  0% {
+    outline-color: rgba(var(--accent-rgb), 0.2); 
+    filter: brightness(1);
+  }
+  100% {
+    outline-color: var(--accent); 
+    filter: brightness(1.5);
+    box-shadow: 0 0 15px var(--accent);
+  }
 }
 </style>

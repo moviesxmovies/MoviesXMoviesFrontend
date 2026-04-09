@@ -108,12 +108,85 @@ watch(
   </div>
 </template>
 
-<style scoped>
-#mainSwipe .animate-boarding {
+<style>
+#mainSwipe.animate-boarding {
   z-index: 1001;
 }
 
-#stars .animate-boarding {
+#stars.animate-boarding {
+  position: relative;
   z-index: 1001;
+  background: rgba(var(--primary-rgb), 0.1);
+  padding: 1.5rem;
+  border-radius: 1rem;
+  border: 2px dashed var(--accent);
+}
+
+.animate-boarding .star-icon {
+  animation: star-fill-sweep 2.5s alternate infinite ease-in-out;
+  position: relative;
+}
+
+.animate-boarding .star-icon:nth-child(1) {
+  animation-delay: 0s;
+}
+.animate-boarding .star-icon:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.animate-boarding .star-icon:nth-child(3) {
+  animation-delay: 0.4s;
+}
+.animate-boarding .star-icon:nth-child(4) {
+  animation-delay: 0.6s;
+}
+.animate-boarding .star-icon:nth-child(5) {
+  animation-delay: 0.8s;
+}
+
+@keyframes star-fill-sweep {
+  0%,
+  100% {
+    color: var(--primary);
+    transform: scale(1);
+  }
+  30%,
+  70% {
+    color: var(--accent);
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 10px var(--accent));
+  }
+}
+
+.animate-boarding .star-icon.pi-star:before {
+  animation: icon-change 2.5s infinite ease-in-out;
+}
+
+.animate-boarding .star-icon:nth-child(1):before {
+  animation-delay: 0s;
+}
+.animate-boarding .star-icon:nth-child(2):before {
+  animation-delay: 0.2s;
+}
+.animate-boarding .star-icon:nth-child(3):before {
+  animation-delay: 0.4s;
+}
+.animate-boarding .star-icon:nth-child(4):before {
+  animation-delay: 0.6s;
+}
+.animate-boarding .star-icon:nth-child(5):before {
+  animation-delay: 0.8s;
+}
+
+@keyframes icon-change {
+  0%,
+  100%,
+  20%,
+  80% {
+    content: "\e937";
+  }
+  30%,
+  70% {
+    content: "\e936";
+  }
 }
 </style>
