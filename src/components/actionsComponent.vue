@@ -15,9 +15,7 @@ const markAsNotSeen = async () => {
 
 <template>
   <div class="flex justify-center">
-    <div
-      class="inline-flex w-full max-w-sm overflow-hidden rounded-b-2xl"
-    >
+    <div class="inline-flex w-full max-w-sm overflow-hidden rounded-b-2xl">
       <button
         id="more-info"
         class="flex-1 h-16 bg-accent cursor-pointer hover:brightness-120 flex items-center justify-center border-r border-white/10 transition-all active:bg-accent/80"
@@ -42,3 +40,17 @@ const markAsNotSeen = async () => {
     </div>
   </div>
 </template>
+
+<style scoped>
+#more-info .animate-boarding {
+  z-index: 1001;
+}
+
+#unseen-button .animate-boarding {
+  z-index: 1001;
+}
+
+#add-to-list-button .animate-boarding {
+  z-index: 1001;
+}
+</style>

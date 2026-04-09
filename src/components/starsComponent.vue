@@ -81,3 +81,9 @@ const rateMovie = async (rating: number) => {
     />
   </div>
 </template>
+
+<style scoped>
+#stars .animate-boarding {
+  z-index: 1001;
+}
+</style>

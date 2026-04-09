@@ -78,9 +78,8 @@ watch(
 <template>
   <div class="min-h-screen">
     <div v-if="loading || actualMovie" class="mt-30 relative overflow-visible">
-      <div class="w-full max-w-sm m-auto rounded-2xl relative">
+      <div class="w-full max-w-sm m-auto rounded-2xl relative" id="mainSwipe">
         <MovieComponent
-          id="mainSwipe"
           :movie="actualMovie || ({} as Movie)"
           :loading="loading"
         />
@@ -102,3 +101,9 @@ watch(
     <div v-else>No movies found.</div>
   </div>
 </template>
+
+<style scoped>
+#mainSwipe .animate-boarding {
+  z-index: 1001;
+}
+</style>
