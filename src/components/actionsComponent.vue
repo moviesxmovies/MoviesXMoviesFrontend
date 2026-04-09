@@ -1,14 +1,17 @@
 <script lang="ts" setup>
 import { setAsNotSeen } from "@/repositories/movieRepository";
+
 const props = defineProps<{
   movieSlug: string;
   loading: boolean;
 }>();
 
-const emit = defineEmits(["showNextMovie"]);
+const emit = defineEmits(["showNextMovie", "setLoading"]);
 
 const markAsNotSeen = async () => {
+  emit("setLoading", true);
   await setAsNotSeen(props.movieSlug);
+  emit("setLoading", false);
   emit("showNextMovie");
 };
 </script>
@@ -25,7 +28,13 @@ const markAsNotSeen = async () => {
 
       <button
         id="unseen-button"
-        class="flex-1 h-16 bg-gray-600 cursor-pointer hover:bg-gray-500 flex items-center justify-center border-r border-white/10 transition-all active:bg-gray-700"
+        :disabled="loading"
+        :class="[
+          'flex-1 h-16 cursor-pointer hover:bg-gray-500 flex items-center justify-center border-r border-white/10 transition-all active:bg-gray-700',
+          loading
+            ? 'bg-gray-600 opacity-40 pointer-events-none'
+            : 'bg-gray-600',
+        ]"
         @click="markAsNotSeen"
       >
         <i class="pi pi-eye-slash text-2xl text-white" />

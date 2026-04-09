@@ -2,9 +2,9 @@ import { defineStore } from "pinia";
 
 export const useThemeStore = defineStore("theme", {
   state: () => {
-    let theme = "light";
+    let theme = globalThis.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
     try {
-      theme = localStorage.getItem("theme") || "light";
+      theme = localStorage.getItem("theme") || theme;
     } catch {
       // Testing environment without localStorage, or SSR. Default to light theme, which is fine.
     }

@@ -25,9 +25,13 @@ onMounted(async () => {
   prefetchImage(movieIndex.value);
 });
 
+const setLoading = (value: boolean) => {
+  loading.value = value;
+};
+
 const fetchMovies = async () => {
   if (loading.value) return;
-  if (movies.value.length === 0) loading.value = true;
+  if (movies.value.length === 0) setLoading(true);
   try {
     movies.value = await getRecommendedMovies();
     movieIndex.value = 0;
@@ -39,7 +43,7 @@ const fetchMovies = async () => {
       life: 3000,
     });
   } finally {
-    loading.value = false;
+    setLoading(false);
   }
 };
 
@@ -87,6 +91,7 @@ watch(
           :loading="loading"
           :movieSlug="actualMovie?.slug || ''"
           @showNextMovie="showNextRecommendedMovie"
+          @setLoading="setLoading"
         />
       </div>
       <div class="flex justify-center mt-4">
@@ -95,6 +100,7 @@ watch(
           :loading="loading"
           :movieSlug="actualMovie?.slug || ''"
           @showNextMovie="showNextRecommendedMovie"
+          @setLoading="setLoading"
         />
       </div>
     </div>
@@ -104,6 +110,10 @@ watch(
 
 <style scoped>
 #mainSwipe .animate-boarding {
+  z-index: 1001;
+}
+
+#stars .animate-boarding {
   z-index: 1001;
 }
 </style>
