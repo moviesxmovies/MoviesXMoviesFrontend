@@ -88,8 +88,8 @@ const steps = [
             </div>
         </div>
 
-        <div class="absolute inset-0 bg-black/50 z-[999] pointer-events-none"></div>
-        <div class="no-cursor-interactions h-full w-full grayscale-[0.5] blur-[2px]">
+        <div class="absolute inset-0 bg-black/80 z-[999] pointer-events-none"></div>
+        <div class="no-cursor-interactions h-full w-full">
             <HomeView />
         </div>
     </div>

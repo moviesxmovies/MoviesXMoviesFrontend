@@ -65,7 +65,7 @@ const rateMovie = async (rating: number) => {
       v-for="i in 5"
       :key="i"
       :class="[
-        'text-5xl mx-2 transition-colors duration-200',
+        'text-5xl mx-2 transition-colors duration-200 star-icon',
         !loading ? 'cursor-pointer' : 'cursor-default',
         i <= focusedRating
           ? 'pi pi-star-fill text-accent'
