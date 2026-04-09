@@ -9,9 +9,7 @@ const props = defineProps<{
   loading: boolean;
 }>();
 
-const submittingRating = ref(false);
-
-const emit = defineEmits(["showNextMovie"]);
+const emit = defineEmits(["showNextMovie", "setLoading"]);
 
 const handleMouseEnter = (rating: number) => {
   focusedRating.value = rating;
@@ -43,10 +41,10 @@ const handleTouchMove = (event: TouchEvent) => {
 
 const rateMovie = async (rating: number) => {
   if (rating === 0) return;
-  submittingRating.value = true;
+  emit("setLoading", true);
   await submitRating(props.movieSlug, rating);
+  emit("setLoading", false);
   emit("showNextMovie");
-  submittingRating.value = false;
   handleMouseLeave();
 };
 </script>
@@ -56,9 +54,7 @@ const rateMovie = async (rating: number) => {
     ref="starsContainer"
     :class="[
       'touch-none select-none flex justify-center transition-opacity duration-300',
-      loading || submittingRating
-        ? 'opacity-40 pointer-events-none'
-        : 'opacity-100',
+      loading ? 'opacity-40 pointer-events-none' : 'opacity-100',
     ]"
     @contextmenu.prevent
     @mouseleave="handleMouseLeave"
@@ -70,20 +66,14 @@ const rateMovie = async (rating: number) => {
       :key="i"
       :class="[
         'text-5xl mx-2 transition-colors duration-200',
-        !loading && !submittingRating ? 'cursor-pointer' : 'cursor-default',
+        !loading ? 'cursor-pointer' : 'cursor-default',
         i <= focusedRating
           ? 'pi pi-star-fill text-accent'
           : 'pi pi-star text-primary',
       ]"
-      @mouseenter="!loading && !submittingRating && handleMouseEnter(i)"
-      @touchstart="!loading && !submittingRating && handleMouseEnter(i)"
-      @click="!loading && !submittingRating && rateMovie(i)"
+      @mouseenter="!loading && handleMouseEnter(i)"
+      @touchstart="!loading && handleMouseEnter(i)"
+      @click="!loading && rateMovie(i)"
     />
   </div>
 </template>
-
-<style scoped>
-#stars .animate-boarding {
-  z-index: 1001;
-}
-</style>
