@@ -43,3 +43,40 @@ export interface ForgotPasswordPayload {
   new_password: string;
   email: string;
 }
+
+
+export interface Movie {
+  id: number;
+  title: string;
+  slug: string;
+  release_date: string;
+  synopsis: string;
+  cover: string;
+  genres: Genre[];
+  awards: any[];
+  platforms: Platform[];
+  actors: Actor[];
+  directors: Actor[];
+}
+
+interface Actor {
+  id: number;
+  name: string;
+  slug: string;
+  image: string;
+  awards: any[];
+}
+
+interface Platform {
+  id: number;
+  name: string;
+  slug: string;
+  url: null;
+  image: string | null;
+}
+
+interface Genre {
+  id: number;
+  name: string;
+  slug: string;
+}
