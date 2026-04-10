@@ -25,7 +25,7 @@ const direction = defineModel<string>("direction", { default: "" });
 
 // --- Drag and Swipe Logic ---
 
-const isDragging = ref(false);
+const isDragging = defineModel<boolean>("isDragging", { default: false });
 const startX = ref(0);
 const currentX = ref(0);
 const startY = ref(0);
@@ -149,6 +149,8 @@ const checkSwipe = (func: Function) => {
     @touchmove="onDrag"
     @touchend="endDrag"
   >
+    <div v-if="isDragging" class="fixed inset-0 z-11 cursor-grabbing"></div>
+
     <div :style="cardStyle" class="draggable-wrapper z-10 relative">
       <slot></slot>
     </div>

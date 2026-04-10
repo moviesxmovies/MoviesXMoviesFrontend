@@ -27,6 +27,7 @@ const movies = ref<Movie[]>([] as Movie[]);
 const movieIndex = ref(0);
 const langStore = useLangStore();
 const direction = ref<string>("");
+const isDragging = ref<boolean>(false);
 
 const actualMovie = computed(() => {
   return movies.value.length > 0 ? movies.value[movieIndex.value] : null;
@@ -126,17 +127,18 @@ const rateMovie = async (rating: number) => {
 </script>
 
 <template>
-  <div class="min-h-screen">
-    <div v-if="loading || actualMovie" class="mt-30 relative overflow-visible">
+  <div class="min-h-screen flex items-center justify-center overflow-hidden fixed inset-0" :class="isDragging && 'z-50'">
+    <div v-if="loading || actualMovie" class="overflow-visible min-w-screen">
       <DraggeableComponent
         :swipeThreshold="100"
-        @right="rateMovie(5)"
-        @left="rateMovie(1)"
+        @right="rateMovie(0)"
+        @left="rateMovie(0)"
         @up="showNextRecommendedMovie"
-        @down="markAsNotSeen"
+        @down=""
         v-model:direction="direction"
+        v-model:isDragging="isDragging"
       >
-        <div class="w-full max-w-sm m-auto rounded-2xl relative" id="mainSwipe">
+        <div id="mainSwipe">
           <MovieComponent
             class="select-none"
             :movie="actualMovie || ({} as Movie)"
@@ -150,20 +152,15 @@ const rateMovie = async (rating: number) => {
         </div>
       </DraggeableComponent>
       <div
-        class="absolute inset-0 pointer-events-none flex items-center justify-center"
-        style="z-index: 0"
+        class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center mb-7"
       >
         <div
-          class="w-full max-w-sm aspect-[3/5] mb-18 rounded-3xl transition-all duration-500 ease-out"
+          class="w-full max-w-sm aspect-[3/5] rounded-3xl transition-all duration-500 ease-out"
           :style="glowStyle"
         ></div>
       </div>
-      <div class="flex justify-center mt-4">
-        <StarsComponent
-          id="stars"
-          :loading="loading"
-          @rateMovie="rateMovie"
-        />
+      <div class="flex justify-center mt-4 relative z-">
+        <StarsComponent id="stars" :loading="loading" @rateMovie="rateMovie" />
       </div>
     </div>
     <div v-else>No movies found.</div>
