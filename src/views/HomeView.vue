@@ -15,8 +15,8 @@ import ActionsComponent from "@/components/actionsComponent.vue";
 import DraggeableComponent from "@/components/draggeableComponent.vue";
 
 const PREDICTED_COLORS: Record<string, string> = {
-  right: "var(--accent)",
-  left: "var(--primary)",
+  right: "#FFD700",
+  left: "#EF4444",
   up: "var(--primary)",
   down: "#6b7280",
 };
@@ -127,14 +127,17 @@ const rateMovie = async (rating: number) => {
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center overflow-hidden fixed inset-0" :class="isDragging && 'z-50'">
+  <div
+    class="min-h-screen flex items-center justify-center overflow-hidden fixed inset-0"
+    :class="isDragging && 'z-50'"
+  >
     <div v-if="loading || actualMovie" class="overflow-visible min-w-screen">
       <DraggeableComponent
         :swipeThreshold="100"
-        @right="rateMovie(0)"
-        @left="rateMovie(0)"
+        @right="rateMovie(5)"
+        @left="rateMovie(1)"
         @up="showNextRecommendedMovie"
-        @down=""
+        @down="markAsNotSeen"
         v-model:direction="direction"
         v-model:isDragging="isDragging"
       >
@@ -151,6 +154,25 @@ const rateMovie = async (rating: number) => {
           />
         </div>
       </DraggeableComponent>
+      <div class="icon-container mb-7">
+        <div class="icon-grid">
+          <div class="cell top" :class="direction == 'down' && 'active-icon'">
+            <i class="pi pi-eye-slash text-3xl"></i>
+          </div>
+
+          <div class="cell left" :class="direction == 'right' && 'active-icon'">
+            <i class="pi pi-star-fill text-3xl"></i>
+          </div>
+
+          <div class="cell right" :class="direction == 'left' && 'active-icon'">
+            <i class="pi pi-thumbs-down-fill text-3xl"></i>
+          </div>
+
+          <div class="cell bottom" :class="direction == 'up' && 'active-icon'">
+            <i class="pi pi-plus-circle text-3xl"></i>
+          </div>
+        </div>
+      </div>
       <div
         class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center mb-7"
       >
@@ -247,5 +269,72 @@ const rateMovie = async (rating: number) => {
   70% {
     content: "\e936";
   }
+}
+
+.icon-container {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  margin-bottom: 1.75rem; 
+}
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  width: 100%;
+  max-width: 24rem; 
+  aspect-ratio: 3 / 5;
+  border-radius: 1.5rem;
+  transition: all 0.5s ease-out;
+}
+
+.cell {
+  display: flex;
+  color: var(--text);
+  font-size: 2rem;
+  transition: all 0.3s ease;
+  opacity: 0.1; 
+}
+
+.cell.top {
+  grid-column: 2;
+  grid-row: 1;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 2rem;
+}
+
+.cell.left {
+  grid-column: 1;
+  grid-row: 2;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 2rem;
+}
+
+.cell.right {
+  grid-column: 3;
+  grid-row: 2;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 2rem;
+}
+
+.cell.bottom {
+  grid-column: 2;
+  grid-row: 3;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 2rem;
+}
+
+.active-icon {
+  opacity: 1;
+  transform: scale(1.25);
+  filter: drop-shadow(0 0 10px var(--text));
 }
 </style>

@@ -25,7 +25,9 @@ const props = defineProps<{
             ? 'bg-gray-600 opacity-40 pointer-events-none'
             : 'bg-gray-600',
         ]"
-        @click="emit('markAsNotSeen')"
+        @mousedown.stop
+        @touchstart.stop
+        @click.stop="emit('markAsNotSeen')"
       >
         <i class="pi pi-eye-slash text-2xl text-white" />
       </button>
