@@ -4,12 +4,13 @@ import DraggeableComponent from "@/components/draggeableComponent.vue";
 
 describe("DraggeableComponent", () => {
   const swipeThreshold = 100;
+  const maxDragDistance = 150;
 
   const factory = (props = {}) => {
     return mount(DraggeableComponent, {
       props: {
         swipeThreshold,
-        ...props,
+        maxDragDistance,
       },
       slots: {
         default: '<div id="content">Card Content</div>',
@@ -115,6 +116,42 @@ describe("DraggeableComponent", () => {
     expect(wrapper.emitted("update:isDragging")?.at(-1)).toEqual([false]);
     expect(wrapper.emitted("update:direction")?.at(-1)).toEqual([""]);
     expect(wrapper.emitted("update:direction")?.at(0)).toEqual(["down"]);
+  });
+
+  it("applies y max drag distance if dragged beyond threshold", async () => {
+    const wrapper = factory();
+    const container = wrapper.find(".draggable-container");
+
+    await container.trigger("mousedown", { clientX: 0, clientY: 0 });
+    await container.trigger("mousemove", {
+      clientX: 0,
+      clientY: maxDragDistance + 50,
+    });
+    await container.trigger("mouseup");
+
+    expect(wrapper.emitted()).toHaveProperty("down");
+
+    expect(wrapper.emitted("update:isDragging")?.at(-1)).toEqual([false]);
+    expect(wrapper.emitted("update:direction")?.at(-1)).toEqual([""]);
+    expect(wrapper.emitted("update:direction")?.at(0)).toEqual(["down"]);
+  });
+
+  it("applies x max drag distance if dragged beyond threshold", async () => {
+    const wrapper = factory();
+    const container = wrapper.find(".draggable-container");
+
+    await container.trigger("mousedown", { clientX: 0, clientY: 0 });
+    await container.trigger("mousemove", {
+      clientX: maxDragDistance + 50,
+      clientY: 0,
+    });
+    await container.trigger("mouseup");
+
+    expect(wrapper.emitted()).toHaveProperty("right");
+
+    expect(wrapper.emitted("update:isDragging")?.at(-1)).toEqual([false]);
+    expect(wrapper.emitted("update:direction")?.at(-1)).toEqual([""]);
+    expect(wrapper.emitted("update:direction")?.at(0)).toEqual(["right"]);
   });
 
   it("detects upward swipe", async () => {
