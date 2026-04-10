@@ -23,8 +23,8 @@ const sendVerificationCode = async () => {
     });
   } catch (error: any) {
     toast.add({
-      severity: "warn",
-      summary: t("toast.warn"),
+      severity: "error",
+      summary: t("toast.error"),
       detail: error.response?.data?.error || t("verify.toast.resendError"),
       life: 3000,
     });
