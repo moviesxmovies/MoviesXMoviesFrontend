@@ -199,7 +199,7 @@ describe("FieldMsg", () => {
     });
 
     it("renders nothing when field is null", () => {
-      const wrapper = mountFieldMsg(undefined); // null cast as undefined
+      const wrapper = mountFieldMsg(undefined);
       expect(wrapper.html()).toBe("");
     });
   });
@@ -261,7 +261,6 @@ describe("FieldMsg", () => {
       });
       const div = wrapper.find("div.field-msg.error");
       expect(div.exists()).toBe(true);
-      // icon exists but no text beyond it
       expect(div.text()).toBe("");
     });
 

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { nextTick } from "vue"; // ← desde vue, no vitest
+import { nextTick } from "vue";
 import { mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import NavbarComponent from "@/components/navbar.vue";
@@ -73,7 +73,7 @@ describe("NavbarComponent", () => {
     const wrapper = factory(false);
     const buttons = wrapper.findAll(".btn-ghost");
     expect(buttons).toHaveLength(1);
-    expect(buttons[0].text()).toContain("Login"); // valor resuelto por i18n
+    expect(buttons[0].text()).toContain("Login"); 
   });
 
   it("does not show profile button when not authenticated", () => {

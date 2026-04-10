@@ -1,6 +1,6 @@
 import { mount, flushPromises } from "@vue/test-utils";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import ResetPasswordView from "../../views/ResetPasswordView.vue"; // Ajusta la ruta si es necesario
+import ResetPasswordView from "../../views/ResetPasswordView.vue"; 
 
 const { mockResetPassword, mockPush, mockToastAdd, mockRoute } = vi.hoisted(() => ({
   mockResetPassword: vi.fn(),
@@ -74,7 +74,6 @@ describe("ResetPasswordView", () => {
 
   it("should render password inputs", () => {
     const wrapper = factory();
-    // Buscamos los componentes Password mockeados
     expect(wrapper.findAll(".p-password").length).toBe(2);
   });
 

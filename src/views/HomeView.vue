@@ -15,10 +15,10 @@ import ActionsComponent from "@/components/actionsComponent.vue";
 import DraggeableComponent from "@/components/draggeableComponent.vue";
 
 const PREDICTED_COLORS: Record<string, string> = {
-  right: "#FFD700",
-  left: "#EF4444",
+  right: "var(--yellow)",
+  left: "var(--red)",
   up: "var(--primary)",
-  down: "#6b7280",
+  down: "var(--gray)",
 };
 const { t } = useI18n();
 const toast = useToast();
@@ -92,17 +92,13 @@ const glowStyle = computed(() => {
   const isActive = !!direction.value;
 
   return {
-    // We use a very soft border to define the edge of the neon
     border: isActive ? `2px solid ${color}` : "2px solid transparent",
-    // Multiple shadows create the "glow" depth without looking like a solid block
     boxShadow: isActive
       ? `0 0 40px -10px ${color}, 0 0 100px -20px ${color}`
       : "none",
-    // Very subtle inner glow
     backgroundColor: isActive ? `${color}` : "transparent",
     opacity: isActive ? 0.7 : 0,
-    // Adding a slight scale effect makes it feel alive
-    filter: "blur(2px)", // Softens the edges even more
+    filter: "blur(2px)",
   };
 });
 
@@ -278,7 +274,7 @@ const rateMovie = async (rating: number) => {
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  margin-bottom: 1.75rem; 
+  margin-bottom: 1.75rem;
 }
 
 .icon-grid {
@@ -286,7 +282,7 @@ const rateMovie = async (rating: number) => {
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
   width: 100%;
-  max-width: 24rem; 
+  max-width: 24rem;
   aspect-ratio: 3 / 5;
   border-radius: 1.5rem;
   transition: all 0.5s ease-out;
@@ -297,7 +293,7 @@ const rateMovie = async (rating: number) => {
   color: var(--text);
   font-size: 2rem;
   transition: all 0.3s ease;
-  opacity: 0.1; 
+  opacity: 0.1;
 }
 
 .cell.top {

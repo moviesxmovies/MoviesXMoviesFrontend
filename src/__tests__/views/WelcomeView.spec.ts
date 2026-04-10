@@ -1,4 +1,3 @@
-// src/__tests__/views/WelcomeView.spec.ts
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
@@ -36,7 +35,6 @@ describe("WelcomeView", () => {
   });
 
   // ── Render ──────────────────────────────────────────────────────────────
-
   it("renders the hero title", () => {
     const wrapper = factory();
     expect(wrapper.find(".hero-title").text()).toContain("Movies");
@@ -54,7 +52,9 @@ describe("WelcomeView", () => {
 
   it("renders the OauthButtonComponent", () => {
     const wrapper = factory();
-    expect(wrapper.findComponent({ name: "OauthButtonComponent" }).exists()).toBe(true);
+    expect(
+      wrapper.findComponent({ name: "OauthButtonComponent" }).exists(),
+    ).toBe(true);
   });
 
   it("renders the 3 feature items", () => {
@@ -62,21 +62,22 @@ describe("WelcomeView", () => {
     expect(wrapper.findAll(".feature-item")).toHaveLength(3);
   });
 
-
-
   // ── Signup button ────────────────────────────────────────────────────────
-
   it("shows error class when clicking signup with empty email", async () => {
     const wrapper = factory();
     await wrapper.find(".btn-signup").trigger("click");
-    expect(wrapper.find(".email-input").classes()).toContain("email-input--error");
+    expect(wrapper.find(".email-input").classes()).toContain(
+      "email-input--error",
+    );
   });
 
   it("shows error class when clicking signup with invalid email", async () => {
     const wrapper = factory();
     await wrapper.find(".email-input").setValue("notanemail");
     await wrapper.find(".btn-signup").trigger("click");
-    expect(wrapper.find(".email-input").classes()).toContain("email-input--error");
+    expect(wrapper.find(".email-input").classes()).toContain(
+      "email-input--error",
+    );
   });
 
   it("navigates to /signup with email query when valid email is entered", async () => {
@@ -97,7 +98,6 @@ describe("WelcomeView", () => {
   });
 
   // ── Enter key ────────────────────────────────────────────────────────────
-
   it("triggers signup on Enter key in the input", async () => {
     const wrapper = factory();
     await wrapper.find(".email-input").setValue("user@test.com");
@@ -116,10 +116,11 @@ describe("WelcomeView", () => {
   });
 
   // ── OAuth button ─────────────────────────────────────────────────────────
-
   it("navigates to /login when OauthButtonComponent is clicked", async () => {
     const wrapper = factory();
-    await wrapper.findComponent({ name: "OauthButtonComponent" }).trigger("click");
+    await wrapper
+      .findComponent({ name: "OauthButtonComponent" })
+      .trigger("click");
     expect(mockPush).toHaveBeenCalledWith("/login");
   });
 });

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 
-// Define props for customizability
 const props = defineProps({
   swipeThreshold: {
     type: Number,
@@ -13,7 +12,6 @@ const props = defineProps({
   },
 });
 
-// Define events that the parent component can listen to
 const emit = defineEmits<{
   (e: "left"): void;
   (e: "right"): void;
@@ -24,7 +22,6 @@ const emit = defineEmits<{
 const direction = defineModel<string>("direction", { default: "" });
 
 // --- Drag and Swipe Logic ---
-
 const isDragging = defineModel<boolean>("isDragging", { default: false });
 const startX = ref(0);
 const currentX = ref(0);
@@ -35,7 +32,6 @@ const currentY = ref(0);
 const offsetX = computed(() => {
   let distance = currentX.value - startX.value;
 
-  // Apply maximum movement limits
   if (distance > props.maxDragDistance) distance = props.maxDragDistance;
   if (distance < -props.maxDragDistance) distance = -props.maxDragDistance;
 
@@ -46,22 +42,18 @@ const offsetX = computed(() => {
 const offsetY = computed(() => {
   let distance = currentY.value - startY.value;
 
-  // Apply maximum movement limits
   if (distance > props.maxDragDistance) distance = props.maxDragDistance;
   if (distance < -props.maxDragDistance) distance = -props.maxDragDistance;
 
   return distance;
 });
 
-// Dynamic styles to move and rotate the card
+// Dynamic styles to move the card
 const cardStyle = computed(() => {
-  const RESISTANCE = 0.25; // Sensitivity factor (0 to 1)
+  const RESISTANCE = 0.25;
 
-  // Function to calculate resisted movement
-  // formula: movement = limit * tanh(actual / limit)
+  // As actualValue approaches MAX_TRAVEL, the increment gets smaller
   const getResistedValue = (actualValue: number) => {
-    // We use a simplified version of the rubber-band effect
-    // As actualValue approaches MAX_TRAVEL, the increment gets smaller
     return (
       props.maxDragDistance *
       Math.tanh(actualValue / (props.maxDragDistance / RESISTANCE))
@@ -115,7 +107,6 @@ const endDrag = () => {
   if (!isDragging.value) return;
   isDragging.value = false;
 
-  // Emit events based on the drag distance
   checkSwipe(emit);
   direction.value = "";
 

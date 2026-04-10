@@ -1,7 +1,11 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { mount, flushPromises } from "@vue/test-utils";
 import HomeView from "@/views/HomeView.vue";
-import { getRecommendedMovies, submitRating, setAsNotSeen } from "@/repositories/movieRepository";
+import {
+  getRecommendedMovies,
+  submitRating,
+  setAsNotSeen,
+} from "@/repositories/movieRepository";
 import { setActivePinia, createPinia } from "pinia";
 import { useLangStore } from "@/stores/langStore";
 
@@ -47,7 +51,7 @@ describe("HomeView", () => {
           MovieComponent: true,
           ActionsComponent: true,
           StarsComponent: true,
-          DraggeableComponent: false, 
+          DraggeableComponent: false,
         },
       },
     });
@@ -58,8 +62,21 @@ describe("HomeView", () => {
     await flushPromises();
 
     expect(getRecommendedMovies).toHaveBeenCalledTimes(1);
-    const movieComp = wrapper.findComponent({ name: "movieComponent" }); 
+    const movieComp = wrapper.findComponent({ name: "movieComponent" });
     expect(movieComp.props("movie")).toEqual(mockMovies[0]);
+  });
+
+  it("gets an error toast if fetching movies fails", async () => {
+    (getRecommendedMovies as any).mockRejectedValue(new Error("Network error"));
+    mountWrapper();
+    await flushPromises();
+
+    expect(mockAddToast).toHaveBeenCalledWith({
+      severity: "error",
+      summary: "toast.error",
+      detail: "toast.home.fetchMoviesError",
+      life: 3000,
+    });
   });
 
   it("advances to the next movie when an action is triggered", async () => {
@@ -79,8 +96,8 @@ describe("HomeView", () => {
     await flushPromises();
 
     const actionsComp = wrapper.findComponent({ name: "actionsComponent" });
-    await actionsComp.vm.$emit("markAsNotSeen"); 
-    await actionsComp.vm.$emit("markAsNotSeen"); 
+    await actionsComp.vm.$emit("markAsNotSeen");
+    await actionsComp.vm.$emit("markAsNotSeen");
     await flushPromises();
 
     expect(getRecommendedMovies).toHaveBeenCalledTimes(2);
@@ -106,7 +123,7 @@ describe("HomeView", () => {
     await flushPromises();
 
     expect(submitRating).toHaveBeenCalledWith(mockMovies[0].slug, 5);
-    
+
     const movieComp = wrapper.findComponent({ name: "movieComponent" });
     expect(movieComp.props("movie")).toEqual(mockMovies[1]);
   });

@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import ActionsComponent from "@/components/actionsComponent.vue";
-import { setAsNotSeen } from "@/repositories/movieRepository";
 
 vi.mock("@/repositories/movieRepository", () => ({
   setAsNotSeen: vi.fn(),

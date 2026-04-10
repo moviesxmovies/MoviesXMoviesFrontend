@@ -32,19 +32,15 @@ describe("BoardingRepository", () => {
 
     // completeBoarding
     it("completeBoarding calls API and refreshes token", async () => {
-        // 1. Definimos la respuesta para el POST de onboarding
         const mockBoardingData = { success: true };
-        // 2. Definimos la respuesta para el POST de refresh (que llama internamente)
         const mockRefreshData = { access: "new-token" };
 
-        // Usamos mockResolvedValueOnce en cadena
         mockPost
-            .mockResolvedValueOnce({ data: mockBoardingData }) // Primera llamada: /users/onboarding/
-            .mockResolvedValueOnce({ data: mockRefreshData }); // Segunda llamada: /auth/refresh/
+            .mockResolvedValueOnce({ data: mockBoardingData }) 
+            .mockResolvedValueOnce({ data: mockRefreshData }); 
 
         const result = await completeBoarding();
 
-        // Verificamos ambas llamadas
         expect(mockPost).toHaveBeenCalledWith("/users/onboarding/");
         expect(mockPost).toHaveBeenCalledWith("/auth/refresh/", expect.any(Object));
 
