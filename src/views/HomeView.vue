@@ -1,6 +1,10 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from "vue";
-import { getRecommendedMovies } from "@/repositories/movieRepository";
+import {
+  getRecommendedMovies,
+  setAsNotSeen,
+  submitRating,
+} from "@/repositories/movieRepository";
 import type { Movie } from "@/types";
 import MovieComponent from "@/components/movieComponent.vue";
 import { useToast } from "primevue";
@@ -8,13 +12,22 @@ import { useI18n } from "vue-i18n";
 import StarsComponent from "@/components/starsComponent.vue";
 import { useLangStore } from "@/stores/langStore";
 import ActionsComponent from "@/components/actionsComponent.vue";
+import DraggeableComponent from "@/components/draggeableComponent.vue";
 
+const PREDICTED_COLORS: Record<string, string> = {
+  right: "var(--yellow)",
+  left: "var(--red)",
+  up: "var(--primary)",
+  down: "var(--gray)",
+};
 const { t } = useI18n();
 const toast = useToast();
 const loading = ref(false);
 const movies = ref<Movie[]>([] as Movie[]);
 const movieIndex = ref(0);
 const langStore = useLangStore();
+const direction = ref<string>("");
+const isDragging = ref<boolean>(false);
 
 const actualMovie = computed(() => {
   return movies.value.length > 0 ? movies.value[movieIndex.value] : null;
@@ -25,13 +38,9 @@ onMounted(async () => {
   prefetchImage(movieIndex.value);
 });
 
-const setLoading = (value: boolean) => {
-  loading.value = value;
-};
-
 const fetchMovies = async () => {
   if (loading.value) return;
-  if (movies.value.length === 0) setLoading(true);
+  if (movies.value.length === 0) loading.value = true;
   try {
     movies.value = await getRecommendedMovies();
     movieIndex.value = 0;
@@ -43,7 +52,7 @@ const fetchMovies = async () => {
       life: 3000,
     });
   } finally {
-    setLoading(false);
+    loading.value = false;
   }
 };
 
@@ -77,31 +86,99 @@ watch(
     }
   },
 );
+
+const glowStyle = computed(() => {
+  const color = PREDICTED_COLORS[direction.value || ""] || "transparent";
+  const isActive = !!direction.value;
+
+  return {
+    border: isActive ? `2px solid ${color}` : "2px solid transparent",
+    boxShadow: isActive
+      ? `0 0 40px -10px ${color}, 0 0 100px -20px ${color}`
+      : "none",
+    backgroundColor: isActive ? `${color}` : "transparent",
+    opacity: isActive ? 0.7 : 0,
+    filter: "blur(2px)",
+  };
+});
+
+const markAsNotSeen = async () => {
+  loading.value = true;
+  if (actualMovie.value) {
+    await setAsNotSeen(actualMovie.value.slug);
+  }
+  loading.value = false;
+  showNextRecommendedMovie();
+};
+
+const rateMovie = async (rating: number) => {
+  if (rating === 0) return;
+  loading.value = true;
+  if (actualMovie.value) {
+    await submitRating(actualMovie.value.slug, rating);
+  }
+  loading.value = false;
+  showNextRecommendedMovie();
+};
 </script>
 
 <template>
-  <div class="min-h-screen">
-    <div v-if="loading || actualMovie" class="mt-30 relative overflow-visible">
-      <div class="w-full max-w-sm m-auto rounded-2xl relative" id="mainSwipe">
-        <MovieComponent
-          :movie="actualMovie || ({} as Movie)"
-          :loading="loading"
-        />
-        <ActionsComponent
-          :loading="loading"
-          :movieSlug="actualMovie?.slug || ''"
-          @showNextMovie="showNextRecommendedMovie"
-          @setLoading="setLoading"
-        />
+  <div
+    class="min-h-screen flex items-center justify-center overflow-hidden fixed inset-0"
+    :class="isDragging && 'z-50'"
+  >
+    <div v-if="loading || actualMovie" class="overflow-visible min-w-screen">
+      <DraggeableComponent
+        :swipeThreshold="100"
+        @right="rateMovie(5)"
+        @left="rateMovie(1)"
+        @up="showNextRecommendedMovie"
+        @down="markAsNotSeen"
+        v-model:direction="direction"
+        v-model:isDragging="isDragging"
+      >
+        <div id="mainSwipe">
+          <MovieComponent
+            class="select-none"
+            :movie="actualMovie || ({} as Movie)"
+            :loading="loading"
+          />
+          <ActionsComponent
+            class="select-none"
+            :loading="loading"
+            @markAsNotSeen="markAsNotSeen"
+          />
+        </div>
+      </DraggeableComponent>
+      <div class="icon-container mb-7">
+        <div class="icon-grid">
+          <div class="cell top" :class="direction == 'down' && 'active-icon'">
+            <i class="pi pi-eye-slash text-3xl"></i>
+          </div>
+
+          <div class="cell left" :class="direction == 'right' && 'active-icon'">
+            <i class="pi pi-star-fill text-3xl"></i>
+          </div>
+
+          <div class="cell right" :class="direction == 'left' && 'active-icon'">
+            <i class="pi pi-thumbs-down-fill text-3xl"></i>
+          </div>
+
+          <div class="cell bottom" :class="direction == 'up' && 'active-icon'">
+            <i class="pi pi-plus-circle text-3xl"></i>
+          </div>
+        </div>
       </div>
-      <div class="flex justify-center mt-4">
-        <StarsComponent
-          id="stars"
-          :loading="loading"
-          :movieSlug="actualMovie?.slug || ''"
-          @showNextMovie="showNextRecommendedMovie"
-          @setLoading="setLoading"
-        />
+      <div
+        class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center mb-7"
+      >
+        <div
+          class="w-full max-w-sm aspect-[3/5] rounded-3xl transition-all duration-500 ease-out"
+          :style="glowStyle"
+        ></div>
+      </div>
+      <div class="flex justify-center mt-4 relative z-">
+        <StarsComponent id="stars" :loading="loading" @rateMovie="rateMovie" />
       </div>
     </div>
     <div v-else>No movies found.</div>
@@ -188,5 +265,72 @@ watch(
   70% {
     content: "\e936";
   }
+}
+
+.icon-container {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  margin-bottom: 1.75rem;
+}
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  width: 100%;
+  max-width: 24rem;
+  aspect-ratio: 3 / 5;
+  border-radius: 1.5rem;
+  transition: all 0.5s ease-out;
+}
+
+.cell {
+  display: flex;
+  color: var(--text);
+  font-size: 2rem;
+  transition: all 0.3s ease;
+  opacity: 0.1;
+}
+
+.cell.top {
+  grid-column: 2;
+  grid-row: 1;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 2rem;
+}
+
+.cell.left {
+  grid-column: 1;
+  grid-row: 2;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 2rem;
+}
+
+.cell.right {
+  grid-column: 3;
+  grid-row: 2;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 2rem;
+}
+
+.cell.bottom {
+  grid-column: 2;
+  grid-row: 3;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 2rem;
+}
+
+.active-icon {
+  opacity: 1;
+  transform: scale(1.25);
+  filter: drop-shadow(0 0 10px var(--text));
 }
 </style>

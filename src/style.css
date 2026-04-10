@@ -27,6 +27,9 @@
   --primary: #2f27ce;
   --secondary: #bcbbdd;
   --accent: #bb3dff;
+  --yellow: #FFD700;
+  --red: #EF4444;
+  --gray: #6b7280;
 }
 
 .dark {

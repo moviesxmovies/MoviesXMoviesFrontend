@@ -20,6 +20,7 @@ const props = defineProps<{
           :key="movie.cover"
           :src="movie.cover"
           :alt="movie.title"
+          draggable="false"
           class="w-full max-w-sm aspect-[2/3] object-cover blur-[200px] scale-110 pointer-events-none transition-all duration-1000"
           aria-hidden="true"
         />
@@ -49,6 +50,7 @@ const props = defineProps<{
         <img
           decoding="async"
           loading="eager"
+          draggable="false"
           :src="movie.cover"
           :alt="movie.title"
           class="absolute inset-0 w-full h-full object-cover"

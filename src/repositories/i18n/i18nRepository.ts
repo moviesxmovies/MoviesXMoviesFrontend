@@ -7,7 +7,7 @@ export const getValidLocale = () => {
   try {
     savedLanguage = localStorage.getItem("language");
   } catch {
-    // entorno sin localStorage (tests, SSR)
+    // Testing environment without localStorage, or SSR. Tokens will be null, which is fine.
   }
 
   const languageObtained =

@@ -6,8 +6,6 @@ import {
 } from "@/repositories/movieRepository";
 
 // ── Mocks ────────────────────────────────────────────────────────────────────
-
-// Usamos vi.hoisted para asegurar que los mocks estén disponibles antes de las importaciones
 const { mockGet, mockPost } = vi.hoisted(() => ({
   mockGet: vi.fn(),
   mockPost: vi.fn(),

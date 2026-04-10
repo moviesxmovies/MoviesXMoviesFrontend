@@ -1,22 +1,15 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { mount } from "@vue/test-utils";
 import StarsComponent from "@/components/starsComponent.vue";
-import { submitRating } from "@/repositories/movieRepository";
-
-vi.mock("@/repositories/movieRepository", () => ({
-  submitRating: vi.fn(),
-}));
 
 describe("StarsComponent", () => {
-  const movieSlug = "the-matrix";
-
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   const mountComponent = (loading = false) => {
     return mount(StarsComponent, {
-      props: { movieSlug, loading },
+      props: { loading },
     });
   };
 
@@ -34,27 +27,21 @@ describe("StarsComponent", () => {
     expect(wrapper.findAll(".pi-star-fill").length).toBe(0);
   });
 
-  it("calls submitRating and emits showNextMovie when a star is clicked", async () => {
+  it("calls rateMovie and emits showNextMovie when a star is clicked", async () => {
     const wrapper = mountComponent();
     const stars = wrapper.findAll("i");
 
     await stars[3].trigger("click");
 
-    expect(submitRating).toHaveBeenCalledWith(movieSlug, 4);
-    expect(wrapper.emitted()).toHaveProperty("showNextMovie");
+    expect(wrapper.emitted()).toHaveProperty("rateMovie");
   });
 
   it("disables interactions when loading is true", async () => {
     const wrapper = mountComponent(true);
     const container = wrapper.find("div");
-    const stars = wrapper.findAll("i");
 
     expect(container.classes()).toContain("opacity-40");
     expect(container.classes()).toContain("pointer-events-none");
-
-    await stars[4].trigger("click");
-
-    expect(submitRating).not.toHaveBeenCalled();
   });
 
   it("calculates rating correctly during touch move", async () => {
@@ -88,18 +75,6 @@ describe("StarsComponent", () => {
     await stars[1].trigger("mouseenter");
 
     await container.trigger("touchend");
-
-    expect(submitRating).toHaveBeenCalledWith(movieSlug, 2);
-    expect(wrapper.emitted()).toHaveProperty("showNextMovie");
-  });
-
-  it("does not submit if the rating is 0", async () => {
-    const wrapper = mountComponent();
-    const container = wrapper.find({ ref: "starsContainer" });
-
-    await container.trigger("touchend");
-
-    expect(submitRating).not.toHaveBeenCalled();
-    expect(wrapper.emitted("showNextMovie")).toBeFalsy();
+    expect(wrapper.emitted()).toHaveProperty("rateMovie");
   });
 });

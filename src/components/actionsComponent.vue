@@ -1,19 +1,8 @@
 <script lang="ts" setup>
-import { setAsNotSeen } from "@/repositories/movieRepository";
-
+const emit = defineEmits(["markAsNotSeen"]);
 const props = defineProps<{
-  movieSlug: string;
   loading: boolean;
 }>();
-
-const emit = defineEmits(["showNextMovie", "setLoading"]);
-
-const markAsNotSeen = async () => {
-  emit("setLoading", true);
-  await setAsNotSeen(props.movieSlug);
-  emit("setLoading", false);
-  emit("showNextMovie");
-};
 </script>
 
 <template>
@@ -21,6 +10,7 @@ const markAsNotSeen = async () => {
     <div class="inline-flex w-full max-w-sm overflow-hidden rounded-b-2xl">
       <button
         id="more-info"
+        :disabled="loading"
         class="flex-1 h-16 bg-accent cursor-pointer hover:brightness-120 flex items-center justify-center border-r border-white/10 transition-all active:bg-accent/80"
       >
         <i class="pi pi-info-circle text-2xl text-white" />
@@ -35,13 +25,16 @@ const markAsNotSeen = async () => {
             ? 'bg-gray-600 opacity-40 pointer-events-none'
             : 'bg-gray-600',
         ]"
-        @click="markAsNotSeen"
+        @mousedown.stop
+        @touchstart.stop
+        @click.stop="emit('markAsNotSeen')"
       >
         <i class="pi pi-eye-slash text-2xl text-white" />
       </button>
 
       <button
         id="add-to-list-button"
+        :disabled="loading"
         class="flex-1 h-16 bg-primary cursor-pointer hover:brightness-120 flex items-center justify-center transition-all active:bg-primary/80"
       >
         <i class="pi pi-plus-circle text-2xl text-white" />
@@ -61,11 +54,11 @@ const markAsNotSeen = async () => {
 
 @keyframes button-pulse {
   0% {
-    outline-color: rgba(var(--accent-rgb), 0.2); 
+    outline-color: rgba(var(--accent-rgb), 0.2);
     filter: brightness(1);
   }
   100% {
-    outline-color: var(--accent); 
+    outline-color: var(--accent);
     filter: brightness(1.5);
     box-shadow: 0 0 15px var(--accent);
   }

@@ -1,7 +1,7 @@
 import { mount, flushPromises } from "@vue/test-utils";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import PrimeVue from "primevue/config";
-import LoginView from "@/views/LoginView.vue"; // adjust path as needed
+import LoginView from "@/views/LoginView.vue"; 
 
 const { mockHandleLogin, mockToastAdd, mockPush, mockLoginWithGoogle } =
   vi.hoisted(() => ({
@@ -12,7 +12,6 @@ const { mockHandleLogin, mockToastAdd, mockPush, mockLoginWithGoogle } =
   }));
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
-
 vi.mock("@/repositories/auth/authRepository", () => ({
   handleLogin: mockHandleLogin,
   FieldMsg: {
@@ -75,7 +74,6 @@ vi.mock("@/components/oauthButtonComponent.vue", () => ({
 }));
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
 const globalConfig = {
   plugins: [PrimeVue],
   mocks: { $t: (key: string) => key },
@@ -127,7 +125,6 @@ async function submitForm(
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
-
 describe("LoginView rendering", () => {
   it("renders title and subtitle i18n keys", () => {
     const wrapper = mountComponent();
@@ -165,7 +162,6 @@ describe("LoginView rendering", () => {
 });
 
 // ── login() – happy path ──────────────────────────────────────────────────────
-
 describe("LoginView login() success", () => {
   beforeEach(() => {
     mockHandleLogin.mockResolvedValue(undefined);
@@ -201,7 +197,6 @@ describe("LoginView login() success", () => {
 });
 
 // ── login() – invalid form ────────────────────────────────────────────────────
-
 describe("LoginView login() invalid form", () => {
   beforeEach(() => {
     mockHandleLogin.mockClear();
@@ -232,7 +227,6 @@ describe("LoginView login() invalid form", () => {
 });
 
 // ── login() – error handling ──────────────────────────────────────────────────
-
 describe("LoginView login() error handling", () => {
   beforeEach(() => {
     mockToastAdd.mockClear();
@@ -240,7 +234,7 @@ describe("LoginView login() error handling", () => {
   });
 
   const makeAxiosError = (status: number, detail: string) => {
-    const err = new Error() as any;
+    const err = new Error("error") as any;
     err.response = { status, data: { detail } };
     return err;
   };
@@ -295,7 +289,6 @@ describe("LoginView login() error handling", () => {
 });
 
 // ── Navigation ────────────────────────────────────────────────────────────────
-
 describe("LoginView navigation", () => {
   beforeEach(() => mockPush.mockClear());
 
@@ -304,7 +297,7 @@ describe("LoginView navigation", () => {
     const btn = wrapper
       .findAll("button[type='button']")
       .find((b) => b.text().includes("login.forgotPassword"));
-    await btn!.trigger("click");
+    await btn.trigger("click");
 
     expect(mockPush).toHaveBeenCalledWith("/forgot-password");
   });
@@ -314,14 +307,13 @@ describe("LoginView navigation", () => {
     const btn = wrapper
       .findAll("button[type='button']")
       .find((b) => b.text().includes("login.signup"));
-    await btn!.trigger("click");
+    await btn.trigger("click");
 
     expect(mockPush).toHaveBeenCalledWith("/signup");
   });
 });
 
 // ── OAuth ─────────────────────────────────────────────────────────────────────
-
 describe("LoginView OAuth", () => {
   it("calls loginWithGoogle when the OAuth button is clicked", async () => {
     const wrapper = mountComponent();
