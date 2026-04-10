@@ -1,53 +1,154 @@
 {
+  "next": "Weiter",
+  "back": "Zurück",
+  "toast": {
+    "success": "Erfolgreich",
+    "error": "Fehler aufgetreten"
+  },
   "components": {
-    "selectLanguage": "Sprache auswählen",
+    "selectLanguage": "Sprache wählen",
     "oauthButton": "Mit {0} anmelden",
-    "changeTheme": "Thema ändern",
+    "changeTheme": "Design ändern",
     "form": {
-      "requiredUsername": "Benutzername ist erforderlich",
-      "requiredPassword": "Passwort ist erforderlich",
-      "submit": "Anmelden"
+      "requiredUsername": "Nutzername fehlt",
+      "requiredPassword": "Passwort fehlt",
+      "submit": "Login"
     }
+  },
+  "signup": {
+    "toast": {
+      "success": "Konto erstellt",
+      "failed": "Fehler beim Erstellen"
+    },
+    "step1": {
+      "subtitle": "Konto erstellen und Filme teilen."
+    },
+    "step2": {
+      "title": "Profil erstellen",
+      "subtitle": "Richte dein Profil ein.",
+      "image": "Profilbild"
+    },
+    "title": "Registrieren",
+    "username": "Nutzername",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "email": "E-Mail",
+    "or": "oder weiter mit",
+    "password": "Passwort",
+    "confirmPassword": "Bestätigen",
+    "login": "Konto? Hier einloggen"
   },
   "login": {
     "toast": {
-      "success": "Sitzung gestartet",
-      "connectionError": "Anmeldung mit {0} fehlgeschlagen. Bitte versuche es erneut.",
-      "invalidCredentials": "Ungültiger Benutzername oder Passwort",
-      "accessDenied": "Zugriff verweigert"
+      "success": "Eingeloggt"
     },
-    "title": "Anmelden",
-    "username": "Benutzername",
-    "password": "Passwort"
+    "title": "Login",
+    "subtitle": "Daten eingeben.",
+    "username": "Nutzername",
+    "password": "Passwort",
+    "signup": "Kein Konto? Registrieren",
+    "forgotPassword": "Passwort vergessen?"
   },
   "notFound": {
     "title": "404 - Nicht gefunden",
-    "description": "Die gesuchte Seite existiert nicht.",
-    "linkText": "Zurück zur Startseite"
+    "description": "Seite existiert nicht.",
+    "linkText": "Zur Startseite"
   },
   "oauth": {
     "toast": {
-      "success": "Sitzung gestartet",
-      "connectionError": "Anmeldung mit {0} fehlgeschlagen. Bitte versuche es erneut.",
-      "invalidCode": "Ungültiger {0}-Code"
+      "success": "Eingeloggt",
+      "connectionError": "Fehler mit {0}.",
+      "invalidCode": "Falscher {0} Code"
     },
-    "loading": "Laden..."
+    "loading": "Lädt..."
+  },
+  "forgotPassword": {
+    "toast": {
+      "error": "E-Mail-Versand fehlgeschlagen."
+    },
+    "title": "Passwort vergessen",
+    "description": "E-Mail eingeben, wir senden einen Link.",
+    "resetPassword": "Passwort zurücksetzen",
+    "rememberPassword": "Passwort bereit? Login",
+    "backToLogin": "Zurück zum Login"
+  },
+  "resetPassword": {
+    "toast": {
+      "error": "Fehler beim Zurücksetzen."
+    },
+    "title": "Neues Passwort",
+    "description": "Neues Passwort eingeben.",
+    "newPassword": "Neues Passwort",
+    "confirmNewPassword": "Bestätigen",
+    "submit": "Speichern"
   },
   "home": {
     "welcome": "Willkommen bei MoviesXMovies!",
-    "login": "Anmelden",
-    "emailPlaceholder": "Gib deine E-Mail-Adresse ein",
+    "login": "Login",
+    "emailPlaceholder": "E-Mail eingeben",
     "signupBtn": "Registrieren",
-    "orContinue": "oder fahre fort mit",
+    "orContinue": "oder weiter mit",
     "badge": "Online",
-    "feature1": "Teile deine Lieblingsfilme",
-    "feature2": "Erhalte Filmempfehlungen",
-    "feature3": "Erstelle deine eigenen Filmlisten."
+    "feature1": "Lieblingsfilme teilen",
+    "feature2": "Empfehlungen erhalten",
+    "feature3": "Filmlisten erstellen.",
+    "fetchMoviesHerror": "Fehler beim Laden."
+  },
+  "onboarding": {
+    "step1": "Kurze Einführung",
+    "step2": "Filme mit Sternen bewerten",
+    "step3": "Listen füllen",
+    "step4": "Als nicht gesehen markieren",
+    "step5": "Schneller? Wische horizontal für Sterne, vertikal für Listen.",
+    "finish": "Starten",
+    "continue": "Weiter",
+    "skip": "Überspringen"
   },
   "verify": {
+    "toast": {
+      "success": "E-Mail bestätigt",
+      "inocrrectLength": "6 Ziffern eingeben.",
+      "invalidCode": "Ungültiger Code",
+      "resendSuccess": "Code erneut gesendet",
+      "resendError": "Fehler beim Senden."
+    },
     "title": "MOVIESXMOVIES",
-    "description": "Wir haben einen 6-stelligen Code an deine E-Mail-Adresse gesendet.",
-    "button": "CODE BESTÄTIGEN",
-    "resend": "Keinen Code erhalten? Code erneut senden"
+    "description": "Code wurde an E-Mail gesendet.",
+    "button": "CODE PRÜFEN",
+    "resend": "Kein Code? Erneut senden"
+  },
+  "schema": {
+    "username": { "required": "Nutzername nötig" },
+    "firstName": { "required": "Vorname nötig" },
+    "lastName": { "required": "Nachname nötig" },
+    "email": {
+      "required": "E-Mail nötig",
+      "invalid": "Ungültige E-Mail"
+    },
+    "password": {
+      "required": "Passwort nötig",
+      "minLength": "Min. 10 Zeichen",
+      "upperCase": "Großbuchstabe fehlt",
+      "number": "Zahl fehlt"
+    },
+    "confirmPassword": {
+      "required": "Bestätigung nötig",
+      "mismatch": "Stimmt nicht überein"
+    },
+    "checks": {
+      "username": "Nutzername",
+      "first_name": "Vorname",
+      "last_name": "Nachname",
+      "email": "E-Mail",
+      "samePasswordAs": "Darf nicht wie dein {0} sein"
+    },
+    "forgotPasswordCode": {
+      "required": "Code wird benötigt"
+    }
+  },
+  "checkEmail": {
+    "title": "E-Mails prüfen",
+    "description": "Code erhalten? Unten eingeben zum Ändern.",
+    "button": "Zum Login"
   }
 }

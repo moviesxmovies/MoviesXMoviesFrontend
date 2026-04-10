@@ -91,7 +91,8 @@
     "badge": "Online",
     "feature1": "Share your favorite movies",
     "feature2": "Get movie recommendations",
-    "feature3": "Create your own movie lists."
+    "feature3": "Create your own movie lists.",
+    "fetchMoviesHerror": "Failed to fetch movies. Please try again later."
   },
   "onboarding": {
     "step1": "Let's get you started with a quick tour",
@@ -117,15 +118,9 @@
     "resend": "Haven't received the code? Resend code"
   },
   "schema": {
-    "username": {
-      "required": "Username is required"
-    },
-    "firstName": {
-      "required": "First name is required"
-    },
-    "lastName": {
-      "required": "Last name is required"
-    },
+    "username": { "required": "Username is required" },
+    "firstName": { "required": "First name is required" },
+    "lastName": { "required": "Last name is required" },
     "email": {
       "required": "Email is required",
       "invalid": "Invalid email address"

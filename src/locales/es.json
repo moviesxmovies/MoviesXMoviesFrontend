@@ -1,54 +1,154 @@
 {
+  "next": "Siguiente",
+  "back": "Volver",
+  "toast": {
+    "success": "Operación exitosa",
+    "error": "Ha ocurrido un error"
+  },
   "components": {
-    "selectLanguage": "Selecciona un idioma",
-    "oauthButton": "Iniciar sesión con {0}",
+    "selectLanguage": "Idioma",
+    "oauthButton": "Entrar con {0}",
     "changeTheme": "Cambiar tema",
     "form": {
-      "requiredUsername": "El nombre de usuario es obligatorio",
-      "requiredPassword": "La contraseña es obligatoria",
-      "submit": "Iniciar sesión"
+      "requiredUsername": "Usuario obligatorio",
+      "requiredPassword": "Clave obligatoria",
+      "submit": "Entrar"
     }
+  },
+  "signup": {
+    "toast": {
+      "success": "Cuenta creada",
+      "failed": "Error al registrar"
+    },
+    "step1": {
+      "subtitle": "Crea tu cuenta para compartir tus pelis favoritas."
+    },
+    "step2": {
+      "title": "Crea tu perfil",
+      "subtitle": "Configura tu perfil.",
+      "image": "Foto de perfil"
+    },
+    "title": "Registro",
+    "username": "Usuario",
+    "firstName": "Nombre",
+    "lastName": "Apellidos",
+    "email": "Email",
+    "or": "o continúa con",
+    "password": "Clave",
+    "confirmPassword": "Confirmar clave",
+    "login": "¿Ya tienes cuenta? Entra aquí"
   },
   "login": {
     "toast": {
-      "success": "Sesión iniciada",
-      "connectionError": "Error al iniciar sesión con {0}. Por favor, inténtalo de nuevo.",
-      "invalidCredentials": "Usuario o contraseña incorrectos",
-      "accessDenied": "Acceso denegado"
+      "success": "Sesión iniciada"
     },
-    "title": "Iniciar sesión",
+    "title": "Entrar",
+    "subtitle": "Introduce tus datos.",
     "username": "Usuario",
-    "password": "Contraseña"
-
+    "password": "Clave",
+    "signup": "¿Sin cuenta? Regístrate aquí",
+    "forgotPassword": "¿Olvidaste tu clave?"
   },
   "notFound": {
-    "title": "404 - No encontrado",
-    "description": "La página que buscas no existe.",
-    "linkText": "Volver al inicio"
+    "title": "404 - No Encontrado",
+    "description": "La página no existe.",
+    "linkText": "Volver a Inicio"
   },
   "oauth": {
     "toast": {
       "success": "Sesión iniciada",
-      "connectionError": "Error al iniciar sesión con {0}. Por favor, inténtalo de nuevo.",
-      "invalidCode": "Código de {0} inválido"
+      "connectionError": "Error al entrar con {0}.",
+      "invalidCode": "Código {0} no válido"
     },
     "loading": "Cargando..."
   },
+  "forgotPassword": {
+    "toast": {
+      "error": "Error al enviar el email."
+    },
+    "title": "Recuperar clave",
+    "description": "Dinos tu email y te enviaremos un enlace.",
+    "resetPassword": "Resetear clave",
+    "rememberPassword": "¿La recuerdas? Entra aquí",
+    "backToLogin": "Volver al Login"
+  },
+  "resetPassword": {
+    "toast": {
+      "error": "Error al cambiar la clave."
+    },
+    "title": "Nueva clave",
+    "description": "Escribe tu nueva clave abajo.",
+    "newPassword": "Nueva clave",
+    "confirmNewPassword": "Confirmar nueva clave",
+    "submit": "Cambiar clave"
+  },
   "home": {
     "welcome": "¡Bienvenido a MoviesXMovies!",
-    "login": "Iniciar sesión",
-    "emailPlaceholder": "Introduce tu correo electrónico",
-    "signupBtn": "Regístrate",
+    "login": "Entrar",
+    "emailPlaceholder": "Tu email",
+    "signupBtn": "Registro",
     "orContinue": "o continúa con",
-    "badge": "En línea",
-    "feature1": "Comparte tus películas favoritas",
-    "feature2": "Obtén recomendaciones de películas",
-    "feature3": "Crea tus propias listas de películas."
+    "badge": "Online",
+    "feature1": "Comparte tus pelis",
+    "feature2": "Recibe recomendaciones",
+    "feature3": "Crea tus propias listas.",
+    "fetchMoviesHerror": "Error al cargar películas."
+  },
+  "onboarding": {
+    "step1": "Te enseñamos cómo funciona",
+    "step2": "Puntúa con las estrellas",
+    "step3": "Añade pelis a tus listas",
+    "step4": "Márcalas como no vistas",
+    "step5": "¿Quieres velocidad? Desliza lateral para puntuar y vertical para listas o no vistas",
+    "finish": "Empezar",
+    "continue": "Continuar",
+    "skip": "Saltar"
   },
   "verify": {
+    "toast": {
+      "success": "Email verificado",
+      "inocrrectLength": "Introduce los 6 dígitos.",
+      "invalidCode": "Código no válido",
+      "resendSuccess": "Código reenviado",
+      "resendError": "Error al reenviar código."
+    },
     "title": "MOVIESXMOVIES",
-    "description": "Hemos enviado un código de 6 dígitos a tu dirección de correo.",
+    "description": "Hemos enviado un código a tu email.",
     "button": "VERIFICAR CÓDIGO",
-    "resend": "¿No has recibido el código? Reenviar código"
+    "resend": "¿No te llegó? Reenviar"
+  },
+  "schema": {
+    "username": { "required": "Usuario obligatorio" },
+    "firstName": { "required": "Nombre obligatorio" },
+    "lastName": { "required": "Apellido obligatorio" },
+    "email": {
+      "required": "Email obligatorio",
+      "invalid": "Email no válido"
+    },
+    "password": {
+      "required": "Clave obligatoria",
+      "minLength": "Mínimo 10 caracteres",
+      "upperCase": "Falta una mayúscula",
+      "number": "Falta un número"
+    },
+    "confirmPassword": {
+      "required": "Confirma tu clave",
+      "mismatch": "Las claves no coinciden"
+    },
+    "checks": {
+      "username": "usuario",
+      "first_name": "nombre",
+      "last_name": "apellido",
+      "email": "email",
+      "samePasswordAs": "La clave no puede ser tu {0}"
+    },
+    "forgotPasswordCode": {
+      "required": "Código obligatorio"
+    }
+  },
+  "checkEmail": {
+    "title": "Revisa tu email",
+    "description": "Enviamos un código. Introdúcelo para cambiar tu clave.",
+    "button": "Ir al login"
   }
 }
