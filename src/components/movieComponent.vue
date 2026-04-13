@@ -71,9 +71,14 @@ const props = defineProps<{
         <div
           class="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black via-black/80 to-transparent flex flex-col justify-end p-6 gap-3"
         >
-          <p class="text-[14px] text-center font-bold text-white uppercase">
-            {{ movie.platforms.map((p) => p.name).join(" | ") }}
-          </p>
+          <div v-for="platform in movie.platforms" :key="platform.id">
+            <image
+              class="text-[14px] text-center font-bold text-white uppercase"
+              :src="platform.image"
+              :alt="platform.name"
+              :title="platform.name"
+            />
+          </div>
           <p class="text-[14px] text-center font-bold text-white uppercase">
             {{ movie.genres.map((g) => g.name).join(" | ") }}
           </p>

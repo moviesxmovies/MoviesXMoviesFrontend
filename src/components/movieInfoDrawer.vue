@@ -1,25 +1,400 @@
 <script setup lang="ts">
-import type { Movie } from "@/types";
-import { Drawer } from "primevue";
+import type { Person, Movie } from "@/types";
+import { Drawer, ScrollPanel, useToast } from "primevue";
+import { ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
+import { api } from "@/composables/useAPI";
 
 const props = defineProps<{
   movie: Movie;
 }>();
 
 const visible = defineModel<boolean>("visible", { default: false });
+const toast = useToast();
+const { t } = useI18n();
+const actors = ref<Person[]>([]);
+const directors = ref<Person[]>([]);
+const loading = ref(false);
+
+const fetchDetails = async (finalList: any, list: string[]) => {
+  finalList.value = [];
+  for (const element of list) {
+    try {
+      const { data } = await api.get(element);
+      finalList.value.push(data);
+    } catch (error: any) {
+      toast.add({
+        severity: "error",
+        summary: "Error",
+        detail:
+          error.response?.data?.message ||
+          t("components.movieInfoDrawer.fetchActorsError"),
+        life: 3000,
+      });
+    }
+  }
+};
+
+watch(
+  () => props.movie,
+  async () => {
+    loading.value = true;
+    await fetchDetails(actors, props.movie.actors);
+    await fetchDetails(directors, props.movie.directors);
+    loading.value = false;
+  },
+);
 </script>
 
 <template>
   <Drawer
     v-model:visible="visible"
-    :header="movie.title"
     :modal="false"
     :dismissable="false"
     position="right"
-    class="!w-full md:!w-[40rem]"
+    class="movie-drawer !w-full md:!w-[40rem]"
   >
-    <p>
-      {{ movie.synopsis }}
-    </p>
+    <template #header>
+      <div class="drawer-header-inner">
+        <img
+          v-if="movie.cover"
+          :src="movie.cover"
+          :alt="movie.title"
+          class="drawer-poster"
+        />
+        <div class="drawer-title-block">
+          <h2 class="drawer-title">{{ movie.title }}</h2>
+          <span class="drawer-year">{{ movie.release_date }}</span>
+        </div>
+      </div>
+    </template>
+
+    <!-- Skeleton de carga -->
+    <div v-if="loading" class="drawer-loading">
+      <div class="skeleton-line w-3/4" />
+      <div class="skeleton-line w-1/2" />
+      <div class="skeleton-line w-full" />
+      <div class="skeleton-line w-2/3" />
+    </div>
+
+    <template v-else>
+      <section class="drawer-section">
+        <h3 class="drawer-section__title">
+          {{ t("components.movieInfoDrawer.description") }}
+        </h3>
+        <p class="drawer-section__body">{{ movie.synopsis }}</p>
+      </section>
+
+      <section class="drawer-section">
+        <h3 class="drawer-section__title">
+          {{ t("components.movieInfoDrawer.platforms") }}
+        </h3>
+        <ScrollPanel
+          class="horizontal-scroll-panel"
+          :pt="{ content: { class: 'scroll-content' } }"
+        >
+          <div class="inline-list">
+            <div
+              v-for="platform in movie.platforms"
+              :key="platform.id"
+              class="platform-item"
+            >
+              <img
+                :src="platform.image ?? ''"
+                :alt="platform.name"
+                class="platform-item__img"
+              />
+            </div>
+          </div>
+        </ScrollPanel>
+      </section>
+
+      <!-- Géneros -->
+      <section class="drawer-section">
+        <h3 class="drawer-section__title">
+          {{ t("components.movieInfoDrawer.genres") }}
+        </h3>
+        <div class="genre-list">
+          <span v-for="genre in movie.genres" :key="genre.id" class="genre-tag">
+            {{ genre.name }}
+          </span>
+        </div>
+      </section>
+
+      <section class="drawer-section">
+        <h3 class="drawer-section__title">
+          {{ t("components.movieInfoDrawer.actors") }}
+        </h3>
+        <ScrollPanel
+          class="horizontal-scroll-panel"
+          :pt="{ content: { class: 'scroll-content' } }"
+        >
+          <div class="inline-list">
+            <div v-for="actor in actors" :key="actor.id" class="person-item">
+              <img
+                :src="actor.image"
+                :alt="actor.name"
+                class="person-item__img"
+              />
+              <span class="person-item__name">{{ actor.name }}</span>
+            </div>
+          </div>
+        </ScrollPanel>
+      </section>
+
+      <section class="drawer-section">
+        <h3 class="drawer-section__title">
+          {{ t("components.movieInfoDrawer.directors") }}
+        </h3>
+        <ScrollPanel
+          class="horizontal-scroll-panel"
+          :pt="{ content: { class: 'scroll-content' } }"
+        >
+          <div class="inline-list">
+            <div
+              v-for="director in directors"
+              :key="director.id"
+              class="person-item"
+            >
+              <img
+                :src="director.image"
+                :alt="director.name"
+                class="person-item__img"
+              />
+              <span class="person-item__name">{{ director.name }}</span>
+            </div>
+          </div>
+        </ScrollPanel>
+      </section>
+    </template>
   </Drawer>
 </template>
+
+<style scoped>
+:root {
+  --mxm-bg: #0f0f13;
+  --mxm-surface: #18181f;
+  --mxm-surface-2: #22222c;
+  --mxm-accent: #e8b84b;
+  --mxm-text: #e8e6e1;
+  --mxm-text-muted: #7a7a8a;
+  --mxm-radius: 12px;
+}
+
+:deep(.movie-drawer__root) {
+  background: var(--mxm-bg) !important;
+  border-left: 1px solid rgba(232, 184, 75, 0.15);
+  box-shadow: -8px 0 40px rgba(0, 0, 0, 0.6);
+}
+
+:deep(.movie-drawer__header) {
+  background: var(--mxm-surface) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 1.25rem 1.5rem !important;
+}
+
+.drawer-header-inner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.drawer-poster {
+  width: 52px;
+  height: 74px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.drawer-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.drawer-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--mxm-text);
+  line-height: 1.2;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.drawer-year {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--mxm-accent);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+:deep(.movie-drawer__content) {
+  background: var(--mxm-bg) !important;
+  padding: 1.5rem !important;
+  overflow-y: auto;
+}
+
+.drawer-section {
+  margin-bottom: 2rem;
+}
+
+.drawer-section__title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mxm-accent);
+  margin: 0 0 0.75rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(232, 184, 75, 0.2);
+}
+
+.drawer-section__body {
+  font-size: 0.925rem;
+  line-height: 1.7;
+  color: var(--mxm-text-muted);
+  margin: 0;
+}
+
+.horizontal-scroll-panel {
+  width: 100%;
+  height: auto;
+}
+
+:deep(.horizontal-scroll-panel .p-scrollpanel-bar-x) {
+  background: rgba(232, 184, 75, 0.25) !important;
+  height: 3px !important;
+  border-radius: 99px;
+}
+
+:deep(.horizontal-scroll-panel .p-scrollpanel-bar-x:hover) {
+  background: var(--mxm-accent) !important;
+}
+
+.inline-list {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  padding: 0.25rem 0.125rem 0.5rem;
+  width: max-content;
+}
+
+.person-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 72px;
+  flex-shrink: 0;
+}
+
+.person-item__img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--mxm-surface-2);
+  border: 2px solid rgba(255, 255, 255, 0.06);
+  transition: border-color 0.2s;
+}
+
+.person-item:hover .person-item__img {
+  border-color: rgba(232, 184, 75, 0.4);
+}
+
+.person-item__name {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--mxm-text-muted);
+  text-align: center;
+  line-height: 1.3;
+  word-break: break-word;
+  transition: color 0.2s;
+}
+
+.person-item:hover .person-item__name {
+  color: var(--mxm-text);
+}
+
+.platform-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.platform-item__img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: var(--mxm-surface);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 6px;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+
+.platform-item:hover .platform-item__img {
+  border-color: rgba(232, 184, 75, 0.3);
+  background: var(--mxm-surface-2);
+}
+
+.genre-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.genre-tag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--mxm-text-muted);
+  background: var(--mxm-surface);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 99px;
+  padding: 0.25rem 0.75rem;
+  transition:
+    color 0.2s,
+    border-color 0.2s;
+}
+
+.genre-tag:hover {
+  color: var(--mxm-accent);
+  border-color: rgba(232, 184, 75, 0.3);
+}
+
+.drawer-loading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+}
+
+.skeleton-line {
+  height: 14px;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    var(--mxm-surface) 25%,
+    var(--mxm-surface-2) 50%,
+    var(--mxm-surface) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+</style>
