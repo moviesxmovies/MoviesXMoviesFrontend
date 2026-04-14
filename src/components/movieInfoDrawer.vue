@@ -78,16 +78,16 @@ watch(
     </div>
 
     <template v-else>
-      <section class="drawer-section">
+      <section class="drawer-section" v-show="movie.synopsis">
         <h3 class="drawer-section__title">
-          {{ t("components.movieInfoDrawer.description") }}
+          {{ t("components.movieInfoDrawer.synopsis") }}
         </h3>
         <p class="drawer-section__body">{{ movie.synopsis }}</p>
       </section>
 
-      <section class="drawer-section">
+      <section class="drawer-section" v-show="movie.platforms.length">
         <h3 class="drawer-section__title">
-          {{ t("components.movieInfoDrawer.platforms") }}
+          {{ t("components.movieInfoDrawer.platforms", movie.platforms.length > 1 ? 2 : 1) }}
         </h3>
         <ScrollPanel
           class="horizontal-scroll-panel"
@@ -110,9 +110,9 @@ watch(
       </section>
 
       <!-- Géneros -->
-      <section class="drawer-section">
+      <section class="drawer-section" v-show="movie.genres.length">
         <h3 class="drawer-section__title">
-          {{ t("components.movieInfoDrawer.genres") }}
+          {{ t("components.movieInfoDrawer.genres", movie.genres.length > 1 ? 2 : 1) }}
         </h3>
         <div class="genre-list">
           <span v-for="genre in movie.genres" :key="genre.id" class="genre-tag">
@@ -121,9 +121,9 @@ watch(
         </div>
       </section>
 
-      <section class="drawer-section">
+      <section class="drawer-section" v-show="movie.actors.length">
         <h3 class="drawer-section__title">
-          {{ t("components.movieInfoDrawer.actors") }}
+          {{ t("components.movieInfoDrawer.actors", movie.actors.length > 1 ? 2 : 1) }}
         </h3>
         <ScrollPanel
           class="horizontal-scroll-panel"
@@ -142,9 +142,9 @@ watch(
         </ScrollPanel>
       </section>
 
-      <section class="drawer-section">
+      <section class="drawer-section" v-show="movie.directors.length">
         <h3 class="drawer-section__title">
-          {{ t("components.movieInfoDrawer.directors") }}
+          {{ t("components.movieInfoDrawer.directors", movie.directors.length > 1 ? 2 : 1 ) }}
         </h3>
         <ScrollPanel
           class="horizontal-scroll-panel"

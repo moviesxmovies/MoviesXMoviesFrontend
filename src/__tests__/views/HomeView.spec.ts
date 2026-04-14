@@ -52,6 +52,7 @@ describe("HomeView", () => {
           ActionsComponent: true,
           StarsComponent: true,
           DraggeableComponent: false,
+          MovieInfoDrawer: true,
         },
       },
     });
