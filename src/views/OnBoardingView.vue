@@ -8,6 +8,7 @@ import { useRouter } from 'vue-router';
 const currentStep = ref(0);
 const router = useRouter();
 const toast = useToast();
+const stepCard = ref<HTMLElement | null>(null);
 let previousAnimationElement: HTMLElement | null = null;
 
 const handleFinish = () => {
@@ -29,7 +30,6 @@ const handleAnimation = (targetId: string) => {
         previousAnimationElement.classList.remove('animate-boarding');
     }
     const targetElement = document.getElementById(targetId);
-    console.log('Animating element with ID:', targetId, 'Found element:', targetElement);
     if (targetElement) {
         targetElement.classList.add('animate-boarding');
         previousAnimationElement = targetElement;
@@ -39,7 +39,6 @@ const handleAnimation = (targetId: string) => {
 const handleContinue = () => {
     if (currentStep.value < steps.length - 1) {
         currentStep.value++;
-
         const currentStepData = steps[currentStep.value];
         if (!currentStepData) return;
         const currentTargetId = currentStepData.targetId;
@@ -50,11 +49,11 @@ const handleContinue = () => {
 };
 
 const steps = [
-    { id: 'step1', positionClass: 'pos-bottom-left', targetId: 'welcome' },
-    { id: 'step2', positionClass: 'pos-top-left', targetId: 'stars' },
-    { id: 'step3', positionClass: 'pos-top-center', targetId: 'add-to-list-button' },
-    { id: 'step4', positionClass: 'pos-top-right', targetId: 'unseen-button' },
-    { id: 'step5', positionClass: 'pos-bottom-right', targetId: 'mainSwipe' },
+    { id: 'step1', targetId: 'welcome' },
+    { id: 'step2', targetId: 'stars' },
+    { id: 'step3', targetId: 'add-to-list-button' },
+    { id: 'step4', targetId: 'unseen-button' },
+    { id: 'step5', targetId: 'mainSwipe' },
 ];
 </script>
 
@@ -65,22 +64,16 @@ const steps = [
                 {{ $t("onboarding.skip") }} <span class="pi pi-step-forward"></span>
             </button>
 
-            <div v-for="(step, index) in steps" :key="step.id" :class="[
-                'step-card',
-                step.positionClass,
-                currentStep >= index ? 'visible-boarding' : 'hidden-boarding',
-                currentStep === index ? 'current-step' : ''
-            ]">
-                <div class="card-inner" :class="currentStep === index ? 'card-active' : 'card-past'">
-                    <p class="card-text">{{ $t(`onboarding.step${index + 1}`) }}</p>
-                    <div class="button-wrapper" :class="currentStep === index ? 'btn-visible' : 'btn-hidden'">
+            <div class="step-card pos-top-left">
+                <div class="card-inner">
+                    <p class="card-text">{{ $t(`onboarding.step${currentStep + 1}`) }}</p>
+                    <div class="button-wrapper">
                         <div class="step-indicator">
                             <span v-for="(s, i) in steps" :key="i"
-                                :class="['step-dot', i === index ? 'dot-active' : i < index ? 'dot-past' : 'dot-future']">
+                                :class="['step-dot', i === currentStep ? 'dot-active' : i < currentStep ? 'dot-past' : 'dot-future']">
                             </span>
                         </div>
                         <Button
-                            
                             :label="currentStep === steps.length - 1 ? $t('onboarding.finish') : $t('onboarding.continue')"
                             class="pointer-events-auto" @click="handleContinue" />
                     </div>
@@ -88,7 +81,7 @@ const steps = [
             </div>
         </div>
 
-        <div class="absolute inset-0 bg-black/80 z-[999] pointer-events-none"></div>
+        <div class="absolute bg-black/80 z-[999] pointer-events-none"></div>
         <div class="no-cursor-interactions h-full w-full">
             <HomeView />
         </div>
@@ -138,45 +131,11 @@ const steps = [
     transform: translateX(-50%);
 }
 
-.pos-top-center {
-    top: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-.pos-top-right {
-    top: 4rem;
-    left: 83.33%;
-    transform: translateX(-50%);
-}
-
-.pos-bottom-left {
-    bottom: 4rem;
-    left: 16.66%;
-    transform: translateX(-50%);
-}
-
-.pos-bottom-right {
-    bottom: 4rem;
-    left: 83.33%;
-    transform: translateX(-50%);
-}
-
-/* ── Transition ── */
-.step-card.visible-boarding {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.step-card.hidden-boarding {
-    opacity: 0;
-    pointer-events: none;
-}
 
 
 /* ── Card UI ── */
 .card-inner {
-    background: color-mix(in srgb, var(--background) 80%, transparent);
+    background: var(--background);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 0.5px solid color-mix(in srgb, var(--secondary) 40%, transparent);
@@ -188,6 +147,7 @@ const steps = [
     justify-content: center;
     align-items: center;
     max-width: 300px;
+    padding: 1.25rem 1.25rem 1.1rem;
 }
 
 .card-text {
@@ -200,25 +160,6 @@ const steps = [
     padding: 10px;
 }
 
-/* ── Card size animation ── */
-.card-active {
-    padding: 1.25rem 1.25rem 1.1rem;
-    transition: max-height 0.4s ease, padding 0.4s ease;
-}
-
-.card-past {
-    padding: 0.9rem 1.25rem;
-    transition: max-height 0.4s ease, padding 0.4s ease;
-}
-
-/* ── Button wrapper ── */
-.button-wrapper {
-    overflow: hidden;
-    transition: max-height 0.4s ease, opacity 0.3s ease 0.1s;
-}
-
-
-/* ── Botón personalizado ── */
 .button-wrapper :deep(.p-button) {
     background: var(--primary) !important;
     border: 0.5px solid color-mix(in srgb, var(--primary) 60%, var(--accent)) !important;
@@ -241,21 +182,6 @@ const steps = [
     transform: translateY(0px) scale(0.98);
 }
 
-
-.btn-visible {
-    min-height: 65px;
-
-    max-height: 65px;
-    max-width: 150px;
-    opacity: 1;
-}
-
-.btn-hidden {
-    max-height: 0;
-    max-width: 0;
-    opacity: 0;
-}
-
 /* ── Mobile: todos abajo al centro ── */
 @media (max-width: 768px) {
 
@@ -264,8 +190,7 @@ const steps = [
     .pos-top-right,
     .pos-bottom-left,
     .pos-bottom-right {
-        top: auto;
-        bottom: 4rem;
+        top: 4rem;
         left: 50%;
         right: auto;
     }
