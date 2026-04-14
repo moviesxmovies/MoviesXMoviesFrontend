@@ -58,6 +58,19 @@ describe("HomeView", () => {
     });
   };
 
+  it("prevents multiple simultaneous fetchMovies calls if already loading", async () => {
+    const longPendingPromise = new Promise((resolve) => {});
+    (getRecommendedMovies as any).mockReturnValue(longPendingPromise);
+    mountWrapper();
+    expect(getRecommendedMovies).toHaveBeenCalledTimes(1);
+
+    const langStore = useLangStore();
+    langStore.language = "fr";
+    await flushPromises();
+
+    expect(getRecommendedMovies).toHaveBeenCalledTimes(1);
+  });
+
   it("fetches movies on mount and displays the first one", async () => {
     const wrapper = mountWrapper();
     await flushPromises();
@@ -78,6 +91,49 @@ describe("HomeView", () => {
       detail: "toast.home.fetchMoviesError",
       life: 3000,
     });
+  });
+
+  it("doesn't update movies if change lang is the same", async () => {
+    mountWrapper();
+    expect(getRecommendedMovies).toHaveBeenCalledTimes(1);
+
+    const langStore = useLangStore();
+    langStore.language = "en";
+    await flushPromises();
+
+    expect(getRecommendedMovies).toHaveBeenCalledTimes(1);
+  });
+
+  it("doesn't call setAsNotSeen if there's no actualMovie", async () => {
+    (getRecommendedMovies as any).mockResolvedValue([]);
+    const wrapper = mountWrapper();
+    await flushPromises();
+
+    await (wrapper.vm as any).markAsNotSeen();
+    await flushPromises();
+
+    expect(setAsNotSeen).not.toHaveBeenCalled();
+  });
+
+  it("doesn't give rating if tried to rate 0 stars", async () => {
+    const wrapper = mountWrapper();
+    await flushPromises();
+
+    await (wrapper.vm as any).rateMovie(0);
+    await flushPromises();
+
+    expect(submitRating).not.toHaveBeenCalled();
+  });
+
+  it("doesn't give rating if there's no actualMovie", async () => {
+    (getRecommendedMovies as any).mockResolvedValue([]);
+    const wrapper = mountWrapper();
+    await flushPromises();
+
+    await (wrapper.vm as any).rateMovie(5);
+    await flushPromises();
+
+    expect(submitRating).not.toHaveBeenCalled();
   });
 
   it("advances to the next movie when an action is triggered", async () => {
