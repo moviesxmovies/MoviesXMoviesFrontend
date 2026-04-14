@@ -184,4 +184,41 @@ describe("HomeView", () => {
     const movieComp = wrapper.findComponent({ name: "movieComponent" });
     expect(movieComp.props("movie")).toEqual(mockMovies[1]);
   });
+
+  it("alternates info drawer visibility", async () => {
+    const wrapper = mountWrapper();
+    await flushPromises();
+
+    const drawer = wrapper.findComponent({ name: "MovieInfoDrawer" });
+
+    expect(drawer.props("visible")).toBe(false);
+    await (wrapper.vm as any).alternateInfoDrawer();
+    expect(drawer.props("visible")).toBe(true);
+  });
+
+  it("updates visibleDrawer when MovieInfoDrawer emits update:visible", async () => {
+    const wrapper = mountWrapper();
+    await flushPromises();
+
+    const drawer = wrapper.findComponent({ name: "MovieInfoDrawer" });
+
+    await (wrapper.vm as any).alternateInfoDrawer();
+    expect(drawer.props("visible")).toBe(true);
+
+    await drawer.vm.$emit("update:visible", false);
+    expect(drawer.props("visible")).toBe(false);
+  });
+
+  it("updates direction and dragging state when DraggeableComponent emits update events", async () => {
+    const wrapper = mountWrapper();
+    await flushPromises();
+
+    const draggable = wrapper.findComponent({ name: "DraggeableComponent" });
+
+    await draggable.vm.$emit("update:direction", "right");
+    expect(draggable.props("direction")).toBe("right");
+
+    await draggable.vm.$emit("update:isDragging", true);
+    expect(draggable.props("isDragging")).toBe(true);
+  });
 });
