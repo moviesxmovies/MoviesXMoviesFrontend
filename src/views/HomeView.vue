@@ -123,31 +123,15 @@ const rateMovie = async (rating: number) => {
 </script>
 
 <template>
-  <div
-    class="min-h-screen flex items-center justify-center overflow-hidden fixed inset-0"
-    :class="isDragging && 'z-50'"
-  >
+  <div class="min-h-screen flex items-center justify-center overflow-hidden fixed inset-0"
+    :class="isDragging && 'z-50'">
     <div v-if="loading || actualMovie" class="overflow-visible min-w-screen">
-      <DraggeableComponent
-        :swipeThreshold="100"
-        @right="rateMovie(5)"
-        @left="rateMovie(1)"
-        @up="showNextRecommendedMovie"
-        @down="markAsNotSeen"
-        v-model:direction="direction"
-        v-model:isDragging="isDragging"
-      >
+      <DraggeableComponent :swipeThreshold="100" @right="rateMovie(5)" @left="rateMovie(1)"
+        @up="showNextRecommendedMovie" @down="markAsNotSeen" v-model:direction="direction"
+        v-model:isDragging="isDragging">
         <div id="mainSwipe">
-          <MovieComponent
-            class="select-none"
-            :movie="actualMovie || ({} as Movie)"
-            :loading="loading"
-          />
-          <ActionsComponent
-            class="select-none"
-            :loading="loading"
-            @markAsNotSeen="markAsNotSeen"
-          />
+          <MovieComponent class="select-none" :movie="actualMovie || ({} as Movie)" :loading="loading" />
+          <ActionsComponent class="select-none" :loading="loading" @markAsNotSeen="markAsNotSeen" />
         </div>
       </DraggeableComponent>
       <div class="icon-container mb-7">
@@ -169,13 +153,10 @@ const rateMovie = async (rating: number) => {
           </div>
         </div>
       </div>
-      <div
-        class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center mb-7"
-      >
-        <div
-          class="w-full max-w-sm aspect-[3/5] rounded-3xl transition-all duration-500 ease-out"
-          :style="glowStyle"
-        ></div>
+      <div class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center mb-7">
+        <div id="glow-container" class="w-full max-w-sm aspect-[3/5] rounded-3xl transition-all duration-500 ease-out"
+          :style="glowStyle">
+        </div>
       </div>
       <div class="flex justify-center mt-4 relative z-">
         <StarsComponent id="stars" :loading="loading" @rateMovie="rateMovie" />
@@ -188,6 +169,185 @@ const rateMovie = async (rating: number) => {
 <style>
 #mainSwipe.animate-boarding {
   z-index: 1001;
+  animation: swipe-tutorial 8s ease-in-out infinite;
+}
+
+.overflow-visible:has(#mainSwipe.animate-boarding) #glow-container {
+  animation: glow-tutorial 8s ease-in-out infinite !important;
+  opacity: 0.7 !important;
+}
+
+.overflow-visible:has(#mainSwipe.animate-boarding) .cell.left {
+  animation: icon-left-tutorial 8s infinite;
+}
+
+.overflow-visible:has(#mainSwipe.animate-boarding) .cell.right {
+  animation: icon-right-tutorial 8s infinite;
+}
+
+.overflow-visible:has(#mainSwipe.animate-boarding) .cell.bottom {
+  animation: icon-bottom-tutorial 8s infinite;
+}
+
+.overflow-visible:has(#mainSwipe.animate-boarding) .cell.top {
+  animation: icon-top-tutorial 8s infinite;
+}
+
+
+@keyframes swipe-tutorial {
+
+  0%,
+  10%,
+  100% {
+    transform: translate(0, 0) rotate(0);
+  }
+
+  15%,
+  25% {
+    transform: translate(60px, 5px) rotate(4deg);
+  }
+
+  30%,
+  35% {
+    transform: translate(0, 0) rotate(0);
+  }
+
+  40%,
+  50% {
+    transform: translate(-60px, 5px) rotate(-4deg);
+  }
+
+  55%,
+  60% {
+    transform: translate(0, 0) rotate(0);
+  }
+
+  65%,
+  75% {
+    transform: translate(0, -60px) scale(0.98);
+  }
+
+  80%,
+  85% {
+    transform: translate(0, 0) rotate(0);
+  }
+
+  90%,
+  98% {
+    transform: translate(0, 60px) scale(1.02);
+  }
+}
+
+@keyframes glow-tutorial {
+
+  0%,
+  12%,
+  28%,
+  37%,
+  53%,
+  62%,
+  78%,
+  87%,
+  100% {
+    background-color: transparent;
+    box-shadow: none;
+  }
+
+  15%,
+  25% {
+    background-color: var(--yellow);
+    box-shadow: 0 0 80px var(--yellow);
+  }
+
+  40%,
+  50% {
+    background-color: var(--red);
+    box-shadow: 0 0 80px var(--red);
+  }
+
+  65%,
+  75% {
+    background-color: var(--primary);
+    box-shadow: 0 0 80px var(--primary);
+  }
+
+  90%,
+  98% {
+    background-color: var(--gray);
+    box-shadow: 0 0 80px var(--gray);
+  }
+}
+
+@keyframes icon-left-tutorial {
+
+  15%,
+  25% {
+    opacity: 1;
+    transform: scale(1.4);
+    color: var(--text);
+  }
+
+  0%,
+  14%,
+  26%,
+  100% {
+    opacity: 0.1;
+    transform: scale(1);
+  }
+}
+
+@keyframes icon-right-tutorial {
+
+  40%,
+  50% {
+    opacity: 1;
+    transform: scale(1.4);
+    color: var(--text);
+  }
+
+  0%,
+  39%,
+  51%,
+  100% {
+    opacity: 0.1;
+    transform: scale(1);
+  }
+}
+
+@keyframes icon-bottom-tutorial {
+
+  65%,
+  75% {
+    opacity: 1;
+    transform: scale(1.4);
+    color: var(--text);
+  }
+
+  0%,
+  64%,
+  76%,
+  100% {
+    opacity: 0.1;
+    transform: scale(1);
+  }
+}
+
+@keyframes icon-top-tutorial {
+
+  90%,
+  98% {
+    opacity: 1;
+    transform: scale(1.4);
+    color: var(--text);
+  }
+
+  0%,
+  89%,
+  99%,
+  100% {
+    opacity: 0.1;
+    transform: scale(1);
+  }
 }
 
 #stars.animate-boarding {
@@ -207,25 +367,31 @@ const rateMovie = async (rating: number) => {
 .animate-boarding .star-icon:nth-child(1) {
   animation-delay: 0s;
 }
+
 .animate-boarding .star-icon:nth-child(2) {
   animation-delay: 0.2s;
 }
+
 .animate-boarding .star-icon:nth-child(3) {
   animation-delay: 0.4s;
 }
+
 .animate-boarding .star-icon:nth-child(4) {
   animation-delay: 0.6s;
 }
+
 .animate-boarding .star-icon:nth-child(5) {
   animation-delay: 0.8s;
 }
 
 @keyframes star-fill-sweep {
+
   0%,
   100% {
     color: var(--primary);
     transform: scale(1);
   }
+
   30%,
   70% {
     color: var(--accent);
@@ -241,26 +407,32 @@ const rateMovie = async (rating: number) => {
 .animate-boarding .star-icon:nth-child(1):before {
   animation-delay: 0s;
 }
+
 .animate-boarding .star-icon:nth-child(2):before {
   animation-delay: 0.2s;
 }
+
 .animate-boarding .star-icon:nth-child(3):before {
   animation-delay: 0.4s;
 }
+
 .animate-boarding .star-icon:nth-child(4):before {
   animation-delay: 0.6s;
 }
+
 .animate-boarding .star-icon:nth-child(5):before {
   animation-delay: 0.8s;
 }
 
 @keyframes icon-change {
+
   0%,
   100%,
   20%,
   80% {
     content: "\e937";
   }
+
   30%,
   70% {
     content: "\e936";

@@ -102,7 +102,13 @@
     "step5": "You want speed? Swipe left or right to rate movies and up or down to add them to your lists or mark them as unseen",
     "finish": "Get Started",
     "continue": "Continue",
-    "skip": "Skip"
+    "skip": "Skip",
+    "step1Label": "Start",
+    "step2Label": "Rate",
+    "step3Label": "Add",
+    "step4Label": "Unseen",
+    "step5Label": "Swipe",
+    "hint": "You can skip this at any time"
   },
   "verify": {
     "toast": {
@@ -118,9 +124,15 @@
     "resend": "Haven't received the code? Resend code"
   },
   "schema": {
-    "username": { "required": "Username is required" },
-    "firstName": { "required": "First name is required" },
-    "lastName": { "required": "Last name is required" },
+    "username": {
+      "required": "Username is required"
+    },
+    "firstName": {
+      "required": "First name is required"
+    },
+    "lastName": {
+      "required": "Last name is required"
+    },
     "email": {
       "required": "Email is required",
       "invalid": "Invalid email address"
