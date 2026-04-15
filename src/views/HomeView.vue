@@ -13,6 +13,7 @@ import StarsComponent from "@/components/starsComponent.vue";
 import { useLangStore } from "@/stores/langStore";
 import ActionsComponent from "@/components/actionsComponent.vue";
 import DraggeableComponent from "@/components/draggeableComponent.vue";
+import MovieInfoDrawer from "@/components/movieInfoDrawer.vue";
 
 const PREDICTED_COLORS: Record<string, string> = {
   right: "var(--yellow)",
@@ -28,6 +29,7 @@ const movieIndex = ref(0);
 const langStore = useLangStore();
 const direction = ref<string>("");
 const isDragging = ref<boolean>(false);
+const visibleDrawer = ref<boolean>(false);
 
 const actualMovie = computed(() => {
   return movies.value.length > 0 ? movies.value[movieIndex.value] : null;
@@ -120,6 +122,10 @@ const rateMovie = async (rating: number) => {
   loading.value = false;
   showNextRecommendedMovie();
 };
+
+const alternateInfoDrawer = () => {
+  visibleDrawer.value = !visibleDrawer.value;
+};
 </script>
 
 <template>
@@ -127,6 +133,10 @@ const rateMovie = async (rating: number) => {
     class="min-h-screen flex items-center justify-center overflow-hidden fixed inset-0"
     :class="isDragging && 'z-50'"
   >
+    <MovieInfoDrawer
+      v-model:visible="visibleDrawer"
+      :movie="actualMovie || ({} as Movie)"
+    />
     <div v-if="loading || actualMovie" class="overflow-visible min-w-screen">
       <DraggeableComponent
         :swipeThreshold="100"
@@ -147,6 +157,7 @@ const rateMovie = async (rating: number) => {
             class="select-none"
             :loading="loading"
             @markAsNotSeen="markAsNotSeen"
+            @showMoreInfo="alternateInfoDrawer"
           />
         </div>
       </DraggeableComponent>

@@ -62,7 +62,7 @@ const cardStyle = computed(() => {
 
   const visualX = getResistedValue(offsetX.value);
   const visualY = getResistedValue(offsetY.value);
-
+  
   return {
     transform: `
       translateX(${visualX}px) 

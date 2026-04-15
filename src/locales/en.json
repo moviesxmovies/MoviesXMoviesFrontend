@@ -13,6 +13,14 @@
       "requiredUsername": "Username is required",
       "requiredPassword": "Password is required",
       "submit": "Login"
+    },
+    "movieInfoDrawer": {
+      "fetchActorsError": "Error fetching actors",
+      "synopsis": "Synopsis",
+      "platforms": "Platform | Platforms",
+      "genres": "Genre | Genres",
+      "actors": "Actor | Actors",
+      "directors": "Director | Directors"
     }
   },
   "signup": {

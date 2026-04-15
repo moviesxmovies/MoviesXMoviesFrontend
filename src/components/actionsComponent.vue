@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-const emit = defineEmits(["markAsNotSeen"]);
+const emit = defineEmits(["markAsNotSeen", "showMoreInfo"]);
 const props = defineProps<{
   loading: boolean;
 }>();
@@ -12,6 +12,9 @@ const props = defineProps<{
         id="more-info"
         :disabled="loading"
         class="flex-1 h-16 bg-accent cursor-pointer hover:brightness-120 flex items-center justify-center border-r border-white/10 transition-all active:bg-accent/80"
+        @mousedown.stop
+        @touchstart.stop
+        @click.stop="emit('showMoreInfo')"
       >
         <i class="pi pi-info-circle text-2xl text-white" />
       </button>
