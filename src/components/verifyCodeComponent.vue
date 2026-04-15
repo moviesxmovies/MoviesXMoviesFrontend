@@ -23,15 +23,18 @@ const handleSubmit = async () => {
     error.value = t("verify.toast.incorrectLength");
     return;
   }
+  loading.value = true;
   error.value = "";
   emit("handleVerification", verificationCode.value);
 };
 
 onMounted(() => {
   if (route.query.code) {
+    loading.value = true;
     authTimer = setTimeout(() => {
       handleSubmit();
     }, 500);
+    loading.value = false;
   }
 });
 
