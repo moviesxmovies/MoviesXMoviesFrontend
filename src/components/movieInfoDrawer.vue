@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Person, Movie } from "@/types";
-import { Drawer, ScrollPanel, useToast } from "primevue";
-import { ref, watch } from "vue";
+import { Drawer, ScrollPanel, Skeleton, useToast } from "primevue";
+import { ref, watch, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { api } from "@/composables/useAPI";
 
@@ -16,7 +16,7 @@ const actors = ref<Person[]>([]);
 const directors = ref<Person[]>([]);
 const loading = ref(false);
 
-const fetchDetails = async (finalList: any, list: string[]) => {
+const fetchDetails = async (finalList: Ref<Person[]>, list: string[]) => {
   finalList.value = [];
   for (const element of list) {
     try {
@@ -37,12 +37,19 @@ const fetchDetails = async (finalList: any, list: string[]) => {
 
 watch(
   () => props.movie,
-  async () => {
+  async (movie) => {
+    const currentId = movie.id;
     loading.value = true;
-    await fetchDetails(actors, props.movie.actors);
-    await fetchDetails(directors, props.movie.directors);
-    loading.value = false;
+    await Promise.all([
+      fetchDetails(actors, movie.actors),
+      fetchDetails(directors, movie.directors),
+    ]);
+
+    if (currentId === props.movie.id) {
+      loading.value = false;
+    }
   },
+  { immediate: true },
 );
 </script>
 
@@ -69,14 +76,102 @@ watch(
       </div>
     </template>
 
-    <!-- Skeleton de carga -->
     <div v-if="loading" class="drawer-loading">
-      <div class="skeleton-line w-3/4" />
-      <div class="skeleton-line w-1/2" />
-      <div class="skeleton-line w-full" />
-      <div class="skeleton-line w-2/3" />
+      <!-- Synopsis -->
+      <div class="drawer-section">
+        <Skeleton
+          width="30%"
+          height="0.7rem"
+          border-radius="4px"
+          class="mb-3"
+        />
+        <Skeleton
+          width="100%"
+          height="0.9rem"
+          border-radius="4px"
+          class="mb-2"
+        />
+        <Skeleton
+          width="100%"
+          height="0.9rem"
+          border-radius="4px"
+          class="mb-2"
+        />
+        <Skeleton width="75%" height="0.9rem" border-radius="4px" />
+      </div>
+
+      <!-- Platforms -->
+      <div class="drawer-section">
+        <Skeleton
+          width="25%"
+          height="0.7rem"
+          border-radius="4px"
+          class="mb-3"
+        />
+        <div class="inline-list">
+          <Skeleton
+            v-for="n in 3"
+            :key="n"
+            width="52px"
+            height="52px"
+            border-radius="10px"
+          />
+        </div>
+      </div>
+
+      <!-- Genres -->
+      <div class="drawer-section">
+        <Skeleton
+          width="20%"
+          height="0.7rem"
+          border-radius="4px"
+          class="mb-3"
+        />
+        <div class="genre-list">
+          <Skeleton
+            v-for="n in 4"
+            :key="n"
+            width="72px"
+            height="1.6rem"
+            border-radius="99px"
+          />
+        </div>
+      </div>
+
+      <!-- Actors -->
+      <div class="drawer-section">
+        <Skeleton
+          width="22%"
+          height="0.7rem"
+          border-radius="4px"
+          class="mb-3"
+        />
+        <div class="inline-list">
+          <div v-for="n in 4" :key="n" class="person-item">
+            <Skeleton width="64px" height="64px" border-radius="50%" />
+            <Skeleton width="56px" height="0.65rem" border-radius="4px" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Directors -->
+      <div class="drawer-section">
+        <Skeleton
+          width="24%"
+          height="0.7rem"
+          border-radius="4px"
+          class="mb-3"
+        />
+        <div class="inline-list">
+          <div v-for="n in 2" :key="n" class="person-item">
+            <Skeleton width="64px" height="64px" border-radius="50%" />
+            <Skeleton width="56px" height="0.65rem" border-radius="4px" />
+          </div>
+        </div>
+      </div>
     </div>
 
+    <!-- Synopsis -->
     <template v-else>
       <section class="drawer-section" v-show="movie.synopsis">
         <h3 class="drawer-section__title">
@@ -85,9 +180,15 @@ watch(
         <p class="drawer-section__body">{{ movie.synopsis }}</p>
       </section>
 
+      <!-- Platforms -->
       <section class="drawer-section" v-show="movie.platforms.length">
         <h3 class="drawer-section__title">
-          {{ t("components.movieInfoDrawer.platforms", movie.platforms.length > 1 ? 2 : 1) }}
+          {{
+            t(
+              "components.movieInfoDrawer.platforms",
+              movie.platforms.length > 1 ? 2 : 1,
+            )
+          }}
         </h3>
         <ScrollPanel
           class="horizontal-scroll-panel"
@@ -109,10 +210,15 @@ watch(
         </ScrollPanel>
       </section>
 
-      <!-- Géneros -->
+      <!-- Genres -->
       <section class="drawer-section" v-show="movie.genres.length">
         <h3 class="drawer-section__title">
-          {{ t("components.movieInfoDrawer.genres", movie.genres.length > 1 ? 2 : 1) }}
+          {{
+            t(
+              "components.movieInfoDrawer.genres",
+              movie.genres.length > 1 ? 2 : 1,
+            )
+          }}
         </h3>
         <div class="genre-list">
           <span v-for="genre in movie.genres" :key="genre.id" class="genre-tag">
@@ -121,9 +227,15 @@ watch(
         </div>
       </section>
 
+      <!-- Actors -->
       <section class="drawer-section" v-show="movie.actors.length">
         <h3 class="drawer-section__title">
-          {{ t("components.movieInfoDrawer.actors", movie.actors.length > 1 ? 2 : 1) }}
+          {{
+            t(
+              "components.movieInfoDrawer.actors",
+              movie.actors.length > 1 ? 2 : 1,
+            )
+          }}
         </h3>
         <ScrollPanel
           class="horizontal-scroll-panel"
@@ -142,9 +254,15 @@ watch(
         </ScrollPanel>
       </section>
 
+      <!-- Directors -->
       <section class="drawer-section" v-show="movie.directors.length">
         <h3 class="drawer-section__title">
-          {{ t("components.movieInfoDrawer.directors", movie.directors.length > 1 ? 2 : 1 ) }}
+          {{
+            t(
+              "components.movieInfoDrawer.directors",
+              movie.directors.length > 1 ? 2 : 1,
+            )
+          }}
         </h3>
         <ScrollPanel
           class="horizontal-scroll-panel"
@@ -367,34 +485,5 @@ watch(
 .genre-tag:hover {
   color: var(--mxm-accent);
   border-color: rgba(232, 184, 75, 0.3);
-}
-
-.drawer-loading {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  padding-top: 0.5rem;
-}
-
-.skeleton-line {
-  height: 14px;
-  border-radius: 6px;
-  background: linear-gradient(
-    90deg,
-    var(--mxm-surface) 25%,
-    var(--mxm-surface-2) 50%,
-    var(--mxm-surface) 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.4s infinite;
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
 }
 </style>
