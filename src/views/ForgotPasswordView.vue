@@ -13,7 +13,6 @@ import {
   useToast,
 } from "primevue";
 import { useI18n } from "vue-i18n";
-import { id } from "zod/locales";
 
 const resolver = zodResolver(forgotPasswordSchema);
 const toast = useToast();
