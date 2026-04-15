@@ -49,13 +49,16 @@ const navigate = (path: string) => {
         <Transition name="slide">
             <div class="mobile-menu" v-if="menuOpen">
                 <div class="mobile-menu-items">
-                    <div class="theme-wrapper">
-                        <ThemeComponent />
+                    <div class="mobile-controls-row">
+                        <div class="theme-wrapper">
+                            <ThemeComponent />
+                        </div>
+                        <LangComponent />
                     </div>
-                    <LangComponent />
-                    <button class="btn-ghost" @click="navigate('/profile')" v-if="authStore.isAuthenticated">
-                        <span class="pi pi-user"></span>
 
+                    <button class="btn-ghost" @click="navigate('/profile')" v-if="authStore.isAuthenticated">
+                        <span class="pi pi-user" style="margin-right: 8px;"></span>
+                        {{ $t("home.profile") || "Mi Perfil" }}
                     </button>
                     <button class="btn-ghost" @click="navigate('/login')" v-else>
                         {{ $t("home.login") }}
@@ -90,6 +93,27 @@ const navigate = (path: string) => {
     gap: 10px;
 }
 
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-grow: 1;
+    justify-content: flex-end;
+}
+
+.btn-ghost {
+    background: color-mix(in srgb, var(--text) 8%, transparent);
+    border: 0.5px solid rgba(47, 39, 206, 0.15);
+    height: 2.5rem;
+    padding: 0 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
 .logo-icon {
     width: 32px;
     height: 32px;
@@ -115,27 +139,6 @@ const navigate = (path: string) => {
     margin: 0 1px;
 }
 
-.nav-right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-grow: 1;
-    justify-content: flex-end;
-}
-
-.btn-ghost {
-    background: color-mix(in srgb, var(--text) 15%, transparent);
-    border: 0.5px solid rgba(47, 39, 206, 0.2);
-    color: var(--text);
-    padding: 0.45rem 1.1rem;
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    height: 2.5rem;
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
-}
 
 .btn-ghost:hover {
     border-color: var(--primary);
@@ -147,7 +150,6 @@ const navigate = (path: string) => {
     justify-content: center;
 }
 
-/* Hamburger button */
 .hamburger {
     display: none;
     flex-direction: column;
@@ -185,33 +187,51 @@ const navigate = (path: string) => {
     transform: translateY(-7px) rotate(-45deg);
 }
 
-/* Mobile menu dropdown */
 .mobile-menu {
     position: fixed;
     top: 0;
     right: 0;
-    width: min(280px, 85vw);
+    width: min(300px, 90vw);
     height: 100dvh;
-    background: var(--background, #fff);
-    border-left: 0.5px solid rgba(47, 39, 206, 0.15);
+    background: color-mix(in srgb, var(--background) 95%, black);
+    backdrop-filter: blur(10px);
+    border-left: 1px solid rgba(47, 39, 206, 0.1);
     z-index: 100;
-    padding: 5rem 1.5rem 2rem;
-    box-sizing: border-box;
+    padding: 6rem 1.5rem 2rem;
+    display: flex;
+    flex-direction: column;
 }
 
 .mobile-menu-items {
     display: flex;
     flex-direction: column;
+    gap: 16px;
+    width: 100%;
+}
+
+.mobile-controls-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 12px;
-    width: 100%;
+    margin-bottom: 8px;
 }
 
-.mobile-menu-items button {
-    width: 100%;
+.mobile-menu-items button,
+.mobile-menu-items :deep(.lang-select) {
+    width: 100% !important;
     justify-content: center;
+    background: color-mix(in srgb, var(--text) 5%, transparent) !important;
+    border: 1px solid rgba(47, 39, 206, 0.1) !important;
+    font-size: 0.9rem;
+    letter-spacing: 0.02em;
 }
 
-/* Overlay */
+.mobile-menu-items .btn-ghost {
+    font-weight: 600;
+    height: 3rem;
+    color: var(--primary);
+}
+
 .overlay {
     position: fixed;
     inset: 0;
@@ -219,7 +239,6 @@ const navigate = (path: string) => {
     z-index: 99;
 }
 
-/* Transitions */
 .slide-enter-active,
 .slide-leave-active {
     transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
@@ -240,7 +259,6 @@ const navigate = (path: string) => {
     opacity: 0;
 }
 
-/* Responsive breakpoints */
 @media (max-width: 640px) {
     .nav {
         padding: 0.3rem 1rem;
