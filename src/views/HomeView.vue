@@ -137,7 +137,7 @@ const alternateInfoDrawer = () => {
       v-model:visible="visibleDrawer"
       :movie="actualMovie || ({} as Movie)"
     />
-    <div v-if="loading || actualMovie" class="overflow-visible min-w-screen">
+    <div v-if="loading || actualMovie" class="overflow-visible min-w-screen px-14 md:px-0">
       <DraggeableComponent
         :swipeThreshold="100"
         @right="rateMovie(5)"
@@ -161,7 +161,7 @@ const alternateInfoDrawer = () => {
           />
         </div>
       </DraggeableComponent>
-      <div class="icon-container mb-7">
+      <div class="icon-container mb-7 px-14 md:px-0">
         <div class="icon-grid">
           <div class="cell top" :class="direction == 'down' && 'active-icon'">
             <i class="pi pi-eye-slash text-3xl"></i>
@@ -181,7 +181,7 @@ const alternateInfoDrawer = () => {
         </div>
       </div>
       <div
-        class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center mb-7"
+        class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center mb-7  px-14 md:px-0"
       >
         <div
           class="w-full max-w-sm aspect-[3/5] rounded-3xl transition-all duration-500 ease-out"
@@ -292,7 +292,7 @@ const alternateInfoDrawer = () => {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
-  width: 100%;
+  width: 85vw;
   max-width: 24rem;
   aspect-ratio: 3 / 5;
   border-radius: 1.5rem;
@@ -343,5 +343,12 @@ const alternateInfoDrawer = () => {
   opacity: 1;
   transform: scale(1.25);
   filter: drop-shadow(0 0 10px var(--text));
+}
+
+.w-full.max-w-sm.aspect-\[3\/5\] {
+  max-width: 85vw;
+  @media (min-width: 768px) {
+    max-width: 24rem;
+  }
 }
 </style>
