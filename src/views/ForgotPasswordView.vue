@@ -13,6 +13,7 @@ import {
   useToast,
 } from "primevue";
 import { useI18n } from "vue-i18n";
+import { id } from "zod/locales";
 
 const resolver = zodResolver(forgotPasswordSchema);
 const toast = useToast();
@@ -81,7 +82,7 @@ const handleSubmit = async ({
             <Button type="submit" :label="$t('forgotPassword.resetPassword')" fluid class="py-3.5" />
           </Form>
 
-          <button @click="router.push('/login')"
+          <button @click="router.push('/login')" type="button"
             class="w-full text-center mt-8 text-sm font-bold flex items-center justify-center gap-2 hover:underline transition-all"
             style="color: var(--primary)">
             <i class="pi pi-arrow-left text-[10px]"></i>

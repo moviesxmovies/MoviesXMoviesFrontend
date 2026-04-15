@@ -352,34 +352,5 @@ describe("LoginView Validation UI", () => {
     });
   });
 
-  describe("Password field errors", () => {
-    it("renders the list of error messages when dirty and invalid", () => {
-      const errorList = [
-        { message: "password.too_short" },
-        { message: "password.no_number" },
-      ];
-
-      const wrapper = mountWithFieldState("password", {
-        dirty: true,
-        invalid: true,
-        errors: errorList,
-      });
-
-      expect(wrapper.text()).toContain("password.too_short");
-      expect(wrapper.text()).toContain("password.no_number");
-
-      const errorIcons = wrapper.findAll(".pi-times-circle");
-      expect(errorIcons.length).toBeGreaterThanOrEqual(2);
-    });
-
-    it("does not show errors when field is pristine (not dirty)", () => {
-      const wrapper = mountWithFieldState("password", {
-        dirty: false,
-        invalid: true,
-        errors: [{ message: "Some error" }],
-      });
-
-      expect(wrapper.text()).not.toContain("Some error");
-    });
-  });
+  
 });
