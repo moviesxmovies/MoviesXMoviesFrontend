@@ -100,7 +100,8 @@
     "feature1": "Share your favorite movies",
     "feature2": "Get movie recommendations",
     "feature3": "Create your own movie lists.",
-    "fetchMoviesHerror": "Failed to fetch movies. Please try again later."
+    "fetchMoviesHerror": "Failed to fetch movies. Please try again later.",
+    "profile": "My Profile"
   },
   "onboarding": {
     "step1": "Let's get you started with a quick tour",
