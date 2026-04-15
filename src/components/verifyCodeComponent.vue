@@ -12,6 +12,7 @@ const verificationCode = ref(route.query.code ? String(route.query.code) : "");
 const error = ref("");
 const loading = defineModel<boolean>("loading", { default: false });
 let authTimer: ReturnType<typeof setTimeout>;
+
 const emit = defineEmits<{
   (e: "sendCode"): void;
   (e: "handleVerification", code: string): void;
@@ -22,18 +23,15 @@ const handleSubmit = async () => {
     error.value = t("verify.toast.incorrectLength");
     return;
   }
-  loading.value = true;
   error.value = "";
   emit("handleVerification", verificationCode.value);
 };
 
 onMounted(() => {
   if (route.query.code) {
-    loading.value = true;
     authTimer = setTimeout(() => {
       handleSubmit();
     }, 500);
-    loading.value = false;
   }
 });
 
@@ -43,74 +41,69 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center px-4">
-    <div
-      class="w-full max-w-md bg-[#1f1f1f] rounded-2xl p-6 sm:p-8 border border-[#232244] shadow-2xl"
-    >
-      <div class="text-center mb-6 sm:mb-8">
-        <h1
-          class="text-accent text-xl sm:text-2xl font-black tracking-widest mb-2"
-        >
-          {{ $t("verify.title") }}
-        </h1>
-        <div
-          class="h-1 w-12 bg-gradient-to-r from-[#2f27ce] to-[#bb3dff] mx-auto rounded-full"
-        ></div>
-      </div>
-      <div class="text-center mb-6 sm:mb-8">
-        <p class="text-[#bcbbdd] text-sm sm:text-base">
-          {{ $t("verify.description") }}
-        </p>
-      </div>
-      <form
-        @submit.prevent="handleSubmit"
-        class="flex flex-col items-center"
-      >
-        <InputOtp
-          v-model="verificationCode"
-          :length="6"
-          integer-only
-          class="gap-1 sm:gap-2 mb-6 sm:mb-8"
-        >
-          <template #default="{ attrs, events }">
-            <input
-              v-bind="attrs"
-              v-on="events"
-              class="w-9 h-14 sm:w-10 sm:h-16 text-lg sm:text-xl font-bold text-center bg-[#0d0d0d] text-[#bb3dff] border-2 border-[#3a31d8] rounded-xl focus:border-[#7e00c2] focus:ring-2 focus:ring-[#7e00c2]/30 transition-all outline-none"
-            />
-          </template>
-        </InputOtp>
-        <Message
-          size="small"
-          variant="simple"
-          :life="2000"
-          v-if="error"
-          severity="error"
-          class="mb-4 w-full text-center text-sm"
-          >{{ error }}</Message
-        >
-        <Button
-          type="submit"
-          :loading="loading"
-          :disabled="loading"
-          class="w-full py-3 sm:py-4 rounded-xl font-bold text-white transition-transform active:scale-95 overflow-hidden border-none text-sm sm:text-base"
-          style="background: linear-gradient(135deg, #2f27ce 0%, #bb3dff 100%)"
-        >
-          <span class="tracking-wide">{{
-            loading ? "VERIFYING..." : "VERIFY CODE"
-          }}</span>
-        </Button>
-        <Button
-          variant="link"
-          label="Link"
-          type="button"
-          data-testid="resend-btn"
-          @click="emit('sendCode')"
-          class="mt-4 sm:mt-6 text-[#bcbbdd] text-xs hover:text-[#f2f2f2] transition-colors underline decoration-[#3a31d8]"
-        >
-          {{ $t("verify.resend") }}
-        </Button>
-      </form>
+  <form @submit.prevent="handleSubmit" class="flex flex-col items-center w-full">
+    <InputOtp v-model="verificationCode" :length="6" integer-only class="gap-2 mb-8">
+      <template #default="{ attrs, events }">
+        <input v-bind="attrs" v-on="events" class="custom-otp-input" />
+      </template>
+    </InputOtp>
+
+    <Message v-if="error" severity="error" variant="simple" class="mb-4 text-sm">{{ error }}</Message>
+
+    <Button type="submit" :label="loading ? $t('verifying') : $t('verify.button')" :loading="loading" fluid
+      class="py-3" />
+
+    <div class="mt-8 flex flex-col gap-2">
+      <p class="text-xs" style="color: var(--text); opacity: 0.5">
+        {{ $t("verify.didntReceive") }}
+      </p>
+      <button type="button" @click="emit('sendCode')" class="text-sm font-bold hover:underline"
+        style="color: var(--primary)">
+        {{ $t("verify.resend") }}
+      </button>
     </div>
-  </div>
+  </form>
 </template>
+
+<style scoped>
+.custom-otp-input {
+  width: 42px;
+  height: 52px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-align: center;
+  background-color: transparent;
+  color: var(--text);
+  border: 2px solid var(--secondary);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.custom-otp-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+:deep(.p-button) {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: white !important;
+}
+
+.p-message {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>

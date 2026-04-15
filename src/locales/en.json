@@ -54,7 +54,9 @@
     "subtitle": "Enter your credentials to log in.",
     "username": "Username",
     "password": "Password",
-    "signup": "Don't have an account? Sign up here",
+    "noAccount": "Don't have an account?",
+    "signup": "Sign up here",
+
     "forgotPassword": "Forgot your password?"
   },
   "notFound": {
@@ -127,10 +129,11 @@
       "resendSuccess": "Verification code resent to your email",
       "resendError": "Failed to resend verification code. Please try again."
     },
-    "title": "MOVIESXMOVIES",
+    "title": "Verify Your Email",
     "description": "We've sent a 6 digit code to your mail direction.",
     "button": "VERIFY CODE",
-    "resend": "Haven't received the code? Resend code"
+    "resend": "Resend code",
+    "didntReceive": "Didn't receive the code?"
   },
   "schema": {
     "username": {

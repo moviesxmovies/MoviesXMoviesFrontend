@@ -44,108 +44,104 @@ const handleSubmit = async ({
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col items-center justify-center px-4">
-    <div
-      class="relative w-full max-w-sm rounded-2xl border p-8 flex flex-col gap-6 bg-background/80 border-primary/40"
-    >
-      <div class="absolute -inset-4 -z-10 blur-3xl bg-accent/50" />
+  <div class="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6"
+    style="background-color: var(--background)">
+    <div class="w-full max-w-md my-4">
+      <div class="rounded-2xl border shadow-sm overflow-hidden"
+        style="background-color: var(--background); border-color: var(--secondary)">
 
-      <div class="text-center">
-        <img src="/favicon.svg" alt="Logo" class="w-16 h-16 m-auto" />
-        <h2 class="text-xl font-semibold mt-3" style="color: var(--text)">
-          {{ $t("forgotPassword.title") }}
-        </h2>
-        <p class="text-sm mt-1" style="color: var(--text); opacity: 0.5">
-          {{ $t("forgotPassword.description") }}
-        </p>
+        <div class="p-6 sm:p-8">
+          <div class="text-center mb-8">
+            <div
+              class="w-full h-10 sm:h-16 sm:aspect-square bg-primary/10 rounded-xl sm:rounded-full flex items-center justify-center m-auto mb-4 transition-all">
+              <i class="pi pi-key text-lg sm:text-2xl" style="color: var(--primary)"></i>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-bold" style="color: var(--text)">
+              {{ $t("forgotPassword.title") }}
+            </h2>
+            <p class="text-xs sm:text-sm mt-2 px-2" style="color: var(--text); opacity: 0.6">
+              {{ $t("forgotPassword.description") }}
+            </p>
+          </div>
+
+          <Form @submit="handleSubmit" :resolver="resolver" class="flex flex-col gap-6 w-full">
+            <FormField v-slot="$field" name="email" initialValue="" class="flex flex-col gap-1">
+              <FloatLabel variant="over">
+                <IconField>
+                  <InputText v-bind="$field" id="email" type="email" fluid
+                    :class="{ 'p-invalid': $field?.invalid, 'p-valid': $field?.dirty && !$field?.invalid }" />
+                  <InputIcon v-if="$field?.dirty" :class="$field?.invalid ? 'pi pi-times-circle' : 'pi pi-envelope'"
+                    :style="{ color: $field?.invalid ? '#ef4444' : 'var(--primary)', opacity: $field?.invalid ? '1' : '0.5' }" />
+                </IconField>
+                <label for="email">{{ $t("signup.email") }}</label>
+              </FloatLabel>
+              <FieldMsg :field="$field" />
+            </FormField>
+
+            <Button type="submit" :label="$t('forgotPassword.resetPassword')" fluid class="py-3.5" />
+          </Form>
+
+          <button @click="router.push('/login')"
+            class="w-full text-center mt-8 text-sm font-bold flex items-center justify-center gap-2 hover:underline transition-all"
+            style="color: var(--primary)">
+            <i class="pi pi-arrow-left text-[10px]"></i>
+            {{ $t("forgotPassword.backToLogin") }}
+          </button>
+        </div>
       </div>
-
-      <Form
-        @submit="handleSubmit"
-        :resolver="resolver"
-        class="flex flex-col gap-4 w-full"
-      >
-        <FormField
-          v-slot="$field"
-          name="email"
-          initialValue=""
-          class="flex flex-col gap-1"
-        >
-          <FloatLabel variant="over">
-            <IconField>
-              <InputText
-                v-bind="$field"
-                id="email"
-                type="email"
-                fluid
-                :class="{
-                  'p-invalid': $field?.invalid,
-                  'p-valid': $field?.dirty && !$field?.invalid,
-                }"
-              />
-              <InputIcon
-                v-if="$field?.dirty"
-                :class="
-                  $field?.invalid ? 'pi pi-times-circle' : 'pi pi-check-circle'
-                "
-                :style="{ color: $field?.invalid ? '#ef4444' : '#22c55e' }"
-              />
-            </IconField>
-            <label for="email">{{ $t("signup.email") }}</label>
-          </FloatLabel>
-          <FieldMsg :field="$field" />
-        </FormField>
-
-        <Button
-          type="submit"
-          :label="$t('forgotPassword.resetPassword')"
-          icon="pi pi-send"
-          fluid
-          class="mt-2"
-        />
-      </Form>
-
-      <p class="text-center text-xs" style="color: var(--text); opacity: 0.5">
-        {{ $t("forgotPassword.rememberPassword") }}
-        <button
-          type="button"
-          class="transition-opacity hover:opacity-100"
-          style="
-            color: var(--primary);
-            opacity: 0.8;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0;
-            text-decoration: underline;
-            text-underline-offset: 3px;
-          "
-          @click="router.push('/login')"
-        >
-          {{ $t("forgotPassword.backToLogin") }}
-        </button>
-      </p>
     </div>
   </div>
 </template>
 
 <style scoped>
+:deep(.p-inputtext) {
+  background-color: var(--background) !important;
+  color: var(--text) !important;
+  border-color: var(--secondary) !important;
+  font-size: 16px !important;
+  padding: 0.75rem !important;
+}
+
+:deep(.p-inputtext:focus) {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 1px var(--primary) !important;
+}
+
+:deep(.p-float-label label) {
+  color: var(--text);
+  opacity: 0.6;
+}
+
+:deep(.p-button) {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: #fff !important;
+  padding: 0.85rem !important;
+  font-weight: 700;
+}
+
+:deep(.p-invalid .p-inputtext) {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 1px #ef4444 !important;
+}
+
 .field-msg {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   animation: fadeIn 0.15s ease;
 }
-.field-msg.error {
-  color: #ef4444;
-}
-.field-msg.success {
-  color: #22c55e;
-}
 
-.msg-icon {
-  font-size: 0.85rem;
-  flex-shrink: 0;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>
