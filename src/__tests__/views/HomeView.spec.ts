@@ -52,10 +52,24 @@ describe("HomeView", () => {
           ActionsComponent: true,
           StarsComponent: true,
           DraggeableComponent: false,
+          MovieInfoDrawer: true,
         },
       },
     });
   };
+
+  it("prevents multiple simultaneous fetchMovies calls if already loading", async () => {
+    const longPendingPromise = new Promise((resolve) => {});
+    (getRecommendedMovies as any).mockReturnValue(longPendingPromise);
+    mountWrapper();
+    expect(getRecommendedMovies).toHaveBeenCalledTimes(1);
+
+    const langStore = useLangStore();
+    langStore.language = "fr";
+    await flushPromises();
+
+    expect(getRecommendedMovies).toHaveBeenCalledTimes(1);
+  });
 
   it("fetches movies on mount and displays the first one", async () => {
     const wrapper = mountWrapper();
@@ -77,6 +91,49 @@ describe("HomeView", () => {
       detail: "toast.home.fetchMoviesError",
       life: 3000,
     });
+  });
+
+  it("doesn't update movies if change lang is the same", async () => {
+    mountWrapper();
+    expect(getRecommendedMovies).toHaveBeenCalledTimes(1);
+
+    const langStore = useLangStore();
+    langStore.language = "en";
+    await flushPromises();
+
+    expect(getRecommendedMovies).toHaveBeenCalledTimes(1);
+  });
+
+  it("doesn't call setAsNotSeen if there's no actualMovie", async () => {
+    (getRecommendedMovies as any).mockResolvedValue([]);
+    const wrapper = mountWrapper();
+    await flushPromises();
+
+    await (wrapper.vm as any).markAsNotSeen();
+    await flushPromises();
+
+    expect(setAsNotSeen).not.toHaveBeenCalled();
+  });
+
+  it("doesn't give rating if tried to rate 0 stars", async () => {
+    const wrapper = mountWrapper();
+    await flushPromises();
+
+    await (wrapper.vm as any).rateMovie(0);
+    await flushPromises();
+
+    expect(submitRating).not.toHaveBeenCalled();
+  });
+
+  it("doesn't give rating if there's no actualMovie", async () => {
+    (getRecommendedMovies as any).mockResolvedValue([]);
+    const wrapper = mountWrapper();
+    await flushPromises();
+
+    await (wrapper.vm as any).rateMovie(5);
+    await flushPromises();
+
+    expect(submitRating).not.toHaveBeenCalled();
   });
 
   it("advances to the next movie when an action is triggered", async () => {
@@ -126,5 +183,42 @@ describe("HomeView", () => {
 
     const movieComp = wrapper.findComponent({ name: "movieComponent" });
     expect(movieComp.props("movie")).toEqual(mockMovies[1]);
+  });
+
+  it("alternates info drawer visibility", async () => {
+    const wrapper = mountWrapper();
+    await flushPromises();
+
+    const drawer = wrapper.findComponent({ name: "MovieInfoDrawer" });
+
+    expect(drawer.props("visible")).toBe(false);
+    await (wrapper.vm as any).alternateInfoDrawer();
+    expect(drawer.props("visible")).toBe(true);
+  });
+
+  it("updates visibleDrawer when MovieInfoDrawer emits update:visible", async () => {
+    const wrapper = mountWrapper();
+    await flushPromises();
+
+    const drawer = wrapper.findComponent({ name: "MovieInfoDrawer" });
+
+    await (wrapper.vm as any).alternateInfoDrawer();
+    expect(drawer.props("visible")).toBe(true);
+
+    await drawer.vm.$emit("update:visible", false);
+    expect(drawer.props("visible")).toBe(false);
+  });
+
+  it("updates direction and dragging state when DraggeableComponent emits update events", async () => {
+    const wrapper = mountWrapper();
+    await flushPromises();
+
+    const draggable = wrapper.findComponent({ name: "DraggeableComponent" });
+
+    await draggable.vm.$emit("update:direction", "right");
+    expect(draggable.props("direction")).toBe("right");
+
+    await draggable.vm.$emit("update:isDragging", true);
+    expect(draggable.props("isDragging")).toBe(true);
   });
 });

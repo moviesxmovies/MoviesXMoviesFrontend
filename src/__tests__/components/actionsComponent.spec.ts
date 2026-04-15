@@ -6,7 +6,7 @@ vi.mock("@/repositories/movieRepository", () => ({
   setAsNotSeen: vi.fn(),
 }));
 
-function mountComponent(movieSlug: string, loading: boolean) {
+function mountComponent(loading: boolean) {
   return mount(ActionsComponent, {
     props: { loading },
   });
@@ -14,16 +14,25 @@ function mountComponent(movieSlug: string, loading: boolean) {
 
 describe("ActionsComponent", () => {
   it("accepts props correctly", () => {
-    const wrapper = mountComponent("inception", false);
+    const wrapper = mountComponent(false);
     expect(wrapper.props().loading).toBe(false);
   });
 
-  it("calls setAsNotSeen and emits showNextMovie when button is clicked", async () => {
+  it("Emits markAsNotSeen function when button is clicked", async () => {
     const wrapper = mountComponent(false);
-    
+
     const notSeenButton = wrapper.find("#unseen-button");
     await notSeenButton.trigger("click");
 
     expect(wrapper.emitted()).toHaveProperty("markAsNotSeen");
+  });
+
+  it("Emits showMoreInfo  function when button is clicked", async () => {
+    const wrapper = mountComponent(false);
+
+    const notSeenButton = wrapper.find("#more-info");
+    await notSeenButton.trigger("click");
+
+    expect(wrapper.emitted()).toHaveProperty("showMoreInfo");
   });
 });

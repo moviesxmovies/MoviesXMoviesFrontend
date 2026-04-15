@@ -13,6 +13,7 @@ import StarsComponent from "@/components/starsComponent.vue";
 import { useLangStore } from "@/stores/langStore";
 import ActionsComponent from "@/components/actionsComponent.vue";
 import DraggeableComponent from "@/components/draggeableComponent.vue";
+import MovieInfoDrawer from "@/components/movieInfoDrawer.vue";
 
 const PREDICTED_COLORS: Record<string, string> = {
   right: "var(--yellow)",
@@ -28,6 +29,7 @@ const movieIndex = ref(0);
 const langStore = useLangStore();
 const direction = ref<string>("");
 const isDragging = ref<boolean>(false);
+const visibleDrawer = ref<boolean>(false);
 
 const actualMovie = computed(() => {
   return movies.value.length > 0 ? movies.value[movieIndex.value] : null;
@@ -120,21 +122,46 @@ const rateMovie = async (rating: number) => {
   loading.value = false;
   showNextRecommendedMovie();
 };
+
+const alternateInfoDrawer = () => {
+  visibleDrawer.value = !visibleDrawer.value;
+};
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center overflow-hidden fixed inset-0"
-    :class="isDragging && 'z-50'">
-    <div v-if="loading || actualMovie" class="overflow-visible min-w-screen">
-      <DraggeableComponent :swipeThreshold="100" @right="rateMovie(5)" @left="rateMovie(1)"
-        @up="showNextRecommendedMovie" @down="markAsNotSeen" v-model:direction="direction"
-        v-model:isDragging="isDragging">
+  <div
+    class="min-h-screen flex items-center justify-center overflow-hidden fixed inset-0"
+    :class="isDragging && 'z-50'"
+  >
+    <MovieInfoDrawer
+      v-model:visible="visibleDrawer"
+      :movie="actualMovie || ({} as Movie)"
+    />
+    <div v-if="loading || actualMovie" class="overflow-visible min-w-screen px-14 md:px-0">
+      <DraggeableComponent
+        :swipeThreshold="100"
+        @right="rateMovie(5)"
+        @left="rateMovie(1)"
+        @up="showNextRecommendedMovie"
+        @down="markAsNotSeen"
+        v-model:direction="direction"
+        v-model:isDragging="isDragging"
+      >
         <div id="mainSwipe">
-          <MovieComponent class="select-none" :movie="actualMovie || ({} as Movie)" :loading="loading" />
-          <ActionsComponent class="select-none" :loading="loading" @markAsNotSeen="markAsNotSeen" />
+          <MovieComponent
+            class="select-none"
+            :movie="actualMovie || ({} as Movie)"
+            :loading="loading"
+          />
+          <ActionsComponent
+            class="select-none"
+            :loading="loading"
+            @markAsNotSeen="markAsNotSeen"
+            @showMoreInfo="alternateInfoDrawer"
+          />
         </div>
       </DraggeableComponent>
-      <div class="icon-container mb-7">
+      <div class="icon-container mb-7 px-14 md:px-0">
         <div class="icon-grid">
           <div class="cell top" :class="direction == 'down' && 'active-icon'">
             <i class="pi pi-eye-slash text-3xl"></i>
@@ -153,10 +180,14 @@ const rateMovie = async (rating: number) => {
           </div>
         </div>
       </div>
-      <div class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center mb-7">
-        <div id="glow-container" class="w-full max-w-sm aspect-[3/5] rounded-3xl transition-all duration-500 ease-out"
-          :style="glowStyle">
-        </div>
+      <div
+        class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center mb-7  px-14 md:px-0"
+      >
+        <div
+          class="w-full max-w-sm aspect-[3/5] rounded-3xl transition-all duration-500 ease-out"
+          :style="glowStyle"
+          id="glow-container"
+        ></div>
       </div>
       <div class="flex justify-center mt-4 relative z-">
         <StarsComponent id="stars" :loading="loading" @rateMovie="rateMovie" />
@@ -453,7 +484,7 @@ const rateMovie = async (rating: number) => {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
-  width: 100%;
+  width: 85vw;
   max-width: 24rem;
   aspect-ratio: 3 / 5;
   border-radius: 1.5rem;
@@ -504,5 +535,12 @@ const rateMovie = async (rating: number) => {
   opacity: 1;
   transform: scale(1.25);
   filter: drop-shadow(0 0 10px var(--text));
+}
+
+.w-full.max-w-sm.aspect-\[3\/5\] {
+  max-width: 85vw;
+  @media (min-width: 768px) {
+    max-width: 24rem;
+  }
 }
 </style>

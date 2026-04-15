@@ -55,11 +55,11 @@ export interface Movie {
   genres: Genre[];
   awards: any[];
   platforms: Platform[];
-  actors: Actor[];
-  directors: Actor[];
+  actors: string[];
+  directors: string[];
 }
 
-interface Actor {
+export interface Person {
   id: number;
   name: string;
   slug: string;
