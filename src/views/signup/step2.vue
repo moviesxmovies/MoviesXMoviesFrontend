@@ -47,12 +47,12 @@ const onFileSelect = (event: FileUploadSelectEvent) => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-6">
+  <div class="flex flex-col gap-4 sm:gap-6">
     <div class="text-center">
       <h2 class="text-xl font-semibold" style="color: var(--text)">
         {{ $t("signup.step2.title") }}
       </h2>
-      <p class="text-sm mt-1" style="color: var(--text); opacity: 0.5">
+      <p class="text-xs sm:text-sm mt-1" style="color: var(--text); opacity: 0.5">
         {{ $t("signup.step2.subtitle") }}
       </p>
     </div>
