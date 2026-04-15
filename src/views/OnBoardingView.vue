@@ -78,7 +78,7 @@ const steps = [
                         </div>
                         <span class="card-eyebrow">
                             <Transition name="fade" mode="out-in">
-                                <span :key="currentStep">{{ currentStep + 1 }} / {{ steps.length }}</span>
+                                <span id="step-span" :key="currentStep">{{ currentStep + 1 }} / {{ steps.length }}</span>
                             </Transition>
                         </span>
                     </div>
@@ -93,7 +93,7 @@ const steps = [
                                 i < currentStep ? 'dot-past' : 'dot-future']" />
                     </div>
 
-                    <Button :label="currentStep === steps.length - 1
+                    <Button id="continue-button" :label="currentStep === steps.length - 1
                         ? $t('onboarding.finish')
                         : $t('onboarding.continue')" class="pointer-events-auto" @click="handleContinue" />
 
