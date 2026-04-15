@@ -242,14 +242,14 @@ watch(
           :pt="{ content: { class: 'scroll-content' } }"
         >
           <div class="inline-list">
-            <div v-for="actor in actors" :key="actor.id" class="person-item">
+            <a v-for="actor in actors" :key="actor.id" class="person-item" :href="`/profiles/${actor.slug}`">
               <img
                 :src="actor.image"
                 :alt="actor.name"
                 class="person-item__img"
               />
               <span class="person-item__name">{{ actor.name }}</span>
-            </div>
+            </a>
           </div>
         </ScrollPanel>
       </section>
@@ -269,10 +269,11 @@ watch(
           :pt="{ content: { class: 'scroll-content' } }"
         >
           <div class="inline-list">
-            <div
+            <a
               v-for="director in directors"
               :key="director.id"
               class="person-item"
+              :href="`/profiles/${director.slug}`"
             >
               <img
                 :src="director.image"
@@ -280,7 +281,7 @@ watch(
                 class="person-item__img"
               />
               <span class="person-item__name">{{ director.name }}</span>
-            </div>
+            </a>
           </div>
         </ScrollPanel>
       </section>

@@ -64,7 +64,10 @@ export interface Person {
   name: string;
   slug: string;
   image: string;
-  awards: any[];
+  biography: string;
+  birthday: string;
+  deathday: string;
+  gender: number;
 }
 
 interface Platform {
