@@ -14,6 +14,7 @@ import { useLangStore } from "@/stores/langStore";
 import ActionsComponent from "@/components/actionsComponent.vue";
 import DraggeableComponent from "@/components/draggeableComponent.vue";
 import MovieInfoDrawer from "@/components/movieInfoDrawer.vue";
+import AddToListDialog from "@/components/addToListDialog.vue";
 
 const PREDICTED_COLORS: Record<string, string> = {
   right: "var(--yellow)",
@@ -30,6 +31,7 @@ const langStore = useLangStore();
 const direction = ref<string>("");
 const isDragging = ref<boolean>(false);
 const visibleDrawer = ref<boolean>(false);
+const visibleDialog = ref<boolean>(false);
 
 const actualMovie = computed(() => {
   return movies.value.length > 0 ? movies.value[movieIndex.value] : null;
@@ -122,10 +124,6 @@ const rateMovie = async (rating: number) => {
   loading.value = false;
   showNextRecommendedMovie();
 };
-
-const alternateInfoDrawer = () => {
-  visibleDrawer.value = !visibleDrawer.value;
-};
 </script>
 
 <template>
@@ -137,12 +135,19 @@ const alternateInfoDrawer = () => {
       v-model:visible="visibleDrawer"
       :movie="actualMovie || ({} as Movie)"
     />
-    <div v-if="loading || actualMovie" class="overflow-visible min-w-screen px-14 md:px-0">
+    <AddToListDialog
+      v-model:visible="visibleDialog"
+      :movie="actualMovie || ({} as Movie)"
+    />
+    <div
+      v-if="loading || actualMovie"
+      class="overflow-visible min-w-screen px-14 md:px-0"
+    >
       <DraggeableComponent
         :swipeThreshold="100"
         @right="rateMovie(5)"
         @left="rateMovie(1)"
-        @up="showNextRecommendedMovie"
+        @up="() => (visibleDialog = true)"
         @down="markAsNotSeen"
         v-model:direction="direction"
         v-model:isDragging="isDragging"
@@ -158,7 +163,8 @@ const alternateInfoDrawer = () => {
             :loading="loading"
             :movie="actualMovie || ({} as Movie)"
             @markAsNotSeen="markAsNotSeen"
-            @showMoreInfo="alternateInfoDrawer"
+            @showMoreInfo="() => (visibleDrawer = !visibleDrawer)"
+            @addToList="() => (visibleDialog = !visibleDialog)"
           />
         </div>
       </DraggeableComponent>
@@ -182,7 +188,7 @@ const alternateInfoDrawer = () => {
         </div>
       </div>
       <div
-        class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center mb-7  px-14 md:px-0"
+        class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center mb-7 px-14 md:px-0"
       >
         <div
           class="w-full max-w-sm aspect-[3/5] rounded-3xl transition-all duration-500 ease-out"
@@ -225,9 +231,7 @@ const alternateInfoDrawer = () => {
   animation: icon-top-tutorial 8s infinite;
 }
 
-
 @keyframes swipe-tutorial {
-
   0%,
   10%,
   100% {
@@ -271,7 +275,6 @@ const alternateInfoDrawer = () => {
 }
 
 @keyframes glow-tutorial {
-
   0%,
   12%,
   28%,
@@ -311,7 +314,6 @@ const alternateInfoDrawer = () => {
 }
 
 @keyframes icon-left-tutorial {
-
   15%,
   25% {
     opacity: 1;
@@ -329,7 +331,6 @@ const alternateInfoDrawer = () => {
 }
 
 @keyframes icon-right-tutorial {
-
   40%,
   50% {
     opacity: 1;
@@ -347,7 +348,6 @@ const alternateInfoDrawer = () => {
 }
 
 @keyframes icon-bottom-tutorial {
-
   65%,
   75% {
     opacity: 1;
@@ -365,7 +365,6 @@ const alternateInfoDrawer = () => {
 }
 
 @keyframes icon-top-tutorial {
-
   90%,
   98% {
     opacity: 1;
@@ -417,7 +416,6 @@ const alternateInfoDrawer = () => {
 }
 
 @keyframes star-fill-sweep {
-
   0%,
   100% {
     color: var(--primary);
@@ -457,7 +455,6 @@ const alternateInfoDrawer = () => {
 }
 
 @keyframes icon-change {
-
   0%,
   100%,
   20%,
