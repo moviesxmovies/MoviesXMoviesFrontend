@@ -29,3 +29,13 @@ export const addMovieToList = async (
     throw error;
   }
 };
+
+export const createList = async (listName: string) => {
+  try {
+    await api.post("/movies-lists/", {
+      name: listName,
+    });
+  } catch (error: any) {
+    throw error;
+  }
+};

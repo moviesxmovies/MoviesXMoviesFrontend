@@ -4,6 +4,7 @@ import type { Movie, MovieList } from "@/types";
 import { Checkbox, Dialog, useToast } from "primevue";
 import { watch, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import CreateListDialog from "./createListDialog.vue";
 
 const { t } = useI18n();
 const toast = useToast();
@@ -13,6 +14,7 @@ const props = defineProps<{
   movie: Movie;
 }>();
 const visible = defineModel<boolean>("visible", { default: false });
+const visibleCreateList = ref(false);
 
 const addToList = async (listSlug: string) => {
   try {
@@ -56,6 +58,7 @@ watch(
 </script>
 
 <template>
+  <CreateListDialog v-model:visible="visibleCreateList" />
   <Dialog
     v-model:visible="visible"
     modal
@@ -132,6 +135,7 @@ watch(
       <div class="w-full pt-4 border-t border-[var(--secondary)]/20">
         <button
           class="w-full py-4 rounded-xl flex items-center justify-center gap-2 text-sm font-bold text-[var(--accent)] hover:bg-[var(--accent)]/5 transition-all"
+          @click="visibleCreateList = true"
         >
           <i class="pi pi-plus-circle"></i>
           Crear nueva lista
