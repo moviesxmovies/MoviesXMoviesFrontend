@@ -17,7 +17,9 @@ const directors = ref<Person[]>([]);
 const loading = ref(false);
 
 const fetchDetails = async (finalList: Ref<Person[]>, list: string[]) => {
+  if (!list) return;
   finalList.value = [];
+  
   for (const element of list) {
     try {
       const { data } = await api.get(element);

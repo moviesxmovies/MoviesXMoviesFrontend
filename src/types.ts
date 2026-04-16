@@ -80,3 +80,24 @@ interface Genre {
   name: string;
   slug: string;
 }
+
+export interface MovieListPagination {
+  results: MovieList[];
+  total_pages: number;
+  count: number;
+  has_next: boolean;
+  has_previous: boolean;
+  current_page: number;
+}
+
+export interface MovieList {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  privacity: string;
+  user: string;
+  movies: string[];
+  created_at: string;
+  updated_at: string;
+}

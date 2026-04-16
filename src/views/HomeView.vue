@@ -156,6 +156,7 @@ const alternateInfoDrawer = () => {
           <ActionsComponent
             class="select-none"
             :loading="loading"
+            :movie="actualMovie || ({} as Movie)"
             @markAsNotSeen="markAsNotSeen"
             @showMoreInfo="alternateInfoDrawer"
           />
