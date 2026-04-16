@@ -158,5 +158,20 @@
     "title": "Check your email",
     "description": "We've sent a password reset code to your email address. Please enter the code below to reset your password.",
     "button": "Go to login"
+  },
+  "celebrity": {
+    "error": {
+      "fetching": "Failed to fetch celebrity data. Please try again later."
+    },
+    "no_movies": "No movies found",
+    "no_movies_description": "This celebrity's filmography is currently empty or pending updates.",
+    "birthday": "Birthday",
+    "deathday": "Deathday",
+    "biography": "Biography",
+    "no_biography": "No biography available.",
+    "filmography": {
+      "acted_in": "Acted in",
+      "directed": "Directed"
+    }
   }
 }

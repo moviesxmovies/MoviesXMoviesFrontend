@@ -54,7 +54,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/profiles/:slug",
-    component: () => import("../views/ProfileView.vue"),
+    component: () => import("../views/CelebrityView.vue"),
     meta: { requiresAuth: true },
   },
   {
