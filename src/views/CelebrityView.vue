@@ -9,13 +9,14 @@ import {
   AccordionContent,
   AccordionHeader,
   AccordionPanel,
-  ScrollPanel,
   Tag,
   useToast,
 } from "primevue";
-import { computed, onMounted, onUnmounted, ref, watch, type Ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
+import { useInfiniteScroll } from "@/composables/useInfiniteScroll";
+import FilmographyComponent from "@/components/filmographyComponent.vue";
 
 const route = useRoute();
 const user = ref<Person>({} as Person);
@@ -27,42 +28,6 @@ const { t } = useI18n();
 const router = useRouter();
 const acted_movies = ref<MoviePagination>({} as MoviePagination);
 const directed_movies = ref<MoviePagination>({} as MoviePagination);
-const actedSentinelRef = ref<HTMLElement | null>(null);
-const directedSentinelRef = ref<HTMLElement | null>(null);
-let actedObserver: IntersectionObserver | null = null;
-let directedObserver: IntersectionObserver | null = null;
-
-const actedObserverSentinel = (sentinelRef: Ref<HTMLElement | null>) => {
-  if (!sentinelRef.value || loadingActors.value) return;
-  actedObserver?.disconnect();
-
-  actedObserver = new IntersectionObserver(
-    ([entry]) => {
-      if (!entry?.isIntersecting) return;
-
-      const lastId = acted_movies.value.next_last_id;
-      if (lastId) fetchFilmography("acted", lastId);
-    },
-    { threshold: 0.1 },
-  );
-  actedObserver.observe(sentinelRef.value);
-};
-
-const directedObserverSentinel = (sentinelRef: Ref<HTMLElement | null>) => {
-  if (!sentinelRef.value || loadingDirectors.value) return;
-  directedObserver?.disconnect();
-
-  directedObserver = new IntersectionObserver(
-    ([entry]) => {
-      if (!entry?.isIntersecting) return;
-
-      const lastId = directed_movies.value.next_last_id;
-      if (lastId) fetchFilmography("directed", lastId);
-    },
-    { threshold: 0.1 },
-  );
-  directedObserver.observe(sentinelRef.value);
-};
 
 const genderMap: Record<string, { color: string; icon: string }> = {
   "0": { color: "var(--secondary)", icon: "pi pi-minus" },
@@ -143,17 +108,20 @@ const fetchFilmography = async (
   }
 };
 
-watch(actedSentinelRef, (el) => {
-  if (el) actedObserverSentinel(actedSentinelRef);
+const { sentinelRef: actedSentinelRef } = useInfiniteScroll(async () => {
+  if (loadingActors.value) return;
+  loadingActors.value = true;
+  const lastId = acted_movies.value.next_last_id;
+  if (lastId) await fetchFilmography("acted", lastId);
+  loadingActors.value = false;
 });
 
-watch(directedSentinelRef, (el) => {
-  if (el) directedObserverSentinel(directedSentinelRef);
-});
-
-onUnmounted(() => {
-  actedObserver?.disconnect();
-  directedObserver?.disconnect();
+const { sentinelRef: directedSentinelRef } = useInfiniteScroll(async () => {
+  if (loadingDirectors.value) return;
+  loadingDirectors.value = true;
+  const lastId = directed_movies.value.next_last_id;
+  if (lastId) await fetchFilmography("directed", lastId);
+  loadingDirectors.value = false;
 });
 
 onMounted(async () => {
@@ -168,7 +136,6 @@ onMounted(async () => {
 <template>
   <div class="page">
     <div class="layout">
-      <!-- ─── ASIDE ─── -->
       <aside class="sidebar">
         <div class="card sticky-card">
           <div class="card-image">
@@ -206,9 +173,7 @@ onMounted(async () => {
         </div>
       </aside>
 
-      <!-- ─── MAIN ─── -->
       <Accordion value="0" class="content">
-        <!-- Biography -->
         <AccordionPanel value="0" class="section">
           <AccordionHeader class="section-header">
             <i class="pi pi-book accent-icon" />
@@ -220,119 +185,32 @@ onMounted(async () => {
           </AccordionContent>
         </AccordionPanel>
 
-        <!-- Filmography -->
-        <AccordionPanel
-          value="1"
+        <FilmographyComponent
           v-if="
             acted_movies.results?.length === 0 &&
             directed_movies.results?.length === 0
           "
-          class="section"
-        >
-          <AccordionHeader class="section-header">
-            <i class="pi pi-video primary-icon" />
-            <h2 class="section-title">
-              {{ t("celebrity.filmography.acted_in") }}
-            </h2>
-          </AccordionHeader>
-          <AccordionContent
-            class="bg-secondary/5 rounded-[2rem] p-10 md:p-20 border-2 border-dashed border-secondary/40 flex flex-col items-center justify-center text-center"
-          >
-            <div
-              class="w-20 h-20 bg-secondary/10 rounded-full flex items-center justify-center mb-4"
-            >
-              <i class="pi pi-video text-3xl text-secondary"></i>
-            </div>
-            <h3 class="text-xl font-semibold opacity-70">
-              {{ t("celebrity.filmography.no_movies") }}
-            </h3>
-            <p class="text-sm opacity-50 max-w-xs mx-auto">
-              {{ t("celebrity.filmography.no_movies_description") }}
-            </p>
-          </AccordionContent>
-        </AccordionPanel>
+          :index="1"
+          :loading="loadingActors"
+          :title="t('celebrity.filmography.acted_in')"
+          v-model:sentinelRef="actedSentinelRef"
+        />
 
-        <AccordionPanel
-          value="2"
-          v-if="acted_movies.results?.length"
-          class="section"
-        >
-          <AccordionHeader class="section-header">
-            <i class="pi pi-video primary-icon" />
-            <h2 class="section-title">
-              {{ t("celebrity.filmography.acted_in") }}
-            </h2>
-          </AccordionHeader>
-          <AccordionContent class="section-body">
-            <ScrollPanel ref="actedGridRef" style="width: 100%; height: 500px">
-              <div class="movies-grid">
-                <div
-                  v-for="movie in acted_movies.results"
-                  :key="movie.id"
-                  class="movie-card"
-                >
-                  <div class="movie-poster-wrap">
-                    <img
-                      :src="movie.cover"
-                      :alt="movie.title"
-                      class="movie-poster"
-                    />
-                  </div>
-                  <div class="movie-info">
-                    <p class="movie-title">{{ movie.title }}</p>
-                    <p class="movie-year">{{ movie.release_date }}</p>
-                  </div>
-                </div>
-                <div ref="actedSentinelRef" class="sentinel" />
-                <div v-if="loadingActors" class="loading-footer">
-                  <i class="pi pi-spin pi-spinner"></i>
-                </div>
-              </div>
-            </ScrollPanel>
-          </AccordionContent>
-        </AccordionPanel>
-        <AccordionPanel
-          value="3"
-          v-if="directed_movies.results?.length"
-          class="section"
-        >
-          <AccordionHeader class="section-header">
-            <i class="pi pi-video primary-icon" />
-            <h2 class="section-title">
-              {{ t("celebrity.filmography.directed") }}
-            </h2>
-          </AccordionHeader>
-          <AccordionContent class="section-body">
-            <ScrollPanel
-              ref="directedGridRef"
-              style="width: 100%; height: 500px"
-            >
-              <div class="movies-grid">
-                <div
-                  v-for="movie in directed_movies.results"
-                  :key="movie.id"
-                  class="movie-card"
-                >
-                  <div class="movie-poster-wrap">
-                    <img
-                      :src="movie.cover"
-                      :alt="movie.title"
-                      class="movie-poster"
-                    />
-                  </div>
-                  <div class="movie-info">
-                    <p class="movie-title">{{ movie.title }}</p>
-                    <p class="movie-year">{{ movie.release_date }}</p>
-                  </div>
-                </div>
-                <div ref="directedSentinelRef" class="sentinel" />
-                <div v-if="loadingDirectors" class="loading-footer">
-                  <i class="pi pi-spin pi-spinner"></i>
-                </div>
-              </div>
-            </ScrollPanel>
-          </AccordionContent>
-        </AccordionPanel>
+        <FilmographyComponent
+          :index="1"
+          :list="acted_movies.results"
+          :loading="loadingActors"
+          :title="t('celebrity.filmography.acted_in')"
+          v-model:sentinelRef="actedSentinelRef"
+        />
+
+        <FilmographyComponent
+          :index="2"
+          :list="directed_movies.results"
+          :loading="loadingDirectors"
+          :title="t('celebrity.filmography.directed')"
+          v-model:sentinelRef="directedSentinelRef"
+        />
       </Accordion>
     </div>
   </div>
@@ -470,9 +348,7 @@ onMounted(async () => {
 .accent-icon {
   color: var(--accent);
 }
-.primary-icon {
-  color: var(--primary);
-}
+
 .death-icon {
   color: #ef4444;
 }
@@ -529,118 +405,5 @@ onMounted(async () => {
   color: var(--gray);
   font-style: italic;
   margin: 0;
-}
-
-/* ── Movies ────────────────────────────────────────────── */
-.empty-movies {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 3rem 0;
-  color: var(--gray);
-}
-
-.empty-icon {
-  font-size: 2.5rem;
-  opacity: 0.2;
-}
-
-.empty-label {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  font-weight: 700;
-}
-
-:deep(.movies-grid) {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-}
-
-@media (min-width: 480px) {
-  :deep(.movies-grid) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 768px) {
-  :deep(.movies-grid) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  :deep(.movies-grid) {
-    grid-template-columns: repeat(5, 1fr);
-  }
-}
-
-/* ── Movie card ────────────────────────────────────────── */
-.movie-card {
-  display: flex;
-  flex-direction: column;
-  border-radius: 1rem;
-  overflow: hidden;
-  border: 1px solid var(--secondary);
-  cursor: pointer;
-  transition:
-    border-color 0.3s,
-    box-shadow 0.3s;
-}
-
-.movie-card:hover {
-  border-color: var(--primary);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-}
-
-.movie-poster-wrap {
-  overflow: hidden;
-}
-
-.movie-poster {
-  width: 100%;
-  aspect-ratio: 2 / 3;
-  object-fit: cover;
-  display: block;
-  transition: transform 0.5s;
-}
-
-.movie-card:hover .movie-poster {
-  transform: scale(1.08);
-}
-
-.movie-info {
-  padding: 0.6rem 0.75rem;
-}
-
-.movie-title {
-  font-size: 0.7rem;
-  font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin: 0 0 0.2rem;
-  line-height: 1.3;
-}
-
-.movie-year {
-  font-size: 0.65rem;
-  color: var(--gray);
-  font-weight: 500;
-  margin: 0;
-}
-
-.sentinel {
-  grid-column: 1 / -1;
-  height: 1px;
-}
-
-.loading-footer {
-  grid-column: 1 / -1;
-  display: flex;
-  justify-content: center;
-  padding: 1rem;
 }
 </style>
