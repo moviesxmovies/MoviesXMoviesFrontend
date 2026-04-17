@@ -62,7 +62,7 @@ function handleKeydown(e: KeyboardEvent) {
             <span class="divider-line" />
           </div>
 
-          <OauthButtonComponent @click="() => router.push('/login')" />
+          <OauthButtonComponent />
 
         </div>
 

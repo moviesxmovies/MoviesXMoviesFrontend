@@ -115,12 +115,5 @@ describe("WelcomeView", () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  // ── OAuth button ─────────────────────────────────────────────────────────
-  it("navigates to /login when OauthButtonComponent is clicked", async () => {
-    const wrapper = factory();
-    await wrapper
-      .findComponent({ name: "OauthButtonComponent" })
-      .trigger("click");
-    expect(mockPush).toHaveBeenCalledWith("/login");
-  });
+
 });
