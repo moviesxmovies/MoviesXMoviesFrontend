@@ -1,57 +1,45 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { useAuthStore } from '../stores/authStore';
-import { config } from '@/config'
-
+import { config as appConfig } from '@/config';
 const refreshInstance = axios.create({
-    baseURL: config.apiUrl,
-    withCredentials: true,
-});
-export const api = axios.create({
-    baseURL: config.apiUrl,
+    baseURL: appConfig.apiUrl,
     withCredentials: true,
 });
 
-const refreshToken = async (refreshToken: string, authStore: any, config: any) => {
+export const api = axios.create({
+    baseURL: appConfig.apiUrl,
+    withCredentials: true,
+});
+
+const doRefresh = async (authStore: any) => {
     const { data } = await refreshInstance.post('/auth/refresh/', {
         refresh: authStore.refreshToken,
     });
-
     authStore.setTokens(data.access, data.refresh);
-    config.headers.Authorization = `Bearer ${data.access}`;
-}
+    return data.access;
+};
+
 function logout(authStore: any) {
     authStore.logout();
     globalThis.location.href = '/login';
-}
-const handleRefreshError = (error: AxiosError, authStore: any) => {
-    if (error.response?.status === 401) {
-        logout(authStore);
-        return Promise.reject(error);
-
-    }
-    return Promise.reject(error instanceof Error ? error : new Error(String(error)));
-
 }
 
 api.interceptors.request.use(async (config) => {
     const authStore = useAuthStore();
 
-    if (authStore.token && authStore.refreshToken) {
-        if (authStore.isTokenExpired()) {
-            try {
-                await refreshToken(authStore.refreshToken, authStore, config);
-            } catch (error: any) {
-                return handleRefreshError(error, authStore);
-            }
-        } else {
-            config.headers.Authorization = `Bearer ${authStore.token}`;
+    if (!authStore.token) return config;
+
+    if (authStore.isTokenExpired()) {
+        try {
+            const newToken = await doRefresh(authStore);
+            config.headers.Authorization = `Bearer ${newToken}`;
+        } catch (error) {
+            logout(authStore);
+            return Promise.reject(error as Error);
         }
     } else {
-        logout(authStore);
+        config.headers.Authorization = `Bearer ${authStore.token}`;
     }
 
     return config;
 });
-
-
-

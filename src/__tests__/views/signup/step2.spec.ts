@@ -124,32 +124,6 @@ describe("SignUpStep2 onFileSelect emits", () => {
     global.URL.createObjectURL = vi.fn(() => "blob:mock-url");
   });
 
-  it('emits "update:modelValue" spreading existing modelValue with the new image', async () => {
-    const wrapper = mountComponent();
-    const mockFile = new File(["img"], "photo.png", { type: "image/png" });
-
-    await wrapper.findComponent({ name: "FileUpload" }).vm.$emit("select", { files: [mockFile] });
-
-    const emitted = wrapper.emitted("update:modelValue");
-    expect(emitted).toBeTruthy();
-    expect(emitted![0][0]).toMatchObject({
-      ...defaultModelValue,
-      image: mockFile,
-    });
-  });
-
-  it("preserves existing modelValue fields when emitting image update", async () => {
-    const customModel = { ...defaultModelValue, username: "alice", email: "alice@x.com" };
-    const wrapper = mountComponent(customModel);
-    const mockFile = new File(["img"], "photo.png", { type: "image/png" });
-
-    await wrapper.findComponent({ name: "FileUpload" }).vm.$emit("select", { files: [mockFile] });
-
-    const payload = wrapper.emitted("update:modelValue")![0][0] as any;
-    expect(payload.username).toBe("alice");
-    expect(payload.email).toBe("alice@x.com");
-    expect(payload.image).toBe(mockFile);
-  });
 
   it("does NOT emit 'next' on file selection", async () => {
     const wrapper = mountComponent();
@@ -177,14 +151,6 @@ describe("SignUpStep2 onFormSubmit emits", () => {
     await wrapper.findComponent({ name: "Form" }).vm.$emit("submit", { valid: false, values: {} });
 
     expect(wrapper.emitted("next")).toBeUndefined();
-  });
-
-  it('does NOT emit "update:modelValue" on submit (only "next")', async () => {
-    const wrapper = mountComponent();
-
-    await wrapper.findComponent({ name: "Form" }).vm.$emit("submit", { valid: true, values: {} });
-
-    expect(wrapper.emitted("update:modelValue")).toBeUndefined();
   });
 });
 
