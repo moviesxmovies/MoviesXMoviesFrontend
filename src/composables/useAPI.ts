@@ -1,14 +1,10 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { useAuthStore } from '../stores/authStore';
 import { config as appConfig } from '@/config';
-const PUBLIC_ROUTES = ['/auth/login/', '/auth/signup/', '/auth/refresh/'];
 const refreshInstance = axios.create({
     baseURL: appConfig.apiUrl,
     withCredentials: true,
 });
-
-const isPublicRoute = (url: string) =>
-    PUBLIC_ROUTES.some(route => url.includes(route));
 
 export const api = axios.create({
     baseURL: appConfig.apiUrl,
@@ -39,7 +35,7 @@ api.interceptors.request.use(async (config) => {
             config.headers.Authorization = `Bearer ${newToken}`;
         } catch (error) {
             logout(authStore);
-            return Promise.reject(error);
+            return Promise.reject(error as Error);
         }
     } else {
         config.headers.Authorization = `Bearer ${authStore.token}`;
