@@ -65,7 +65,7 @@ api.interceptors.response.use(
         const originalRequest = error.config as any;
 
         if (error.response?.status !== 401 || originalRequest._retry || isPublicRoute(originalRequest.url ?? '')) {
-            return Promise.reject(error);
+            return Promise.reject(error as Error);
         }
 
         if (isRefreshing) {
@@ -88,7 +88,7 @@ api.interceptors.response.use(
         } catch (refreshError: any) {
             processQueue(refreshError, null);
             logout(authStore);
-            return Promise.reject(refreshError);
+            return Promise.reject(refreshError as Error);
         } finally {
             isRefreshing = false;
         }
