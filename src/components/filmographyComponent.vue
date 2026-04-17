@@ -15,7 +15,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'update:sentinelRef', el: HTMLElement | null): void
+  'update:sentinelRef': [el: HTMLElement | null]
 }>();
 </script>
 
