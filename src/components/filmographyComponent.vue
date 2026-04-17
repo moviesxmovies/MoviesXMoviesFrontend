@@ -1,6 +1,11 @@
 <script lang="ts" setup>
 import type { Movie } from "@/types";
-import { AccordionContent, AccordionHeader, AccordionPanel, ScrollPanel } from "primevue";
+import {
+  AccordionContent,
+  AccordionHeader,
+  AccordionPanel,
+  ScrollPanel,
+} from "primevue";
 import { useI18n } from "vue-i18n";
 import MovieCardComponent from "./movieCardComponent.vue";
 
@@ -12,10 +17,11 @@ const props = defineProps<{
   title: string;
   loading: boolean;
   sentinelRef: HTMLElement | null;
+  empty?: boolean;
 }>();
 
 const emit = defineEmits<{
-  'update:sentinelRef': [el: HTMLElement | null]
+  "update:sentinelRef": [el: HTMLElement | null];
 }>();
 </script>
 
@@ -35,15 +41,26 @@ const emit = defineEmits<{
             :key="movie.id"
             :movie="movie"
           />
-          <div :ref="(el) => emit('update:sentinelRef', el as HTMLElement)" class="sentinel" />
+          <div
+            :ref="(el) => emit('update:sentinelRef', el as HTMLElement)"
+            class="sentinel"
+          />
           <div v-if="props.loading" class="loading-footer">
             <i class="pi pi-spin pi-spinner"></i>
           </div>
         </div>
       </ScrollPanel>
     </AccordionContent>
+  </AccordionPanel>
+
+  <AccordionPanel :value="index" v-if="props.empty" class="section">
+    <AccordionHeader class="section-header">
+      <i :class="[props.icon || 'pi pi-video', 'primary-icon']" />
+      <h2 class="section-title">
+        {{ props.title }}
+      </h2>
+    </AccordionHeader>
     <AccordionContent
-      v-else
       class="bg-secondary/5 rounded-[2rem] p-10 md:p-20 border-2 border-dashed border-secondary/40 flex flex-col items-center justify-center text-center"
     >
       <div

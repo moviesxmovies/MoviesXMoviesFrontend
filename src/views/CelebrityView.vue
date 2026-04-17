@@ -190,6 +190,7 @@ onMounted(async () => {
             acted_movies.results?.length === 0 &&
             directed_movies.results?.length === 0
           "
+          :empty="true"
           :index="1"
           :loading="loadingActors"
           :title="t('celebrity.filmography.acted_in')"
