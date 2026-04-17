@@ -1,36 +1,86 @@
 <script lang="ts" setup>
-import { getUserProfile } from "@/repositories/userRepository";
-import type { Movie, Person } from "@/types";
-import { useToast } from "primevue";
-import { computed, onMounted, ref } from "vue";
+import {
+  getUserFilmography,
+  getUserProfile,
+} from "@/repositories/userRepository";
+import type { MoviePagination, Person } from "@/types";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionHeader,
+  AccordionPanel,
+  ScrollPanel,
+  Tag,
+  useToast,
+} from "primevue";
+import { computed, onMounted, onUnmounted, ref, watch, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
 const user = ref<Person>({} as Person);
-const loading = ref<boolean>(false);
+const loadingProfile = ref<boolean>(false);
+const loadingActors = ref<boolean>(false);
+const loadingDirectors = ref<boolean>(false);
 const toast = useToast();
 const { t } = useI18n();
 const router = useRouter();
-const acted_movies = ref<Movie[]>([]);
-const directed_movies = ref<Movie[]>([]);
+const acted_movies = ref<MoviePagination>({} as MoviePagination);
+const directed_movies = ref<MoviePagination>({} as MoviePagination);
+const actedSentinelRef = ref<HTMLElement | null>(null);
+const directedSentinelRef = ref<HTMLElement | null>(null);
+let actedObserver: IntersectionObserver | null = null;
+let directedObserver: IntersectionObserver | null = null;
 
-const genderMap: Record<number, { label: string; icon: string }> = {
-  0: { label: t("profile.gender.unknown"), icon: "pi pi-minus" },
-  1: { label: t("profile.gender.female"), icon: "pi pi-venus" },
-  2: { label: t("profile.gender.male"), icon: "pi pi-mars" },
+const actedObserverSentinel = (sentinelRef: Ref<HTMLElement | null>) => {
+  if (!sentinelRef.value || loadingActors.value) return;
+  actedObserver?.disconnect();
+
+  actedObserver = new IntersectionObserver(
+    ([entry]) => {
+      if (!entry?.isIntersecting) return;
+
+      const lastId = acted_movies.value.next_last_id;
+      if (lastId) fetchFilmography("acted", lastId);
+    },
+    { threshold: 0.1 },
+  );
+  actedObserver.observe(sentinelRef.value);
 };
 
-const genderLabel = computed(
-  () => genderMap[user.value.gender]?.label ?? t("profile.gender.unknown"),
-);
+const directedObserverSentinel = (sentinelRef: Ref<HTMLElement | null>) => {
+  if (!sentinelRef.value || loadingDirectors.value) return;
+  directedObserver?.disconnect();
+
+  directedObserver = new IntersectionObserver(
+    ([entry]) => {
+      if (!entry?.isIntersecting) return;
+
+      const lastId = directed_movies.value.next_last_id;
+      if (lastId) fetchFilmography("directed", lastId);
+    },
+    { threshold: 0.1 },
+  );
+  directedObserver.observe(sentinelRef.value);
+};
+
+const genderMap: Record<string, { color: string; icon: string }> = {
+  "0": { color: "var(--secondary)", icon: "pi pi-minus" },
+  "1": { color: "var(--accent)", icon: "pi pi-venus" },
+  "2": { color: "var(--primary)", icon: "pi pi-mars" },
+};
+
 const genderIcon = computed(
   () => genderMap[user.value.gender]?.icon ?? "pi pi-question",
 );
 
-onMounted(async () => {
+const genderBackground = computed(() => {
+  return genderMap[user.value.gender]?.color ?? "var(--secondary)";
+});
+
+const fetchUserProfile = async () => {
   const { slug } = route.params;
-  loading.value = true;
+  loadingProfile.value = true;
   try {
     const profile = await getUserProfile(slug as string);
     user.value = profile;
@@ -38,12 +88,80 @@ onMounted(async () => {
     toast.add({
       severity: "error",
       summary: t("toast.error"),
-      detail: error.response?.data?.message || t("celebrity.error.fetching"),
+      detail:
+        error.response?.data?.message || t("celebrity.error.fetchingProfile"),
     });
     router.push({ name: "NotFound" });
   } finally {
-    loading.value = false;
+    loadingProfile.value = false;
   }
+};
+
+const fetchFilmography = async (
+  type: "acted" | "directed",
+  lastId?: number,
+) => {
+  try {
+    if (type === "acted") {
+      loadingActors.value = true;
+    } else if (type === "directed") {
+      loadingDirectors.value = true;
+    }
+    const movies = await getUserFilmography(
+      route.params.slug as string,
+      type,
+      lastId,
+    );
+    if (type === "acted") {
+      if (!acted_movies.value.results) {
+        acted_movies.value = movies;
+        return;
+      }
+      acted_movies.value.results.push(...movies.results);
+      acted_movies.value.next_last_id = movies.next_last_id;
+    } else if (type === "directed") {
+      if (!directed_movies.value.results) {
+        directed_movies.value = movies;
+        return;
+      }
+      directed_movies.value.results.push(...movies.results);
+      directed_movies.value.next_last_id = movies.next_last_id;
+    }
+  } catch (error: any) {
+    toast.add({
+      severity: "error",
+      summary: t("toast.error"),
+      detail:
+        error.response?.data?.message || t("celebrity.error.fetchingMovies"),
+    });
+  } finally {
+    if (type === "acted") {
+      loadingActors.value = false;
+    } else if (type === "directed") {
+      loadingDirectors.value = false;
+    }
+  }
+};
+
+watch(actedSentinelRef, (el) => {
+  if (el) actedObserverSentinel(actedSentinelRef);
+});
+
+watch(directedSentinelRef, (el) => {
+  if (el) directedObserverSentinel(directedSentinelRef);
+});
+
+onUnmounted(() => {
+  actedObserver?.disconnect();
+  directedObserver?.disconnect();
+});
+
+onMounted(async () => {
+  await Promise.all([
+    fetchUserProfile(),
+    fetchFilmography("acted"),
+    fetchFilmography("directed"),
+  ]);
 });
 </script>
 
@@ -56,11 +174,10 @@ onMounted(async () => {
           <div class="card-image">
             <img :src="user.image" :alt="user.name" class="card-img" />
             <Tag
-              :value="genderLabel"
               :icon="genderIcon"
               class="gender-tag"
               :style="{
-                background: 'var(--primary)',
+                background: `${genderBackground}`,
                 color: '#fff',
                 borderRadius: '8px',
               }"
@@ -73,13 +190,15 @@ onMounted(async () => {
               <div class="date-row">
                 <i class="pi pi-calendar accent-icon" />
                 <span
-                  ><b>{{ t("celebrity.birthday") }}:</b> {{ user.birthday }}</span
+                  ><b>{{ t("celebrity.birthday") }}:</b>
+                  {{ user.birthday }}</span
                 >
               </div>
               <div v-if="user.deathday" class="date-row">
                 <i class="pi pi-heart-fill death-icon" />
                 <span
-                  ><b>{{ t("celebrity.deathday") }}:</b> {{ user.deathday }}</span
+                  ><b>{{ t("celebrity.deathday") }}:</b>
+                  {{ user.deathday }}</span
                 >
               </div>
             </div>
@@ -88,99 +207,146 @@ onMounted(async () => {
       </aside>
 
       <!-- ─── MAIN ─── -->
-      <main class="content">
+      <Accordion value="0" class="content">
         <!-- Biography -->
-        <section class="section">
-          <div class="section-header">
+        <AccordionPanel value="0" class="section">
+          <AccordionHeader class="section-header">
             <i class="pi pi-book accent-icon" />
             <h2 class="section-title">{{ t("celebrity.biography") }}</h2>
-          </div>
-          <div class="section-body">
+          </AccordionHeader>
+          <AccordionContent class="section-body">
             <p v-if="user.biography" class="biography">{{ user.biography }}</p>
             <p v-else class="empty-text">{{ t("celebrity.no_biography") }}</p>
-          </div>
-        </section>
+          </AccordionContent>
+        </AccordionPanel>
 
         <!-- Filmography -->
-        <section v-if="acted_movies.length === 0 && directed_movies.length === 0" class="section">
-          <div class="section-header">
+        <AccordionPanel
+          value="1"
+          v-if="
+            acted_movies.results?.length === 0 &&
+            directed_movies.results?.length === 0
+          "
+          class="section"
+        >
+          <AccordionHeader class="section-header">
             <i class="pi pi-video primary-icon" />
             <h2 class="section-title">
               {{ t("celebrity.filmography.acted_in") }}
             </h2>
-          </div>
-          <div class="bg-secondary/5 rounded-[2rem] p-10 md:p-20 border-2 border-dashed border-secondary/40 flex flex-col items-center justify-center text-center">
-            <div class="w-20 h-20 bg-secondary/10 rounded-full flex items-center justify-center mb-4">
+          </AccordionHeader>
+          <AccordionContent
+            class="bg-secondary/5 rounded-[2rem] p-10 md:p-20 border-2 border-dashed border-secondary/40 flex flex-col items-center justify-center text-center"
+          >
+            <div
+              class="w-20 h-20 bg-secondary/10 rounded-full flex items-center justify-center mb-4"
+            >
               <i class="pi pi-video text-3xl text-secondary"></i>
             </div>
-            <h3 class="text-xl font-semibold opacity-70">{{ t("celebrity.filmography.no_movies") }}</h3>
-            <p class="text-sm opacity-50 max-w-xs mx-auto">{{ t("celebrity.filmography.no_movies_description") }}</p>
-          </div>
-        </section>
-        <section v-if="acted_movies.length" class="section">
-          <div class="section-header">
+            <h3 class="text-xl font-semibold opacity-70">
+              {{ t("celebrity.filmography.no_movies") }}
+            </h3>
+            <p class="text-sm opacity-50 max-w-xs mx-auto">
+              {{ t("celebrity.filmography.no_movies_description") }}
+            </p>
+          </AccordionContent>
+        </AccordionPanel>
+
+        <AccordionPanel
+          value="2"
+          v-if="acted_movies.results?.length"
+          class="section"
+        >
+          <AccordionHeader class="section-header">
             <i class="pi pi-video primary-icon" />
             <h2 class="section-title">
               {{ t("celebrity.filmography.acted_in") }}
             </h2>
-          </div>
-          <div class="section-body">
-            <div class="movies-grid">
-              <div
-                v-for="movie in acted_movies"
-                :key="movie.id"
-                class="movie-card"
-              >
-                <div class="movie-poster-wrap">
-                  <img
-                    :src="movie.cover"
-                    :alt="movie.title"
-                    class="movie-poster"
-                  />
+          </AccordionHeader>
+          <AccordionContent class="section-body">
+            <ScrollPanel ref="actedGridRef" style="width: 100%; height: 500px">
+              <div class="movies-grid">
+                <div
+                  v-for="movie in acted_movies.results"
+                  :key="movie.id"
+                  class="movie-card"
+                >
+                  <div class="movie-poster-wrap">
+                    <img
+                      :src="movie.cover"
+                      :alt="movie.title"
+                      class="movie-poster"
+                    />
+                  </div>
+                  <div class="movie-info">
+                    <p class="movie-title">{{ movie.title }}</p>
+                    <p class="movie-year">{{ movie.release_date }}</p>
+                  </div>
                 </div>
-                <div class="movie-info">
-                  <p class="movie-title">{{ movie.title }}</p>
-                  <p class="movie-year">{{ movie.release_date }}</p>
+                <div ref="actedSentinelRef" class="sentinel" />
+                <div v-if="loadingActors" class="loading-footer">
+                  <i class="pi pi-spin pi-spinner"></i>
                 </div>
               </div>
-            </div>
-          </div>
-        </section>
-        <section v-if="directed_movies.length" class="section">
-          <div class="section-header">
+            </ScrollPanel>
+          </AccordionContent>
+        </AccordionPanel>
+        <AccordionPanel
+          value="3"
+          v-if="directed_movies.results?.length"
+          class="section"
+        >
+          <AccordionHeader class="section-header">
             <i class="pi pi-video primary-icon" />
             <h2 class="section-title">
               {{ t("celebrity.filmography.directed") }}
             </h2>
-          </div>
-          <div class="section-body">
-            <div class="movies-grid">
-              <div
-                v-for="movie in directed_movies"
-                :key="movie.id"
-                class="movie-card"
-              >
-                <div class="movie-poster-wrap">
-                  <img
-                    :src="movie.cover"
-                    :alt="movie.title"
-                    class="movie-poster"
-                  />
+          </AccordionHeader>
+          <AccordionContent class="section-body">
+            <ScrollPanel
+              ref="directedGridRef"
+              style="width: 100%; height: 500px"
+            >
+              <div class="movies-grid">
+                <div
+                  v-for="movie in directed_movies.results"
+                  :key="movie.id"
+                  class="movie-card"
+                >
+                  <div class="movie-poster-wrap">
+                    <img
+                      :src="movie.cover"
+                      :alt="movie.title"
+                      class="movie-poster"
+                    />
+                  </div>
+                  <div class="movie-info">
+                    <p class="movie-title">{{ movie.title }}</p>
+                    <p class="movie-year">{{ movie.release_date }}</p>
+                  </div>
                 </div>
-                <div class="movie-info">
-                  <p class="movie-title">{{ movie.title }}</p>
-                  <p class="movie-year">{{ movie.release_date }}</p>
+                <div ref="directedSentinelRef" class="sentinel" />
+                <div v-if="loadingDirectors" class="loading-footer">
+                  <i class="pi pi-spin pi-spinner"></i>
                 </div>
               </div>
-            </div>
-          </div>
-        </section>
-      </main>
+            </ScrollPanel>
+          </AccordionContent>
+        </AccordionPanel>
+      </Accordion>
     </div>
   </div>
 </template>
 
 <style scoped>
+:deep(.p-accordionheader) {
+  color: var(--text);
+}
+
+:deep(.p-accordioncontent-content) {
+  all: unset;
+}
+
 /* ── Page ──────────────────────────────────────────────── */
 .page {
   min-height: 100vh;
@@ -387,26 +553,26 @@ onMounted(async () => {
   font-weight: 700;
 }
 
-.movies-grid {
+:deep(.movies-grid) {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1rem;
 }
 
 @media (min-width: 480px) {
-  .movies-grid {
+  :deep(.movies-grid) {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (min-width: 768px) {
-  .movies-grid {
+  :deep(.movies-grid) {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
 @media (min-width: 1024px) {
-  .movies-grid {
+  :deep(.movies-grid) {
     grid-template-columns: repeat(5, 1fr);
   }
 }
@@ -464,5 +630,17 @@ onMounted(async () => {
   color: var(--gray);
   font-weight: 500;
   margin: 0;
+}
+
+.sentinel {
+  grid-column: 1 / -1;
+  height: 1px;
+}
+
+.loading-footer {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
 }
 </style>

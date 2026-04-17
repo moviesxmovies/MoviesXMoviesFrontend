@@ -44,6 +44,10 @@ export interface ForgotPasswordPayload {
   email: string;
 }
 
+export interface MoviePagination {
+  results: Movie[];
+  next_last_id: number;
+}
 
 export interface Movie {
   id: number;
