@@ -18,6 +18,8 @@ import { ref } from "vue";
 const fileUploadRef = ref();
 const imagePreview = ref<string | null>(null);
 
+const selectedImage = ref<Blob | null>(null);
+  
 const props = defineProps<{
   modelValue: RegisterPayload;
 }>();
@@ -30,8 +32,9 @@ const emit = defineEmits<{
   (e: "back"): void;
 }>();
 
-const onFormSubmit = ({ valid }: FormSubmitEvent<Record<string, any>>) => {
+const onFormSubmit = ({ valid, values }: FormSubmitEvent<Record<string, any>>) => {
   if (valid) {
+    emit("update:modelValue", { ...props.modelValue, ...values, image: selectedImage.value ?? props.modelValue.image });
     emit("next");
   }
 };
@@ -42,7 +45,7 @@ const triggerUpload = () =>
 const onFileSelect = (event: FileUploadSelectEvent) => {
   const file = Array.isArray(event.files) ? event.files[0] : event.files;
   imagePreview.value = URL.createObjectURL(file);
-  emit("update:modelValue", { ...props.modelValue, image: file as Blob });
+  selectedImage.value = file as Blob;
 };
 </script>
 
@@ -58,116 +61,59 @@ const onFileSelect = (event: FileUploadSelectEvent) => {
     </div>
 
     <div class="flex justify-center">
-      <div
-        class="relative w-32 h-32 group cursor-pointer"
-        @click="triggerUpload"
-      >
-        <div
-          v-if="!imagePreview"
+      <div class="relative w-32 h-32 group cursor-pointer" @click="triggerUpload">
+        <div v-if="!imagePreview"
           class="w-24 h-24 rounded-full flex flex-col items-center justify-center border-2 border-dashed transition-colors"
           style="
             border-color: var(--secondary);
             background-color: var(--background);
-          "
-        >
+          ">
           <i class="pi pi-camera text-xl" style="color: var(--primary)" />
           <span class="text-xs mt-1" style="color: var(--text); opacity: 0.5">
             {{ $t("signup.step2.image") }}
           </span>
         </div>
 
-        <img
-          v-else
-          :src="imagePreview"
-          alt="Avatar"
-          class="w-24 h-24 rounded-full object-cover border-2 m-auto"
-          style="border-color: var(--primary)"
-        />
+        <img v-else :src="imagePreview" alt="Avatar" class="w-24 h-24 rounded-full object-cover border-2 m-auto"
+          style="border-color: var(--primary)" />
 
-        <div
-          v-if="imagePreview"
+        <div v-if="imagePreview"
           class="absolute inset-0 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-          style="background-color: rgba(0, 0, 0, 0.4)"
-        >
+          style="background-color: rgba(0, 0, 0, 0.4)">
           <i class="pi pi-pencil text-white text-lg" />
         </div>
       </div>
 
-      <FileUpload
-        ref="fileUploadRef"
-        mode="basic"
-        :auto="true"
-        chooseLabel=""
-        accept="image/png, image/jpeg"
-        :maxFileSize="1000000"
-        :multiple="false"
-        @select="onFileSelect"
-        class="!hidden"
-      />
+      <FileUpload ref="fileUploadRef" mode="basic" :auto="true" chooseLabel="" accept="image/png, image/jpeg"
+        :maxFileSize="1000000" :multiple="false" @select="onFileSelect" class="!hidden" />
     </div>
 
-    <Form
-      :resolver="resolver"
-      @submit="onFormSubmit"
-      class="flex flex-col gap-4 w-full"
-    >
+    <Form :resolver="resolver" @submit="onFormSubmit" class="flex flex-col gap-4 w-full">
       <div class="flex gap-3">
-        <FormField
-          v-slot="$field"
-          name="first_name"
-          initialValue=""
-          class="flex flex-col gap-1 flex-1"
-        >
+        <FormField v-slot="$field" name="first_name" initialValue="" class="flex flex-col gap-1 flex-1">
           <FloatLabel variant="over">
             <IconField>
-              <InputText
-                v-bind="$field"
-                id="first_name"
-                type="text"
-                fluid
-                :class="{
-                  'p-invalid': $field?.invalid,
-                  'p-valid': $field?.dirty && !$field?.invalid,
-                }"
-              />
-              <InputIcon
-                v-if="$field?.dirty"
-                :class="
-                  $field?.invalid ? 'pi pi-times-circle' : 'pi pi-check-circle'
-                "
-                :style="{ color: $field?.invalid ? '#ef4444' : '#22c55e' }"
-              />
+              <InputText v-bind="$field" id="first_name" type="text" fluid :class="{
+                'p-invalid': $field?.invalid,
+                'p-valid': $field?.dirty && !$field?.invalid,
+              }" />
+              <InputIcon v-if="$field?.dirty" :class="$field?.invalid ? 'pi pi-times-circle' : 'pi pi-check-circle'
+                " :style="{ color: $field?.invalid ? '#ef4444' : '#22c55e' }" />
             </IconField>
             <label for="first_name">{{ $t("signup.firstName") }}</label>
           </FloatLabel>
           <FieldMsg :field="$field" />
         </FormField>
 
-        <FormField
-          v-slot="$field"
-          name="last_name"
-          initialValue=""
-          class="flex flex-col gap-1 flex-1"
-        >
+        <FormField v-slot="$field" name="last_name" initialValue="" class="flex flex-col gap-1 flex-1">
           <FloatLabel variant="over">
             <IconField>
-              <InputText
-                v-bind="$field"
-                id="last_name"
-                type="text"
-                fluid
-                :class="{
-                  'p-invalid': $field?.invalid,
-                  'p-valid': $field?.dirty && !$field?.invalid,
-                }"
-              />
-              <InputIcon
-                v-if="$field?.dirty"
-                :class="
-                  $field?.invalid ? 'pi pi-times-circle' : 'pi pi-check-circle'
-                "
-                :style="{ color: $field?.invalid ? '#ef4444' : '#22c55e' }"
-              />
+              <InputText v-bind="$field" id="last_name" type="text" fluid :class="{
+                'p-invalid': $field?.invalid,
+                'p-valid': $field?.dirty && !$field?.invalid,
+              }" />
+              <InputIcon v-if="$field?.dirty" :class="$field?.invalid ? 'pi pi-times-circle' : 'pi pi-check-circle'
+                " :style="{ color: $field?.invalid ? '#ef4444' : '#22c55e' }" />
             </IconField>
             <label for="last_name">{{ $t("signup.lastName") }}</label>
           </FloatLabel>
@@ -176,13 +122,7 @@ const onFileSelect = (event: FileUploadSelectEvent) => {
       </div>
 
       <div class="flex gap-3 mt-2">
-        <Button
-          type="button"
-          :label="$t('back')"
-          fluid
-          outlined
-          @click="emit('back')"
-        />
+        <Button type="button" :label="$t('back')" fluid outlined @click="emit('back')" />
         <Button type="submit" :label="$t('signup.title')" fluid />
       </div>
     </Form>
@@ -197,9 +137,11 @@ const onFileSelect = (event: FileUploadSelectEvent) => {
   font-size: 0.78rem;
   animation: fadeIn 0.15s ease;
 }
+
 .field-msg.error {
   color: #ef4444;
 }
+
 .field-msg.success {
   color: #22c55e;
 }

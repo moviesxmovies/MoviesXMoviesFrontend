@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import { api } from "@/composables/useAPI";
+import { handleRegister } from "@/repositories/auth/authRepository";
 import { useLangStore } from "@/stores/langStore";
+import type { RegisterPayload } from "@/types";
 import Step1 from "@/views/signup/step1.vue";
 import Step2 from "@/views/signup/step2.vue";
 import { ProgressBar, useToast } from "primevue";
@@ -55,14 +56,13 @@ const handleForm = async () => {
 
 const signup = async (form: FormData) => {
   try {
-    await api.post("/auth/signup/?lang=" + useLang.language, form);
+    await handleRegister(useLang.language , form as unknown as RegisterPayload);
     toast.add({
       severity: "success",
       summary: "Success",
       detail: t("signup.toast.success"),
-      life: 3000,
+      life: 5000,
     });
-
     router.push("/home");
   } catch (error: any) {
     toast.add({
