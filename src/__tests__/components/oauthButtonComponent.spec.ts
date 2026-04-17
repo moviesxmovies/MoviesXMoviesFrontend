@@ -12,15 +12,6 @@ describe("oauthButtonComponent", () => {
     });
   };
 
-  it("handleGoogleLogin emites click", () => {
-    const wrapper = factory();
-
-    wrapper.vm.handleGoogleLogin();
-
-    expect(wrapper.emitted("click")).toBeTruthy();
-    expect(wrapper.emitted("click")).toHaveLength(1);
-  });
-
   it("Emits click event when button is clicked", async () => {
     const wrapper = factory();
 
