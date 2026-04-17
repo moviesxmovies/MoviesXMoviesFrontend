@@ -9,7 +9,6 @@ import {
   Password,
   useToast,
 } from "primevue";
-import { loginWithGoogle } from "@/composables/useOAUTH";
 import OauthButtonComponent from "@/components/oauthButtonComponent.vue";
 import { FieldMsg, handleLogin } from "@/repositories/auth/authRepository";
 import type { LoginPayload } from "@/types";
@@ -112,7 +111,7 @@ const login = async ({
             <div class="flex-1 h-px" style="background-color: var(--secondary); opacity: 0.5" />
           </div>
 
-          <OauthButtonComponent @click="loginWithGoogle" />
+          <OauthButtonComponent />
 
           <p class="text-center text-sm mt-4 sm:mt-8" style="color: var(--text); opacity: 0.7">
             {{ $t("login.noAccount") }}
