@@ -21,6 +21,11 @@
       "genres": "Genre | Genres",
       "actors": "Actor | Actors",
       "directors": "Director | Directors"
+    },
+    "navbar": {
+      "logout": "Logout",
+      "profile": "My Profile"
+
     }
   },
   "signup": {

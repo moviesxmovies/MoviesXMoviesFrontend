@@ -1,13 +1,31 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
-import { ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import LangComponent from "./langComponent.vue";
 import ThemeComponent from "./themeComponent.vue";
 import { useAuthStore } from "@/stores/authStore";
+import { getUserProfile } from "@/repositories/userRepository";
+import Menu from 'primevue/menu';
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const router = useRouter();
 const authStore = useAuthStore();
 const menuOpen = ref(false);
+const profilePicture = ref<string | null>(null);
+
+const loadProfilePicture = async () => {
+    if (!authStore.isAuthenticated) {
+        profilePicture.value = null;
+        return;
+    }
+    try {
+        const profile = await getUserProfile();
+        profilePicture.value = profile?.picture ?? null;
+    } catch {
+        profilePicture.value = null;
+    }
+};
 
 const toggleMenu = () => {
     menuOpen.value = !menuOpen.value;
@@ -17,6 +35,32 @@ const navigate = (path: string) => {
     router.push(path);
     menuOpen.value = false;
 };
+
+
+const profileMenu = ref();
+const menuItems = computed(() => [
+    {
+        label: t('components.navbar.profile'),
+        icon: 'pi pi-user',
+        command: () => router.push('/profile')
+    },
+    {
+        separator: true
+    },
+    {
+        label: t('components.navbar.logout'),
+        icon: 'pi pi-sign-out',
+        command: () => {
+            authStore.logout();
+            router.push('/');
+        }
+    }
+]);
+
+
+onMounted(loadProfilePicture);
+
+watch(() => authStore.isAuthenticated, loadProfilePicture);
 </script>
 
 <template>
@@ -31,9 +75,12 @@ const navigate = (path: string) => {
         <div class="nav-right desktop-only">
             <LangComponent />
             <ThemeComponent />
-            <button class="btn-ghost" @click="router.push('/profile')" v-if="authStore.isAuthenticated">
-                <span class="pi pi-user"></span>
-            </button>
+            <template v-if="authStore.isAuthenticated">
+                <button class="btn-profile" @click="(e) => profileMenu.toggle(e)">
+                    <img :src="profilePicture ?? ''" :alt="$t('home.profile')" />
+                </button>
+                <Menu ref="profileMenu" :model="menuItems" popup class="profile-menu" appendTo="self" />
+            </template>
             <button class="btn-ghost" @click="router.push('/login')" v-else>
                 {{ $t("home.login") }}
             </button>
@@ -57,7 +104,7 @@ const navigate = (path: string) => {
                     </div>
 
                     <button class="btn-ghost" @click="navigate('/profile')" v-if="authStore.isAuthenticated">
-                        <span class="pi pi-user" style="margin-right: 8px;"></span>
+                        <img :src="profilePicture ?? ''" :alt="$t('home.profile')" class="btn-profile-img" />
                         {{ $t("home.profile") || "Mi Perfil" }}
                     </button>
                     <button class="btn-ghost" @click="navigate('/login')" v-else>
@@ -113,6 +160,97 @@ const navigate = (path: string) => {
     font-weight: 600;
     cursor: pointer;
 }
+
+.btn-profile {
+    background: color-mix(in srgb, var(--text) 8%, transparent);
+    border: 0.5px solid rgba(47, 39, 206, 0.15);
+    border-radius: 8px;
+    height: 2.5rem;
+    width: 2.5rem;
+    padding: 3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-profile:hover {
+    border-color: var(--primary);
+    background: color-mix(in srgb, var(--text) 12%, transparent);
+}
+
+.btn-profile img,.btn-profile-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 100%;
+    object-fit: cover;
+}
+.btn-profile-img {
+    margin-right: 8px;
+    height: 1.5rem;
+    width: 1.5rem;
+
+}
+
+/* MENU */
+:deep(.profile-menu.p-menu) {
+    background: var(--background);
+    border: 0.5px solid rgba(47, 39, 206, 0.2);
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    padding: 6px;
+    margin-top: 8px;
+    min-width: 180px;
+    font-family: 'DM Sans', sans-serif;
+}
+
+:deep(.profile-menu .p-menu-item-link) {
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.1s ease;
+    gap: 10px;
+}
+
+:deep(.profile-menu .p-menu-item-link:hover) {
+    background: var(--secondary);
+    color: var(--primary);
+}
+
+:deep(.profile-menu .p-menu-item-content:focus),
+:deep(.profile-menu .p-menu-item-content:focus-visible),
+:deep(.profile-menu .p-menu-item-link:focus),
+:deep(.profile-menu .p-menu-item-link:focus-visible),
+:deep(.profile-menu .p-menu-item[data-p-focused="true"] .p-menu-item-content) {
+    background: transparent !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+:deep(.profile-menu .p-menu-item[data-p-active="true"] .p-menu-item-content),
+:deep(.profile-menu .p-menu-item-link:active .p-menu-item-content),
+:deep(.profile-menu .p-menu-item-content:active) {
+    background: color-mix(in srgb, var(--primary) 15%, transparent) !important;
+}
+
+:deep(.profile-menu .p-menu-item[data-p-active="true"] .p-menu-item-link),
+:deep(.profile-menu .p-menu-item-link:active) {
+    color: var(--primary) !important;
+}
+
+:deep(.profile-menu .p-menu-item-link .p-menu-item-icon) {
+    color: inherit;
+    font-size: 0.85rem;
+}
+
+:deep(.profile-menu .p-menuitem-separator) {
+    border-color: rgba(47, 39, 206, 0.1);
+    margin: 4px 0
+}
+
 
 .logo-icon {
     width: 32px;
@@ -271,6 +409,8 @@ const navigate = (path: string) => {
     .mobile-only {
         display: flex;
     }
+
+
 }
 
 @media (min-width: 641px) {
