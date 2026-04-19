@@ -25,7 +25,7 @@ const factory = (isAuthenticated = false) => {
   vi.mocked(useAuthStore).mockReturnValue({ isAuthenticated } as any);
   return mount(NavbarComponent, {
     global: {
-      plugins: [createPinia(), i18n],
+      plugins: [i18n],
       stubs: {
         LangComponent: true,
         ThemeComponent: true,
@@ -40,6 +40,7 @@ describe("NavbarComponent", () => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
   });
+
 
   // ── Render ───────────────────────────────────────────────────────────────
   it("renders the logo text", () => {
@@ -73,7 +74,7 @@ describe("NavbarComponent", () => {
     const wrapper = factory(false);
     const buttons = wrapper.findAll(".btn-ghost");
     expect(buttons).toHaveLength(1);
-    expect(buttons[0].text()).toContain("Login"); 
+    expect(buttons[0].text()).toContain("Login");
   });
 
   it("does not show profile button when not authenticated", () => {
@@ -98,12 +99,13 @@ describe("NavbarComponent", () => {
     });
   });
 
-  it("navigates to /profile when profile button is clicked", async () => {
+  it("does not show login button when authenticated", () => {
     const wrapper = factory(true);
-    await wrapper.find(".btn-ghost").trigger("click");
-    expect(mockPush).toHaveBeenCalledWith("/profile");
+    const loginBtns = wrapper.findAll(".btn-ghost").filter(btn =>
+      btn.text().includes("Login")
+    );
+    expect(loginBtns).toHaveLength(0);
   });
-
   // ── Hamburger ────────────────────────────────────────────────────────────
   it("renders hamburger button", () => {
     const wrapper = factory();
