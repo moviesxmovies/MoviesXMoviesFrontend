@@ -152,7 +152,7 @@ const checkSwipe = (func: Function) => {
 .select-none {
   user-select: none;
   -webkit-user-select: none;
-  touch-action: pan-y;
+  touch-action: none; 
 }
 
 .draggable-wrapper {
