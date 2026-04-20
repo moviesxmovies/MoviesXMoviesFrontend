@@ -1,14 +1,24 @@
 <script lang="ts" setup>
-import { addMovieToList, fetchUserLists } from "@/repositories/listRepository";
+import {
+  addMovieToList,
+  fetchMovieListsFromMovie,
+  fetchUserLists,
+  removeMovieFromList,
+} from "@/repositories/listRepository";
 import type { Movie, MovieList } from "@/types";
-import { Checkbox, Dialog, useToast } from "primevue";
+import { Checkbox, Dialog, Skeleton, useToast } from "primevue";
 import { watch, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import CreateListDialog from "./createListDialog.vue";
 
+type UserMovieList = {
+  list: MovieList;
+  containsMovie?: boolean;
+};
+
 const { t } = useI18n();
 const toast = useToast();
-const userList = ref<MovieList[]>([]);
+const userList = ref<UserMovieList[]>([]);
 const loading = ref(false);
 const props = defineProps<{
   movie: Movie;
@@ -19,6 +29,13 @@ const visibleCreateList = ref(false);
 const addToList = async (listSlug: string) => {
   try {
     await addMovieToList(listSlug, props.movie.slug);
+    await checkMovieInLists();
+    toast.add({
+      severity: "success",
+      summary: t("toast.success"),
+      detail: t("components.actions.addToListSuccess"),
+      life: 3000,
+    });
   } catch (error: any) {
     toast.add({
       severity: "error",
@@ -30,28 +47,72 @@ const addToList = async (listSlug: string) => {
   }
 };
 
+const removeFromList = async (listSlug: string) => {
+  try {
+    await removeMovieFromList(listSlug, props.movie.slug);
+    await checkMovieInLists();
+    toast.add({
+      severity: "success",
+      summary: t("toast.success"),
+      detail: t("components.actions.removeFromListSuccess"),
+      life: 3000,
+    });
+  } catch (error: any) {
+    toast.add({
+      severity: "error",
+      summary: t("toast.error"),
+      detail:
+        error.response?.data?.message ||
+        t("components.actions.removeFromListError"),
+      life: 3000,
+    });
+  }
+};
+
+const getUserLists = async () => {
+  loading.value = true;
+  try {
+    const lists = await fetchUserLists();
+    userList.value = lists.map((list) => ({ list }));
+  } catch (error: any) {
+    toast.add({
+      severity: "error",
+      summary: t("toast.error"),
+      detail:
+        error.response?.data?.message ||
+        t("components.actions.fetchListsError"),
+      life: 3000,
+    });
+  } finally {
+    loading.value = false;
+  }
+};
+
+const checkMovieInLists = async () => {
+  try {
+    const slugs = await fetchMovieListsFromMovie(props.movie.slug);
+    userList.value.forEach((list) => {
+      list.containsMovie = slugs.includes(list.list.slug);
+    });
+  } catch (error: any) {
+    toast.add({
+      severity: "error",
+      summary: t("toast.error"),
+      detail:
+        error.response?.data?.message ||
+        t("components.actions.checkMovieInListsError"),
+      life: 3000,
+    });
+  }
+};
+
 watch(
   () => props.movie,
-  async (movie) => {
-    const currentId = movie.id;
-    loading.value = true;
+  async () => {
     visible.value = false;
-
-    try {
-      const data = await fetchUserLists();
-      userList.value = data;
-    } catch (error: any) {
-      toast.add({
-        severity: "error",
-        summary: t("toast.error"),
-        detail: error.response?.data?.message || t("toast.genericError"),
-        life: 3000,
-      });
-    } finally {
-      if (currentId === props.movie.id) {
-        loading.value = false;
-      }
-    }
+    if (!props.movie) return;
+    await getUserLists();
+    await checkMovieInLists();
   },
   { immediate: true },
 );
@@ -87,18 +148,15 @@ watch(
 
     <div class="flex flex-col gap-3">
       <div v-if="loading" class="flex flex-col gap-3">
-        <div
-          v-for="i in 3"
-          :key="i"
-          class="h-16 w-full bg-[var(--secondary)]/10 animate-pulse rounded-2xl"
-        ></div>
+        <div v-for="i in 3" :key="i" class="h-16 rounded-2xl">
+          <Skeleton height="100%" />
+        </div>
       </div>
 
       <div
         v-for="list in userList"
-        :key="list.id"
+        :key="list.list.id"
         class="group flex items-center justify-between p-4 rounded-2xl border border-[var(--secondary)]/30 bg-white/50 dark:bg-white/5 hover:border-[var(--primary)] hover:bg-[var(--primary)]/[0.02] transition-all duration-300 cursor-pointer"
-        @click="addToList(list.slug)"
       >
         <div class="flex items-center gap-4">
           <div
@@ -109,14 +167,18 @@ watch(
           <span
             class="font-bold text-[var(--text)] group-hover:text-[var(--primary)] transition-colors"
           >
-            {{ list.name }}
+            {{ list.list.name }}
           </span>
         </div>
 
         <Checkbox
           :binary="true"
-          :modelValue="false"
-          @click.stop
+          :modelValue="list.containsMovie"
+          @click="
+            list.containsMovie
+              ? removeFromList(list.list.slug)
+              : addToList(list.list.slug)
+          "
           class="custom-checkbox"
         />
       </div>

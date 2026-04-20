@@ -17,12 +17,34 @@ export const fetchUserLists = async (
   }
 };
 
+export const fetchMovieListsFromMovie = async (movieSlug: string) => {
+  try {
+    const { data } = await api.get(`/movies/${movieSlug}/movie-lists/`);
+    return data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 export const addMovieToList = async (
   movieListSlug: string,
   movieSlug: string,
 ) => {
   try {
     await api.post(
+      `/movies-lists/${authStore.user?.username || ""}/${movieListSlug}/${movieSlug}/`,
+    );
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+export const removeMovieFromList = async (
+  movieListSlug: string,
+  movieSlug: string,
+) => {
+  try {
+    await api.delete(
       `/movies-lists/${authStore.user?.username || ""}/${movieListSlug}/${movieSlug}/`,
     );
   } catch (error: any) {

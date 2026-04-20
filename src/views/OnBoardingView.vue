@@ -13,7 +13,6 @@ let previousAnimationElement: HTMLElement | null = null;
 
 const handleFinish = () => {
     completeBoarding().then(() => {
-        console.log('Onboarding completed successfully');
         router.push('/');
     }).catch((error) => {
         toast.add({
