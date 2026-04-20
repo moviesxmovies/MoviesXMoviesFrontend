@@ -59,9 +59,9 @@ describe("AuthRepository", () => {
     };
     mockPost.mockResolvedValueOnce({ data: userData });
 
-    const result = await handleRegister(userData);
+    const result = await handleRegister(undefined, userData);
 
-    expect(mockPost).toHaveBeenCalledWith("/auth/signup/", userData);
+    expect(mockPost).toHaveBeenCalledWith("/auth/signup/", userData, { params: { lang: undefined } });
     expect(result).toEqual(userData);
   });
 

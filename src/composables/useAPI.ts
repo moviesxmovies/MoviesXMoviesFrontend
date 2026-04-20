@@ -1,36 +1,45 @@
 import axios from 'axios';
 import { useAuthStore } from '../stores/authStore';
-import { config } from '@/config'
-
+import { config as appConfig } from '@/config';
 const refreshInstance = axios.create({
-    baseURL: config.apiUrl,
+    baseURL: appConfig.apiUrl,
     withCredentials: true,
 });
+
 export const api = axios.create({
-    baseURL: config.apiUrl,
+    baseURL: appConfig.apiUrl,
     withCredentials: true,
 });
+
+const doRefresh = async (authStore: any) => {
+    const { data } = await refreshInstance.post('/auth/refresh/', {
+        refresh: authStore.refreshToken,
+    });
+    authStore.setTokens(data.access, data.refresh);
+    return data.access;
+};
+
+function logout(authStore: any) {
+    authStore.logout();
+    globalThis.location.href = '/login';
+}
 
 api.interceptors.request.use(async (config) => {
     const authStore = useAuthStore();
 
-    if (authStore.token && authStore.refreshToken) {
-        if (authStore.isTokenExpired()) {
-            try {
-                const { data } = await refreshInstance.post('/auth/refresh/', {
-                    refresh: authStore.refreshToken,
-                });
+    if (!authStore.token) return config;
 
-                authStore.setTokens(data.access, data.refresh);
-                config.headers.Authorization = `Bearer ${data.access}`;
-            } catch (error) {
-                authStore.logout();
-                globalThis.location.href = '/login';
-                return Promise.reject(error instanceof Error ? error : new Error(String(error)));
-            }
-        } else {
-            config.headers.Authorization = `Bearer ${authStore.token}`;
+    if (authStore.isTokenExpired()) {
+        try {
+            const newToken = await doRefresh(authStore);
+            config.headers.Authorization = `Bearer ${newToken}`;
+        } catch (error) {
+            logout(authStore);
+            return Promise.reject(error as Error);
         }
+    } else {
+        config.headers.Authorization = `Bearer ${authStore.token}`;
     }
+
     return config;
 });

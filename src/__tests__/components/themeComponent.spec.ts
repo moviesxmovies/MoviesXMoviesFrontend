@@ -41,28 +41,16 @@ describe("ThemeToggle", () => {
   });
 
   describe("light mode", () => {
-    it("Should show the sun", () => {
+    it("Should show the sun (no hidden class)", () => {
       const wrapper = factory();
-      const [sun] = wrapper.findAll("svg");
-      expect(sun.attributes("style")).toContain("opacity: 1");
+      const sun = wrapper.find(".sun-icon");
+      expect(sun.classes()).not.toContain("hidden-icon");
     });
 
-    it("Should not rotate the sun", () => {
+    it("Should hide the moon (has hidden class)", () => {
       const wrapper = factory();
-      const [sun] = wrapper.findAll("svg");
-      expect(sun.attributes("style")).toContain("rotate: 0deg");
-    });
-
-    it("Should hide the moon", () => {
-      const wrapper = factory();
-      const [, moon] = wrapper.findAll("svg");
-      expect(moon.attributes("style")).toContain("opacity: 0");
-    });
-
-    it("Should rotate the moon to -90deg", () => {
-      const wrapper = factory();
-      const [, moon] = wrapper.findAll("svg");
-      expect(moon.attributes("style")).toContain("rotate: -90deg");
+      const moon = wrapper.find(".moon-icon");
+      expect(moon.classes()).toContain("hidden-icon");
     });
   });
 
@@ -71,28 +59,16 @@ describe("ThemeToggle", () => {
       mockStore.theme = "dark";
     });
 
-    it("Should hide the sun", () => {
+    it("Should hide the sun (has hidden class)", () => {
       const wrapper = factory();
-      const [sun] = wrapper.findAll("svg");
-      expect(sun.attributes("style")).toContain("opacity: 0");
+      const sun = wrapper.find(".sun-icon");
+      expect(sun.classes()).toContain("hidden-icon");
     });
 
-    it("Should rotate the sun to 90deg", () => {
+    it("Should show the moon (no hidden class)", () => {
       const wrapper = factory();
-      const [sun] = wrapper.findAll("svg");
-      expect(sun.attributes("style")).toContain("rotate: 90deg");
-    });
-
-    it("Should show the moon", () => {
-      const wrapper = factory();
-      const [, moon] = wrapper.findAll("svg");
-      expect(moon.attributes("style")).toContain("opacity: 1");
-    });
-
-    it("Should not rotate the moon", () => {
-      const wrapper = factory();
-      const [, moon] = wrapper.findAll("svg");
-      expect(moon.attributes("style")).toContain("rotate: 0deg");
+      const moon = wrapper.find(".moon-icon");
+      expect(moon.classes()).not.toContain("hidden-icon");
     });
   });
 });

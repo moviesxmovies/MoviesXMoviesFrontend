@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import { api } from "@/composables/useAPI";
+import { handleRegister } from "@/repositories/auth/authRepository";
 import { useLangStore } from "@/stores/langStore";
+import type { RegisterPayload } from "@/types";
 import Step1 from "@/views/signup/step1.vue";
 import Step2 from "@/views/signup/step2.vue";
 import { ProgressBar, useToast } from "primevue";
@@ -55,14 +56,13 @@ const handleForm = async () => {
 
 const signup = async (form: FormData) => {
   try {
-    await api.post("/auth/signup/?lang=" + useLang.language, form);
+    await handleRegister(useLang.language , form as unknown as RegisterPayload);
     toast.add({
       severity: "success",
       summary: "Success",
       detail: t("signup.toast.success"),
-      life: 3000,
+      life: 5000,
     });
-
     router.push("/home");
   } catch (error: any) {
     toast.add({
@@ -78,17 +78,21 @@ defineExpose({ currentStep, formData, next, handleForm });
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col items-center justify-center px-4" style="background-color: var(--background)">
-
-    <div class="w-full max-w-md">
-      <div class="mb-4">
-        <ProgressBar :value="currentStep * 100 / Object.keys(steps).length">{{ }}</ProgressBar>
-      </div>
-      <div class="rounded-2xl border p-8 shadow-sm"
+  <div class="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6"
+    style="background-color: var(--background)">
+    <div class="w-full max-w-md my-4">
+      <div class="rounded-2xl border shadow-sm overflow-hidden"
         style="background-color: var(--background); border-color: var(--secondary)">
-        <keep-alive>
-          <component :is="steps[currentStep]" v-model="formData" @next="next" @back="currentStep--" />
-        </keep-alive>
+
+        <ProgressBar :value="currentStep * 100 / Object.keys(steps).length" class="custom-progress">
+          {{ }}
+        </ProgressBar>
+
+        <div class="p-6 sm:p-8">
+          <keep-alive>
+            <component :is="steps[currentStep]" v-model="formData" @next="next" @back="currentStep--" />
+          </keep-alive>
+        </div>
       </div>
 
     </div>
@@ -96,10 +100,24 @@ defineExpose({ currentStep, formData, next, handleForm });
 </template>
 
 <style scoped>
+.custom-progress {
+  height: 4px !important;
+  border-radius: 0 !important;
+  background-color: rgba(var(--secondary-rgb), 0.1) !important;
+  border: none !important;
+}
+
+:deep(.p-progressbar-value) {
+  background-color: var(--primary) !important;
+  transition: width 0.4s ease-in-out;
+}
+
 :deep(.p-inputtext) {
   background-color: var(--background) !important;
   color: var(--text) !important;
   border-color: var(--secondary) !important;
+  font-size: 16px !important;
+  padding: 0.75rem !important;
 }
 
 :deep(.p-inputtext:focus) {
@@ -139,6 +157,8 @@ defineExpose({ currentStep, formData, next, handleForm });
   background-color: var(--primary) !important;
   border-color: var(--primary) !important;
   color: #fff !important;
+  padding: 0.85rem !important;
+  font-weight: 600;
 }
 
 :deep(.p-button:hover) {

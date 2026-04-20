@@ -8,6 +8,7 @@ import { useRouter } from 'vue-router';
 const currentStep = ref(0);
 const router = useRouter();
 const toast = useToast();
+const stepCard = ref<HTMLElement | null>(null);
 let previousAnimationElement: HTMLElement | null = null;
 
 const handleFinish = () => {
@@ -29,7 +30,6 @@ const handleAnimation = (targetId: string) => {
         previousAnimationElement.classList.remove('animate-boarding');
     }
     const targetElement = document.getElementById(targetId);
-    console.log('Animating element with ID:', targetId, 'Found element:', targetElement);
     if (targetElement) {
         targetElement.classList.add('animate-boarding');
         previousAnimationElement = targetElement;
@@ -39,7 +39,6 @@ const handleAnimation = (targetId: string) => {
 const handleContinue = () => {
     if (currentStep.value < steps.length - 1) {
         currentStep.value++;
-
         const currentStepData = steps[currentStep.value];
         if (!currentStepData) return;
         const currentTargetId = currentStepData.targetId;
@@ -50,51 +49,86 @@ const handleContinue = () => {
 };
 
 const steps = [
-    { id: 'step1', positionClass: 'pos-bottom-left', targetId: 'welcome' },
-    { id: 'step2', positionClass: 'pos-top-left', targetId: 'stars' },
-    { id: 'step3', positionClass: 'pos-top-center', targetId: 'add-to-list-button' },
-    { id: 'step4', positionClass: 'pos-top-right', targetId: 'unseen-button' },
-    { id: 'step5', positionClass: 'pos-bottom-right', targetId: 'mainSwipe' },
+    { id: 'step1', targetId: 'welcome' },
+    { id: 'step2', targetId: 'stars' },
+    { id: 'step3', targetId: 'add-to-list-button' },
+    { id: 'step4', targetId: 'unseen-button' },
+    { id: 'step5', targetId: 'mainSwipe' },
 ];
 </script>
 
 <template>
     <div class="relative w-full h-screen overflow-hidden">
         <div class="onboarding-overlay">
+
             <button @click="handleFinish" class="skip-button">
-                {{ $t("onboarding.skip") }} <span class="pi pi-step-forward"></span>
+                {{ $t("onboarding.skip") }}
+                <span class="pi pi-step-forward" style="font-size:10px; opacity:0.6"></span>
             </button>
 
-            <div v-for="(step, index) in steps" :key="step.id" :class="[
-                'step-card',
-                step.positionClass,
-                currentStep >= index ? 'visible-boarding' : 'hidden-boarding',
-                currentStep === index ? 'current-step' : ''
-            ]">
-                <div class="card-inner" :class="currentStep === index ? 'card-active' : 'card-past'">
-                    <p class="card-text">{{ $t(`onboarding.step${index + 1}`) }}</p>
-                    <div class="button-wrapper" :class="currentStep === index ? 'btn-visible' : 'btn-hidden'">
-                        <div class="step-indicator">
-                            <span v-for="(s, i) in steps" :key="i"
-                                :class="['step-dot', i === index ? 'dot-active' : i < index ? 'dot-past' : 'dot-future']">
-                            </span>
+            <div class="step-card pos-top-left">
+                <div class="card-inner">
+                    <div class="card-header">
+                        <div class="card-badge">
+                            <span class="badge-dot" />
+                            <Transition name="fade" mode="out-in">
+                                <span :key="currentStep">{{ $t(`onboarding.step${currentStep + 1}Label`) || "Onboarding"
+                                    }}</span>
+                            </Transition>
                         </div>
-                        <Button
-                            
-                            :label="currentStep === steps.length - 1 ? $t('onboarding.finish') : $t('onboarding.continue')"
-                            class="pointer-events-auto" @click="handleContinue" />
+                        <span class="card-eyebrow">
+                            <Transition name="fade" mode="out-in">
+                                <span id="step-span" :key="currentStep">{{ currentStep + 1 }} / {{ steps.length }}</span>
+                            </Transition>
+                        </span>
                     </div>
+
+                    <Transition name="fade" mode="out-in">
+                        <p :key="currentStep" class="card-text">{{ $t(`onboarding.step${currentStep + 1}`) }}</p>
+                    </Transition>
+
+                    <div class="step-indicator">
+                        <span v-for="(s, i) in steps" :key="i" :class="['step-dot',
+                            i === currentStep ? 'dot-active' :
+                                i < currentStep ? 'dot-past' : 'dot-future']" />
+                    </div>
+
+                    <Button id="continue-button" :label="currentStep === steps.length - 1
+                        ? $t('onboarding.finish')
+                        : $t('onboarding.continue')" class="pointer-events-auto" @click="handleContinue" />
+
+                    <p class="card-hint">{{ $t("onboarding.hint") }}</p>
                 </div>
             </div>
+
         </div>
 
-        <div class="absolute inset-0 bg-black/80 z-[999] pointer-events-none"></div>
         <div class="no-cursor-interactions h-full w-full">
             <HomeView />
         </div>
     </div>
 </template>
+
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+/* ── Animaciones de Transición ── */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.fade-enter-from {
+    opacity: 0;
+    transform: translateY(4px);
+}
+
+.fade-leave-to {
+    opacity: 0;
+    transform: translateY(-4px);
+}
+
+/* ── Layout ── */
 .no-cursor-interactions {
     pointer-events: none;
     user-select: none;
@@ -107,217 +141,184 @@ const steps = [
     pointer-events: auto;
 }
 
+/* ── Skip button (Base Light) ── */
 .skip-button {
     position: absolute;
-    top: 3rem;
-    right: 2rem;
-    color: var(--primary);
-    pointer-events: auto;
-    background-color: var(--background);
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
+    top: calc(28px + 1.5rem);
+    right: 3.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 999px;
     cursor: pointer;
-    transition: color 0.2s;
+    transition: all 0.2s;
+    z-index: 20;
+    background: var(--ob-card-bg);
+    border: 1px solid var(--ob-card-border);
+    color: var(--ob-text-muted);
 }
 
 .skip-button:hover {
-    color: var(--accent);
-
+    border-color: var(--primary);
+    color: #000;
 }
 
-/* ── Cards ── */
+/* ── Card position ── */
 .step-card {
     position: absolute;
     pointer-events: none;
-    transition: opacity 0.5s ease, transform 0.5s ease;
+    z-index: 15;
+    transition: top 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+        left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+        transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .pos-top-left {
-    top: 4rem;
-    left: 16.66%;
-    transform: translateX(-50%);
+    top: 30%;
+    left: 20%;
+    transform: translate(-50%, -50%);
 }
 
-.pos-top-center {
-    top: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-.pos-top-right {
-    top: 4rem;
-    left: 83.33%;
-    transform: translateX(-50%);
-}
-
-.pos-bottom-left {
-    bottom: 4rem;
-    left: 16.66%;
-    transform: translateX(-50%);
-}
-
-.pos-bottom-right {
-    bottom: 4rem;
-    left: 83.33%;
-    transform: translateX(-50%);
-}
-
-/* ── Transition ── */
-.step-card.visible-boarding {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.step-card.hidden-boarding {
-    opacity: 0;
-    pointer-events: none;
-}
-
-
-/* ── Card UI ── */
+/* ── Card inner (Base Light) ── */
 .card-inner {
-    background: color-mix(in srgb, var(--background) 80%, transparent);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 0.5px solid color-mix(in srgb, var(--secondary) 40%, transparent);
+    background: var(--ob-card-bg);
+    border: 1px solid var(--ob-card-border);
     border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    text-align: center;
+    padding: 1.5rem 1.7rem 1.3rem;
+    width: 340px;
+    max-width: 90vw;
+    box-shadow: var(--ob-card-shadow);
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    pointer-events: auto;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    overflow: hidden;
+}
+
+/* ── Elementos internos (Base Light) ── */
+.card-header {
+    display: flex;
     align-items: center;
-    max-width: 300px;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.card-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--ob-badge-bg);
+    color: var(--primary);
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.badge-dot {
+    width: 5px;
+    height: 5px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.4;
+        transform: scale(0.6);
+    }
+}
+
+.card-eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ob-text-muted);
 }
 
 .card-text {
-    color: var(--text);
-    font-size: 0.95rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14.5px;
     font-weight: 400;
-    line-height: 1.5;
-    letter-spacing: 0.01em;
-
-    padding: 10px;
+    color: var(--ob-text-color);
+    line-height: 1.65;
+    margin-bottom: 1.4rem;
 }
 
-/* ── Card size animation ── */
-.card-active {
-    padding: 1.25rem 1.25rem 1.1rem;
-    transition: max-height 0.4s ease, padding 0.4s ease;
-}
-
-.card-past {
-    padding: 0.9rem 1.25rem;
-    transition: max-height 0.4s ease, padding 0.4s ease;
-}
-
-/* ── Button wrapper ── */
-.button-wrapper {
-    overflow: hidden;
-    transition: max-height 0.4s ease, opacity 0.3s ease 0.1s;
-}
-
-
-/* ── Botón personalizado ── */
-.button-wrapper :deep(.p-button) {
-    background: var(--primary) !important;
-    border: 0.5px solid color-mix(in srgb, var(--primary) 60%, var(--accent)) !important;
-    border-radius: 10px !important;
-    padding: 0.5rem 1.4rem !important;
-    font-size: 0.875rem !important;
-    font-weight: 500 !important;
-    letter-spacing: 0.02em !important;
-    color: var(--background) !important;
-    transition: background 0.2s ease, transform 0.15s ease !important;
-    width: 100%;
-}
-
-.button-wrapper :deep(.p-button:hover) {
-    background: color-mix(in srgb, var(--primary) 85%, var(--accent)) !important;
-    transform: translateY(-1px);
-}
-
-.button-wrapper :deep(.p-button:active) {
-    transform: translateY(0px) scale(0.98);
-}
-
-
-.btn-visible {
-    min-height: 65px;
-
-    max-height: 65px;
-    max-width: 150px;
-    opacity: 1;
-}
-
-.btn-hidden {
-    max-height: 0;
-    max-width: 0;
-    opacity: 0;
-}
-
-/* ── Mobile: todos abajo al centro ── */
-@media (max-width: 768px) {
-
-    .pos-top-left,
-    .pos-top-center,
-    .pos-top-right,
-    .pos-bottom-left,
-    .pos-bottom-right {
-        top: auto;
-        bottom: 4rem;
-        left: 50%;
-        right: auto;
-    }
-
-    /* En mobile solo mostramos el paso actual, no los anteriores */
-    .step-card.visible-boarding {
-        opacity: 0;
-        pointer-events: none;
-    }
-
-    .step-card.visible-boarding.current-step {
-        opacity: 1;
-        pointer-events: auto;
-    }
-}
-
-@media (max-width: 768px) {
-    .card-past {
-        max-height: 0;
-        padding: 0;
-        border: none;
-    }
-}
-
-/* ── Step dots ── */
+/* ── Dots (Base Light) ── */
 .step-indicator {
     display: flex;
     justify-content: center;
-    gap: 6px;
-    margin-bottom: 0.85rem;
+    gap: 5px;
+    margin-bottom: 1rem;
 }
 
 .step-dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    margin-top: 5px;
-    transition: background 0.3s ease, transform 0.3s ease;
+    transition: background 0.3s, transform 0.3s;
 }
 
 .dot-active {
     background: var(--primary);
-    transform: scale(1.3);
-
+    transform: scale(1.4);
 }
 
 .dot-past {
-    background: var(--secondary);
-
+    background: rgba(47, 39, 206, 0.3);
 }
 
 .dot-future {
-    background: color-mix(in srgb, var(--secondary) 40%, transparent);
+    background: var(--ob-dot-future);
+}
+
+.card-hint {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11.5px;
+    color: var(--ob-text-muted);
+    text-align: center;
+    margin-top: 0.85rem;
+}
+
+
+
+/* ── Button ── */
+:deep(.p-button) {
+    background: var(--primary) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 0.65rem 1.3rem !important;
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    color: #fff !important;
+    width: 100% !important;
+}
+
+@media (max-width: 768px) {
+    .pos-top-left {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
 }
 </style>

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+
 @theme {
   --color-text: var(--text);
   --color-background: var(--background);
@@ -30,6 +31,13 @@
   --yellow: #FFD700;
   --red: #EF4444;
   --gray: #6b7280;
+
+  --ob-card-bg: rgba(255, 255, 255, 0.95);
+  --ob-card-border: rgba(47, 39, 206, 0.15);
+  --ob-card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  --ob-text-muted: rgba(0, 0, 0, 0.4);
+  --ob-badge-bg: rgba(47, 39, 206, 0.08);
+  --ob-dot-future: rgba(0, 0, 0, 0.1);
 }
 
 .dark {
@@ -38,17 +46,22 @@
   --primary: #3a31d8;
   --secondary: #232244;
   --accent: #7e00c2;
+
+  --ob-card-bg: rgba(15, 15, 26, 0.93);
+  --ob-card-border: rgba(47, 39, 206, 0.35);
+  --ob-card-shadow: 0 2px 32px rgba(47, 39, 206, 0.15);
+  --ob-text-muted: rgba(255, 255, 255, 0.25);
+  --ob-badge-bg: rgba(47, 39, 206, 0.18);
+  --ob-dot-future: rgba(47, 39, 206, 0.18);
 }
 
 .p-skeleton {
-    background-color: #1a1a1a !important;
+  background-color: #1a1a1a !important;
 }
 
 .p-skeleton::after {
-    background: linear-gradient(
-        90deg, 
-        transparent, 
-        rgba(255, 255, 255, 0.1), 
-        transparent
-    ) !important;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent) !important;
 }

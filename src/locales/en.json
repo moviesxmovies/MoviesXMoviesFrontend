@@ -25,6 +25,11 @@
     "filmography": {
       "no_movies": "No movies found",
       "no_movies_description": "This celebrity's filmography is currently empty or pending updates."
+    },
+    "navbar": {
+      "logout": "Logout",
+      "profile": "My Profile"
+
     }
   },
   "signup": {
@@ -58,7 +63,9 @@
     "subtitle": "Enter your credentials to log in.",
     "username": "Username",
     "password": "Password",
-    "signup": "Don't have an account? Sign up here",
+    "noAccount": "Don't have an account?",
+    "signup": "Sign up here",
+
     "forgotPassword": "Forgot your password?"
   },
   "notFound": {
@@ -104,7 +111,8 @@
     "feature1": "Share your favorite movies",
     "feature2": "Get movie recommendations",
     "feature3": "Create your own movie lists.",
-    "fetchMoviesHerror": "Failed to fetch movies. Please try again later."
+    "fetchMoviesHerror": "Failed to fetch movies. Please try again later.",
+    "profile": "My Profile"
   },
   "onboarding": {
     "step1": "Let's get you started with a quick tour",
@@ -114,7 +122,13 @@
     "step5": "You want speed? Swipe left or right to rate movies and up or down to add them to your lists or mark them as unseen",
     "finish": "Get Started",
     "continue": "Continue",
-    "skip": "Skip"
+    "skip": "Skip",
+    "step1Label": "Start",
+    "step2Label": "Rate",
+    "step3Label": "Add",
+    "step4Label": "Unseen",
+    "step5Label": "Swipe",
+    "hint": "You can skip this at any time"
   },
   "verify": {
     "toast": {
@@ -124,15 +138,22 @@
       "resendSuccess": "Verification code resent to your email",
       "resendError": "Failed to resend verification code. Please try again."
     },
-    "title": "MOVIESXMOVIES",
+    "title": "Verify Your Email",
     "description": "We've sent a 6 digit code to your mail direction.",
     "button": "VERIFY CODE",
-    "resend": "Haven't received the code? Resend code"
+    "resend": "Resend code",
+    "didntReceive": "Didn't receive the code?"
   },
   "schema": {
-    "username": { "required": "Username is required" },
-    "firstName": { "required": "First name is required" },
-    "lastName": { "required": "Last name is required" },
+    "username": {
+      "required": "Username is required"
+    },
+    "firstName": {
+      "required": "First name is required"
+    },
+    "lastName": {
+      "required": "Last name is required"
+    },
     "email": {
       "required": "Email is required",
       "invalid": "Invalid email address"

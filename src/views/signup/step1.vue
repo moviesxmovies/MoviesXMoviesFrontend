@@ -42,13 +42,13 @@ const route = useRoute();
 </script>
 
 <template>
-  <div class="flex flex-col gap-6">
+  <div class="flex flex-col gap-4 sm:gap-6">
     <div class="text-center">
       <img src="/favicon.svg" alt="Logo" class="w-16 h-16 m-auto" />
       <h2 class="text-xl font-semibold" style="color: var(--text)">
         {{ $t("signup.title") }}
       </h2>
-      <p class="text-sm mt-1" style="color: var(--text); opacity: 0.5">
+      <p class="text-xs sm:text-sm mt-1" style="color: var(--text); opacity: 0.5">
         {{ $t("signup.step1.subtitle") }}
       </p>
     </div>
