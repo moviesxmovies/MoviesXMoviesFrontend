@@ -21,6 +21,10 @@
       "genres": "Genre | Genres",
       "actors": "Actor | Actors",
       "directors": "Director | Directors"
+    },
+    "filmography": {
+      "no_movies": "No movies found",
+      "no_movies_description": "This celebrity's filmography is currently empty or pending updates."
     }
   },
   "signup": {
@@ -161,10 +165,9 @@
   },
   "celebrity": {
     "error": {
-      "fetching": "Failed to fetch celebrity data. Please try again later."
+      "fetchingProfile": "Failed to fetch celebrity data. Please try again later.",
+      "fetchingMovies": "Failed to fetch celebrity's movies. Please try again later."
     },
-    "no_movies": "No movies found",
-    "no_movies_description": "This celebrity's filmography is currently empty or pending updates.",
     "birthday": "Birthday",
     "deathday": "Deathday",
     "biography": "Biography",
