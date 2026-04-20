@@ -31,15 +31,15 @@ const routes: Array<RouteRecordRaw> = [
     meta: { forbiddenWhenAuthenticated: true },
   },
   {
-    path: '/forgot-password',
+    path: "/forgot-password",
     component: () => import("../views/ForgotPasswordView.vue"),
   },
   {
-    path: '/reset-password',
+    path: "/reset-password",
     component: () => import("../views/ResetPasswordView.vue"),
   },
   {
-    path: '/check-email',
+    path: "/check-email",
     component: () => import("../views/CheckEmailView.vue"),
   },
   {
@@ -53,7 +53,13 @@ const routes: Array<RouteRecordRaw> = [
     meta: { forbiddenWhenAuthenticated: true },
   },
   {
+    path: "/profiles/:slug",
+    component: () => import("../views/CelebrityView.vue"),
+    meta: { requiresAuth: true },
+  },
+  {
     path: "/:pathMatch(.*)*",
+    name: "NotFound",
     component: () => import("../views/NotFoundView.vue"),
   },
 ];
