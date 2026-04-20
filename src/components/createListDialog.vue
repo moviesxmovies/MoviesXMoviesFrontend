@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { createList } from "@/repositories/listRepository";
+import { FieldMsg } from "@/repositories/auth/authRepository";
+import { privacityConfig } from "@/repositories/listRepository";
 import { defaultListSchema } from "@/schemas/listSchema";
 import { Form, FormField, type FormSubmitEvent } from "@primevue/forms";
 import { zodResolver } from "@primevue/forms/resolvers/zod";
@@ -20,43 +21,29 @@ const toast = useToast();
 const { t } = useI18n();
 const resolver = zodResolver(defaultListSchema);
 
-const privacity = [
-  {
-    label: t("components.createList.public"),
-    value: "P",
-  },
-  {
-    label: t("components.createList.private"),
-    value: "R",
-  },
-  {
-    label: t("components.createList.friends"),
-    value: "F",
-  },
-];
-
 const handleSubmit = async ({
   valid,
   values,
 }: FormSubmitEvent<Record<string, any>>) => {
   if (!valid) return;
-  try {
-    const status = await createList(values.listName);
-    toast.add({
-      severity: "success",
-      summary: t("toast.success"),
-      detail: status,
-      life: 3000,
-    });
-    visible.value = false;
-  } catch (error: any) {
-    toast.add({
-      severity: "error",
-      summary: t("toast.error"),
-      detail: error.response?.data?.message || t("createList.toast.error"),
-      life: 3000,
-    });
-  }
+  console.log(values);
+  // try {
+  //   const status = await createList(values.listName);
+  //   toast.add({
+  //     severity: "success",
+  //     summary: t("toast.success"),
+  //     detail: status,
+  //     life: 3000,
+  //   });
+  //   visible.value = false;
+  // } catch (error: any) {
+  //   toast.add({
+  //     severity: "error",
+  //     summary: t("toast.error"),
+  //     detail: error.response?.data?.message || t("createList.toast.error"),
+  //     life: 3000,
+  //   });
+  // }
 };
 </script>
 
@@ -66,11 +53,11 @@ const handleSubmit = async ({
     modal
     :draggable="false"
     :dismissableMask="true"
-    class="rounded-2xl border shadow-sm overflow-hidden w-full max-w-md mx-4"
+    class="rounded-2xl border shadow-sm overflow-hidden w-full max-w-md"
     style="background-color: var(--background); border-color: var(--secondary)"
     :header="t('components.createList.header')"
   >
-    <div class="p-6 sm:p-8">
+    <div class="p-4">
       <div class="text-center mb-8">
         <div
           class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center m-auto mb-4"
@@ -88,7 +75,7 @@ const handleSubmit = async ({
       <Form
         :resolver="resolver"
         @submit="handleSubmit"
-        class="flex flex-col gap-6 w-full"
+        class="flex flex-col gap-5 w-full"
       >
         <FormField
           v-slot="$field"
@@ -98,16 +85,28 @@ const handleSubmit = async ({
         >
           <FloatLabel variant="over">
             <IconField>
-              <InputText id="listName" v-bind="$field" fluid />
+              <InputText
+                v-bind="$field"
+                id="listName"
+                fluid
+                :class="{
+                  'p-invalid': $field?.invalid,
+                  'p-valid': $field?.dirty && !$field?.invalid,
+                }"
+              />
               <InputIcon
-                class="pi pi-pencil"
-                style="color: var(--primary); opacity: 0.5"
+                v-if="$field?.dirty"
+                :class="$field?.invalid ? 'pi pi-times-circle' : 'pi pi-pencil'"
+                :style="{
+                  color: $field?.invalid ? '#ef4444' : 'var(--primary)',
+                }"
               />
             </IconField>
             <label for="listName">{{
-              t("components.createList.listName")
+              $t("components.createList.listName")
             }}</label>
           </FloatLabel>
+          <FieldMsg :field="$field" />
         </FormField>
 
         <FormField
@@ -131,17 +130,28 @@ const handleSubmit = async ({
         </FormField>
 
         <FormField v-slot="$field" name="privacity" class="flex flex-col gap-1">
-          <div class="flex items-center gap-2">
-            <FloatLabel
-              v-for="option in privacity"
-              :key="option.value"
-              variant="over"
+          <div
+            class="flex justify-evenly gap-4 p-4 bg-white/5 rounded-2xl border border-secondary/20"
+          >
+            <div
+              v-for="(option, key) in privacityConfig"
+              :key="key"
+              class="flex items-center gap-2"
             >
-              <RadioButton v-bind="$field" :value="option.value" fluid />
-              <label for="privacity">{{
-                t("components.createList.privacity")
-              }}</label>
-            </FloatLabel>
+              <RadioButton
+                v-bind="$field"
+                :inputId="`privacity-${key}`"
+                name="privacity"
+                :value="option.value"
+              />
+              <label
+                :for="`privacity-${key}`"
+                class="text-sm font-medium cursor-pointer text-text"
+              >
+                <i :class="option.icon" class="text-xs opacity-70"></i>
+                <span class="ml-2">{{ t(`components.lists.${key}`) }}</span>
+              </label>
+            </div>
           </div>
         </FormField>
 
@@ -162,10 +172,16 @@ const handleSubmit = async ({
 </template>
 
 <style scoped>
-:deep(.p-dialog-content) {
-  background-color: var(--background) !important;
-  border-radius: 1.5rem;
-  padding: 0; /* Controlamos el padding internamente */
+:deep(.p-button.p-button-secondary) {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  color: var(--primary) !important;
+  opacity: 0.8;
+}
+
+:deep(.p-button.p-button-secondary:hover) {
+  opacity: 1;
+  text-decoration: underline;
 }
 
 :deep(.p-inputtext) {
@@ -192,18 +208,34 @@ const handleSubmit = async ({
   color: #fff !important;
   padding: 0.85rem !important;
   font-weight: 700;
-  border-radius: 0.75rem;
 }
 
-:deep(.p-button.p-button-secondary) {
-  background-color: transparent !important;
-  border-color: transparent !important;
-  color: var(--primary) !important;
-  opacity: 0.8;
+:deep(.p-invalid .p-inputtext) {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 1px #ef4444 !important;
 }
 
-:deep(.p-button.p-button-secondary:hover) {
-  opacity: 1;
-  text-decoration: underline;
+.field-msg {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  animation: fadeIn 0.15s ease;
+}
+
+.field-msg.error {
+  color: #ef4444;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>

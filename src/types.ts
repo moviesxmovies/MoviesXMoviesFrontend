@@ -108,3 +108,8 @@ export interface MovieList {
   created_at: string;
   updated_at: string;
 }
+
+export type UserMovieList = {
+  list: MovieList;
+  containsMovie?: boolean;
+};

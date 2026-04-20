@@ -29,7 +29,13 @@
     "navbar": {
       "logout": "Logout",
       "profile": "My Profile"
-
+    },
+    "lists": {
+      "public": "Public",
+      "private": "Private",
+      "friends": "Friends",
+      "noLists": "You don't have any lists yet. Start adding movies to your lists to see them here.",
+      "noListDesc": "Your lists will appear here once you create them. You can create lists to organize your favorite movies, share them with friends, or keep them private for your own reference."
     }
   },
   "signup": {

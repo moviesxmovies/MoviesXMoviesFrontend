@@ -5,16 +5,12 @@ import {
   fetchUserLists,
   removeMovieFromList,
 } from "@/repositories/listRepository";
-import type { Movie, MovieList } from "@/types";
-import { Checkbox, Dialog, Skeleton, useToast } from "primevue";
+import type { Movie, UserMovieList } from "@/types";
+import { Dialog, useToast } from "primevue";
 import { watch, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import CreateListDialog from "./createListDialog.vue";
-
-type UserMovieList = {
-  list: MovieList;
-  containsMovie?: boolean;
-};
+import ListComponent from "./listComponent.vue";
 
 const { t } = useI18n();
 const toast = useToast();
@@ -110,7 +106,6 @@ watch(
   () => props.movie,
   async () => {
     visible.value = false;
-    if (!props.movie) return;
     await getUserLists();
     await checkMovieInLists();
   },
@@ -132,9 +127,9 @@ watch(
         class:
           'rounded-[2rem] border-none shadow-2xl bg-[var(--background)] overflow-hidden',
       },
-      header: { class: 'p-8 pb-4 bg-[var(--background)]' },
+      header: { class: 'bg-[var(--background)]' },
       title: { class: 'text-2xl font-display font-bold text-[var(--primary)]' },
-      content: { class: 'p-8 pt-0 bg-[var(--background)]' },
+      content: { class: 'bg-[var(--background)]' },
       closeButton: {
         class: 'hover:bg-[var(--secondary)]/20 transition-colors',
       },
@@ -146,52 +141,12 @@ watch(
       Selecciona una o varias listas
     </p>
 
-    <div class="flex flex-col gap-3">
-      <div v-if="loading" class="flex flex-col gap-3">
-        <div v-for="i in 3" :key="i" class="h-16 rounded-2xl">
-          <Skeleton height="100%" />
-        </div>
-      </div>
-
-      <div
-        v-for="list in userList"
-        :key="list.list.id"
-        class="group flex items-center justify-between p-4 rounded-2xl border border-[var(--secondary)]/30 bg-white/50 dark:bg-white/5 hover:border-[var(--primary)] hover:bg-[var(--primary)]/[0.02] transition-all duration-300 cursor-pointer"
-      >
-        <div class="flex items-center gap-4">
-          <div
-            class="w-10 h-10 rounded-xl bg-[var(--secondary)]/20 flex items-center justify-center group-hover:bg-[var(--primary)]/10 transition-colors"
-          >
-            <i class="pi pi-bookmark text-[var(--primary)]"></i>
-          </div>
-          <span
-            class="font-bold text-[var(--text)] group-hover:text-[var(--primary)] transition-colors"
-          >
-            {{ list.list.name }}
-          </span>
-        </div>
-
-        <Checkbox
-          :binary="true"
-          :modelValue="list.containsMovie"
-          @click="
-            list.containsMovie
-              ? removeFromList(list.list.slug)
-              : addToList(list.list.slug)
-          "
-          class="custom-checkbox"
-        />
-      </div>
-
-      <div v-if="!loading && userList.length === 0" class="text-center py-10">
-        <i
-          class="pi pi-folder-open text-4xl text-[var(--gray)] opacity-20 mb-3 block"
-        ></i>
-        <p class="text-sm text-[var(--gray)] italic">
-          No tienes listas creadas aún.
-        </p>
-      </div>
-    </div>
+    <ListComponent
+      :items="userList"
+      :loading="loading"
+      @add="addToList"
+      @remove="removeFromList"
+    />
 
     <template #footer>
       <div class="w-full pt-4 border-t border-[var(--secondary)]/20">
