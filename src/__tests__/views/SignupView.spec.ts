@@ -88,8 +88,9 @@ describe("SignupView", () => {
     await flushPromises();
 
     expect(mockPost).toHaveBeenCalledWith(
-      "/auth/signup/?lang=en",
+      "/auth/signup/",
       expect.any(FormData),
+      { params: { lang: "en" } },
     );
   });
 
