@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import {
-  getUserFilmography,
-  getUserProfile,
+  getPersonFilmography,
+  getPersonProfile,
 } from "@/repositories/userRepository";
 import type { MoviePagination, Person } from "@/types";
 import {
@@ -47,7 +47,7 @@ const fetchUserProfile = async () => {
   const { slug } = route.params;
   loadingProfile.value = true;
   try {
-    const profile = await getUserProfile(slug as string);
+    const profile = await getPersonProfile(slug as string);
     user.value = profile;
   } catch (error: any) {
     toast.add({
@@ -72,7 +72,7 @@ const fetchFilmography = async (
     } else if (type === "directed") {
       loadingDirectors.value = true;
     }
-    const movies = await getUserFilmography(
+    const movies = await getPersonFilmography(
       route.params.slug as string,
       type,
       lastId,

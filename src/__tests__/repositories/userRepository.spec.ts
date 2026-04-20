@@ -1,8 +1,9 @@
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import {
   getUserProfile,
-  getUserMovieListsFromMovie,
-  getUserFilmography,
+  getPersonProfile,
+  getPersonMovieListsFromMovie,
+  getPersonFilmography,
 } from "@/repositories/userRepository";
 
 // ── Mocks ────────────────────────────────────────────────────────────────────
@@ -23,13 +24,31 @@ describe("UserRepository", () => {
   });
 
   // ── getUserProfile ──────────────────────────────────────────────────────────
-
   describe("getUserProfile", () => {
+    it("calls API with correct endpoint and returns user data", async () => {
+      const mockProfile = { id: "1", name: "Christopher Nolan", slug: "christopher-nolan" };
+
+      mockGet.mockResolvedValueOnce({ data: mockProfile });
+      const result = await getUserProfile();
+
+      expect(mockGet).toHaveBeenCalledWith("/users/");
+      expect(result).toEqual(mockProfile);
+    });
+
+    it("throws when API fails", async () => {
+      mockGet.mockRejectedValueOnce(new Error("Not found"));
+
+      await expect(getUserProfile()).rejects.toThrow("Not found");
+    });
+  });
+
+  // ── getPersonProfile ──────────────────────────────────────────────────────────
+  describe("getPersonProfile", () => {
     it("calls API with correct endpoint and returns profile data", async () => {
       const mockProfile = { id: "1", name: "Christopher Nolan", slug: "christopher-nolan" };
 
       mockGet.mockResolvedValueOnce({ data: mockProfile });
-      const result = await getUserProfile("christopher-nolan");
+      const result = await getPersonProfile("christopher-nolan");
 
       expect(mockGet).toHaveBeenCalledWith("/persons/christopher-nolan/");
       expect(result).toEqual(mockProfile);
@@ -37,7 +56,7 @@ describe("UserRepository", () => {
 
     it("calls API with the slug provided", async () => {
       mockGet.mockResolvedValueOnce({ data: {} });
-      await getUserProfile("quentin-tarantino");
+      await getPersonProfile("quentin-tarantino");
 
       expect(mockGet).toHaveBeenCalledWith("/persons/quentin-tarantino/");
     });
@@ -45,13 +64,13 @@ describe("UserRepository", () => {
     it("throws when API fails", async () => {
       mockGet.mockRejectedValueOnce(new Error("Not found"));
 
-      await expect(getUserProfile("unknown-slug")).rejects.toThrow("Not found");
+      await expect(getPersonProfile("unknown-slug")).rejects.toThrow("Not found");
     });
   });
 
-  // ── getUserMovieListsFromMovie ───────────────────────────────────────────────
+  // ── getPersonMovieListsFromMovie ───────────────────────────────────────────────
 
-  describe("getUserMovieListsFromMovie", () => {
+  describe("getPersonMovieListsFromMovie", () => {
     it("calls API with correct endpoint and returns movie lists", async () => {
       const mockLists = [
         { id: "1", name: "Favourites" },
@@ -59,7 +78,7 @@ describe("UserRepository", () => {
       ];
 
       mockGet.mockResolvedValueOnce({ data: mockLists });
-      const result = await getUserMovieListsFromMovie("inception");
+      const result = await getPersonMovieListsFromMovie("inception");
 
       expect(mockGet).toHaveBeenCalledWith("/movies/inception/movie-lists/");
       expect(result).toEqual(mockLists);
@@ -67,7 +86,7 @@ describe("UserRepository", () => {
 
     it("calls API with the slug provided", async () => {
       mockGet.mockResolvedValueOnce({ data: [] });
-      await getUserMovieListsFromMovie("interstellar");
+      await getPersonMovieListsFromMovie("interstellar");
 
       expect(mockGet).toHaveBeenCalledWith("/movies/interstellar/movie-lists/");
     });
@@ -75,18 +94,18 @@ describe("UserRepository", () => {
     it("throws when API fails", async () => {
       mockGet.mockRejectedValueOnce(new Error("Server error"));
 
-      await expect(getUserMovieListsFromMovie("inception")).rejects.toThrow("Server error");
+      await expect(getPersonMovieListsFromMovie("inception")).rejects.toThrow("Server error");
     });
   });
 
-  // ── getUserFilmography ──────────────────────────────────────────────────────
+  // ── getPersonFilmography ──────────────────────────────────────────────────────
 
-  describe("getUserFilmography", () => {
+  describe("getPersonFilmography", () => {
     it("calls API with correct endpoint for 'acted' type", async () => {
       const mockFilmography = [{ id: "1", title: "Inception" }];
 
       mockGet.mockResolvedValueOnce({ data: mockFilmography });
-      const result = await getUserFilmography("leonardo-dicaprio", "acted");
+      const result = await getPersonFilmography("leonardo-dicaprio", "acted");
 
       expect(mockGet).toHaveBeenCalledWith("/persons/leonardo-dicaprio/acted-movies/", {
         params: { last_id: undefined },
@@ -96,7 +115,7 @@ describe("UserRepository", () => {
 
     it("calls API with correct endpoint for 'directed' type", async () => {
       mockGet.mockResolvedValueOnce({ data: [] });
-      await getUserFilmography("christopher-nolan", "directed");
+      await getPersonFilmography("christopher-nolan", "directed");
 
       expect(mockGet).toHaveBeenCalledWith("/persons/christopher-nolan/directed-movies/", {
         params: { last_id: undefined },
@@ -105,7 +124,7 @@ describe("UserRepository", () => {
 
     it("passes lastId as param when provided", async () => {
       mockGet.mockResolvedValueOnce({ data: [] });
-      await getUserFilmography("christopher-nolan", "directed", 42);
+      await getPersonFilmography("christopher-nolan", "directed", 42);
 
       expect(mockGet).toHaveBeenCalledWith("/persons/christopher-nolan/directed-movies/", {
         params: { last_id: 42 },
@@ -114,7 +133,7 @@ describe("UserRepository", () => {
 
     it("does not pass lastId when undefined", async () => {
       mockGet.mockResolvedValueOnce({ data: [] });
-      await getUserFilmography("christopher-nolan", "acted");
+      await getPersonFilmography("christopher-nolan", "acted");
 
       expect(mockGet).toHaveBeenCalledWith(
         expect.any(String),
@@ -126,7 +145,7 @@ describe("UserRepository", () => {
       mockGet.mockRejectedValueOnce(new Error("Network error"));
 
       await expect(
-        getUserFilmography("leonardo-dicaprio", "acted"),
+        getPersonFilmography("leonardo-dicaprio", "acted"),
       ).rejects.toThrow("Network error");
     });
 
@@ -134,7 +153,7 @@ describe("UserRepository", () => {
       mockGet.mockRejectedValueOnce(new Error("Unauthorized"));
 
       await expect(
-        getUserFilmography("christopher-nolan", "directed", 10),
+        getPersonFilmography("christopher-nolan", "directed", 10),
       ).rejects.toThrow("Unauthorized");
     });
   });

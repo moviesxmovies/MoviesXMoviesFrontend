@@ -4,12 +4,12 @@ import CelebrityView from "@/views/CelebrityView.vue"; // adjust path as needed
 import type { MoviePagination, Person } from "@/types";
 
 // ── Repository mocks ─────────────────────────────────────────────────────────
-const mockGetUserProfile = vi.fn();
-const mockGetUserFilmography = vi.fn();
+const mockGetPersonProfile = vi.fn();
+const mockGetPersonFilmography = vi.fn();
 
 vi.mock("@/repositories/userRepository", () => ({
-  getUserProfile: (...args: unknown[]) => mockGetUserProfile(...args),
-  getUserFilmography: (...args: unknown[]) => mockGetUserFilmography(...args),
+  getPersonProfile: (...args: unknown[]) => mockGetPersonProfile(...args),
+  getPersonFilmography: (...args: unknown[]) => mockGetPersonFilmography(...args),
 }));
 
 // ── vue-router ───────────────────────────────────────────────────────────────
@@ -105,32 +105,32 @@ const mountView = () =>
 describe("CelebrityView", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockGetUserProfile.mockResolvedValue(makePerson());
-    mockGetUserFilmography.mockResolvedValue(makeMoviePagination());
+    mockGetPersonProfile.mockResolvedValue(makePerson());
+    mockGetPersonFilmography.mockResolvedValue(makeMoviePagination());
   });
 
   // ── onMounted data fetching ───────────────────────────────────────────────
   describe("onMounted", () => {
-    it("calls getUserProfile with the route slug", async () => {
+    it("calls getPersonProfile with the route slug", async () => {
       mountView();
       await flushPromises();
-      expect(mockGetUserProfile).toHaveBeenCalledWith("keanu-reeves");
+      expect(mockGetPersonProfile).toHaveBeenCalledWith("keanu-reeves");
     });
 
-    it("calls getUserFilmography for 'acted' on mount", async () => {
+    it("calls getPersonFilmography for 'acted' on mount", async () => {
       mountView();
       await flushPromises();
-      expect(mockGetUserFilmography).toHaveBeenCalledWith(
+      expect(mockGetPersonFilmography).toHaveBeenCalledWith(
         "keanu-reeves",
         "acted",
         undefined
       );
     });
 
-    it("calls getUserFilmography for 'directed' on mount", async () => {
+    it("calls getPersonFilmography for 'directed' on mount", async () => {
       mountView();
       await flushPromises();
-      expect(mockGetUserFilmography).toHaveBeenCalledWith(
+      expect(mockGetPersonFilmography).toHaveBeenCalledWith(
         "keanu-reeves",
         "directed",
         undefined
@@ -167,7 +167,7 @@ describe("CelebrityView", () => {
     });
 
     it("renders deathday when present", async () => {
-      mockGetUserProfile.mockResolvedValue(
+      mockGetPersonProfile.mockResolvedValue(
         makePerson({ deathday: "2099-01-01" })
       );
       const wrapper = mountView();
@@ -184,7 +184,7 @@ describe("CelebrityView", () => {
       ["1", "pi pi-venus", "var(--accent)"],
       ["2", "pi pi-mars", "var(--primary)"],
     ])("gender, icon and color renders for celebrity gender", async (gender, icon, color) => {
-      mockGetUserProfile.mockResolvedValue(makePerson({ gender }));
+      mockGetPersonProfile.mockResolvedValue(makePerson({ gender }));
       const wrapper = mountView();
       await flushPromises();
       // Tag stub renders data-testid="Tag"; verify computed values via vm
@@ -197,7 +197,7 @@ describe("CelebrityView", () => {
     });
 
     it("falls back to pi-question for unknown gender", async () => {
-      mockGetUserProfile.mockResolvedValue(makePerson({ gender: "99" }));
+      mockGetPersonProfile.mockResolvedValue(makePerson({ gender: "99" }));
       const wrapper = mountView();
       await flushPromises();
       const vm = wrapper.vm as unknown as { genderIcon: string };
@@ -214,7 +214,7 @@ describe("CelebrityView", () => {
     });
 
     it("displays empty-text when biography is absent", async () => {
-      mockGetUserProfile.mockResolvedValue(makePerson({ biography: "" }));
+      mockGetPersonProfile.mockResolvedValue(makePerson({ biography: "" }));
       const wrapper = mountView();
       await flushPromises();
       expect(wrapper.find(".empty-text").exists()).toBe(true);
@@ -252,7 +252,7 @@ describe("CelebrityView", () => {
     });
 
     it("renders the empty FilmographyComponent when both lists are empty", async () => {
-      mockGetUserFilmography.mockResolvedValue({
+      mockGetPersonFilmography.mockResolvedValue({
         results: [],
         next_last_id: null,
       });
@@ -267,8 +267,8 @@ describe("CelebrityView", () => {
 
   // ── Error handling ────────────────────────────────────────────────────────
   describe("error handling", () => {
-    it("redirects to NotFound when getUserProfile rejects", async () => {
-      mockGetUserProfile.mockRejectedValue({
+    it("redirects to NotFound when getPersonProfile rejects", async () => {
+      mockGetPersonProfile.mockRejectedValue({
         response: { data: { message: "Not found" } },
       });
       mountView();
@@ -277,7 +277,7 @@ describe("CelebrityView", () => {
     });
 
     it("does not redirect to NotFound on filmography errors", async () => {
-      mockGetUserFilmography.mockRejectedValue(new Error("fail"));
+      mockGetPersonFilmography.mockRejectedValue(new Error("fail"));
       mountView();
       await flushPromises();
       expect(mockPush).not.toHaveBeenCalled();
@@ -287,7 +287,7 @@ describe("CelebrityView", () => {
   // ── Infinite scroll — pagination ──────────────────────────────────────────
   describe("fetchFilmography with lastId (pagination)", () => {
     it("appends results when next_last_id is present and callback fires", async () => {
-      mockGetUserFilmography
+      mockGetPersonFilmography
         .mockResolvedValueOnce({
           results: [{ id: 1, title: "Movie 1" }],
           next_last_id: 1,

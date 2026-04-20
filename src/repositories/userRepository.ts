@@ -1,6 +1,15 @@
 import { api } from "@/composables/useAPI";
 
-export const getUserProfile = async (slug: string) => {
+export const getUserProfile = async () => {
+  try {
+    const { data } = await api.get(`/users/`);
+    return data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+export const getPersonProfile = async (slug: string) => {
   try {
     const { data } = await api.get(`/persons/${slug}/`);
     return data;
@@ -9,7 +18,7 @@ export const getUserProfile = async (slug: string) => {
   }
 };
 
-export const getUserMovieListsFromMovie = async (slug: string) => {
+export const getPersonMovieListsFromMovie = async (slug: string) => {
   try {
     const { data } = await api.get(`/movies/${slug}/movie-lists/`);
     return data;
@@ -18,7 +27,7 @@ export const getUserMovieListsFromMovie = async (slug: string) => {
   }
 };
 
-export const getUserFilmography = async (slug: string, type: 'acted' | 'directed', lastId?: number) => {
+export const getPersonFilmography = async (slug: string, type: 'acted' | 'directed', lastId?: number) => {
   try {
     const { data } = await api.get(`/persons/${slug}/${type}-movies/`, {
       params: {
