@@ -113,3 +113,9 @@ export type UserMovieList = {
   list: MovieList;
   containsMovie?: boolean;
 };
+
+export type CreateList = {
+  name: string,
+  description?: string,
+  privacity: string,
+}

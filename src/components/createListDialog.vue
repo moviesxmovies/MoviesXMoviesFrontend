@@ -1,9 +1,11 @@
 <script lang="ts" setup>
 import { FieldMsg } from "@/repositories/auth/authRepository";
-import { privacityConfig } from "@/repositories/listRepository";
+import { addMovieToList, createList, privacityConfig } from "@/repositories/listRepository";
 import { defaultListSchema } from "@/schemas/listSchema";
+import type { CreateList, Movie, MovieList } from "@/types";
 import { Form, FormField, type FormSubmitEvent } from "@primevue/forms";
 import { zodResolver } from "@primevue/forms/resolvers/zod";
+import { useForm } from "@primevue/forms/useform";
 import {
   Button,
   Dialog,
@@ -20,30 +22,57 @@ const visible = defineModel<boolean>("visible", { default: false });
 const toast = useToast();
 const { t } = useI18n();
 const resolver = zodResolver(defaultListSchema);
+const form = useForm({ resolver: zodResolver(defaultListSchema) });
+const props = defineProps<{
+  movie: Movie;
+}>();
+
+const emit = defineEmits(["reloadLists"]);
 
 const handleSubmit = async ({
   valid,
   values,
 }: FormSubmitEvent<Record<string, any>>) => {
   if (!valid) return;
-  console.log(values);
-  // try {
-  //   const status = await createList(values.listName);
-  //   toast.add({
-  //     severity: "success",
-  //     summary: t("toast.success"),
-  //     detail: status,
-  //     life: 3000,
-  //   });
-  //   visible.value = false;
-  // } catch (error: any) {
-  //   toast.add({
-  //     severity: "error",
-  //     summary: t("toast.error"),
-  //     detail: error.response?.data?.message || t("createList.toast.error"),
-  //     life: 3000,
-  //   });
-  // }
+  try {
+    const data = await createList(values as CreateList);
+    await addToList(data.data.slug);
+    toast.add({
+      severity: "success",
+      summary: t("toast.success"),
+      detail: data.status,
+      life: 3000,
+    });
+    emit("reloadLists");
+    visible.value = false;
+  } catch (error: any) {
+    toast.add({
+      severity: "error",
+      summary: t("toast.error"),
+      detail: error.response?.data?.message || t("createList.toast.error"),
+      life: 3000,
+    });
+  }
+};
+
+const addToList = async (listSlug: string) => {
+  try {
+    await addMovieToList(listSlug, props.movie.slug);
+    toast.add({
+      severity: "success",
+      summary: t("toast.success"),
+      detail: t("components.actions.addToListSuccess"),
+      life: 3000,
+    });
+  } catch (error: any) {
+    toast.add({
+      severity: "error",
+      summary: t("toast.error"),
+      detail:
+        error.response?.data?.message || t("components.actions.addToListError"),
+      life: 3000,
+    });
+  }
 };
 </script>
 
@@ -79,7 +108,7 @@ const handleSubmit = async ({
       >
         <FormField
           v-slot="$field"
-          name="listName"
+          name="name"
           initialValue=""
           class="flex flex-col gap-1"
         >
@@ -87,7 +116,7 @@ const handleSubmit = async ({
             <IconField>
               <InputText
                 v-bind="$field"
-                id="listName"
+                id="name"
                 fluid
                 :class="{
                   'p-invalid': $field?.invalid,
@@ -102,9 +131,7 @@ const handleSubmit = async ({
                 }"
               />
             </IconField>
-            <label for="listName">{{
-              $t("components.createList.listName")
-            }}</label>
+            <label for="name">{{ $t("components.createList.name") }}</label>
           </FloatLabel>
           <FieldMsg :field="$field" />
         </FormField>
@@ -129,7 +156,12 @@ const handleSubmit = async ({
           </FloatLabel>
         </FormField>
 
-        <FormField v-slot="$field" name="privacity" class="flex flex-col gap-1">
+        <FormField
+          v-slot="$field"
+          name="privacity"
+          initialValue="P"
+          class="flex flex-col gap-1"
+        >
           <div
             class="flex justify-evenly gap-4 p-4 bg-white/5 rounded-2xl border border-secondary/20"
           >
@@ -139,17 +171,17 @@ const handleSubmit = async ({
               class="flex items-center gap-2"
             >
               <RadioButton
-                v-bind="$field"
                 :inputId="`privacity-${key}`"
                 name="privacity"
                 :value="option.value"
+                v-model="form.fields.privacy"
               />
               <label
                 :for="`privacity-${key}`"
                 class="text-sm font-medium cursor-pointer text-text"
               >
                 <i :class="option.icon" class="text-xs opacity-70"></i>
-                <span class="ml-2">{{ t(`components.lists.${key}`) }}</span>
+                {{ option.text }}
               </label>
             </div>
           </div>

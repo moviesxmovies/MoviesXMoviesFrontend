@@ -102,19 +102,27 @@ const checkMovieInLists = async () => {
   }
 };
 
+const reloadData = async () => {
+  await getUserLists();
+  await checkMovieInLists();
+};
+
 watch(
   () => props.movie,
   async () => {
     visible.value = false;
-    await getUserLists();
-    await checkMovieInLists();
+    await reloadData();
   },
   { immediate: true },
 );
 </script>
 
 <template>
-  <CreateListDialog v-model:visible="visibleCreateList" />
+  <CreateListDialog
+    :movie="props.movie"
+    v-model:visible="visibleCreateList"
+    @reloadLists="reloadData"
+  />
   <Dialog
     v-model:visible="visible"
     modal

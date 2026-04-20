@@ -1,32 +1,32 @@
 import { api } from "@/composables/useAPI";
 import i18n from "@/i18n";
 import { useAuthStore } from "@/stores/authStore";
-import type { MovieList } from "@/types";
+import type { CreateList, MovieList } from "@/types";
 
 const authStore = useAuthStore();
 const { t } = i18n.global;
 
 export const privacityConfig: Record<
   string,
-  { text: string; icon: string; class: string, value: string }
+  { text: string; icon: string; class: string; value: string }
 > = {
   P: {
     text: t("components.lists.public"),
     icon: "pi pi-globe",
     class: "badge-public",
-    value: "P"
+    value: "P",
   },
   R: {
     text: t("components.lists.private"),
     icon: "pi pi-lock",
     class: "badge-private",
-    value: "R"
+    value: "R",
   },
   F: {
     text: t("components.lists.friends"),
     icon: "pi pi-users",
     class: "badge-friends",
-    value: "F"
+    value: "F",
   },
 };
 
@@ -79,11 +79,10 @@ export const removeMovieFromList = async (
   }
 };
 
-export const createList = async (listName: string) => {
+export const createList = async (list: CreateList) => {
   try {
-    await api.post("/movies-lists/", {
-      name: listName,
-    });
+    const data = await api.post("/movies-lists/", list);
+    return data;
   } catch (error: any) {
     throw error;
   }
