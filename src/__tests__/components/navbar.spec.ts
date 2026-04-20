@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { nextTick } from "vue";
+import { nextTick, reactive } from "vue";
 import { mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import NavbarComponent from "@/components/navbar.vue";
 import i18n from "@/i18n";
 import { useAuthStore } from "@/stores/authStore";
+import { getUserProfile } from "@/repositories/userRepository";
 
 const mockPush = vi.fn();
 vi.mock("vue-router", async (importOriginal) => {
@@ -18,6 +19,7 @@ vi.mock("vue-router", async (importOriginal) => {
 vi.mock("@/stores/authStore", () => ({
   useAuthStore: vi.fn(() => ({
     isAuthenticated: false,
+    logout: vi.fn(),
   })),
 }));
 
@@ -200,5 +202,117 @@ describe("NavbarComponent", () => {
     await wrapper.find(".hamburger").trigger("click");
     await nextTick();
     expect(wrapper.find(".hamburger").attributes("aria-label")).toBe("Cerrar menú");
+  });
+  // ── menuItems ────────────────────────────────────────────────────────────────
+  describe("menuItems computed", () => {
+    it("has 3 items (profile, separator, logout)", () => {
+      const wrapper = factory(true);
+      const vm = wrapper.vm as any;
+      expect(vm.menuItems).toHaveLength(3);
+    });
+
+    it("first item has profile label and icon", () => {
+      const wrapper = factory(true);
+      const vm = wrapper.vm as any;
+      expect(vm.menuItems[0].icon).toBe("pi pi-user");
+      expect(typeof vm.menuItems[0].command).toBe("function");
+    });
+
+    it("second item is a separator", () => {
+      const wrapper = factory(true);
+      const vm = wrapper.vm as any;
+      expect(vm.menuItems[1].separator).toBe(true);
+    });
+
+    it("third item has logout icon", () => {
+      const wrapper = factory(true);
+      const vm = wrapper.vm as any;
+      expect(vm.menuItems[2].icon).toBe("pi pi-sign-out");
+      expect(typeof vm.menuItems[2].command).toBe("function");
+    });
+
+    it("profile command navigates to /profile", () => {
+      const wrapper = factory(true);
+      const vm = wrapper.vm as any;
+      vm.menuItems[0].command();
+      expect(mockPush).toHaveBeenCalledWith("/profile");
+    });
+
+    it("logout command calls authStore.logout and navigates to /", () => {
+      const mockLogout = vi.fn();
+      vi.mocked(useAuthStore).mockReturnValue({
+        isAuthenticated: true,
+        logout: mockLogout,
+      } as any);
+      const wrapper = mount(NavbarComponent, {
+        global: {
+          plugins: [i18n],
+          stubs: { LangComponent: true, ThemeComponent: true, Transition: true },
+        },
+      });
+      const vm = wrapper.vm as any;
+      vm.menuItems[2].command();
+      expect(mockLogout).toHaveBeenCalled();
+      expect(mockPush).toHaveBeenCalledWith("/");
+    });
+  });
+
+  // ── loadProfilePicture ───────────────────────────────────────────────────────
+  vi.mock("@/repositories/userRepository", () => ({
+    getUserProfile: vi.fn(),
+  }));
+
+
+  describe("loadProfilePicture", () => {
+    it("sets profilePicture to null when not authenticated", async () => {
+      const wrapper = factory(false);
+      const vm = wrapper.vm as any;
+      await vm.loadProfilePicture();
+      expect(vm.profilePicture).toBeNull();
+    });
+
+    it("sets profilePicture from profile when authenticated", async () => {
+      vi.mocked(getUserProfile).mockResolvedValue({ picture: "https://example.com/pic.jpg" } as any);
+      const wrapper = factory(true);
+      const vm = wrapper.vm as any;
+      await vm.loadProfilePicture();
+      expect(vm.profilePicture).toBe("https://example.com/pic.jpg");
+    });
+
+    it("sets profilePicture to null when profile has no picture", async () => {
+      vi.mocked(getUserProfile).mockResolvedValue({ picture: null } as any);
+      const wrapper = factory(true);
+      const vm = wrapper.vm as any;
+      await vm.loadProfilePicture();
+      expect(vm.profilePicture).toBeNull();
+    });
+
+    it("sets profilePicture to null when getUserProfile throws", async () => {
+      vi.mocked(getUserProfile).mockRejectedValue(new Error("Network error"));
+      const wrapper = factory(true);
+      const vm = wrapper.vm as any;
+      await vm.loadProfilePicture();
+      expect(vm.profilePicture).toBeNull();
+    });
+
+    it("reloads profilePicture when isAuthenticated changes to true", async () => {
+      vi.mocked(getUserProfile).mockResolvedValue({ picture: "https://example.com/pic.jpg" } as any);
+
+      const authState = reactive({ isAuthenticated: false, logout: vi.fn() });
+      vi.mocked(useAuthStore).mockReturnValue(authState as any);
+
+      const wrapper = mount(NavbarComponent, {
+        global: {
+          plugins: [i18n],
+          stubs: { LangComponent: true, ThemeComponent: true, Transition: true },
+        },
+      });
+
+      authState.isAuthenticated = true;   // triggers the watcher
+      await nextTick();
+      await nextTick(); // second tick lets the async watcher callback resolve
+
+      expect((wrapper.vm as any).profilePicture).toBe("https://example.com/pic.jpg");
+    });
   });
 });
