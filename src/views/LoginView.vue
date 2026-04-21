@@ -88,7 +88,7 @@ const login = async ({
             <FormField v-slot="$field" name="password" initialValue="" class="flex flex-col gap-1">
               <FloatLabel variant="over">
                 <Password v-bind="$field" id="password" :feedback="false" toggleMask fluid
-                  :class="{ 'p-invalid': $field?.invalid }" />
+                  :class="{ 'p-invalid': $field?.invalid }" :aria-label="$t('signup.password')" />
                 <label for="password">{{ $t("signup.password") }}</label>
               </FloatLabel>
               <div class="flex justify-end mt-1">

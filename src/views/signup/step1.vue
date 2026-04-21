@@ -75,6 +75,7 @@ const route = useRoute();
                 'p-invalid': $field?.invalid,
                 'p-valid': $field?.dirty && !$field?.invalid,
               }"
+              :aria-label="$t('signup.username')"
             />
             <InputIcon
               v-if="$field?.dirty"
@@ -106,6 +107,7 @@ const route = useRoute();
                 'p-invalid': $field?.invalid,
                 'p-valid': $field?.dirty && !$field?.invalid,
               }"
+              :aria-label="$t('signup.email')"
             />
             <InputIcon
               v-if="$field?.dirty"
@@ -137,6 +139,7 @@ const route = useRoute();
               'p-invalid': $field?.invalid,
               'p-valid': $field?.dirty && !$field?.invalid,
             }"
+            :aria-label="$t('signup.password')"
           />
           <label for="password">{{ $t("signup.password") }}</label>
         </FloatLabel>
@@ -173,6 +176,7 @@ const route = useRoute();
               'p-invalid': $field?.invalid,
               'p-valid': $field?.dirty && !$field?.invalid,
             }"
+            :aria-label="$t('signup.confirmPassword')"
           />
           <label for="confirm_password">{{
             $t("signup.confirmPassword")

@@ -74,7 +74,7 @@ onMounted(() => {
                     </div>
 
                     <!-- Close -->
-                    <button class="toast-close" @click="removeToast(toast.id)" aria-label="Cerrar">
+                    <button class="toast-close" @click="removeToast(toast.id)" :aria-label="$t('toast.close')">
                         <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
                             <path d="M2 2L8 8M8 2L2 8" stroke="currentColor" stroke-width="1.6"
                                 stroke-linecap="round" />
