@@ -2,6 +2,7 @@ import { mount, flushPromises } from "@vue/test-utils";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import CelebrityView from "@/views/CelebrityView.vue"; // adjust path as needed
 import type { MoviePagination, Person } from "@/types";
+import { useLangStore } from "@/stores/langStore";
 
 // ── Repository mocks ─────────────────────────────────────────────────────────
 const mockGetPersonProfile = vi.fn();
@@ -75,25 +76,25 @@ vi.mock("@/components/filmographyComponent.vue", () => ({
 
 // ── Test data factories ───────────────────────────────────────────────────────
 const makePerson = (overrides: Partial<Person> = {}): Person =>
-  ({
-    id: 1,
-    name: "Keanu Reeves",
-    biography: "An actor.",
-    birthday: "1964-09-02",
-    deathday: null,
-    gender: "2",
-    image: "https://example.com/keanu.jpg",
-    ...overrides,
-  } as unknown as Person);
+({
+  id: 1,
+  name: "Keanu Reeves",
+  biography: "An actor.",
+  birthday: "1964-09-02",
+  deathday: null,
+  gender: "2",
+  image: "https://example.com/keanu.jpg",
+  ...overrides,
+} as unknown as Person);
 
 const makeMoviePagination = (count = 2): MoviePagination =>
-  ({
-    results: Array.from({ length: count }, (_, i) => ({
-      id: i + 1,
-      title: `Movie ${i + 1}`,
-    })),
-    next_last_id: null,
-  } as unknown as MoviePagination);
+({
+  results: Array.from({ length: count }, (_, i) => ({
+    id: i + 1,
+    title: `Movie ${i + 1}`,
+  })),
+  next_last_id: null,
+} as unknown as MoviePagination);
 
 // ── Mount helper ─────────────────────────────────────────────────────────────
 const mountView = () =>
@@ -263,6 +264,34 @@ describe("CelebrityView", () => {
       );
       expect(emptyFilmography.attributes("data-empty")).toBe("true");
     });
+    it("doesn't update filmography/celebrity data if change lang is the same", async () => {
+      mountView();
+      await flushPromises();
+      expect(mockGetPersonProfile).toHaveBeenCalledTimes(1);
+      expect(mockGetPersonFilmography).toHaveBeenCalledTimes(2);
+
+      const langStore = useLangStore();
+      langStore.language = "en";
+      await flushPromises();
+
+      expect(mockGetPersonProfile).toHaveBeenCalledTimes(1);
+      expect(mockGetPersonFilmography).toHaveBeenCalledTimes(2);
+    })
+    it("update filmography/celebrity data if change lang is different", async () => {
+      mountView();
+      await flushPromises();
+      expect(mockGetPersonProfile).toHaveBeenCalledTimes(1);
+      expect(mockGetPersonFilmography).toHaveBeenCalledTimes(2);
+
+      const langStore = useLangStore();
+      langStore.language = "es";
+      await flushPromises();
+
+      expect(mockGetPersonProfile).toHaveBeenCalledTimes(2);
+      expect(mockGetPersonFilmography).toHaveBeenCalledTimes(4);
+    });
+
+
   });
 
   // ── Error handling ────────────────────────────────────────────────────────
