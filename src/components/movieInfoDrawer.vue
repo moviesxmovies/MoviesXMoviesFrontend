@@ -15,6 +15,9 @@ const { t } = useI18n();
 const actors = ref<Person[]>([]);
 const directors = ref<Person[]>([]);
 const loading = ref(false);
+const actorsScroll = ref()
+const directorsScroll = ref()
+const hasDragged = ref(false)
 
 const fetchDetails = async (finalList: Ref<Person[]>, list: string[]) => {
   finalList.value = [];
@@ -51,24 +54,58 @@ watch(
   },
   { immediate: true },
 );
+
+function useDragScroll() {
+  const isDown = ref(false)
+  const startX = ref(0)
+  const scrollLeft = ref(0)
+
+  function onMouseDown(e: MouseEvent, el: HTMLElement) {
+    isDown.value = true
+    hasDragged.value = false
+    startX.value = e.pageX - el.offsetLeft
+    scrollLeft.value = el.scrollLeft
+  }
+
+  function onMouseMove(e: MouseEvent, el: HTMLElement) {
+    if (!isDown.value) return
+    e.preventDefault()
+    const x = e.pageX - el.offsetLeft
+    const walk = (x - startX.value) * 1.2
+
+    if (Math.abs(x - startX.value) > 5) {
+      hasDragged.value = true
+    }
+
+    el.scrollLeft = scrollLeft.value - walk
+  }
+
+
+  function onMouseUp() {
+    isDown.value = false
+  }
+
+  function onClick(e: MouseEvent) {
+    if (hasDragged.value) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+  }
+
+
+  return { onMouseDown, onMouseMove, onMouseUp, onClick }
+}
+
+const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll()
+
 </script>
 
 <template>
-  <Drawer
-    v-model:visible="visible"
-    :modal="false"
-    :dismissable="false"
-    position="right"
-    class="movie-drawer !w-full md:!w-[40rem]"
-  >
+  <Drawer v-model:visible="visible" :modal="false" :dismissable="false" position="right"
+    class="movie-drawer !w-full md:!w-[40rem]">
     <template #header>
       <div class="drawer-header-inner">
-        <img
-          v-if="movie.cover"
-          :src="movie.cover"
-          :alt="movie.title"
-          class="drawer-poster"
-        />
+        <img v-if="movie.cover" :src="movie.cover" :alt="movie.title" class="drawer-poster" />
         <div class="drawer-title-block">
           <h2 class="drawer-title">{{ movie.title }}</h2>
           <span class="drawer-year">{{ movie.release_date }}</span>
@@ -79,73 +116,31 @@ watch(
     <div v-if="loading" class="drawer-loading">
       <!-- Synopsis -->
       <div class="drawer-section">
-        <Skeleton
-          width="30%"
-          height="0.7rem"
-          border-radius="4px"
-          class="mb-3"
-        />
-        <Skeleton
-          width="100%"
-          height="0.9rem"
-          border-radius="4px"
-          class="mb-2"
-        />
-        <Skeleton
-          width="100%"
-          height="0.9rem"
-          border-radius="4px"
-          class="mb-2"
-        />
+        <Skeleton width="30%" height="0.7rem" border-radius="4px" class="mb-3" />
+        <Skeleton width="100%" height="0.9rem" border-radius="4px" class="mb-2" />
+        <Skeleton width="100%" height="0.9rem" border-radius="4px" class="mb-2" />
         <Skeleton width="75%" height="0.9rem" border-radius="4px" />
       </div>
 
       <!-- Platforms -->
       <div class="drawer-section">
-        <Skeleton
-          width="25%"
-          height="0.7rem"
-          border-radius="4px"
-          class="mb-3"
-        />
+        <Skeleton width="25%" height="0.7rem" border-radius="4px" class="mb-3" />
         <div class="inline-list">
-          <Skeleton
-            v-for="n in 3"
-            :key="n"
-            width="52px"
-            height="52px"
-            border-radius="10px"
-          />
+          <Skeleton v-for="n in 3" :key="n" width="52px" height="52px" border-radius="10px" />
         </div>
       </div>
 
       <!-- Genres -->
       <div class="drawer-section">
-        <Skeleton
-          width="20%"
-          height="0.7rem"
-          border-radius="4px"
-          class="mb-3"
-        />
+        <Skeleton width="20%" height="0.7rem" border-radius="4px" class="mb-3" />
         <div class="genre-list">
-          <Skeleton
-            v-for="n in 4"
-            :key="n"
-            width="72px"
-            height="1.6rem"
-            border-radius="99px"
-          />
+          <Skeleton v-for="n in 4" :key="n" width="72px" height="1.6rem" border-radius="99px" />
         </div>
       </div>
 
       <!-- Actors -->
       <div class="drawer-section">
-        <Skeleton
-          width="22%"
-          height="0.7rem"
-          border-radius="4px"
-          class="mb-3"
-        />
+        <Skeleton width="22%" height="0.7rem" border-radius="4px" class="mb-3" />
         <div class="inline-list">
           <div v-for="n in 4" :key="n" class="person-item">
             <Skeleton width="64px" height="64px" border-radius="50%" />
@@ -156,12 +151,7 @@ watch(
 
       <!-- Directors -->
       <div class="drawer-section">
-        <Skeleton
-          width="24%"
-          height="0.7rem"
-          border-radius="4px"
-          class="mb-3"
-        />
+        <Skeleton width="24%" height="0.7rem" border-radius="4px" class="mb-3" />
         <div class="inline-list">
           <div v-for="n in 2" :key="n" class="person-item">
             <Skeleton width="64px" height="64px" border-radius="50%" />
@@ -190,21 +180,10 @@ watch(
             )
           }}
         </h3>
-        <ScrollPanel
-          class="horizontal-scroll-panel"
-          :pt="{ content: { class: 'scroll-content' } }"
-        >
+        <ScrollPanel class="horizontal-scroll-panel" :pt="{ content: { class: 'scroll-content' } }">
           <div class="inline-list">
-            <div
-              v-for="platform in movie.platforms"
-              :key="platform.id"
-              class="platform-item"
-            >
-              <img
-                :src="platform.image ?? ''"
-                :alt="platform.name"
-                class="platform-item__img"
-              />
+            <div v-for="platform in movie.platforms" :key="platform.id" class="platform-item">
+              <img :src="platform.image ?? ''" :alt="platform.name" class="platform-item__img" />
             </div>
           </div>
         </ScrollPanel>
@@ -237,21 +216,16 @@ watch(
             )
           }}
         </h3>
-        <ScrollPanel
-          class="horizontal-scroll-panel"
-          :pt="{ content: { class: 'scroll-content' } }"
-        >
+        <div class="scroll-container" ref="actorsScroll" @mousedown="onMouseDown($event, actorsScroll)"
+          @mousemove="onMouseMove($event, actorsScroll)" @mouseup="onMouseUp" @mouseleave="onMouseUp">
           <div class="inline-list">
-            <a v-for="actor in actors" :key="actor.id" class="person-item" :href="`/profiles/${actor.slug}`">
-              <img
-                :src="actor.image"
-                :alt="actor.name"
-                class="person-item__img"
-              />
+            <a v-for="actor in actors" :key="actor.id" class="person-item" :href="`/profiles/${actor.slug}`"
+              draggable="false" @click="onClick">
+              <img :src="actor.image" :alt="actor.name" class="person-item__img" draggable="false" />
               <span class="person-item__name">{{ actor.name }}</span>
             </a>
           </div>
-        </ScrollPanel>
+        </div>
       </section>
 
       <!-- Directors -->
@@ -264,26 +238,16 @@ watch(
             )
           }}
         </h3>
-        <ScrollPanel
-          class="horizontal-scroll-panel"
-          :pt="{ content: { class: 'scroll-content' } }"
-        >
+        <div class="scroll-container" ref="directorsScroll" @mousedown="onMouseDown($event, directorsScroll)"
+          @mousemove="onMouseMove($event, directorsScroll)" @mouseup="onMouseUp" @mouseleave="onMouseUp">
           <div class="inline-list">
-            <a
-              v-for="director in directors"
-              :key="director.id"
-              class="person-item"
-              :href="`/profiles/${director.slug}`"
-            >
-              <img
-                :src="director.image"
-                :alt="director.name"
-                class="person-item__img"
-              />
+            <a v-for="director in directors" :key="director.id" class="person-item" :href="`/profiles/${director.slug}`"
+              draggable="false" @click="onClick">
+              <img :src="director.image" :alt="director.name" class="person-item__img" draggable="false" />
               <span class="person-item__name">{{ director.name }}</span>
             </a>
           </div>
-        </ScrollPanel>
+        </div>
       </section>
     </template>
   </Drawer>
@@ -294,9 +258,9 @@ watch(
   --mxm-bg: #0f0f13;
   --mxm-surface: #18181f;
   --mxm-surface-2: #22222c;
-  --mxm-accent: #e8b84b;
-  --mxm-text: #e8e6e1;
-  --mxm-text-muted: #7a7a8a;
+  --mxm-accent: #bb3dff;
+  --mxm-text: #e8e1e1;
+  --mxm-text-muted: #8a7a7a;
   --mxm-radius: 12px;
 }
 
@@ -368,7 +332,7 @@ watch(
   color: var(--mxm-accent);
   margin: 0 0 0.75rem 0;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(232, 184, 75, 0.2);
+  border-bottom: 1px solid #2f27ce1d;
 }
 
 .drawer-section__body {
@@ -406,22 +370,22 @@ watch(
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  width: 72px;
+  width: 76px;
   flex-shrink: 0;
 }
 
 .person-item__img {
-  width: 64px;
-  height: 64px;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
   object-fit: cover;
-  background: var(--mxm-surface-2);
+  background: #7f6e8b45;
   border: 2px solid rgba(255, 255, 255, 0.06);
   transition: border-color 0.2s;
 }
 
 .person-item:hover .person-item__img {
-  border-color: rgba(232, 184, 75, 0.4);
+  border-color: #bb3dff;
 }
 
 .person-item__name {
@@ -459,7 +423,8 @@ watch(
 }
 
 .platform-item:hover .platform-item__img {
-  border-color: rgba(232, 184, 75, 0.3);
+  border-color: #bb3dff;
+  ;
   background: var(--mxm-surface-2);
 }
 
@@ -485,6 +450,24 @@ watch(
 
 .genre-tag:hover {
   color: var(--mxm-accent);
-  border-color: rgba(232, 184, 75, 0.3);
+  border-color: #bb3dff;
+}
+
+.scroll-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+  cursor: grab;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  user-select: none;
+}
+
+.scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+.scroll-container:active {
+  cursor: grabbing;
 }
 </style>
