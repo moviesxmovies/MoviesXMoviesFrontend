@@ -84,7 +84,7 @@ defineExpose({ currentStep, formData, next, handleForm });
       <div class="rounded-2xl border shadow-sm overflow-hidden"
         style="background-color: var(--background); border-color: var(--secondary)">
 
-        <ProgressBar :value="currentStep * 100 / Object.keys(steps).length" class="custom-progress">
+        <ProgressBar :aria-label="$t('signup.progress')" :value="currentStep * 100 / Object.keys(steps).length" class="custom-progress">
           {{ }}
         </ProgressBar>
 

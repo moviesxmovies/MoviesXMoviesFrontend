@@ -102,7 +102,7 @@ describe("MovieInfoDrawer", () => {
 
   describe("Loading State", () => {
     it("Should show skeleton while loading", async () => {
-      mockGet.mockReturnValue(new Promise(() => {}));
+      mockGet.mockReturnValue(new Promise(() => { }));
 
       const wrapper = mountComponent();
 
@@ -278,4 +278,120 @@ describe("MovieInfoDrawer", () => {
       expect(mockGet).toHaveBeenCalledTimes(5);
     });
   });
+  describe("DragScroll", () => {
+    beforeEach(() => {
+      mockGet
+        .mockResolvedValueOnce({ data: mockActor1 })
+        .mockResolvedValueOnce({ data: mockActor2 })
+        .mockResolvedValueOnce({ data: mockDirector })
+      vi.clearAllMocks()
+    })
+
+    function mouseEvent(type: string, pageX: number): MouseEvent {
+      return new MouseEvent(type, { bubbles: true, cancelable: true, pageX })
+    }
+
+    async function getScrollContainer(wrapper: ReturnType<typeof mountComponent>) {
+      await flushPromises()
+      const containers = wrapper.findAll(".scroll-container")
+      return containers[0]
+    }
+
+    it("sets cursor to grabbing on mousedown", async () => {
+      const wrapper = mountComponent()
+      const container = await getScrollContainer(wrapper)
+
+      await container.trigger("mousedown", { pageX: 100 })
+
+      expect(container.classes()).toContain("scroll-container")
+    })
+
+    it("does not scroll if mouse is not down", async () => {
+      const wrapper = mountComponent()
+      const container = await getScrollContainer(wrapper)
+
+      const el = container.element as HTMLElement
+      Object.defineProperty(el, "scrollLeft", { writable: true, value: 0 })
+
+      await container.trigger("mousemove", { pageX: 200 })
+
+      expect(el.scrollLeft).toBe(0)
+    })
+
+    it("stops scrolling after mouseup", async () => {
+      const wrapper = mountComponent()
+      const container = await getScrollContainer(wrapper)
+      const el = container.element as HTMLElement
+
+      Object.defineProperty(el, "scrollLeft", { writable: true, value: 0 })
+      Object.defineProperty(el, "offsetLeft", { writable: true, value: 0 })
+
+      await container.trigger("mousedown", { pageX: 100 })
+      await container.trigger("mouseup")
+
+      const scrollAfterUp = el.scrollLeft
+      await container.trigger("mousemove", { pageX: 50 })
+
+      expect(el.scrollLeft).toBe(scrollAfterUp)
+    })
+
+    it("stops scrolling after mouseleave", async () => {
+      const wrapper = mountComponent()
+      const container = await getScrollContainer(wrapper)
+      const el = container.element as HTMLElement
+
+      Object.defineProperty(el, "scrollLeft", { writable: true, value: 0 })
+      Object.defineProperty(el, "offsetLeft", { writable: true, value: 0 })
+
+      await container.trigger("mousedown", { pageX: 100 })
+      await container.trigger("mouseleave")
+
+      const scrollAfterLeave = el.scrollLeft
+      await container.trigger("mousemove", { pageX: 50 })
+
+      expect(el.scrollLeft).toBe(scrollAfterLeave)
+    })
+
+
+    it("does NOT block click when moved less than 5px", async () => {
+      const wrapper = mountComponent()
+      const container = await getScrollContainer(wrapper)
+      const el = container.element as HTMLElement
+
+      Object.defineProperty(el, "scrollLeft", { writable: true, value: 0 })
+      Object.defineProperty(el, "offsetLeft", { writable: true, value: 0 })
+
+      await container.trigger("mousedown", { pageX: 100 })
+      await container.trigger("mousemove", { pageX: 97 })
+      await container.trigger("mouseup")
+
+      const link = wrapper.find(".person-item")
+      const clickEvent = new MouseEvent("click", { bubbles: true, cancelable: true })
+      link.element.dispatchEvent(clickEvent)
+
+      expect(clickEvent.defaultPrevented).toBe(false)
+    })
+
+    it("resets hasDragged on new mousedown", async () => {
+      const wrapper = mountComponent()
+      const container = await getScrollContainer(wrapper)
+      const el = container.element as HTMLElement
+
+      Object.defineProperty(el, "scrollLeft", { writable: true, value: 0 })
+      Object.defineProperty(el, "offsetLeft", { writable: true, value: 0 })
+
+      await container.trigger("mousedown", { pageX: 100 })
+      await container.trigger("mousemove", { pageX: 80 })
+      await container.trigger("mouseup")
+
+      await container.trigger("mousedown", { pageX: 100 })
+      await container.trigger("mousemove", { pageX: 98 })
+
+      const link = wrapper.find(".person-item")
+      const clickEvent = new MouseEvent("click", { bubbles: true, cancelable: true })
+      link.element.dispatchEvent(clickEvent)
+
+      expect(clickEvent.defaultPrevented).toBe(false)
+    })
+  })
 });

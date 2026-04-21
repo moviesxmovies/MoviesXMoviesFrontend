@@ -8,14 +8,10 @@ const props = defineProps<{
 <template>
   <div class="flex justify-center">
     <div class="inline-flex w-full max-w-sm overflow-hidden rounded-b-2xl">
-      <button
-        id="more-info"
-        :disabled="loading"
+      <button id="more-info" :disabled="loading"
         class="flex-1 h-16 bg-accent cursor-pointer hover:brightness-120 flex items-center justify-center border-r border-white/10 transition-all active:bg-accent/80"
-        @mousedown.stop
-        @touchstart.stop
-        @click.stop="emit('showMoreInfo')"
-      >
+        @mousedown.stop @touchstart.stop @click.stop="emit('showMoreInfo')"
+        :aria-label="$t('actions.showMoreInfo')">
         <i class="pi pi-info-circle text-2xl text-white" />
       </button>
 

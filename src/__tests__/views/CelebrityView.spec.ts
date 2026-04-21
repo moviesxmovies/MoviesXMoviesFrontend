@@ -2,6 +2,7 @@ import { mount, flushPromises } from "@vue/test-utils";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import CelebrityView from "@/views/CelebrityView.vue"; // adjust path as needed
 import type { MoviePagination, Person } from "@/types";
+import { useLangStore } from "@/stores/langStore";
 
 // ── Repository mocks ─────────────────────────────────────────────────────────
 const mockGetPersonProfile = vi.fn();
@@ -265,6 +266,34 @@ describe("CelebrityView", () => {
       const [emptyFilmography] = wrapper.findAll("[data-testid='filmography']");
       expect(emptyFilmography.attributes("data-empty")).toBe("true");
     });
+    it("doesn't update filmography/celebrity data if change lang is the same", async () => {
+      mountView();
+      await flushPromises();
+      expect(mockGetPersonProfile).toHaveBeenCalledTimes(1);
+      expect(mockGetPersonFilmography).toHaveBeenCalledTimes(2);
+
+      const langStore = useLangStore();
+      langStore.language = "en";
+      await flushPromises();
+
+      expect(mockGetPersonProfile).toHaveBeenCalledTimes(1);
+      expect(mockGetPersonFilmography).toHaveBeenCalledTimes(2);
+    })
+    it("update filmography/celebrity data if change lang is different", async () => {
+      mountView();
+      await flushPromises();
+      expect(mockGetPersonProfile).toHaveBeenCalledTimes(1);
+      expect(mockGetPersonFilmography).toHaveBeenCalledTimes(2);
+
+      const langStore = useLangStore();
+      langStore.language = "es";
+      await flushPromises();
+
+      expect(mockGetPersonProfile).toHaveBeenCalledTimes(2);
+      expect(mockGetPersonFilmography).toHaveBeenCalledTimes(4);
+    });
+
+
   });
 
   // ── Error handling ────────────────────────────────────────────────────────

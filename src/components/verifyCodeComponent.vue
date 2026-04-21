@@ -46,8 +46,8 @@ onUnmounted(() => {
 <template>
   <form @submit.prevent="handleSubmit" class="flex flex-col items-center w-full">
     <InputOtp v-model="verificationCode" :length="6" integer-only class="gap-2 mb-8">
-      <template #default="{ attrs, events }">
-        <input v-bind="attrs" v-on="events" class="custom-otp-input" />
+      <template #default="{ attrs, events, index }">
+        <input v-bind="attrs" v-on="events" class="custom-otp-input" :aria-label="$t('verify.ariaLabel', { index: index + 1 })"/>
       </template>
     </InputOtp>
 
