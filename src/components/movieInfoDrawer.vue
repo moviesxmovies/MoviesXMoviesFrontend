@@ -414,7 +414,6 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll()
 
 .platform-item:hover .platform-item__img {
   border-color: #bb3dff;
-  ;
   background: var(--mxm-surface-2);
 }
 
