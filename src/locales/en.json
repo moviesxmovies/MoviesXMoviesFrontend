@@ -143,6 +143,7 @@
     "fetchMoviesError": "Failed to fetch movies. Please try again later.",
     "profile": "My Profile",
     "shortcuts": "Shortcuts"
+    "search": "Search"
   },
   "onboarding": {
     "step1": "Let's get you started with a quick tour",
