@@ -254,16 +254,6 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll()
 </template>
 
 <style scoped>
-:root {
-  --mxm-bg: #0f0f13;
-  --mxm-surface: #18181f;
-  --mxm-surface-2: #22222c;
-  --mxm-accent: #bb3dff;
-  --mxm-text: #e8e1e1;
-  --mxm-text-muted: #8a7a7a;
-  --mxm-radius: 12px;
-}
-
 :deep(.movie-drawer__root) {
   background: var(--mxm-bg) !important;
   border-left: 1px solid rgba(232, 184, 75, 0.15);
