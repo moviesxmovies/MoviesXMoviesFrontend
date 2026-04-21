@@ -55,6 +55,11 @@ describe("NavbarComponent", () => {
     expect(wrapper.find(".logo-icon img").exists()).toBe(true);
   });
 
+  it("renders search button", () => {
+    const wrapper = factory();
+    expect(wrapper.find('#search-btn').exists()).toBe(true);
+  });
+
   it("renders LangComponent", () => {
     const wrapper = factory();
     expect(wrapper.findComponent({ name: "LangComponent" }).exists()).toBe(true);
@@ -69,6 +74,12 @@ describe("NavbarComponent", () => {
     const wrapper = factory();
     await wrapper.find(".nav-logo").trigger("click");
     expect(mockPush).toHaveBeenCalledWith("/");
+  });
+
+  it("navigates to /search when search is clicked", async () => {
+    const wrapper = factory();
+    await wrapper.find("#search-btn").trigger("click");
+    expect(mockPush).toHaveBeenCalledWith("/search");
   });
 
   // ── Not authenticated ────────────────────────────────────────────────────
@@ -176,7 +187,7 @@ describe("NavbarComponent", () => {
     const wrapper = factory(false);
     await wrapper.find(".hamburger").trigger("click");
     await nextTick();
-    await wrapper.find(".mobile-menu .btn-ghost").trigger("click");
+    await wrapper.find("#profile-btn-mobile").trigger("click");
     await nextTick();
     expect(mockPush).toHaveBeenCalledWith("/login");
     expect(wrapper.find(".mobile-menu").exists()).toBe(false);
@@ -186,9 +197,19 @@ describe("NavbarComponent", () => {
     const wrapper = factory(true);
     await wrapper.find(".hamburger").trigger("click");
     await nextTick();
-    await wrapper.find(".mobile-menu .btn-ghost").trigger("click");
+    await wrapper.find("#profile-btn-mobile").trigger("click");
     await nextTick();
     expect(mockPush).toHaveBeenCalledWith("/profile");
+    expect(wrapper.find(".mobile-menu").exists()).toBe(false);
+  });
+
+  it("navigates and closes menu when mobile search button is clicked", async () => {
+    const wrapper = factory(false);
+    await wrapper.find(".hamburger").trigger("click");
+    await nextTick();
+    await wrapper.find("#search-btn-mobile").trigger("click");
+    await nextTick();
+    expect(mockPush).toHaveBeenCalledWith("/search");
     expect(wrapper.find(".mobile-menu").exists()).toBe(false);
   });
 

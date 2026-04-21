@@ -135,7 +135,8 @@
     "feature2": "Get movie recommendations",
     "feature3": "Create your own movie lists.",
     "fetchMoviesHerror": "Failed to fetch movies. Please try again later.",
-    "profile": "My Profile"
+    "profile": "My Profile",
+    "search": "Search"
   },
   "onboarding": {
     "step1": "Let's get you started with a quick tour",
