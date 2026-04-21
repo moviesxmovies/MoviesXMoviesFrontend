@@ -12,11 +12,12 @@ import {
   Tag,
   useToast,
 } from "primevue";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 import { useInfiniteScroll } from "@/composables/useInfiniteScroll";
 import FilmographyComponent from "@/components/filmographyComponent.vue";
+import { useLangStore } from "@/stores/langStore";
 
 const route = useRoute();
 const user = ref<Person>({} as Person);
@@ -28,6 +29,7 @@ const { t } = useI18n();
 const router = useRouter();
 const acted_movies = ref<MoviePagination>({} as MoviePagination);
 const directed_movies = ref<MoviePagination>({} as MoviePagination);
+const langeStore = useLangStore();
 
 const genderMap: Record<string, { color: string; icon: string }> = {
   "0": { color: "var(--secondary)", icon: "pi pi-minus" },
@@ -43,7 +45,7 @@ const genderBackground = computed(() => {
   return genderMap[user.value.gender]?.color ?? "var(--secondary)";
 });
 
-const fetchUserProfile = async () => {
+const fetchPersonProfile = async () => {
   const { slug } = route.params;
   loadingProfile.value = true;
   try {
@@ -126,11 +128,23 @@ const { sentinelRef: directedSentinelRef } = useInfiniteScroll(async () => {
 
 onMounted(async () => {
   await Promise.all([
-    fetchUserProfile(),
+    fetchPersonProfile(),
     fetchFilmography("acted"),
     fetchFilmography("directed"),
   ]);
 });
+watch(
+  () => langeStore.language, async (newLang, oldLang) => {
+    if (newLang !== oldLang) {
+      acted_movies.value = {} as MoviePagination;
+      directed_movies.value = {} as MoviePagination;
+      await fetchPersonProfile();
+      await fetchFilmography("acted");
+      await fetchFilmography("directed");
+    }
+
+  }
+)
 </script>
 
 <template>
@@ -140,15 +154,11 @@ onMounted(async () => {
         <div class="card sticky-card">
           <div class="card-image">
             <img :src="user.image" :alt="user.name" class="card-img" />
-            <Tag
-              :icon="genderIcon"
-              class="gender-tag"
-              :style="{
-                background: `${genderBackground}`,
-                color: '#fff',
-                borderRadius: '8px',
-              }"
-            />
+            <Tag :icon="genderIcon" class="gender-tag" :style="{
+              background: `${genderBackground}`,
+              color: '#fff',
+              borderRadius: '8px',
+            }" />
           </div>
 
           <div class="card-body">
@@ -156,17 +166,13 @@ onMounted(async () => {
             <div class="dates">
               <div class="date-row">
                 <i class="pi pi-calendar accent-icon" />
-                <span
-                  ><b>{{ t("celebrity.birthday") }}:</b>
-                  {{ user.birthday }}</span
-                >
+                <span><b>{{ t("celebrity.birthday") }}:</b>
+                  {{ user.birthday }}</span>
               </div>
               <div v-if="user.deathday" class="date-row">
                 <i class="pi pi-heart-fill death-icon" />
-                <span
-                  ><b>{{ t("celebrity.deathday") }}:</b>
-                  {{ user.deathday }}</span
-                >
+                <span><b>{{ t("celebrity.deathday") }}:</b>
+                  {{ user.deathday }}</span>
               </div>
             </div>
           </div>
@@ -185,33 +191,17 @@ onMounted(async () => {
           </AccordionContent>
         </AccordionPanel>
 
-        <FilmographyComponent
-          v-if="
-            acted_movies.results?.length === 0 &&
-            directed_movies.results?.length === 0
-          "
-          :empty="true"
-          :index="1"
-          :loading="loadingActors"
-          :title="t('celebrity.filmography.acted_in')"
-          v-model:sentinelRef="actedSentinelRef"
-        />
+        <FilmographyComponent v-if="
+          acted_movies.results?.length === 0 &&
+          directed_movies.results?.length === 0
+        " :empty="true" :index="1" :loading="loadingActors" :title="t('celebrity.filmography.acted_in')"
+          v-model:sentinelRef="actedSentinelRef" />
 
-        <FilmographyComponent
-          :index="1"
-          :list="acted_movies.results"
-          :loading="loadingActors"
-          :title="t('celebrity.filmography.acted_in')"
-          v-model:sentinelRef="actedSentinelRef"
-        />
+        <FilmographyComponent :index="1" :list="acted_movies.results" :loading="loadingActors"
+          :title="t('celebrity.filmography.acted_in')" v-model:sentinelRef="actedSentinelRef" />
 
-        <FilmographyComponent
-          :index="2"
-          :list="directed_movies.results"
-          :loading="loadingDirectors"
-          :title="t('celebrity.filmography.directed')"
-          v-model:sentinelRef="directedSentinelRef"
-        />
+        <FilmographyComponent :index="2" :list="directed_movies.results" :loading="loadingDirectors"
+          :title="t('celebrity.filmography.directed')" v-model:sentinelRef="directedSentinelRef" />
       </Accordion>
     </div>
   </div>
@@ -240,6 +230,7 @@ onMounted(async () => {
     padding: 1.5rem;
   }
 }
+
 @media (min-width: 1024px) {
   .page {
     padding: 2.5rem;
@@ -264,6 +255,7 @@ onMounted(async () => {
   .sidebar {
     order: 1;
   }
+
   .content {
     order: 2;
   }
