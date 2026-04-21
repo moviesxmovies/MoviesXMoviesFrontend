@@ -20,7 +20,9 @@ const directorsScroll = ref()
 const hasDragged = ref(false)
 
 const fetchDetails = async (finalList: Ref<Person[]>, list: string[]) => {
+  if (!list) return;
   finalList.value = [];
+  
   for (const element of list) {
     try {
       const { data } = await api.get(element);
