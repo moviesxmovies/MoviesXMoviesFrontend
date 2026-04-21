@@ -109,6 +109,8 @@ const glowStyle = computed(() => {
 
 const markAsNotSeen = async () => {
   loading.value = true;
+  if (navigator.vibrate)
+    navigator.vibrate(100);
   if (actualMovie.value) {
     await setAsNotSeen(actualMovie.value.slug);
   }
@@ -119,11 +121,14 @@ const markAsNotSeen = async () => {
 const rateMovie = async (rating: number) => {
   if (rating === 0) return;
   loading.value = true;
+  if (navigator.vibrate)
+    navigator.vibrate(100);
   if (actualMovie.value) {
     await submitRating(actualMovie.value.slug, rating);
   }
   loading.value = false;
   showNextRecommendedMovie();
+
 };
 
 const shortcuts = [
