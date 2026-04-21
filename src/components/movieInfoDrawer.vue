@@ -4,6 +4,7 @@ import { Drawer, ScrollPanel, Skeleton, useToast } from "primevue";
 import { ref, watch, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { api } from "@/composables/useAPI";
+import { RouterLink } from "vue-router";
 
 const props = defineProps<{
   movie: Movie;
@@ -221,11 +222,11 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll()
         <div class="scroll-container" ref="actorsScroll" @mousedown="onMouseDown($event, actorsScroll)"
           @mousemove="onMouseMove($event, actorsScroll)" @mouseup="onMouseUp" @mouseleave="onMouseUp">
           <div class="inline-list">
-            <a v-for="actor in actors" :key="actor.id" class="person-item" :href="`/profiles/${actor.slug}`"
+            <RouterLink v-for="actor in actors" :key="actor.id" class="person-item" :to="`/profiles/${actor.slug}`"
               draggable="false" @click="onClick">
               <img :src="actor.image" :alt="actor.name" class="person-item__img" draggable="false" />
               <span class="person-item__name">{{ actor.name }}</span>
-            </a>
+            </RouterLink>
           </div>
         </div>
       </section>
@@ -243,11 +244,11 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll()
         <div class="scroll-container" ref="directorsScroll" @mousedown="onMouseDown($event, directorsScroll)"
           @mousemove="onMouseMove($event, directorsScroll)" @mouseup="onMouseUp" @mouseleave="onMouseUp">
           <div class="inline-list">
-            <a v-for="director in directors" :key="director.id" class="person-item" :href="`/profiles/${director.slug}`"
+            <RouterLink v-for="director in directors" :key="director.id" class="person-item" :to="`/profiles/${director.slug}`"
               draggable="false" @click="onClick">
               <img :src="director.image" :alt="director.name" class="person-item__img" draggable="false" />
               <span class="person-item__name">{{ director.name }}</span>
-            </a>
+            </RouterLink>
           </div>
         </div>
       </section>
