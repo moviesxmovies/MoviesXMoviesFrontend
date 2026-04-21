@@ -9,7 +9,8 @@ const mockGetPersonFilmography = vi.fn();
 
 vi.mock("@/repositories/userRepository", () => ({
   getPersonProfile: (...args: unknown[]) => mockGetPersonProfile(...args),
-  getPersonFilmography: (...args: unknown[]) => mockGetPersonFilmography(...args),
+  getPersonFilmography: (...args: unknown[]) =>
+    mockGetPersonFilmography(...args),
 }));
 
 // ── vue-router ───────────────────────────────────────────────────────────────
@@ -84,7 +85,7 @@ const makePerson = (overrides: Partial<Person> = {}): Person =>
     gender: "2",
     image: "https://example.com/keanu.jpg",
     ...overrides,
-  } as unknown as Person);
+  }) as unknown as Person;
 
 const makeMoviePagination = (count = 2): MoviePagination =>
   ({
@@ -93,7 +94,7 @@ const makeMoviePagination = (count = 2): MoviePagination =>
       title: `Movie ${i + 1}`,
     })),
     next_last_id: null,
-  } as unknown as MoviePagination);
+  }) as unknown as MoviePagination;
 
 // ── Mount helper ─────────────────────────────────────────────────────────────
 const mountView = () =>
@@ -123,7 +124,7 @@ describe("CelebrityView", () => {
       expect(mockGetPersonFilmography).toHaveBeenCalledWith(
         "keanu-reeves",
         "acted",
-        undefined
+        undefined,
       );
     });
 
@@ -133,7 +134,7 @@ describe("CelebrityView", () => {
       expect(mockGetPersonFilmography).toHaveBeenCalledWith(
         "keanu-reeves",
         "directed",
-        undefined
+        undefined,
       );
     });
   });
@@ -168,7 +169,7 @@ describe("CelebrityView", () => {
 
     it("renders deathday when present", async () => {
       mockGetPersonProfile.mockResolvedValue(
-        makePerson({ deathday: "2099-01-01" })
+        makePerson({ deathday: "2099-01-01" }),
       );
       const wrapper = mountView();
       await flushPromises();
@@ -183,18 +184,21 @@ describe("CelebrityView", () => {
       ["0", "pi pi-minus", "var(--secondary)"],
       ["1", "pi pi-venus", "var(--accent)"],
       ["2", "pi pi-mars", "var(--primary)"],
-    ])("gender, icon and color renders for celebrity gender", async (gender, icon, color) => {
-      mockGetPersonProfile.mockResolvedValue(makePerson({ gender }));
-      const wrapper = mountView();
-      await flushPromises();
-      // Tag stub renders data-testid="Tag"; verify computed values via vm
-      const vm = wrapper.vm as unknown as {
-        genderIcon: string;
-        genderBackground: string;
-      };
-      expect(vm.genderIcon).toBe(icon);
-      expect(vm.genderBackground).toBe(color);
-    });
+    ])(
+      "gender, icon and color renders for celebrity gender",
+      async (gender, icon, color) => {
+        mockGetPersonProfile.mockResolvedValue(makePerson({ gender }));
+        const wrapper = mountView();
+        await flushPromises();
+        // Tag stub renders data-testid="Tag"; verify computed values via vm
+        const vm = wrapper.vm as unknown as {
+          genderIcon: string;
+          genderBackground: string;
+        };
+        expect(vm.genderIcon).toBe(icon);
+        expect(vm.genderBackground).toBe(color);
+      },
+    );
 
     it("falls back to pi-question for unknown gender", async () => {
       mockGetPersonProfile.mockResolvedValue(makePerson({ gender: "99" }));
@@ -234,7 +238,7 @@ describe("CelebrityView", () => {
       await flushPromises();
       const all = wrapper.findAll("[data-testid='filmography']");
       const actedFilmography = all.find(
-        (w) => w.attributes("data-title") === "celebrity.filmography.acted_in"
+        (w) => w.attributes("data-title") === "celebrity.filmography.acted_in",
       );
       expect(actedFilmography).toBeDefined();
       expect(actedFilmography.attributes("data-list-length")).toBe("2");
@@ -245,7 +249,7 @@ describe("CelebrityView", () => {
       await flushPromises();
       const all = wrapper.findAll("[data-testid='filmography']");
       const directedFilmography = all.find(
-        (w) => w.attributes("data-title") === "celebrity.filmography.directed"
+        (w) => w.attributes("data-title") === "celebrity.filmography.directed",
       );
       expect(directedFilmography).toBeDefined();
       expect(directedFilmography.attributes("data-list-length")).toBe("2");
@@ -258,9 +262,7 @@ describe("CelebrityView", () => {
       });
       const wrapper = mountView();
       await flushPromises();
-      const [emptyFilmography] = wrapper.findAll(
-        "[data-testid='filmography']"
-      );
+      const [emptyFilmography] = wrapper.findAll("[data-testid='filmography']");
       expect(emptyFilmography.attributes("data-empty")).toBe("true");
     });
   });
@@ -286,7 +288,7 @@ describe("CelebrityView", () => {
 
   // ── Infinite scroll — pagination ──────────────────────────────────────────
   describe("fetchFilmography with lastId (pagination)", () => {
-    it("appends results when next_last_id is present and callback fires", async () => {
+    it("appends results in acted_movies when next_last_id is present and callback fires", async () => {
       mockGetPersonFilmography
         .mockResolvedValueOnce({
           results: [{ id: 1, title: "Movie 1" }],
@@ -307,7 +309,7 @@ describe("CelebrityView", () => {
       const vm = wrapper.vm as unknown as {
         fetchFilmography: (
           type: "acted" | "directed",
-          lastId?: number
+          lastId?: number,
         ) => Promise<void>;
         acted_movies: MoviePagination;
       };
@@ -316,6 +318,38 @@ describe("CelebrityView", () => {
       await flushPromises();
 
       expect(vm.acted_movies.results).toHaveLength(2);
+    });
+
+    it("appends results in directed_movies when next_last_id is present and callback fires", async () => {
+      mockGetPersonFilmography
+        .mockResolvedValueOnce({
+          results: [{ id: 1, title: "Movie 1" }],
+          next_last_id: 1,
+        })
+        .mockResolvedValueOnce({
+          results: [{ id: 1, title: "Movie 1" }],
+          next_last_id: 1,
+        })
+        .mockResolvedValueOnce({
+          results: [{ id: 2, title: "Movie 2" }],
+          next_last_id: null,
+        });
+
+      const wrapper = mountView();
+      await flushPromises();
+
+      const vm = wrapper.vm as unknown as {
+        fetchFilmography: (
+          type: "acted" | "directed",
+          lastId?: number,
+        ) => Promise<void>;
+        directed_movies: MoviePagination;
+      };
+
+      await vm.fetchFilmography("directed", 1);
+      await flushPromises();
+
+      expect(vm.directed_movies.results).toHaveLength(2);
     });
   });
 });
