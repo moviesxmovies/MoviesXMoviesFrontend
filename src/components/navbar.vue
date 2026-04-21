@@ -194,7 +194,7 @@ watch(() => authStore.isAuthenticated, loadProfilePicture);
 .nav-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex-grow: 1;
   justify-content: flex-end;
 }
@@ -517,10 +517,5 @@ watch(() => authStore.isAuthenticated, loadProfilePicture);
   font-family: sans-serif;
   color: color-mix(in srgb, var(--text) 40%, transparent);
   font-weight: 600;
-}
-
-/* Ajuste para que encaje en el nav-right */
-.nav-right {
-  gap: 12px;
 }
 </style>
