@@ -4,3 +4,5 @@ build:
     npm run build
 cv:
     npm run test:unit -- --coverage
+host:
+    npm run dev -- --host
