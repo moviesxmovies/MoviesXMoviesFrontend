@@ -21,31 +21,22 @@ const isDisabled = (d: DropdownOption['disabled']): boolean => {
     if (!d) return false
     return typeof d === 'object' ? d.value : d
 }
-
-const select = (opt: DropdownOption) => {
-    if (isDisabled(opt.disabled)) return
-    opt.handler()
-    open.value = false
-}
 const groupedOptions = computed(() => {
-    const groups: Record<string, { label: string, icon?: string, danger?: boolean, items: DropdownOption[] }> = {}
+    const groups = new Map<string, { label: string, icon?: string, danger?: boolean, items: DropdownOption[] }>()
 
     props.options.forEach(opt => {
-        if (!groups[opt.label]) {
-            groups[opt.label] = {
+        if (!groups.has(opt.label)) {
+            groups.set(opt.label, {
                 label: opt.label,
                 icon: opt.icon,
                 danger: opt.danger,
                 items: []
-            }
+            })
         }
-        const group = groups[opt.label]
-        if (group) {
-            group.items.push(opt)
-        }
+        groups.get(opt.label)?.items.push(opt)
     })
 
-    return Object.values(groups)
+    return Array.from(groups.values())
 })
 
 const handleGroupClick = (group: { items: DropdownOption[] }) => {
@@ -57,7 +48,14 @@ const handleGroupClick = (group: { items: DropdownOption[] }) => {
     }
 }
 const handleKeydown = (e: KeyboardEvent) => {
+    const isTyping = e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        (e.target as HTMLElement).isContentEditable;
+
+    if (isTyping) return;
+
     const pressedKey = e.key.toLowerCase() === " " ? "space" : e.key.toLowerCase();
+
 
     for (const opt of props.options) {
         if (!opt.shortcut || isDisabled(opt.disabled)) continue
