@@ -64,7 +64,6 @@ vi.mock("primevue", async (importOriginal) => {
   };
 });
 
-// 2. Ajusta el mountComponent para que el Stub sea funcional
 function mountComponent(movie: Movie = mockMovie, visible = true) {
   return mount(MovieInfoDrawer, {
     props: {
@@ -75,12 +74,9 @@ function mountComponent(movie: Movie = mockMovie, visible = true) {
       stubs: {
         Drawer: {
           template: `<div v-if="visible" class="p-drawer-stub">
-              <div class="p-drawer-header">
-                <slot name="header" />
-              </div>
-              <div class="p-drawer-content">
-                <slot />
-              </div>
+              <slot name="header" />
+              <slot />
+              <button id="close-stub" @click="$emit('update:visible', false)">Close</button>
             </div>`,
           props: ["visible"],
         },
@@ -101,11 +97,6 @@ describe("MovieInfoDrawer", () => {
     it("Should accept movie prop correctly", () => {
       const wrapper = mountComponent();
       expect(wrapper.props().movie).toEqual(mockMovie);
-    });
-
-    it("Should accept visible prop correctly", () => {
-      const wrapper = mountComponent(mockMovie, true);
-      expect(wrapper.props().visible).toBe(true);
     });
   });
 

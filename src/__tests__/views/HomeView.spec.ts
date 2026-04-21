@@ -186,6 +186,33 @@ describe("HomeView", () => {
     expect(movieComp.props("movie")).toEqual(mockMovies[1]);
   });
 
+  it("gives 1 star rating if dragged to right", async () => {
+    const wrapper = mountWrapper();
+    await flushPromises();
+
+    const draggable = wrapper.findComponent({ name: "draggeableComponent" });
+    await draggable.vm.$emit("left");
+    await flushPromises();
+
+    expect(submitRating).toHaveBeenCalledWith(mockMovies[0].slug, 1);
+
+    const movieComp = wrapper.findComponent({ name: "movieComponent" });
+    expect(movieComp.props("movie")).toEqual(mockMovies[1]);
+  });
+
+  it("shows addToListDialog when dragged up", async () => {
+    const wrapper = mountWrapper();
+    await flushPromises();
+
+    const draggable = wrapper.findComponent({ name: "draggeableComponent" });
+    await draggable.vm.$emit("up");
+    await flushPromises();
+
+    const dialog = wrapper.findComponent({ name: "AddToListDialog" });
+
+    expect(dialog.props("visible")).toBe(true);
+  });
+
   it("alternates info drawer visibility", async () => {
     const wrapper = mountWrapper();
     await flushPromises();
@@ -208,6 +235,19 @@ describe("HomeView", () => {
 
     await drawer.vm.$emit("update:visible", false);
     expect(drawer.props("visible")).toBe(false);
+  });
+
+  it("updates visibleDialog when AddToListDialog emits update:visible", async () => {
+    const wrapper = mountWrapper();
+    await flushPromises();
+
+    const dialog = wrapper.findComponent({ name: "AddToListDialog" });
+
+    await dialog.vm.$emit("update:visible", true);
+    expect(dialog.props("visible")).toBe(true);
+
+    await dialog.vm.$emit("update:visible", false);
+    expect(dialog.props("visible")).toBe(false);
   });
 
   it("updates direction and dragging state when DraggeableComponent emits update events", async () => {
