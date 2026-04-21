@@ -194,14 +194,14 @@ describe("NavbarComponent", () => {
 
   it("has correct aria-label when menu is closed", () => {
     const wrapper = factory();
-    expect(wrapper.find(".hamburger").attributes("aria-label")).toBe("Abrir menú");
+    expect(wrapper.find(".hamburger").attributes("aria-label")).toBe("navbar.openMenu");
   });
 
   it("has correct aria-label when menu is open", async () => {
     const wrapper = factory();
     await wrapper.find(".hamburger").trigger("click");
     await nextTick();
-    expect(wrapper.find(".hamburger").attributes("aria-label")).toBe("Cerrar menú");
+    expect(wrapper.find(".hamburger").attributes("aria-label")).toBe("navbar.closeMenu");
   });
   // ── menuItems ────────────────────────────────────────────────────────────────
   describe("menuItems computed", () => {

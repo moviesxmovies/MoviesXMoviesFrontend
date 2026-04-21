@@ -87,7 +87,7 @@ watch(() => authStore.isAuthenticated, loadProfilePicture);
         </div>
 
         <button class="hamburger mobile-only" @click="toggleMenu" :class="{ open: menuOpen }"
-            :aria-label="menuOpen ? 'Cerrar menú' : 'Abrir menú'">
+            :aria-label="menuOpen ? $t('navbar.closeMenu') : $t('navbar.openMenu')">
             <span></span>
             <span></span>
             <span></span>

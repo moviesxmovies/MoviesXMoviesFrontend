@@ -8,14 +8,10 @@ const props = defineProps<{
 <template>
   <div class="flex justify-center">
     <div class="inline-flex w-full max-w-sm overflow-hidden rounded-b-2xl">
-      <button
-        id="more-info"
-        :disabled="loading"
+      <button id="more-info" :disabled="loading"
         class="flex-1 h-16 bg-accent cursor-pointer hover:brightness-120 flex items-center justify-center border-r border-white/10 transition-all active:bg-accent/80"
-        @mousedown.stop
-        @touchstart.stop
-        @click.stop="emit('showMoreInfo')"
-      >
+        @mousedown.stop @touchstart.stop @click.stop="emit('showMoreInfo')"
+        :aria-label="$t('actions.showMoreInfo')">
         <i class="pi pi-info-circle text-2xl text-white" />
       </button>
 
@@ -24,12 +20,12 @@ const props = defineProps<{
         loading
           ? 'bg-gray-600 opacity-40 pointer-events-none'
           : 'bg-gray-600',
-      ]" @mousedown.stop @touchstart.stop @click.stop="emit('markAsNotSeen')">
+      ]" @mousedown.stop @touchstart.stop @click.stop="emit('markAsNotSeen')" :aria-label="$t('actions.markAsNotSeen')">
         <i class="pi pi-eye-slash text-2xl text-white" />
       </button>
 
-      <button id="add-to-list-button" :disabled="loading"
-        class="flex-1 h-16 bg-primary cursor-pointer hover:brightness-120 flex items-center justify-center transition-all active:bg-primary/80">
+      <button id="add-to-list-button" :disabled="loading" :aria-label="$t('actions.addToList')" class="flex-1 h-16 bg-primary cursor-pointer hover:brightness-120 flex items-center justify-center
+        transition-all active:bg-primary/80">
         <i class="pi pi-plus-circle text-2xl text-white" />
       </button>
     </div>
