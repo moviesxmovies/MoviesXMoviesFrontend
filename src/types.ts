@@ -44,9 +44,32 @@ export interface ForgotPasswordPayload {
   email: string;
 }
 
-export interface MoviePagination {
+export interface MovieDynamicPagination {
   results: Movie[];
   next_last_id: number;
+}
+
+export interface MoviePagination {
+  results: Movie[];
+  total_pages: number;
+  count: number;
+  has_next: boolean;
+  has_previous: boolean;
+  current_page: number;
+}
+
+interface Platform {
+  id: number;
+  name: string;
+  slug: string;
+  url: null;
+  image: string;
+}
+
+interface Genre {
+  id: number;
+  name: string;
+  slug: string;
 }
 
 export interface Movie {
@@ -79,7 +102,7 @@ interface Platform {
   name: string;
   slug: string;
   url: null;
-  image: string | null;
+  image: string;
 }
 
 interface Genre {
