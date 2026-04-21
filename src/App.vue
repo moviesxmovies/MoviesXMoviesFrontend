@@ -1,6 +1,6 @@
 <template>
-  
-  <Toast />
+
+  <CustomToast :life="3000" />
   <Navbar />
 
   <RouterView />
@@ -9,6 +9,6 @@
 <script setup lang="ts">
 
 import { RouterView } from 'vue-router'
-import Toast from 'primevue/toast';
 import Navbar from './components/navbar.vue';
+import CustomToast from './components/customToast.vue';
 </script>
