@@ -1,8 +1,13 @@
 <script lang="ts" setup>
 import { FieldMsg } from "@/repositories/auth/authRepository";
-import { addMovieToList, createList, privacityConfig } from "@/repositories/listRepository";
+import {
+  addMovieToList,
+  createList,
+  privacityConfig,
+} from "@/repositories/listRepository";
 import { defaultListSchema } from "@/schemas/listSchema";
-import type { CreateList, Movie, MovieList } from "@/types";
+import { useAuthStore } from "@/stores/authStore";
+import type { CreateList, Movie } from "@/types";
 import { Form, FormField, type FormSubmitEvent } from "@primevue/forms";
 import { zodResolver } from "@primevue/forms/resolvers/zod";
 import { useForm } from "@primevue/forms/useform";
@@ -19,6 +24,7 @@ import {
 import { useI18n } from "vue-i18n";
 const visible = defineModel<boolean>("visible", { default: false });
 
+const authStore = useAuthStore();
 const toast = useToast();
 const { t } = useI18n();
 const resolver = zodResolver(defaultListSchema);
@@ -49,7 +55,7 @@ const handleSubmit = async ({
     toast.add({
       severity: "error",
       summary: t("toast.error"),
-      detail: error.response?.data?.message || t("createList.toast.error"),
+      detail: error.response?.data?.message || t("components.createList.error"),
       life: 3000,
     });
   }
@@ -57,11 +63,11 @@ const handleSubmit = async ({
 
 const addToList = async (listSlug: string) => {
   try {
-    await addMovieToList(listSlug, props.movie.slug);
+    await addMovieToList(authStore.user?.username || "", listSlug, props.movie.slug);
     toast.add({
       severity: "success",
       summary: t("toast.success"),
-      detail: t("components.actions.addToListSuccess"),
+      detail: t("components.addToList.success", [props.movie.title, listSlug]),
       life: 3000,
     });
   } catch (error: any) {
@@ -69,7 +75,8 @@ const addToList = async (listSlug: string) => {
       severity: "error",
       summary: t("toast.error"),
       detail:
-        error.response?.data?.message || t("components.actions.addToListError"),
+        error.response?.data?.message ||
+        t("components.addToList.addToListError", [props.movie.title, listSlug]),
       life: 3000,
     });
   }
@@ -131,7 +138,7 @@ const addToList = async (listSlug: string) => {
                 }"
               />
             </IconField>
-            <label for="name">{{ $t("components.createList.name") }}</label>
+            <label for="name">{{ $t("components.createList.formName") }}</label>
           </FloatLabel>
           <FieldMsg :field="$field" />
         </FormField>
@@ -151,7 +158,7 @@ const addToList = async (listSlug: string) => {
               />
             </IconField>
             <label for="description">{{
-              t("components.createList.description")
+              t("components.createList.formDescription")
             }}</label>
           </FloatLabel>
         </FormField>

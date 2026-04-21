@@ -18,14 +18,14 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div class="list-container flex flex-col gap-3">
-    <div v-if="loading" class="flex flex-col gap-3">
-      <div v-for="i in 3" :key="i" class="h-20 rounded-2xl overflow-hidden">
+  <div class="max-h-[350px] flex flex-col gap-3">
+    <div v-if="props.loading" class="flex flex-col gap-3">
+      <div v-for="i in 5" :key="i" class="h-20 rounded-2xl overflow-hidden">
         <Skeleton height="100%" class="custom-skeleton" />
       </div>
     </div>
 
-    <ScrollPanel v-else class="max-h-[400px] w-full pr-2">
+    <ScrollPanel v-else class="w-full pr-2">
       <div class="flex flex-col gap-2.5 py-1">
         <div
           v-for="item in props.items"

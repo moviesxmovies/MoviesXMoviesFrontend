@@ -52,7 +52,7 @@ const fetchMovies = async () => {
     toast.add({
       severity: "error",
       summary: t("toast.error"),
-      detail: error.response?.data?.message || t("toast.home.fetchMoviesError"),
+      detail: error.response?.data?.message || t("home.fetchMoviesError"),
       life: 3000,
     });
   } finally {

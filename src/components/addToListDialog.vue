@@ -11,10 +11,12 @@ import { watch, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import CreateListDialog from "./createListDialog.vue";
 import ListComponent from "./listComponent.vue";
+import { useAuthStore } from "@/stores/authStore";
 
 const { t } = useI18n();
 const toast = useToast();
 const userList = ref<UserMovieList[]>([]);
+const authStore = useAuthStore();
 const loading = ref(false);
 const props = defineProps<{
   movie: Movie;
@@ -24,20 +26,19 @@ const visibleCreateList = ref(false);
 
 const addToList = async (listSlug: string) => {
   try {
-    await addMovieToList(listSlug, props.movie.slug);
+    await addMovieToList(authStore.user?.username || "", listSlug, props.movie.slug);
     await checkMovieInLists();
     toast.add({
       severity: "success",
       summary: t("toast.success"),
-      detail: t("components.actions.addToListSuccess"),
+      detail: t("components.addToList.success", [props.movie.title, listSlug]),
       life: 3000,
     });
   } catch (error: any) {
     toast.add({
       severity: "error",
       summary: t("toast.error"),
-      detail:
-        error.response?.data?.message || t("components.actions.addToListError"),
+      detail: error.response?.data?.message || t("components.addToList.error", [props.movie.title, listSlug]),
       life: 3000,
     });
   }
@@ -45,12 +46,12 @@ const addToList = async (listSlug: string) => {
 
 const removeFromList = async (listSlug: string) => {
   try {
-    await removeMovieFromList(listSlug, props.movie.slug);
+    await removeMovieFromList(authStore.user?.username || "", listSlug, props.movie.slug);
     await checkMovieInLists();
     toast.add({
       severity: "success",
       summary: t("toast.success"),
-      detail: t("components.actions.removeFromListSuccess"),
+      detail: t("components.addToList.removeFromListSuccess", [props.movie.title, listSlug]),
       life: 3000,
     });
   } catch (error: any) {
@@ -59,7 +60,7 @@ const removeFromList = async (listSlug: string) => {
       summary: t("toast.error"),
       detail:
         error.response?.data?.message ||
-        t("components.actions.removeFromListError"),
+        t("components.addToList.removeFromListError"),
       life: 3000,
     });
   }
@@ -68,7 +69,7 @@ const removeFromList = async (listSlug: string) => {
 const getUserLists = async () => {
   loading.value = true;
   try {
-    const lists = await fetchUserLists();
+    const lists = await fetchUserLists(authStore.user?.username || "");
     userList.value = lists.map((list) => ({ list }));
   } catch (error: any) {
     toast.add({
@@ -76,7 +77,7 @@ const getUserLists = async () => {
       summary: t("toast.error"),
       detail:
         error.response?.data?.message ||
-        t("components.actions.fetchListsError"),
+        t("components.addToList.fetchListsError"),
       life: 3000,
     });
   } finally {
@@ -96,7 +97,7 @@ const checkMovieInLists = async () => {
       summary: t("toast.error"),
       detail:
         error.response?.data?.message ||
-        t("components.actions.checkMovieInListsError"),
+        t("components.addToList.checkMovieInListsError"),
       life: 3000,
     });
   }
@@ -128,7 +129,7 @@ watch(
     modal
     :draggable="false"
     :dismissableMask="true"
-    header="Mis Listas"
+    :header="t('components.addToList.title')"
     :style="{ width: '90vw', maxWidth: '400px' }"
     :pt="{
       root: {
@@ -141,12 +142,16 @@ watch(
       closeButton: {
         class: 'hover:bg-[var(--secondary)]/20 transition-colors',
       },
+      footer: {
+        class:
+          'bg-[var(--background)] border-t border-[var(--secondary)]',
+      },
     }"
   >
     <p
       class="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--gray)] opacity-60 mb-6"
     >
-      Selecciona una o varias listas
+      {{ t("components.addToList.description", [props.movie.title]) }}
     </p>
 
     <ListComponent
@@ -157,13 +162,13 @@ watch(
     />
 
     <template #footer>
-      <div class="w-full pt-4 border-t border-[var(--secondary)]/20">
+      <div class="w-full pt-4">
         <button
-          class="w-full py-4 rounded-xl flex items-center justify-center gap-2 text-sm font-bold text-[var(--accent)] hover:bg-[var(--accent)]/5 transition-all"
+          class="w-full py-4 rounded-xl flex items-center justify-center gap-2 text-sm font-bold text-[var(--accent)] hover:bg-[var(--accent)]/20 transition-all"
           @click="visibleCreateList = true"
         >
           <i class="pi pi-plus-circle"></i>
-          Crear nueva lista
+          {{ t("components.addToList.createList") }}
         </button>
       </div>
     </template>
@@ -171,7 +176,6 @@ watch(
 </template>
 
 <style scoped>
-/* Estilo para que el checkbox combine perfectamente con el color primary */
 :deep(.p-checkbox-box) {
   border-radius: 8px !important;
   border: 2px solid var(--secondary) !important;
@@ -183,7 +187,6 @@ watch(
   border-color: var(--primary) !important;
 }
 
-/* Animación de entrada suave para los items */
 div[v-for] {
   animation: slideIn 0.3s ease forwards;
   opacity: 0;

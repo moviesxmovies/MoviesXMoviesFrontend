@@ -53,6 +53,7 @@ describe("HomeView", () => {
           StarsComponent: true,
           DraggeableComponent: false,
           MovieInfoDrawer: true,
+          AddToListDialog: true,
         },
       },
     });
@@ -88,7 +89,7 @@ describe("HomeView", () => {
     expect(mockAddToast).toHaveBeenCalledWith({
       severity: "error",
       summary: "toast.error",
-      detail: "toast.home.fetchMoviesError",
+      detail: "home.fetchMoviesError",
       life: 3000,
     });
   });
@@ -192,7 +193,7 @@ describe("HomeView", () => {
     const drawer = wrapper.findComponent({ name: "MovieInfoDrawer" });
 
     expect(drawer.props("visible")).toBe(false);
-    await (wrapper.vm as any).alternateInfoDrawer();
+    await drawer.vm.$emit("update:visible", true);
     expect(drawer.props("visible")).toBe(true);
   });
 
@@ -202,7 +203,7 @@ describe("HomeView", () => {
 
     const drawer = wrapper.findComponent({ name: "MovieInfoDrawer" });
 
-    await (wrapper.vm as any).alternateInfoDrawer();
+    await drawer.vm.$emit("update:visible", true);
     expect(drawer.props("visible")).toBe(true);
 
     await drawer.vm.$emit("update:visible", false);

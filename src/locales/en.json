@@ -36,6 +36,23 @@
       "friends": "Friends",
       "noLists": "You don't have any lists yet. Start adding movies to your lists to see them here.",
       "noListDesc": "Your lists will appear here once you create them. You can create lists to organize your favorite movies, share them with friends, or keep them private for your own reference."
+    },
+    "addToList": {
+      "success": "'{0}' added to {1} correctly",
+      "error": "Error adding '{0}' to '{1}'",
+      "removeFromListSuccess": "'{0}' removed from '{1}' correctly",
+      "removeFromListError": "Error removing '{0}' from '{1}'",
+      "fetchListsError": "Error getting user's lists",
+      "checkMovieInListsError": "Error searching movie lists relations",
+      "title": "Add to list",
+      "description": "Add '{0}' to a list",
+      "createList": "Create new list"
+    },
+    "createList": {
+      "error": "Error creating list",
+      "description": "Create a new list",
+      "formName": "Name",
+      "formDescription": "description"
     }
   },
   "signup": {
@@ -183,6 +200,12 @@
     },
     "forgotPasswordCode": {
       "required": "Password reset code is required"
+    },
+    "listName": {
+      "min": "Name is required"
+    },
+    "privacity": {
+      "required": "Privacity is required"
     }
   },
   "checkEmail": {

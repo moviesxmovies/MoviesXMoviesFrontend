@@ -1,9 +1,7 @@
 import { api } from "@/composables/useAPI";
 import i18n from "@/i18n";
-import { useAuthStore } from "@/stores/authStore";
 import type { CreateList, MovieList } from "@/types";
 
-const authStore = useAuthStore();
 const { t } = i18n.global;
 
 export const privacityConfig: Record<
@@ -31,7 +29,7 @@ export const privacityConfig: Record<
 };
 
 export const fetchUserLists = async (
-  userSlug: string = authStore.user?.username || "",
+  userSlug: string,
 ) => {
   try {
     const { data }: { data: MovieList[] } = await api.get(
@@ -54,12 +52,13 @@ export const fetchMovieListsFromMovie = async (movieSlug: string) => {
 };
 
 export const addMovieToList = async (
+  userSlug: string,
   movieListSlug: string,
   movieSlug: string,
 ) => {
   try {
     await api.post(
-      `/movies-lists/${authStore.user?.username || ""}/${movieListSlug}/${movieSlug}/`,
+      `/movies-lists/${userSlug}/${movieListSlug}/${movieSlug}/`,
     );
   } catch (error: any) {
     throw error;
@@ -67,12 +66,13 @@ export const addMovieToList = async (
 };
 
 export const removeMovieFromList = async (
+  userSlug: string,
   movieListSlug: string,
   movieSlug: string,
 ) => {
   try {
     await api.delete(
-      `/movies-lists/${authStore.user?.username || ""}/${movieListSlug}/${movieSlug}/`,
+      `/movies-lists/${userSlug}/${movieListSlug}/${movieSlug}/`,
     );
   } catch (error: any) {
     throw error;
