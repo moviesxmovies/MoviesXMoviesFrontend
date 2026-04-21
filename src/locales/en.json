@@ -142,7 +142,7 @@
     "feature3": "Create your own movie lists.",
     "fetchMoviesError": "Failed to fetch movies. Please try again later.",
     "profile": "My Profile",
-    "shortcuts": "Shortcuts"
+    "shortcuts": "Shortcuts",
     "search": "Search"
   },
   "onboarding": {
