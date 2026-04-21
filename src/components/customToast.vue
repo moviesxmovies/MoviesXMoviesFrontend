@@ -43,7 +43,7 @@ const toastService = useToast();
 defineExpose({ addToast });
 
 onMounted(() => {
-    const original = toastService.add.bind(toastService);
+    toastService.add.bind(toastService);
     toastService.add = (msg: any) => {
         addToast({
             severity: msg.severity ?? "info",
