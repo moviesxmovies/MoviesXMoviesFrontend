@@ -88,7 +88,7 @@ watch(
 
         <InputText
           v-model="search"
-          :placeholder="$t('home.searchPlaceholder')"
+          :placeholder="$t('search.searchPlaceholder')"
           class="search-input"
           fluid
         />
@@ -106,19 +106,17 @@ watch(
     <div class="movies-grid">
       <div v-if="loading" class="loading-state">
         <i class="pi pi-spin pi-spinner loading-spinner"></i>
-        <span>Buscando películas...</span>
+        <span>{{ t("search.loading") }}</span>
       </div>
 
-      <!-- Estado: sin resultados -->
       <div v-else-if="!movies.results?.length" class="empty-state">
         <div class="empty-icon">
           <i class="pi pi-search"></i>
         </div>
-        <p>No se encontraron películas</p>
-        <span>Intenta con otro término de búsqueda</span>
+        <p>{{ t("search.noFilms") }}</p>
+        <span>{{ t("search.help") }}</span>
       </div>
 
-      <!-- Estado: con resultados -->
       <template v-else>
         <MovieCardComponent
           v-for="movie in movies.results"
@@ -264,7 +262,6 @@ watch(
   }
 }
 
-/* Estado: cargando */
 .loading-state {
   grid-column: 1 / -1;
   display: flex;
@@ -280,7 +277,6 @@ watch(
   font-size: 2rem;
 }
 
-/* Estado: vacío */
 .empty-state {
   grid-column: 1 / -1;
   display: flex;
