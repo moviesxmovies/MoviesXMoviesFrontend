@@ -31,7 +31,7 @@ export const friendsRatings = async (movieSlug: string, limit: number, page: num
     const { data }: { data: any } = await api.get(`/movies/${movieSlug}/friends-ratings/`, {
       params: { limit, page },
     });
-    console.log(data);
+    console.log("Fetched friends ratings:", data);
     return data;
   } catch (error: any) {
     throw error;

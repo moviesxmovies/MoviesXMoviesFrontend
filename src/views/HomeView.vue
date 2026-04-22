@@ -567,7 +567,7 @@ for (let i = 1; i <= 5; i++) {
 .w-full.max-w-sm.aspect-\[3\/5\] {
   max-width: 85vw;
 
-  @media (min-width: 768px) {
+  @media (min-width: 640px) {
     max-width: 24rem;
   }
 }

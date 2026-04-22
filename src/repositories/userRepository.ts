@@ -18,6 +18,20 @@ export const getUserProfile = async (slug: string) => {
   }
 };
 
+export const getFriendsRequests = async (page: number, limit: number) => {
+  try {
+    const { data } = await api.get(`/users/friend-requests/`, {
+      params: {
+        page,
+        limit,
+      },
+    });
+    return data;
+  } catch (error: any) {
+    throw error;
+  }
+}
+
 export const getPersonProfile = async (slug: string) => {
   try {
     const { data } = await api.get(`/persons/${slug}/`);
