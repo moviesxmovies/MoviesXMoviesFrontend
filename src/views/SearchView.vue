@@ -28,7 +28,7 @@ const updateRoute = (newData: searchData) => {
     query: {
       ...route.query,
       ...newData,
-      name: newData.name || undefined,
+      name: search.value || undefined,
       showUnseen: newData.showUnseen ? "true" : undefined,
       showReviewed: newData.showReviewed ? "true" : undefined,
     },
@@ -55,12 +55,12 @@ const changePage = async (page: number) => {
   updateRoute({ page });
 };
 
-const debouncedUpdateRoute = debounce((name: string) => {
-  updateRoute({ name, page: 1 });
+const debouncedUpdateRoute = debounce(() => {
+  changePage(1);
 }, 500);
 
-watch(search, (newVal) => {
-  debouncedUpdateRoute(newVal);
+watch(search, () => {
+  debouncedUpdateRoute();
 });
 
 watch(
