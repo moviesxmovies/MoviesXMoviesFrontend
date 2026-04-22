@@ -29,7 +29,7 @@ const { t } = useI18n();
 const router = useRouter();
 const acted_movies = ref<MovieDynamicPagination>({} as MovieDynamicPagination);
 const directed_movies = ref<MovieDynamicPagination>({} as MovieDynamicPagination);
-const langeStore = useLangStore();
+const langStore = useLangStore();
 
 const genderMap: Record<string, { color: string; icon: string }> = {
   "0": { color: "var(--secondary)", icon: "pi pi-minus" },
@@ -134,7 +134,7 @@ onMounted(async () => {
   ]);
 });
 watch(
-  () => langeStore.language, async (newLang, oldLang) => {
+  () => langStore.language, async (newLang, oldLang) => {
     if (newLang !== oldLang) {
       acted_movies.value = {} as MovieDynamicPagination;
       directed_movies.value = {} as MovieDynamicPagination;
