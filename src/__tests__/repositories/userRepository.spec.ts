@@ -5,6 +5,7 @@ import {
   getPersonMovieListsFromMovie,
   getPersonFilmography,
   getUserProfile,
+  getFriendsRequests,
 } from "@/repositories/userRepository";
 
 // ── Mocks ────────────────────────────────────────────────────────────────────
@@ -176,5 +177,29 @@ describe("UserRepository", () => {
       await expect(getUserProfile()).rejects.toThrow("Not found");
     }
     )
+  });
+
+  // ── getFriendsRequests ─────────────────────────────────────────────────────────
+  describe("getFriendsRequests", () => {
+    it("calls API with correct endpoint and returns friend requests", async () => {
+      const mockRequests = [
+        { id: 1, from_user: "user1", to_user: "user2", status: "pending" },
+        { id: 2, from_user: "user2", to_user: "user3", status: "pending" },
+      ];
+
+      mockGet.mockResolvedValueOnce({ data: mockRequests}, );
+      const result = await getFriendsRequests(1, 10);
+
+      expect(mockGet).toHaveBeenCalledWith("/users/friend-requests/", {
+        params: { limit: 10, page: 1 },
+      });
+      expect(result).toEqual(mockRequests);
+    });
+
+    it("throws when API fails", async () => {
+      mockGet.mockRejectedValueOnce(new Error("Server error"));
+
+      await expect(getFriendsRequests(1,10)).rejects.toThrow("Server error");
+    });
   });
 });

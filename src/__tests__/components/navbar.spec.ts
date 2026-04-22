@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { nextTick, reactive } from "vue";
-import { mount } from "@vue/test-utils";
+import { flushPromises, mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import NavbarComponent from "@/components/navbar.vue";
 import i18n from "@/i18n";
 import { useAuthStore } from "@/stores/authStore";
-import { getSelfUserProfile } from "@/repositories/userRepository";
+import { getSelfUserProfile, getFriendsRequests } from "@/repositories/userRepository";
 
 const mockPush = vi.fn();
 vi.mock("vue-router", async (importOriginal) => {
@@ -281,6 +281,8 @@ describe("NavbarComponent", () => {
   // ── loadProfilePicture ───────────────────────────────────────────────────────
   vi.mock("@/repositories/userRepository", () => ({
     getSelfUserProfile: vi.fn(),
+    getFriendsRequests: vi.fn(),
+
   }));
 
 
@@ -336,4 +338,83 @@ describe("NavbarComponent", () => {
       expect((wrapper.vm as any).profilePicture).toBe("https://example.com/pic.jpg");
     });
   });
+  // ── Notification badge ───────────────────────────────────────────────────
+
+  describe("notification badge", () => {
+    beforeEach(() => {
+      vi.mocked(getSelfUserProfile).mockResolvedValue({ picture: null } as any)
+    })
+
+    it("does not show badge when there are no pending requests", async () => {
+      vi.mocked(getFriendsRequests).mockResolvedValue({ count: 0 } as any)
+      const wrapper = factory(true)
+      await flushPromises()
+      expect(wrapper.find(".notification-badge").exists()).toBe(false)
+    })
+
+    it("shows badge when there are pending requests", async () => {
+      vi.mocked(getFriendsRequests).mockResolvedValue({ count: 3 } as any)
+      const wrapper = factory(true)
+      await flushPromises()
+      expect(wrapper.find(".notification-badge").exists()).toBe(true)
+    })
+
+    it("shows the exact count when less than 6", async () => {
+      vi.mocked(getFriendsRequests).mockResolvedValue({ count: 4 } as any)
+      const wrapper = factory(true)
+      await flushPromises()
+      expect(wrapper.find(".notification-badge").text()).toBe("4")
+    })
+
+    it("shows '5+' when count is 6 or more", async () => {
+      vi.mocked(getFriendsRequests).mockResolvedValue({ count: 6 } as any)
+      const wrapper = factory(true)
+      await flushPromises()
+      expect(wrapper.find(".notification-badge").text()).toBe("5+")
+    })
+
+    it("shows '5+' when count is greater than 6", async () => {
+      vi.mocked(getFriendsRequests).mockResolvedValue({ count: 12 } as any)
+      const wrapper = factory(true)
+      await flushPromises()
+      expect(wrapper.find(".notification-badge").text()).toBe("5+")
+    })
+
+    it("does not show badge when not authenticated", async () => {
+      vi.mocked(getFriendsRequests).mockResolvedValue({ count: 5 } as any)
+      const wrapper = factory(false)
+      await flushPromises()
+      expect(wrapper.find(".notification-badge").exists()).toBe(false)
+    })
+
+    it("resets badge to 0 when user logs out", async () => {
+      vi.mocked(getFriendsRequests).mockResolvedValue({ count: 3 } as any)
+
+      const authState = reactive({ isAuthenticated: true, logout: vi.fn() })
+      vi.mocked(useAuthStore).mockReturnValue(authState as any)
+
+      const wrapper = mount(NavbarComponent, {
+        global: {
+          plugins: [i18n],
+          stubs: { LangComponent: true, ThemeComponent: true, Transition: true },
+        },
+      })
+      await flushPromises()
+      expect((wrapper.vm as any).pendingFriendsRequests).toBe(3)
+
+      authState.isAuthenticated = false
+      await nextTick()
+
+      expect((wrapper.vm as any).pendingFriendsRequests).toBe(0)
+      expect(wrapper.find(".notification-badge").exists()).toBe(false)
+    })
+
+    it("sets pendingFriendsRequests to 0 when getFriendsRequests throws", async () => {
+      vi.mocked(getFriendsRequests).mockRejectedValue(new Error("Network error"))
+      const wrapper = factory(true)
+      await flushPromises()
+      expect((wrapper.vm as any).pendingFriendsRequests).toBe(0)
+      expect(wrapper.find(".notification-badge").exists()).toBe(false)
+    })
+  })
 });

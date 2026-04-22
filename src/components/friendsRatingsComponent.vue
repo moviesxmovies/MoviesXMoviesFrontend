@@ -126,7 +126,6 @@ const fetchPage = async (delayed = false) => {
 };
 
 const reset = async () => {
-    console.log("Resetting FriendsRatingsComponent for movie:", props.movieSlug);
     if (bubbleTimer) clearInterval(bubbleTimer);
     visibleBubbles.value = [];
     queue.value = [];
