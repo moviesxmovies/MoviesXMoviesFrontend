@@ -1,32 +1,30 @@
 <script lang="ts" setup>
-import { fetchGenres } from "@/repositories/genreRepository";
-import { useLangStore } from "@/stores/langStore";
-import type { Genre } from "@/types";
+import { fetchPlatforms } from "@/repositories/platformRepository";
+import type { Platform } from "@/types";
 import { MultiSelect, useToast } from "primevue";
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute } from "vue-router";
 
 const { t } = useI18n();
-const langStore = useLangStore();
 const route = useRoute();
 const toast = useToast();
 const isLoading = ref(false);
-const selectedGenres = ref<Genre[]>();
-const genres = ref<Genre[]>();
-const emit = defineEmits(["filterGenres"]);
+const selectedPlatforms = ref<Platform[]>();
+const platforms = ref<Platform[]>();
+const emit = defineEmits(["filterPlatforms"]);
 
-const getGenres = async () => {
+const getPlatforms = async () => {
   isLoading.value = true;
   try {
-    genres.value = await fetchGenres();
+    platforms.value = await fetchPlatforms();
   } catch (error: any) {
     toast.add({
       severity: "error",
       summary: t("toast.error"),
       detail:
         error.response?.data?.message ||
-        t("components.searchFilters.getGenres"),
+        t("components.searchPlatforms.getPlatforms"),
     });
   } finally {
     isLoading.value = false;
@@ -34,11 +32,13 @@ const getGenres = async () => {
 };
 
 watch(
-  [() => route.query, () => langStore.language],
+  () => route.query,
   async () => {
-    await getGenres();
-    if(route.query.genres) {
-        selectedGenres.value = genres.value?.filter((g: Genre) => route.query.genres?.includes(g.slug));
+    await getPlatforms();
+    if (route.query.platforms) {
+      selectedPlatforms.value = platforms.value?.filter((p: Platform) =>
+        [route.query.platforms].flat().includes(p.slug),
+      );
     }
   },
   { immediate: true },
@@ -46,27 +46,27 @@ watch(
 </script>
 
 <template>
-  <div class="genre">
+  <div class="platform">
     <MultiSelect
-      v-model="selectedGenres"
+      v-model="selectedPlatforms"
       :loading="isLoading"
       display="chip"
-      :options="genres"
+      :options="platforms"
       optionLabel="name"
       filter
       :placeholder="
         t(
           isLoading
-            ? 'components.searchFilters.loading'
-            : 'components.searchFilters.genres',
+            ? 'components.searchPlatforms.loading'
+            : 'components.searchPlatforms.platforms',
         )
       "
       :maxSelectedLabels="99"
       class="w-full md:w-80"
       @change="
         emit(
-          'filterGenres',
-          selectedGenres?.map((g) => g.slug),
+          'filterPlatforms',
+          selectedPlatforms?.map((g) => g.slug),
         )
       "
     />

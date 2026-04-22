@@ -1,13 +1,15 @@
 <script lang="ts" setup>
 import MovieCardComponent from "@/components/movieCardComponent.vue";
 import PaginationComponent from "@/components/paginationComponent.vue";
-import SearchFiltersComponent from "@/components/searchFiltersComponent.vue";
+import SearchGenresComponent from "@/components/searchGenresComponent.vue";
+import SearchFiltersComponent from "@/components/searchGenresComponent.vue";
+import SearchPlatformsComponent from "@/components/searchPlatformsComponent.vue";
 import {
   movieSearching,
   type searchData,
 } from "@/repositories/movieRepository";
 import { useLangStore } from "@/stores/langStore";
-import type { Genre, MoviePagination } from "@/types";
+import type { MoviePagination } from "@/types";
 import debounce from "@/utils/debounce";
 import { InputText, useToast } from "primevue";
 import { ref, watch } from "vue";
@@ -36,11 +38,24 @@ const updateRoute = (newData: searchData) => {
   });
 };
 
+const normalizeQueryParams = (query: typeof route.query): searchData => {
+  const toArray = (value: any): string[] | number[] => {
+    if (!value) return [];
+    return Array.isArray(value) ? value : [value];
+  };
+
+  return {
+    ...query,
+    genres: toArray(query.genres),
+    platforms: toArray(query.platforms),
+    stars: toArray(query.stars),
+  } as searchData;
+};
+
 const searchMovies = async (data: searchData) => {
   try {
     loading.value = true;
-    const result = await movieSearching(data);
-    movies.value = result;
+    movies.value = await movieSearching(data);
   } catch (error: any) {
     toast.add({
       severity: "error",
@@ -73,7 +88,7 @@ watch(
     } else if (route.query.type === "person") {
       console.log("person params");
     } else {
-      await searchMovies(route.query as searchData);
+      await searchMovies(normalizeQueryParams(route.query));
     }
   },
   { immediate: true },
@@ -105,8 +120,11 @@ watch(
     </div>
 
     <div class="filters">
-      <SearchFiltersComponent
+      <SearchGenresComponent
         @filter-genres="(genres: string[]) => updateRoute({ genres })"
+      />
+      <SearchPlatformsComponent
+        @filter-platforms="(platforms: string[]) => updateRoute({ platforms })"
       />
 
       <div class="movies-grid">

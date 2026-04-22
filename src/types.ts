@@ -58,7 +58,7 @@ export interface MoviePagination {
   current_page: number;
 }
 
-interface Platform {
+export interface Platform {
   id: number;
   name: string;
   slug: string;
