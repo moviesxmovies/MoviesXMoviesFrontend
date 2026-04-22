@@ -4,6 +4,7 @@ import {
   getPersonProfile,
   getPersonMovieListsFromMovie,
   getPersonFilmography,
+  getUserProfile,
 } from "@/repositories/userRepository";
 
 // ── Mocks ────────────────────────────────────────────────────────────────────
@@ -156,5 +157,24 @@ describe("UserRepository", () => {
         getPersonFilmography("christopher-nolan", "directed", 10),
       ).rejects.toThrow("Unauthorized");
     });
+  });
+
+  // ── getUserProfile ──────────────────────────────────────────────────────────
+  describe("getUserProfile", () => {
+    it("calls API with correct endpoint and returns user profile", async () => {
+      const mockProfile = { id: "1", name: "Christopher Nolan", slug: "christopher-nolan" };
+
+      mockGet.mockResolvedValueOnce({ data: mockProfile });
+      const result = await getUserProfile(mockProfile.slug);
+
+      expect(mockGet).toHaveBeenCalledWith(`/users/${mockProfile.slug}/`);
+      expect(result).toEqual(mockProfile);
+    });
+    it("throws when API fails", async () => {
+      mockGet.mockRejectedValueOnce(new Error("Not found"));
+
+      await expect(getUserProfile()).rejects.toThrow("Not found");
+    }
+    )
   });
 });
