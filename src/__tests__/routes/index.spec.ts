@@ -62,6 +62,10 @@ describe('Router & LocalStorage Isolation', () => {
         await router.push('/profiles/jhon-doe');
         
         expect(router.currentRoute.value.path).toBe('/profiles/jhon-doe');
+
+        await router.push('/search');
+        
+        expect(router.currentRoute.value.path).toBe('/search');
     });
 
     it('should handle the unverified email flow regardless of storage', async () => {

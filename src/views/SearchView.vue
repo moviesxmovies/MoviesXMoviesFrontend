@@ -4,7 +4,7 @@ import PaginationComponent from "@/components/paginationComponent.vue";
 import {
   movieSearching,
   type searchData,
-} from "@/repositories/searchRepository";
+} from "@/repositories/movieRepository";
 import { useLangStore } from "@/stores/langStore";
 import type { MoviePagination } from "@/types";
 import debounce from "@/utils/debounce";
