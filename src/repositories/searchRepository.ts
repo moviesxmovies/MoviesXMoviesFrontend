@@ -13,7 +13,7 @@ export type searchData = {
   page?: number;
 };
 
-export const movieSearching = async (params: searchData, limit: number = 12) => {
+export const movieSearching = async (params: searchData, limit: number = 15) => {
   try {
     const { data }: { data: MoviePagination } = await api.get(
       "movies/searching/",

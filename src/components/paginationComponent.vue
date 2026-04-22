@@ -1,119 +1,82 @@
 <script lang="ts" setup>
-import { computed } from "vue";
+import { Paginator } from "primevue";
 
 const props = defineProps<{
   total_pages: number;
   current_page: number;
+  rows?: number;
 }>();
 
-const showingPages = computed(() => {
-  const total = props.total_pages;
-  const current = props.current_page;
-
-  const candidates = new Set([
-    1,
-    current - 2,
-    current - 1,
-    current,
-    current + 1,
-    current + 2,
-    total,
-  ]);
-
-  const pages: (number | 0)[] = [];
-
-  for (const page of [...candidates].filter((p) => p >= 1 && p <= total)) {
-    if (pages.length && page - (pages[pages.length - 1] as number) > 1) {
-      pages.push(0);
-    }
-    pages.push(page);
-  }
-  return pages;
-});
 const emit = defineEmits(["changePage"]);
 </script>
 
 <template>
-  <div v-if="total_pages > 1" class="pagination">
-    <button
-      class="page-btn"
-      :disabled="current_page === 1"
-      @click="emit('changePage', current_page - 1)"
-    >
-      <i class="pi pi-angle-left"></i>
-    </button>
-
-    <template v-for="page in showingPages" :key="page">
-      <span v-if="page === 0" class="page-ellipsis">…</span>
-      <button
-        v-else
-        class="page-btn"
-        :class="{ active: page === current_page }"
-        @click="emit('changePage', page)"
-      >
-        {{ page }}
-      </button>
-    </template>
-
-    <button
-      class="page-btn"
-      :disabled="current_page === total_pages"
-      @click="emit('changePage', current_page + 1)"
-    >
-      <i class="pi pi-angle-right"></i>
-    </button>
+  <div class="paginator-container">
+    <Paginator
+      :pt="{
+        root: { class: 'custom-paginator' },
+        page: ({ context }) => ({
+          class: context.active ? 'p-highlight' : '',
+        }),
+      }"
+      :first="(current_page - 1) * (rows || 4)"
+      :rows="rows || 4"
+      :totalRecords="total_pages * (rows || 4)"
+      template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
+      @page="(e) => emit('changePage', e.page + 1)"
+      class="custom-paginator"
+    />
   </div>
 </template>
 
 <style scoped>
-/* Paginación */
-.pagination {
+.paginator-container {
+  margin-top: 2rem;
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 4px;
-  margin-top: 1.5rem;
-  flex-wrap: wrap;
+  width: 100%;
 }
 
-.page-btn {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+:deep(.custom-paginator.p-paginator) {
+  background: transparent;
+  border: none;
+  padding: 0.5rem;
+  gap: 8px;
+  font-family: "DM Sans", sans-serif;
+}
+
+:deep(.custom-paginator .p-paginator-page),
+:deep(.custom-paginator .p-paginator-first),
+:deep(.custom-paginator .p-paginator-prev),
+:deep(.custom-paginator .p-paginator-next),
+:deep(.custom-paginator .p-paginator-last) {
+  border: 0.5px solid var(--secondary);
+  color: var(--primary);
   border-radius: 8px;
-  border: 1px solid var(--surface-border);
-  background: var(--surface-card);
-  color: var(--text-color-secondary);
-  cursor: pointer;
-  font-size: 0.875rem;
-  transition: all 0.15s;
+  transition: all 0.2s ease;
+  font-weight: 600;
 }
 
-.page-btn:hover:not(:disabled) {
-  border-color: var(--primary-color);
-  color: var(--primary-color);
+:deep(.custom-paginator .p-paginator-page:not(.p-highlight):hover),
+:deep(.custom-paginator .p-link:not(.p-disabled):hover) {
+  background: color-mix(in srgb, var(--text) 10%, transparent) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
 }
 
-.page-btn.active {
-  background: var(--primary-color);
-  color: var(--primary-color-text);
-  border-color: var(--primary-color);
+:deep(.custom-paginator .p-paginator-page.p-highlight) {
+  background: var(--primary) !important;
+  color: white !important; /* O el color de texto de tu tema en activo */
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 30%, transparent);
 }
 
-.page-btn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
-.page-ellipsis {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-color-secondary);
-  font-size: 0.875rem;
+/* Responsive: botones más pequeños en móvil */
+@media (max-width: 640px) {
+  :deep(.custom-paginator .p-paginator-page) {
+    min-width: 2.2rem;
+    height: 2.2rem;
+    font-size: 0.9rem;
+  }
 }
 </style>
