@@ -5,9 +5,11 @@ import type { Genre } from "@/types";
 import { MultiSelect, useToast } from "primevue";
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import { useRoute } from "vue-router";
 
 const { t } = useI18n();
 const langStore = useLangStore();
+const route = useRoute();
 const toast = useToast();
 const isLoading = ref(false);
 const selectedGenres = ref<Genre[]>();
@@ -32,9 +34,12 @@ const getGenres = async () => {
 };
 
 watch(
-  () => langStore.language,
+  [() => route.query, () => langStore.language],
   async () => {
     await getGenres();
+    if(route.query.genres) {
+        selectedGenres.value = genres.value?.filter((g: Genre) => route.query.genres?.includes(g.slug));
+    }
   },
   { immediate: true },
 );
@@ -56,7 +61,7 @@ watch(
             : 'components.searchFilters.genres',
         )
       "
-      :maxSelectedLabels="3"
+      :maxSelectedLabels="99"
       class="w-full md:w-80"
       @change="
         emit(
