@@ -3,6 +3,7 @@ import {
   getRecommendedMovies,
   submitRating,
   setAsNotSeen,
+  friendsRatings,
   movieSearching,
   type searchData,
 } from "@/repositories/movieRepository";
@@ -162,6 +163,32 @@ describe("MovieRepository", () => {
     it("Throws error if anything goes wrong", async () => {
       mockGet.mockRejectedValueOnce(new Error("Network Error"));
       await expect(movieSearching({})).rejects.toThrow("Network Error");
+    });
+  });
+  
+  // ── friendsRatings ─────────────────────────────────────────────────────────
+  describe("friendsRatings", () => {
+    it("calls API with correct endpoint and returns ratings", async () => {
+      const movieSlug = "inception";
+      const mockRatings = [
+        { user: "Alice", rating: 5, movie: "Inception", createdAt: "2024-01-01T00:00:00Z" },
+        { user: "Bob", rating: 4, movie: "Inception", createdAt: "2024-01-01T00:00:00Z" },
+      ];
+
+      mockGet.mockResolvedValueOnce({ data: mockRatings });
+
+      const result = await friendsRatings(movieSlug, 5, 10);
+
+      expect(mockGet).toHaveBeenCalledWith(`/movies/${movieSlug}/friends-ratings/`, {
+        params: { limit: 5, page: 10 },
+
+      });
+      expect(result).toEqual(mockRatings);
+    });
+    it("throws when friendsRatings API fails", async () => {
+      mockGet.mockRejectedValueOnce(new Error("Not found"));
+
+      await expect(friendsRatings("slug", 5, 10)).rejects.toThrow("Not found");
     });
   });
 });

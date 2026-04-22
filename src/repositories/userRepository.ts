@@ -1,6 +1,6 @@
 import { api } from "@/composables/useAPI";
 
-export const getUserProfile = async () => {
+export const getSelfUserProfile = async () => {
   try {
     const { data } = await api.get(`/users/`);
     return data;
@@ -8,6 +8,29 @@ export const getUserProfile = async () => {
     throw error;
   }
 };
+
+export const getUserProfile = async (slug: string) => {
+  try {
+    const { data } = await api.get(`/users/${slug}/`);
+    return data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+export const getFriendsRequests = async (page: number, limit: number) => {
+  try {
+    const { data } = await api.get(`/users/friend-requests/`, {
+      params: {
+        page,
+        limit,
+      },
+    });
+    return data;
+  } catch (error: any) {
+    throw error;
+  }
+}
 
 export const getPersonProfile = async (slug: string) => {
   try {

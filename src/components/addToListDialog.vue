@@ -164,7 +164,7 @@ watch(
     <template #footer>
       <div class="w-full pt-4">
         <button
-          class="w-full py-4 rounded-xl flex items-center justify-center gap-2 text-sm font-bold text-[var(--accent)] hover:bg-[var(--accent)]/20 transition-all"
+          class="w-full py-4 rounded-xl flex items-center justify-center gap-2 text-sm font-bold text-[var(--accent)] hover:bg-[var(--accent)]/20 transition-all cursor-pointer"
           @click="visibleCreateList = true"
         >
           <i class="pi pi-plus-circle"></i>

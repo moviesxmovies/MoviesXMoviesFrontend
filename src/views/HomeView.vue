@@ -15,6 +15,8 @@ import ActionsComponent from "@/components/actionsComponent.vue";
 import DraggeableComponent from "@/components/draggeableComponent.vue";
 import MovieInfoDrawer from "@/components/movieInfoDrawer.vue";
 import AddToListDialog from "@/components/addToListDialog.vue";
+import KeyboardShorcuts, { type DropdownOption } from "@/components/keyboardShorcuts.vue";
+import FriendsRatingsComponent from "@/components/friendsRatingsComponent.vue";
 
 const PREDICTED_COLORS: Record<string, string> = {
   right: "var(--yellow)",
@@ -108,6 +110,8 @@ const glowStyle = computed(() => {
 
 const markAsNotSeen = async () => {
   loading.value = true;
+  if (navigator.vibrate)
+    navigator.vibrate(100);
   if (actualMovie.value) {
     await setAsNotSeen(actualMovie.value.slug);
   }
@@ -118,54 +122,76 @@ const markAsNotSeen = async () => {
 const rateMovie = async (rating: number) => {
   if (rating === 0) return;
   loading.value = true;
+  if (navigator.vibrate)
+    navigator.vibrate(100);
   if (actualMovie.value) {
     await submitRating(actualMovie.value.slug, rating);
   }
   loading.value = false;
   showNextRecommendedMovie();
+
 };
+
+const shortcuts = [
+  {
+    label: t("shortcuts.alternateInfo"),
+    icon: "i-heroicons-information-circle-solid",
+    handler: () => (visibleDrawer.value = !visibleDrawer.value),
+    shortcut: "space",
+  },
+  {
+    label: t("shortcuts.addToList"),
+    icon: "i-heroicons-plus-solid",
+    handler: () => (visibleDialog.value = !visibleDialog.value),
+    shortcut: "w",
+  },
+  {
+    label: t("shortcuts.markAsNotSeen"),
+    icon: "i-heroicons-eye-slash-solid",
+    handler: markAsNotSeen,
+    shortcut: "s",
+  },
+  {
+    label: t("shortcuts.rateNStars", { n: 5 }),
+    icon: "i-heroicons-star-solid",
+    handler: () => rateMovie(5),
+    shortcut: "d",
+  },
+  {
+    label: t("shortcuts.rateNStars", { n: 1 }),
+
+    icon: "i-heroicons-thumb-down-solid",
+    handler: () => rateMovie(1),
+    shortcut: "a",
+  },
+] as DropdownOption[]
+
+for (let i = 1; i <= 5; i++) {
+  shortcuts.push({
+    label: t("shortcuts.rateNStars", { n: i }),
+    icon: `i-heroicons-${i}-solid`,
+    handler: () => rateMovie(i),
+    shortcut: `${i}`,
+  })
+}
 </script>
 
 <template>
-  <div
-    class="min-h-screen flex items-center justify-center overflow-hidden fixed inset-0"
-    :class="isDragging && 'z-50'"
-  >
-    <MovieInfoDrawer
-      v-model:visible="visibleDrawer"
-      :movie="actualMovie || ({} as Movie)"
-    />
-    <AddToListDialog
-      v-model:visible="visibleDialog"
-      :movie="actualMovie || ({} as Movie)"
-    />
-    <div
-      v-if="loading || actualMovie"
-      class="overflow-visible min-w-screen px-14 md:px-0"
-    >
-      <DraggeableComponent
-        :swipeThreshold="100"
-        @right="rateMovie(5)"
-        @left="rateMovie(1)"
-        @up="() => (visibleDialog = true)"
-        @down="markAsNotSeen"
-        v-model:direction="direction"
-        v-model:isDragging="isDragging"
-      >
+  <div class="min-h-screen flex items-center justify-center overflow-hidden fixed inset-0"
+    :class="isDragging && 'z-50'">
+    <KeyboardShorcuts :options="shortcuts" />
+    <FriendsRatingsComponent v-if="actualMovie" :movieSlug="actualMovie.slug" />
+    <MovieInfoDrawer v-model:visible="visibleDrawer" :movie="actualMovie || ({} as Movie)" />
+    <AddToListDialog v-model:visible="visibleDialog" :movie="actualMovie || ({} as Movie)" />
+    <div v-if="loading || actualMovie" class="overflow-visible min-w-screen px-14 md:px-0">
+      <DraggeableComponent :swipeThreshold="100" @right="rateMovie(5)" @left="rateMovie(1)"
+        @up="() => (visibleDialog = true)" @down="markAsNotSeen" v-model:direction="direction"
+        v-model:isDragging="isDragging">
         <div id="mainSwipe">
-          <MovieComponent
-            class="select-none"
-            :movie="actualMovie || ({} as Movie)"
-            :loading="loading"
-          />
-          <ActionsComponent
-            class="select-none"
-            :loading="loading"
-            :movie="actualMovie || ({} as Movie)"
-            @markAsNotSeen="markAsNotSeen"
-            @showMoreInfo="() => (visibleDrawer = !visibleDrawer)"
-            @addToList="() => (visibleDialog = !visibleDialog)"
-          />
+          <MovieComponent class="select-none" :movie="actualMovie || ({} as Movie)" :loading="loading" />
+          <ActionsComponent class="select-none" :loading="loading" :movie="actualMovie || ({} as Movie)"
+            @markAsNotSeen="markAsNotSeen" @showMoreInfo="() => (visibleDrawer = !visibleDrawer)"
+            @addToList="() => (visibleDialog = !visibleDialog)" />
         </div>
       </DraggeableComponent>
       <div class="icon-container mb-7 px-14 md:px-0">
@@ -187,14 +213,9 @@ const rateMovie = async (rating: number) => {
           </div>
         </div>
       </div>
-      <div
-        class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center mb-7 px-14 md:px-0"
-      >
-        <div
-          class="w-full max-w-sm aspect-[3/5] rounded-3xl transition-all duration-500 ease-out"
-          :style="glowStyle"
-          id="glow-container"
-        ></div>
+      <div class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center mb-7 px-14 md:px-0">
+        <div class="w-full max-w-sm aspect-[3/5] rounded-3xl transition-all duration-500 ease-out" :style="glowStyle"
+          id="glow-container"></div>
       </div>
       <div class="flex justify-center mt-4 relative z-">
         <StarsComponent id="stars" :loading="loading" @rateMovie="rateMovie" />
@@ -232,6 +253,7 @@ const rateMovie = async (rating: number) => {
 }
 
 @keyframes swipe-tutorial {
+
   0%,
   10%,
   100% {
@@ -275,6 +297,7 @@ const rateMovie = async (rating: number) => {
 }
 
 @keyframes glow-tutorial {
+
   0%,
   12%,
   28%,
@@ -314,6 +337,7 @@ const rateMovie = async (rating: number) => {
 }
 
 @keyframes icon-left-tutorial {
+
   15%,
   25% {
     opacity: 1;
@@ -331,6 +355,7 @@ const rateMovie = async (rating: number) => {
 }
 
 @keyframes icon-right-tutorial {
+
   40%,
   50% {
     opacity: 1;
@@ -348,6 +373,7 @@ const rateMovie = async (rating: number) => {
 }
 
 @keyframes icon-bottom-tutorial {
+
   65%,
   75% {
     opacity: 1;
@@ -365,6 +391,7 @@ const rateMovie = async (rating: number) => {
 }
 
 @keyframes icon-top-tutorial {
+
   90%,
   98% {
     opacity: 1;
@@ -416,6 +443,7 @@ const rateMovie = async (rating: number) => {
 }
 
 @keyframes star-fill-sweep {
+
   0%,
   100% {
     color: var(--primary);
@@ -455,6 +483,7 @@ const rateMovie = async (rating: number) => {
 }
 
 @keyframes icon-change {
+
   0%,
   100%,
   20%,
@@ -537,7 +566,8 @@ const rateMovie = async (rating: number) => {
 
 .w-full.max-w-sm.aspect-\[3\/5\] {
   max-width: 85vw;
-  @media (min-width: 768px) {
+
+  @media (min-width: 640px) {
     max-width: 24rem;
   }
 }

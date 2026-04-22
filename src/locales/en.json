@@ -1,4 +1,10 @@
 {
+  "shortcuts": {
+    "alternateInfo": "Show/hide info",
+    "addToList": "Add to list",
+    "markAsNotSeen": "Mark as not seen",
+    "rateNStars": "Rate {n} stars"
+  },
   "next": "Next",
   "back": "Back",
   "toast": {
@@ -134,8 +140,9 @@
     "feature1": "Share your favorite movies",
     "feature2": "Get movie recommendations",
     "feature3": "Create your own movie lists.",
-    "fetchMoviesHerror": "Failed to fetch movies. Please try again later.",
+    "fetchMoviesError": "Failed to fetch movies. Please try again later.",
     "profile": "My Profile",
+    "shortcuts": "Shortcuts",
     "search": "Search"
   },
   "onboarding": {

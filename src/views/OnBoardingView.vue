@@ -313,7 +313,7 @@ const steps = [
     width: 100% !important;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 640px) {
     .pos-top-left {
         top: 50%;
         left: 50%;
