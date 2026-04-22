@@ -5,7 +5,9 @@ import {
   movieSearching,
   type searchData,
 } from "@/repositories/searchRepository";
+import { useLangStore } from "@/stores/langStore";
 import type { MoviePagination } from "@/types";
+import debounce from "@/utils/debounce";
 import { InputText, useToast } from "primevue";
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
@@ -18,6 +20,7 @@ const movies = ref<MoviePagination>({} as MoviePagination);
 const { t } = useI18n();
 const loading = ref<boolean>(false);
 const search = ref<string>("");
+const langStore = useLangStore();
 
 const updateRoute = (newData: searchData) => {
   router.push({
@@ -25,8 +28,9 @@ const updateRoute = (newData: searchData) => {
     query: {
       ...route.query,
       ...newData,
-      showUnseen: String(newData.showUnseen) || null,
-      showReviewed: String(newData.showReviewed) || null,
+      name: newData.name || undefined,
+      showUnseen: newData.showUnseen ? "true" : undefined,
+      showReviewed: newData.showReviewed ? "true" : undefined,
     },
   });
 };
@@ -51,17 +55,6 @@ const changePage = async (page: number) => {
   updateRoute({ page });
 };
 
-function debounce(fn: Function, delay: number) {
-  let timeoutId: ReturnType<typeof setTimeout> | undefined;
-
-  return (...args: any[]) => {
-    if (timeoutId) clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => {
-      fn(...args);
-    }, delay);
-  };
-}
-
 const debouncedUpdateRoute = debounce((name: string) => {
   updateRoute({ name, page: 1 });
 }, 500);
@@ -71,7 +64,7 @@ watch(search, (newVal) => {
 });
 
 watch(
-  () => route.query,
+  [() => route.query, () => langStore.language],
   async () => {
     search.value = String(route.query.name || "");
     if (route.query.type === "user") {
