@@ -16,6 +16,7 @@ import DraggeableComponent from "@/components/draggeableComponent.vue";
 import MovieInfoDrawer from "@/components/movieInfoDrawer.vue";
 import AddToListDialog from "@/components/addToListDialog.vue";
 import KeyboardShorcuts, { type DropdownOption } from "@/components/keyboardShorcuts.vue";
+import FriendsRatingsComponent from "@/components/friendsRatingsComponent.vue";
 
 const PREDICTED_COLORS: Record<string, string> = {
   right: "var(--yellow)",
@@ -179,6 +180,7 @@ for (let i = 1; i <= 5; i++) {
   <div class="min-h-screen flex items-center justify-center overflow-hidden fixed inset-0"
     :class="isDragging && 'z-50'">
     <KeyboardShorcuts :options="shortcuts" />
+    <FriendsRatingsComponent v-if="actualMovie" :movieSlug="actualMovie.slug" />
     <MovieInfoDrawer v-model:visible="visibleDrawer" :movie="actualMovie || ({} as Movie)" />
     <AddToListDialog v-model:visible="visibleDialog" :movie="actualMovie || ({} as Movie)" />
     <div v-if="loading || actualMovie" class="overflow-visible min-w-screen px-14 md:px-0">

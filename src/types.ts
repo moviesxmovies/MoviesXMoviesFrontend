@@ -74,6 +74,17 @@ export interface Person {
   gender: number;
 }
 
+export interface User {
+  id: number;
+  username: string;
+  bio: string;
+  friendship: Friendship;
+  picture: string;
+}
+interface Friendship {
+  is_friend: boolean;
+  status: string;
+}
 interface Platform {
   id: number;
   name: string;
@@ -86,6 +97,14 @@ interface Genre {
   id: number;
   name: string;
   slug: string;
+}
+
+export interface Rating {
+  id: number;
+  rating: number;
+  user: string;
+  movie: string;
+  created_at: string;
 }
 
 export interface MovieListPagination {

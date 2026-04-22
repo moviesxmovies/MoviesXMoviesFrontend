@@ -5,7 +5,7 @@ import { createPinia, setActivePinia } from "pinia";
 import NavbarComponent from "@/components/navbar.vue";
 import i18n from "@/i18n";
 import { useAuthStore } from "@/stores/authStore";
-import { getUserProfile } from "@/repositories/userRepository";
+import { getSelfUserProfile } from "@/repositories/userRepository";
 
 const mockPush = vi.fn();
 vi.mock("vue-router", async (importOriginal) => {
@@ -280,7 +280,7 @@ describe("NavbarComponent", () => {
 
   // ── loadProfilePicture ───────────────────────────────────────────────────────
   vi.mock("@/repositories/userRepository", () => ({
-    getUserProfile: vi.fn(),
+    getSelfUserProfile: vi.fn(),
   }));
 
 
@@ -293,7 +293,7 @@ describe("NavbarComponent", () => {
     });
 
     it("sets profilePicture from profile when authenticated", async () => {
-      vi.mocked(getUserProfile).mockResolvedValue({ picture: "https://example.com/pic.jpg" } as any);
+      vi.mocked(getSelfUserProfile).mockResolvedValue({ picture: "https://example.com/pic.jpg" } as any);
       const wrapper = factory(true);
       const vm = wrapper.vm as any;
       await vm.loadProfilePicture();
@@ -301,7 +301,7 @@ describe("NavbarComponent", () => {
     });
 
     it("sets profilePicture to null when profile has no picture", async () => {
-      vi.mocked(getUserProfile).mockResolvedValue({ picture: null } as any);
+      vi.mocked(getSelfUserProfile).mockResolvedValue({ picture: null } as any);
       const wrapper = factory(true);
       const vm = wrapper.vm as any;
       await vm.loadProfilePicture();
@@ -309,7 +309,7 @@ describe("NavbarComponent", () => {
     });
 
     it("sets profilePicture to null when getUserProfile throws", async () => {
-      vi.mocked(getUserProfile).mockRejectedValue(new Error("Network error"));
+      vi.mocked(getSelfUserProfile).mockRejectedValue(new Error("Network error"));
       const wrapper = factory(true);
       const vm = wrapper.vm as any;
       await vm.loadProfilePicture();
@@ -317,7 +317,7 @@ describe("NavbarComponent", () => {
     });
 
     it("reloads profilePicture when isAuthenticated changes to true", async () => {
-      vi.mocked(getUserProfile).mockResolvedValue({ picture: "https://example.com/pic.jpg" } as any);
+      vi.mocked(getSelfUserProfile).mockResolvedValue({ picture: "https://example.com/pic.jpg" } as any);
 
       const authState = reactive({ isAuthenticated: false, logout: vi.fn() });
       vi.mocked(useAuthStore).mockReturnValue(authState as any);

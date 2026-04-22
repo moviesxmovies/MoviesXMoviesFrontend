@@ -4,7 +4,7 @@ import { computed, onMounted, ref, watch } from "vue";
 import LangComponent from "./langComponent.vue";
 import ThemeComponent from "./themeComponent.vue";
 import { useAuthStore } from "@/stores/authStore";
-import { getUserProfile } from "@/repositories/userRepository";
+import { getSelfUserProfile } from "@/repositories/userRepository";
 import Menu from "primevue/menu";
 import { useI18n } from "vue-i18n";
 import { useThemeStore } from "@/stores/themeStore";
@@ -22,7 +22,7 @@ const loadProfilePicture = async () => {
     return;
   }
   try {
-    const profile = await getUserProfile();
+    const profile = await getSelfUserProfile();
     profilePicture.value = profile?.picture ?? null;
   } catch {
     profilePicture.value = null;
@@ -73,21 +73,14 @@ watch(() => authStore.isAuthenticated, loadProfilePicture);
     </div>
 
     <div class="nav-right desktop-only">
-      <button
-        id="search-btn"
-        class="search-trigger"
-        @click="router.push('/search')"
-      >
+      <button id="search-btn" class="search-trigger" @click="router.push('/search')">
         <div class="search-content">
-          <i
-            class="pi pi-search"
-            :style="{
-              color:
-                themeStore.theme === 'dark'
-                  ? 'var(--accent)'
-                  : 'var(--primary)',
-            }"
-          />
+          <i class="pi pi-search" :style="{
+            color:
+              themeStore.theme === 'dark'
+                ? 'var(--accent)'
+                : 'var(--primary)',
+          }" />
           <span class="search-text">{{ $t("home.search") }}</span>
         </div>
       </button>
@@ -97,25 +90,15 @@ watch(() => authStore.isAuthenticated, loadProfilePicture);
         <button class="btn-profile" @click="(e) => profileMenu.toggle(e)">
           <img :src="profilePicture ?? ''" :alt="$t('home.profile')" />
         </button>
-        <Menu
-          ref="profileMenu"
-          :model="menuItems"
-          popup
-          class="profile-menu"
-          appendTo="self"
-        />
+        <Menu ref="profileMenu" :model="menuItems" popup class="profile-menu" appendTo="self" />
       </template>
       <button class="btn-ghost" @click="router.push('/login')" v-else>
         {{ $t("home.login") }}
       </button>
     </div>
 
-    <button
-      class="hamburger mobile-only"
-      @click="toggleMenu"
-      :class="{ open: menuOpen }"
-      :aria-label="menuOpen ? $t('navbar.closeMenu') : $t('navbar.openMenu')"
-    >
+    <button class="hamburger mobile-only" @click="toggleMenu" :class="{ open: menuOpen }"
+      :aria-label="menuOpen ? $t('navbar.closeMenu') : $t('navbar.openMenu')">
       <span></span>
       <span></span>
       <span></span>
@@ -124,11 +107,7 @@ watch(() => authStore.isAuthenticated, loadProfilePicture);
     <Transition name="slide">
       <div class="mobile-menu" v-if="menuOpen">
         <div class="mobile-menu-items">
-          <button
-            id="search-btn-mobile"
-            class="btn-ghost"
-            @click="navigate('/search')"
-          >
+          <button id="search-btn-mobile" class="btn-ghost" @click="navigate('/search')">
             <i class="pi pi-search" />
             {{ $t("home.search") }}
           </button>
@@ -140,25 +119,12 @@ watch(() => authStore.isAuthenticated, loadProfilePicture);
             <LangComponent />
           </div>
 
-          <button
-            id="profile-btn-mobile"
-            class="btn-ghost"
-            @click="navigate('/profile')"
-            v-if="authStore.isAuthenticated"
-          >
-            <img
-              :src="profilePicture ?? ''"
-              :alt="$t('home.profile')"
-              class="btn-profile-img"
-            />
+          <button id="profile-btn-mobile" class="btn-ghost" @click="navigate('/profile')"
+            v-if="authStore.isAuthenticated">
+            <img :src="profilePicture ?? ''" :alt="$t('home.profile')" class="btn-profile-img" />
             {{ $t("home.profile") }}
           </button>
-          <button
-            id="profile-btn-mobile"
-            class="btn-ghost"
-            @click="navigate('/login')"
-            v-else
-          >
+          <button id="profile-btn-mobile" class="btn-ghost" @click="navigate('/login')" v-else>
             {{ $t("home.login") }}
           </button>
         </div>
@@ -238,6 +204,7 @@ watch(() => authStore.isAuthenticated, loadProfilePicture);
   border-radius: 100%;
   object-fit: cover;
 }
+
 .btn-profile-img {
   margin-right: 8px;
   height: 1.5rem;
@@ -484,7 +451,8 @@ watch(() => authStore.isAuthenticated, loadProfilePicture);
   padding: 0 0.8rem;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  min-width: 140px; /* Le da cuerpo de input */
+  min-width: 140px;
+  /* Le da cuerpo de input */
   gap: 12px;
 }
 

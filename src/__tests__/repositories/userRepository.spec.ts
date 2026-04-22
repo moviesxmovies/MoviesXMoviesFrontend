@@ -1,9 +1,10 @@
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import {
-  getUserProfile,
+  getSelfUserProfile,
   getPersonProfile,
   getPersonMovieListsFromMovie,
   getPersonFilmography,
+  getUserProfile,
 } from "@/repositories/userRepository";
 
 // ── Mocks ────────────────────────────────────────────────────────────────────
@@ -29,7 +30,7 @@ describe("UserRepository", () => {
       const mockProfile = { id: "1", name: "Christopher Nolan", slug: "christopher-nolan" };
 
       mockGet.mockResolvedValueOnce({ data: mockProfile });
-      const result = await getUserProfile();
+      const result = await getSelfUserProfile();
 
       expect(mockGet).toHaveBeenCalledWith("/users/");
       expect(result).toEqual(mockProfile);
@@ -38,7 +39,7 @@ describe("UserRepository", () => {
     it("throws when API fails", async () => {
       mockGet.mockRejectedValueOnce(new Error("Not found"));
 
-      await expect(getUserProfile()).rejects.toThrow("Not found");
+      await expect(getSelfUserProfile()).rejects.toThrow("Not found");
     });
   });
 
@@ -156,5 +157,24 @@ describe("UserRepository", () => {
         getPersonFilmography("christopher-nolan", "directed", 10),
       ).rejects.toThrow("Unauthorized");
     });
+  });
+
+  // ── getUserProfile ──────────────────────────────────────────────────────────
+  describe("getUserProfile", () => {
+    it("calls API with correct endpoint and returns user profile", async () => {
+      const mockProfile = { id: "1", name: "Christopher Nolan", slug: "christopher-nolan" };
+
+      mockGet.mockResolvedValueOnce({ data: mockProfile });
+      const result = await getUserProfile(mockProfile.slug);
+
+      expect(mockGet).toHaveBeenCalledWith(`/users/${mockProfile.slug}/`);
+      expect(result).toEqual(mockProfile);
+    });
+    it("throws when API fails", async () => {
+      mockGet.mockRejectedValueOnce(new Error("Not found"));
+
+      await expect(getUserProfile()).rejects.toThrow("Not found");
+    }
+    )
   });
 });
