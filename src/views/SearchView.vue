@@ -158,7 +158,7 @@ watch(
 }
 
 .search-container {
-  margin: 30px 0;
+  margin: 40px 0 20px 0;
   display: flex;
   justify-content: center;
   width: 100%;

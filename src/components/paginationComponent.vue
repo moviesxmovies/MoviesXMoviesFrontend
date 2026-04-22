@@ -66,17 +66,19 @@ const emit = defineEmits(["changePage"]);
 
 :deep(.custom-paginator .p-paginator-page.p-highlight) {
   background: var(--primary) !important;
-  color: white !important; /* O el color de texto de tu tema en activo */
+  color: white !important;
   border-color: var(--primary);
   box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 30%, transparent);
 }
 
-/* Responsive: botones más pequeños en móvil */
 @media (max-width: 640px) {
-  :deep(.custom-paginator .p-paginator-page) {
-    min-width: 2.2rem;
-    height: 2.2rem;
-    font-size: 0.9rem;
+  :deep(.custom-paginator .p-paginator-page),
+  :deep(.custom-paginator .p-paginator-first),
+  :deep(.custom-paginator .p-paginator-prev),
+  :deep(.custom-paginator .p-paginator-next),
+  :deep(.custom-paginator .p-paginator-last) {
+    min-width: 2rem;
+    font-size: 0.7rem;
   }
 }
 </style>
