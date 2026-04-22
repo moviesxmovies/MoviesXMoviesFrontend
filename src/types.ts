@@ -66,7 +66,7 @@ interface Platform {
   image: string;
 }
 
-interface Genre {
+export interface Genre {
   id: number;
   name: string;
   slug: string;
@@ -107,19 +107,6 @@ export interface User {
 interface Friendship {
   is_friend: boolean;
   status: string;
-}
-interface Platform {
-  id: number;
-  name: string;
-  slug: string;
-  url: null;
-  image: string;
-}
-
-interface Genre {
-  id: number;
-  name: string;
-  slug: string;
 }
 
 export interface Rating {

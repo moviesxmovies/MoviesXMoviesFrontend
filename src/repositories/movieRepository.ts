@@ -3,8 +3,8 @@ import type { Movie, MoviePagination } from "@/types";
 
 export type searchData = {
   name?: string;
-  showUnseen?: boolean;
-  showReviewed?: boolean;
+  marked_unseen?: boolean;
+  reviewed?: boolean;
   actors?: string[];
   directors?: string[];
   genres?: string[];

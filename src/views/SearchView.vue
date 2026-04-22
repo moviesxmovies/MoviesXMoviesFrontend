@@ -1,12 +1,13 @@
 <script lang="ts" setup>
 import MovieCardComponent from "@/components/movieCardComponent.vue";
 import PaginationComponent from "@/components/paginationComponent.vue";
+import SearchFiltersComponent from "@/components/searchFiltersComponent.vue";
 import {
   movieSearching,
   type searchData,
 } from "@/repositories/movieRepository";
 import { useLangStore } from "@/stores/langStore";
-import type { MoviePagination } from "@/types";
+import type { Genre, MoviePagination } from "@/types";
 import debounce from "@/utils/debounce";
 import { InputText, useToast } from "primevue";
 import { ref, watch } from "vue";
@@ -29,8 +30,8 @@ const updateRoute = (newData: searchData) => {
       ...route.query,
       ...newData,
       name: search.value || undefined,
-      showUnseen: newData.showUnseen ? "true" : undefined,
-      showReviewed: newData.showReviewed ? "true" : undefined,
+      marked_unseen: newData.marked_unseen ? "true" : undefined,
+      reviewed: newData.reviewed ? "true" : undefined,
     },
   });
 };
@@ -103,35 +104,41 @@ watch(
       </div>
     </div>
 
-    <div class="movies-grid">
-      <div v-if="loading" class="loading-state">
-        <i class="pi pi-spin pi-spinner loading-spinner"></i>
-        <span>{{ t("search.loading") }}</span>
-      </div>
-
-      <div v-else-if="!movies.results?.length" class="empty-state">
-        <div class="empty-icon">
-          <i class="pi pi-search"></i>
-        </div>
-        <p>{{ t("search.noFilms") }}</p>
-        <span>{{ t("search.help") }}</span>
-      </div>
-
-      <template v-else>
-        <MovieCardComponent
-          v-for="movie in movies.results"
-          :key="movie.id"
-          :movie="movie"
-        />
-      </template>
-    </div>
-
-    <div v-if="!loading && movies.total_pages > 1">
-      <PaginationComponent
-        :total_pages="movies.total_pages"
-        :current_page="movies.current_page"
-        @change-page="changePage"
+    <div class="filters">
+      <SearchFiltersComponent
+        @filter-genres="(genres: string[]) => updateRoute({ genres })"
       />
+
+      <div class="movies-grid">
+        <div v-if="loading" class="loading-state">
+          <i class="pi pi-spin pi-spinner loading-spinner"></i>
+          <span>{{ t("search.loading") }}</span>
+        </div>
+
+        <div v-else-if="!movies.results?.length" class="empty-state">
+          <div class="empty-icon">
+            <i class="pi pi-search"></i>
+          </div>
+          <p>{{ t("search.noFilms") }}</p>
+          <span>{{ t("search.help") }}</span>
+        </div>
+
+        <template v-else>
+          <MovieCardComponent
+            v-for="movie in movies.results"
+            :key="movie.id"
+            :movie="movie"
+          />
+        </template>
+      </div>
+
+      <div v-if="!loading && movies.total_pages > 1">
+        <PaginationComponent
+          :total_pages="movies.total_pages"
+          :current_page="movies.current_page"
+          @change-page="changePage"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -143,18 +150,6 @@ watch(
   color: var(--text);
   font-family: "Inter", sans-serif;
   padding: 1rem;
-}
-
-@media (min-width: 768px) {
-  .page {
-    padding: 1.5rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .page {
-    padding: 2.5rem;
-  }
 }
 
 .search-container {
@@ -236,30 +231,11 @@ watch(
   }
 }
 
-@media (max-width: 640px) {
-  .search-input {
-    font-size: 1rem;
-    padding: 0.7rem 1rem 0.7rem 2.8rem !important;
-  }
-}
-
 .movies-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
   min-height: 200px;
-}
-
-@media (min-width: 768px) {
-  .movies-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  .movies-grid {
-    grid-template-columns: repeat(5, 1fr);
-  }
 }
 
 .loading-state {
@@ -310,5 +286,50 @@ watch(
 .empty-state span {
   font-size: 0.85rem;
   color: var(--text-color-secondary);
+}
+
+@media (max-width: 640px) {
+  .search-input {
+    font-size: 1rem;
+    padding: 0.7rem 1rem 0.7rem 2.8rem !important;
+  }
+
+  .desktop-only {
+    display: none;
+  }
+
+  .mobile-only {
+    display: flex;
+  }
+}
+
+@media (min-width: 641px) {
+  .mobile-only {
+    display: none;
+  }
+
+  .desktop-only {
+    display: flex;
+  }
+}
+
+@media (min-width: 768px) {
+  .page {
+    padding: 1.5rem;
+  }
+
+  .movies-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .page {
+    padding: 2.5rem;
+  }
+
+  .movies-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
 }
 </style>
