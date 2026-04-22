@@ -234,5 +234,11 @@
       "acted_in": "Acted in",
       "directed": "Directed"
     }
+  },
+  "search": {
+    "searchPlaceholder": "Search",
+    "loading": "Searching for films...",
+    "noFilms": "No films found",
+    "help": "Try with other values"
   }
 }

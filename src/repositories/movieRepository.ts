@@ -1,5 +1,17 @@
 import { api } from "@/composables/useAPI";
-import type { Movie } from "@/types";
+import type { Movie, MoviePagination } from "@/types";
+
+export type searchData = {
+  name?: string;
+  showUnseen?: boolean;
+  showReviewed?: boolean;
+  actors?: string[];
+  directors?: string[];
+  genres?: string[];
+  platforms?: string[];
+  stars?: number[];
+  page?: number;
+};
 
 export const getRecommendedMovies = async () => {
   try {
@@ -26,11 +38,35 @@ export const setAsNotSeen = async (movieSlug: string) => {
   }
 };
 
-export const friendsRatings = async (movieSlug: string, limit: number, page: number) => {
+export const movieSearching = async (
+  params: searchData,
+  limit: number = 15,
+) => {
   try {
-    const { data }: { data: any } = await api.get(`/movies/${movieSlug}/friends-ratings/`, {
-      params: { limit, page },
-    });
+    const { data }: { data: MoviePagination } = await api.get(
+      "movies/searching/",
+      {
+        params: { ...params, limit },
+      },
+    );
+    return data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+export const friendsRatings = async (
+  movieSlug: string,
+  limit: number,
+  page: number,
+) => {
+  try {
+    const { data }: { data: any } = await api.get(
+      `/movies/${movieSlug}/friends-ratings/`,
+      {
+        params: { limit, page },
+      },
+    );
     console.log("Fetched friends ratings:", data);
     return data;
   } catch (error: any) {
