@@ -38,7 +38,10 @@ export const setAsNotSeen = async (movieSlug: string) => {
   }
 };
 
-export const movieSearching = async (params: searchData, limit: number = 15) => {
+export const movieSearching = async (
+  params: searchData,
+  limit: number = 15,
+) => {
   try {
     const { data }: { data: MoviePagination } = await api.get(
       "movies/searching/",
@@ -46,12 +49,24 @@ export const movieSearching = async (params: searchData, limit: number = 15) => 
         params: { ...params, limit },
       },
     );
-    
-export const friendsRatings = async (movieSlug: string, limit: number, page: number) => {
+    return data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+export const friendsRatings = async (
+  movieSlug: string,
+  limit: number,
+  page: number,
+) => {
   try {
-    const { data }: { data: any } = await api.get(`/movies/${movieSlug}/friends-ratings/`, {
-      params: { limit, page },
-    });
+    const { data }: { data: any } = await api.get(
+      `/movies/${movieSlug}/friends-ratings/`,
+      {
+        params: { limit, page },
+      },
+    );
     console.log("Fetched friends ratings:", data);
     return data;
   } catch (error: any) {
