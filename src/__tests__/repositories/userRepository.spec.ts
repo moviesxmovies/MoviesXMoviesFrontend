@@ -1,6 +1,6 @@
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import {
-  getUserProfile,
+  getSelfUserProfile,
   getPersonProfile,
   getPersonMovieListsFromMovie,
   getPersonFilmography,
@@ -29,7 +29,7 @@ describe("UserRepository", () => {
       const mockProfile = { id: "1", name: "Christopher Nolan", slug: "christopher-nolan" };
 
       mockGet.mockResolvedValueOnce({ data: mockProfile });
-      const result = await getUserProfile();
+      const result = await getSelfUserProfile();
 
       expect(mockGet).toHaveBeenCalledWith("/users/");
       expect(result).toEqual(mockProfile);
@@ -38,7 +38,7 @@ describe("UserRepository", () => {
     it("throws when API fails", async () => {
       mockGet.mockRejectedValueOnce(new Error("Not found"));
 
-      await expect(getUserProfile()).rejects.toThrow("Not found");
+      await expect(getSelfUserProfile()).rejects.toThrow("Not found");
     });
   });
 
