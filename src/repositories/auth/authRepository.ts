@@ -16,7 +16,6 @@ export const handleLogin = async (values: LoginPayload) => {
 };
 
 export const handleRegister = async (lang: string | undefined, values: RegisterPayload) => {
-  console.log(values);
   const { data } = await api.post("/auth/signup/", values, { params: { lang } });
   return data;
 };

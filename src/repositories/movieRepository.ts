@@ -25,3 +25,15 @@ export const setAsNotSeen = async (movieSlug: string) => {
     throw error;
   }
 };
+
+export const friendsRatings = async (movieSlug: string, limit: number, page: number) => {
+  try {
+    const { data }: { data: any } = await api.get(`/movies/${movieSlug}/friends-ratings/`, {
+      params: { limit, page },
+    });
+    console.log(data);
+    return data;
+  } catch (error: any) {
+    throw error;
+  }
+};
