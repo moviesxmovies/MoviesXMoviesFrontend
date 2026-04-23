@@ -250,7 +250,6 @@ describe("SearchGenresComponent", () => {
       mockRoute.query = { genres: "action" };
       const wrapper = mountComponent();
       await flushPromises();
-      // no debe lanzar error aunque genres.value sea undefined
       expect(wrapper.find("[data-testid='multiselect']").exists()).toBe(true);
     });
   });
