@@ -13,7 +13,7 @@ export function usePaginatedFetch<T extends object>() {
                 data.value = result;
                 return;
             }
-            (data.value.results as T[]).push(...(result.results as T[]));
+            (data.value.results as T[]).push(...(result.results));
             data.value.next_last_id = result.next_last_id;
         } finally {
             loading.value = false;
