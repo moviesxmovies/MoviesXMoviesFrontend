@@ -18,19 +18,7 @@ export const getUserProfile = async (slug: string) => {
   }
 };
 
-export const getFriendsRequests = async (page: number, limit: number) => {
-  try {
-    const { data } = await api.get(`/users/friend-requests/`, {
-      params: {
-        page,
-        limit,
-      },
-    });
-    return data;
-  } catch (error: any) {
-    throw error;
-  }
-}
+
 
 export const getPersonProfile = async (slug: string) => {
   try {
@@ -58,6 +46,45 @@ export const getPersonFilmography = async (slug: string, type: 'acted' | 'direct
       },
     });
     return data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+export const getUserReviews = async (slug: string, lastId?: number) => {
+  try {
+    const { data } = await api.get(`/users/${slug}/reviews/`, {
+      params: {
+        last_id: lastId,
+      },
+    });
+    return data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+export const getFriendsRequests = async (lastId?: number) => {
+  try {
+    const { data } = await api.get(`/users/friend-requests/`, {
+      params: {
+        last_id: lastId,
+      },
+    });
+    return data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+export const completeFriendRequest = async (fromUsername: string, accept: boolean) => {
+  try {
+    if (accept) {
+      const { data } = await api.post(`/users/${fromUsername}/friend-requests/`);
+      return data;
+    } else {
+      const { data } = await api.delete(`/users/${fromUsername}/friend-requests/`);
+      return data;
+    }
   } catch (error: any) {
     throw error;
   }

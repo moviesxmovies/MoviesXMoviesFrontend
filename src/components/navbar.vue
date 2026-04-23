@@ -8,6 +8,7 @@ import { getFriendsRequests, getSelfUserProfile } from "@/repositories/userRepos
 import Menu from "primevue/menu";
 import { useI18n } from "vue-i18n";
 import { useThemeStore } from "@/stores/themeStore";
+import { useNotificationsStore } from "@/stores/notificationStore";
 
 const { t } = useI18n();
 const router = useRouter();
@@ -15,7 +16,7 @@ const authStore = useAuthStore();
 const themeStore = useThemeStore();
 const menuOpen = ref(false);
 const profilePicture = ref<string | null>(null);
-const pendingFriendsRequests = ref(0);
+const notificationsStore = useNotificationsStore();
 
 const loadProfilePicture = async () => {
   if (!authStore.isAuthenticated) {
@@ -31,17 +32,15 @@ const loadProfilePicture = async () => {
 };
 
 const loadPendingFriendsRequests = async () => {
-
   if (!authStore.isAuthenticated) {
-
-    pendingFriendsRequests.value = 0;
+    notificationsStore.set(0);
     return;
   }
   try {
-    const response = await getFriendsRequests(1, 6);
-    pendingFriendsRequests.value = response.count;
+    const response = await getFriendsRequests();
+    notificationsStore.set(response.count);
   } catch {
-    pendingFriendsRequests.value = 0;
+    notificationsStore.set(0);
   }
 };
 
@@ -59,7 +58,7 @@ const menuItems = computed(() => [
   {
     label: t("components.navbar.profile"),
     icon: "pi pi-user",
-    command: () => router.push("/profile"),
+    command: () => router.push("/users"),
   },
   {
     separator: true,
@@ -85,7 +84,7 @@ watch(() => authStore.isAuthenticated, (isAuthenticated) => {
     loadPendingFriendsRequests();
   } else {
     profilePicture.value = null;
-    pendingFriendsRequests.value = 0;
+    notificationsStore.set(0);
   }
 });
 </script>
@@ -117,8 +116,8 @@ watch(() => authStore.isAuthenticated, (isAuthenticated) => {
         <button class="btn-profile" @click="(e) => profileMenu.toggle(e)">
           <div class="profile-wrapper">
             <img :src="profilePicture ?? ''" :alt="$t('home.profile')" />
-            <span v-if="pendingFriendsRequests > 0" class="notification-badge">
-              {{ pendingFriendsRequests >= 6 ? '5+' : pendingFriendsRequests }}
+            <span v-if="notificationsStore.pendingFriendRequests > 0" class="notification-badge">
+              {{ notificationsStore.pendingFriendRequests >= 6 ? '5+' : notificationsStore.pendingFriendRequests }}
             </span>
           </div>
         </button>
@@ -151,12 +150,13 @@ watch(() => authStore.isAuthenticated, (isAuthenticated) => {
             <LangComponent />
           </div>
 
-          <button id="profile-btn-mobile" class="btn-ghost" @click="navigate('/profile')"
+          <button id="profile-btn-mobile" class="btn-ghost" @click="navigate('/users')"
             v-if="authStore.isAuthenticated">
             <div class="profile-wrapper">
               <img :src="profilePicture ?? ''" :alt="$t('home.profile')" class="btn-profile-img" />
-              <span v-if="pendingFriendsRequests > 0" class="notification-badge notification-badge--sm">
-                {{ pendingFriendsRequests >= 6 ? '5+' : pendingFriendsRequests }}
+              <span v-if="notificationsStore.pendingFriendRequests > 0"
+                class="notification-badge notification-badge--sm">
+                {{ notificationsStore.pendingFriendRequests >= 6 ? '5+' : notificationsStore.pendingFriendRequests }}
               </span>
             </div>
             {{ $t("home.profile") }}

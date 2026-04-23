@@ -240,5 +240,17 @@
     "loading": "Searching for films...",
     "noFilms": "No films found",
     "help": "Try with other values"
+  },
+  "user":{
+    "editProfile": "Edit",
+    "friendsRequests": "Friend Requests",
+    "friends": "Friends",
+    "biography": "Biography",
+    "no_biography": "No biography available.",
+    "reviews": "Reviews",
+    "no_reviews": "No reviews available.",
+    "no_reviews_description": "This user has not written any reviews yet.",
+    "no_friends_requests": "No requests available",
+    "no_friends_requests_description": "You don't have any pending friend requests"
   }
 }

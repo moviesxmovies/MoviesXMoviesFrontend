@@ -36,15 +36,8 @@ const emit = defineEmits<{
     <AccordionContent v-if="props.list" class="section-body">
       <ScrollPanel style="width: 100%; height: 500px">
         <div class="movies-grid">
-          <MovieCardComponent
-            v-for="movie in props.list"
-            :key="movie.id"
-            :movie="movie"
-          />
-          <div
-            :ref="(el) => emit('update:sentinelRef', el as HTMLElement)"
-            class="sentinel"
-          />
+          <MovieCardComponent v-for="movie in props.list" :key="movie.id" :movie="movie" />
+          <div :ref="(el) => emit('update:sentinelRef', el as HTMLElement)" class="sentinel" />
           <div v-if="props.loading" class="loading-footer">
             <i class="pi pi-spin pi-spinner"></i>
           </div>
@@ -60,20 +53,19 @@ const emit = defineEmits<{
         {{ props.title }}
       </h2>
     </AccordionHeader>
-    <AccordionContent
-      class="bg-secondary/5 rounded-[2rem] p-10 md:p-20 border-2 border-dashed border-secondary/40 flex flex-col items-center justify-center text-center"
-    >
-      <div
-        class="w-20 h-20 bg-secondary/10 rounded-full flex items-center justify-center mb-4"
-      >
-        <i class="pi pi-video text-3xl text-secondary"></i>
+    <AccordionContent class="bg-secondary/5 rounded-[2rem] p-10 md:p-20 border-2 border-dashed border-secondary/40">
+      <div class="flex flex-col items-center justify-center text-center">
+
+        <div class="w-20 h-20 bg-secondary/10 rounded-full flex items-center justify-center mb-4">
+          <i class="pi pi-video text-3xl text-secondary"></i>
+        </div>
+        <h3 class="text-xl font-semibold opacity-70">
+          {{ t("components.filmography.no_movies") }}
+        </h3>
+        <p class="text-sm opacity-50 max-w-xs mx-auto">
+          {{ t("components.filmography.no_movies_description") }}
+        </p>
       </div>
-      <h3 class="text-xl font-semibold opacity-70">
-        {{ t("components.filmography.no_movies") }}
-      </h3>
-      <p class="text-sm opacity-50 max-w-xs mx-auto">
-        {{ t("components.filmography.no_movies_description") }}
-      </p>
     </AccordionContent>
   </AccordionPanel>
 </template>

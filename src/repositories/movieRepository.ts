@@ -67,7 +67,6 @@ export const friendsRatings = async (
         params: { limit, page },
       },
     );
-    console.log("Fetched friends ratings:", data);
     return data;
   } catch (error: any) {
     throw error;
