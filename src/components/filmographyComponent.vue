@@ -157,4 +157,18 @@ const emit = defineEmits<{
   justify-content: center;
   padding: 1rem;
 }
+:deep(.p-scrollpanel-bar) {
+    background: var(--secondary);
+    border-radius: 999px;
+    width: 4px;
+    opacity: 1;
+}
+
+:deep(.p-scrollpanel-bar-y) {
+    width: 4px;
+}
+
+:deep(.p-scrollpanel-bar:hover) {
+    background: var(--primary);
+}
 </style>
