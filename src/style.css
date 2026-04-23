@@ -28,8 +28,8 @@
   --primary: #2f27ce;
   --secondary: #bcbbdd;
   --accent: #bb3dff;
-  --yellow: #FFD700;
-  --red: #EF4444;
+  --yellow: #ffd700;
+  --red: #ef4444;
   --gray: #6b7280;
 
   --ob-card-bg: rgba(255, 255, 255, 0.95);
@@ -60,8 +60,18 @@
 }
 
 .p-skeleton::after {
-  background: linear-gradient(90deg,
-      transparent,
-      rgba(255, 255, 255, 0.1),
-      transparent) !important;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  ) !important;
+}
+
+.p-drawer,
+.p-drawer-header,
+.p-drawer-content {
+  background: var(--background) !important;
+  color: var(--text) !important;
+  border: none !important;
 }

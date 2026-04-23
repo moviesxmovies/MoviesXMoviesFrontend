@@ -63,7 +63,7 @@ watch(
         )
       "
       :maxSelectedLabels="99"
-      class="w-full md:w-80"
+      class="w-full multiselect-expandable"
       @change="
         emit(
           'filterGenres',

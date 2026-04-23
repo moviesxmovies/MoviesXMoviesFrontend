@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import FilterComponent from "@/components/filterComponent.vue";
 import MovieCardComponent from "@/components/movieCardComponent.vue";
 import PaginationComponent from "@/components/paginationComponent.vue";
 import SearchGenresComponent from "@/components/searchGenresComponent.vue";
@@ -11,8 +12,8 @@ import {
 import { useLangStore } from "@/stores/langStore";
 import type { MoviePagination } from "@/types";
 import debounce from "@/utils/debounce";
-import { InputText, useToast } from "primevue";
-import { ref, watch } from "vue";
+import { Drawer, InputText, useToast } from "primevue";
+import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 
@@ -24,6 +25,16 @@ const { t } = useI18n();
 const loading = ref<boolean>(false);
 const search = ref<string>("");
 const langStore = useLangStore();
+const filtersOpen = ref(false);
+
+const activeFiltersCount = computed(() => {
+  // para mostrar cuántos filtros activos hay en el badge
+  return (
+    (route.query.genres?.length ?? 0) +
+    (route.query.platforms?.length ?? 0) +
+    (route.query.stars?.length ?? 0)
+  );
+});
 
 const updateRoute = (newData: searchData) => {
   router.push({
@@ -101,14 +112,12 @@ watch(
       <div class="search-wrapper">
         <i v-if="!loading" class="pi pi-search search-icon" />
         <i v-else class="pi pi-spin pi-spinner search-icon" />
-
         <InputText
           v-model="search"
           :placeholder="$t('search.searchPlaceholder')"
           class="search-input"
           fluid
         />
-
         <button
           v-if="search && !loading"
           class="clear-btn"
@@ -119,46 +128,72 @@ watch(
       </div>
     </div>
 
-    <div class="filters">
-      <SearchGenresComponent
+    <button class="filters-toggle mobile-only" @click="filtersOpen = true">
+      <i class="pi pi-sliders-h" />
+      {{ t("search.filters") }}
+      <span v-if="activeFiltersCount" class="filters-badge">
+        {{ activeFiltersCount }}
+      </span>
+    </button>
+
+    <!-- Drawer móvil -->
+    <Drawer
+      v-model:visible="filtersOpen"
+      :header="t('search.filters')"
+      position="left"
+      class="mobile-only !w-full md:!w-[40rem]"
+    >
+      <FilterComponent
         @filter-genres="(genres: string[]) => updateRoute({ genres })"
-      />
-      <SearchPlatformsComponent
         @filter-platforms="(platforms: string[]) => updateRoute({ platforms })"
-      />
-      <SearchStarsComponent
         @filter-stars="(stars: number[]) => updateRoute({ stars })"
+        @close="filtersOpen = false"
       />
+    </Drawer>
 
-      <div class="movies-grid">
-        <div v-if="loading" class="loading-state">
-          <i class="pi pi-spin pi-spinner loading-spinner"></i>
-          <span>{{ t("search.loading") }}</span>
-        </div>
-
-        <div v-else-if="!movies.results?.length" class="empty-state">
-          <div class="empty-icon">
-            <i class="pi pi-search"></i>
-          </div>
-          <p>{{ t("search.noFilms") }}</p>
-          <span>{{ t("search.help") }}</span>
-        </div>
-
-        <template v-else>
-          <MovieCardComponent
-            v-for="movie in movies.results"
-            :key="movie.id"
-            :movie="movie"
-          />
-        </template>
-      </div>
-
-      <div v-if="!loading && movies.total_pages > 1">
-        <PaginationComponent
-          :total_pages="movies.total_pages"
-          :current_page="movies.current_page"
-          @change-page="changePage"
+    <div class="content-layout">
+      <!-- Sidebar de filtros -->
+      <aside class="desktop-only filters-sidebar">
+        <FilterComponent
+          @filter-genres="(genres: string[]) => updateRoute({ genres })"
+          @filter-platforms="
+            (platforms: string[]) => updateRoute({ platforms })
+          "
+          @filter-stars="(stars: number[]) => updateRoute({ stars })"
+          @close="filtersOpen = false"
         />
+      </aside>
+
+      <!-- Contenido principal -->
+      <div class="main-content">
+        <div class="movies-grid">
+          <div v-if="loading" class="loading-state">
+            <i class="pi pi-spin pi-spinner loading-spinner"></i>
+            <span>{{ t("search.loading") }}</span>
+          </div>
+          <div v-else-if="!movies.results?.length" class="empty-state">
+            <div class="empty-icon">
+              <i class="pi pi-search"></i>
+            </div>
+            <p>{{ t("search.noFilms") }}</p>
+            <span>{{ t("search.help") }}</span>
+          </div>
+          <template v-else>
+            <MovieCardComponent
+              v-for="movie in movies.results"
+              :key="movie.id"
+              :movie="movie"
+            />
+          </template>
+        </div>
+
+        <div v-if="!loading && movies.total_pages > 1">
+          <PaginationComponent
+            :total_pages="movies.total_pages"
+            :current_page="movies.current_page"
+            @change-page="changePage"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -315,8 +350,12 @@ watch(
     padding: 0.7rem 1rem 0.7rem 2.8rem !important;
   }
 
+  .content-layout {
+    flex-direction: column;
+  }
+
   .desktop-only {
-    display: none;
+    display: none !important;
   }
 
   .mobile-only {
@@ -352,5 +391,26 @@ watch(
   .movies-grid {
     grid-template-columns: repeat(5, 1fr);
   }
+}
+
+.content-layout {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.filters-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: sticky;
+  top: 1.5rem;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0; /* evita overflow del grid */
 }
 </style>
