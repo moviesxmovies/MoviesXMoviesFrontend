@@ -109,7 +109,11 @@ describe("SearchView", () => {
     it("calls movieSearching on mount with the current route query", async () => {
       mountView();
       await flushPromises();
-      expect(mockMovieSearching).toHaveBeenCalledWith({});
+      expect(mockMovieSearching).toHaveBeenCalledWith({
+        genres: [],
+        platforms: [],
+        stars: [],
+      });
     });
 
     it("renders a movie card for each result", async () => {

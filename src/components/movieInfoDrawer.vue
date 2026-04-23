@@ -242,19 +242,18 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll();
           :pt="{ content: { class: 'scroll-content' } }"
         >
           <div class="inline-list">
-            <div
+            <RouterLink
               v-for="platform in movie.platforms"
               :key="platform.id"
               class="platform-item"
+              :to="`/search?platforms=${platform.slug}`"
             >
-              <RouterLink :to="`/search?platforms=${platform.slug}`"
-                ><img
-                  :src="platform.image ?? ''"
-                  :alt="platform.name"
-                  class="platform-item__img"
-                />
-              </RouterLink>
-            </div>
+              ><img
+                :src="platform.image ?? ''"
+                :alt="platform.name"
+                class="platform-item__img"
+              />
+            </RouterLink>
           </div>
         </ScrollPanel>
       </section>

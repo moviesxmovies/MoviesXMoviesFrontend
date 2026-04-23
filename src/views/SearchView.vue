@@ -120,7 +120,7 @@ watch(
     </div>
 
     <div class="filters">
-      <SearchGenresComponent
+      <!-- <SearchGenresComponent
         @filter-genres="(genres: string[]) => updateRoute({ genres })"
       />
       <SearchPlatformsComponent
@@ -128,7 +128,7 @@ watch(
       />
       <SearchStarsComponent
         @filter-stars="(stars: number[]) => updateRoute({ stars })"
-      />
+      /> -->
 
       <div class="movies-grid">
         <div v-if="loading" class="loading-state">
