@@ -253,6 +253,9 @@
     "no_friends_requests": "No requests available",
     "no_friends_requests_description": "You don't have any pending friend requests",
     "no_friends": "No friends available",
-    "no_friends_description": "This user doesn't have any friends yet."
+    "no_friends_description": "This user doesn't have any friends yet.",
+    "suggested_friends": "Suggested Friends",
+     "no_suggested_friends": "No suggested friends available",
+     "no_suggested_friends_description": "We couldn't find any suggested friends for you at the moment"
   }
 }

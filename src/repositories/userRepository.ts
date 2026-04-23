@@ -104,3 +104,17 @@ export const getUserFriends = async (slug: string, lastId?: number) => {
     throw new TranslatedError(error, error.response?.data?.status);
   }
 };
+
+export const getSuggestedFriends = async (slug: string, lastId?: number) => {
+  try {
+    const { data } = await api.get(`/users/suggested-users/`, {
+      params: {
+        last_id: lastId,
+        recomender_for: slug,
+      },
+    });
+    return data;
+  } catch (error: any) {
+    throw new TranslatedError(error, error.response?.data?.status);
+  }
+};

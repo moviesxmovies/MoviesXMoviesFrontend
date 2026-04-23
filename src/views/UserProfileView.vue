@@ -5,7 +5,8 @@ import {
     getUserReviews,
     getFriendsRequests,
     completeFriendRequest,
-    getUserFriends
+    getUserFriends,
+    getSuggestedFriends,
 } from "@/repositories/userRepository";
 import type { DynamicPagination, FriendRequest, Review, User } from "@/types";
 import {
@@ -26,7 +27,6 @@ import ReviewOnUserComponent from "@/components/reviewOnUserComponent.vue";
 import { useNotificationsStore } from "@/stores/notificationStore";
 import FriendWithFollow from "@/components/friendWithFollow.vue";
 import FriendshipStatusComponent from "@/components/friendshipStatusComponent.vue";
-import type TranslatedError from "@/exceptions/TranslatedError";
 
 const route = useRoute();
 const user = ref<User>({} as User);
@@ -34,12 +34,14 @@ const loadingProfile = ref<boolean>(false);
 const loadingReviews = ref<boolean>(false);
 const loadingRequests = ref<boolean>(false);
 const loadingFriends = ref<boolean>(false);
+const loadingSuggestedFriends = ref<boolean>(false);
 const toast = useToast();
 const { t } = useI18n();
 const router = useRouter();
 const reviews = ref<DynamicPagination<Review>>({} as DynamicPagination<Review>);
 const friendRequests = ref<DynamicPagination<FriendRequest>>({} as DynamicPagination<FriendRequest>);
 const friends = ref<DynamicPagination<User>>({} as DynamicPagination<User>);
+const suggestedFriends = ref<DynamicPagination<User>>({} as DynamicPagination<User>);
 const langStore = useLangStore();
 const authStore = useAuthStore();
 const isSelfProfile = ref<boolean>(false);
@@ -137,6 +139,28 @@ const fetchUserFriends = async (lastId?: number) => {
         loadingFriends.value = false;
     }
 };
+
+const fetchSuggestedFriends = async (lastId?: number) => {
+    loadingSuggestedFriends.value = true;
+    try {
+        const data = await getSuggestedFriends(user.value.username, lastId);
+        suggestedFriends.value = data;
+        if (!suggestedFriends.value.results) {
+            suggestedFriends.value = data;
+            return;
+        }
+        suggestedFriends.value.results.push(...data.results);
+        suggestedFriends.value.next_last_id = data.next_last_id;
+    } catch (error: any) {
+        toast.add({
+            severity: "error",
+            summary: t("toast.error"),
+            detail: error.translatedMessage
+        });
+    } finally {
+        loadingSuggestedFriends.value = false;
+    }
+};
 const acceptFriendRequest = async (username: string) => {
     try {
         await completeFriendRequest(username, true);
@@ -226,12 +250,15 @@ watch(
         reviews.value = {} as DynamicPagination<Review>;
         friendRequests.value = {} as DynamicPagination<FriendRequest>;
         friends.value = {} as DynamicPagination<User>;
+        suggestedFriends.value = {} as DynamicPagination<User>;
         isSelfProfile.value = false;
+
         await Promise.all([
             await fetchUserProfile(),
             fetchUserFriendRequests(),
             fetchUserReviews(),
             fetchUserFriends(),
+            fetchSuggestedFriends()
         ]);
     }, { immediate: true }
 );
@@ -327,7 +354,7 @@ watch(
                 <Accordion :value="1" v-if="isSelfProfile">
                     <AccordionPanel :value="1" v-if="friendRequests.results?.length" class="section">
                         <AccordionHeader class="section-header">
-                            <i class="pi pi-users primary-icon" />
+                            <i class="pi pi-bell primary-icon" />
                             <h2 class="section-title">
                                 {{ t("user.friendsRequests") }}
                             </h2>
@@ -346,7 +373,7 @@ watch(
 
                     <AccordionPanel :value="2" v-if="!friendRequests.results?.length" class="section">
                         <AccordionHeader class="section-header">
-                            <i class="pi pi-users primary-icon" />
+                            <i class="pi pi-bell primary-icon" />
                             <h2 class="section-title">
                                 {{ t("user.friendsRequests") }}
                             </h2>
@@ -416,6 +443,50 @@ watch(
                 </Accordion>
 
                 <!-- SUGGESTED FRIENDS -->
+                <Accordion>
+                    <AccordionPanel :value="1" v-if="suggestedFriends.results?.length" class="section">
+                        <AccordionHeader class="section-header">
+                            <i class="pi pi-lightbulb primary-icon" />
+                            <h2 class="section-title">
+                                {{ t("user.suggested_friends") }}
+                            </h2>
+                        </AccordionHeader>
+                        <AccordionContent v-if="suggestedFriends.results" class="section-body">
+                            <div class="scroll-container">
+                                <FriendWithFollow v-for="friend in suggestedFriends.results" :key="friend.id"
+                                    :user="friend" :onAddFriend="sendFriendRequest" />
+                                <div :ref="friendsSentinelRef as any" class="sentinel" />
+                                <div v-if="loadingFriends" class="loading-footer">
+                                    <i class="pi pi-spin pi-spinner"></i>
+                                </div>
+                            </div>
+                        </AccordionContent>
+                    </AccordionPanel>
+
+                    <AccordionPanel :value="2" v-if="!suggestedFriends.results?.length" class="section">
+                        <AccordionHeader class="section-header">
+                            <i class="pi pi-lightbulb primary-icon" />
+                            <h2 class="section-title">
+                                {{ t("user.suggested_friends") }}
+                            </h2>
+                        </AccordionHeader>
+                        <AccordionContent
+                            class="bg-secondary/5 rounded-[2rem] p-10 md:p-20 border-2 border-dashed border-secondary/40">
+                            <div class="flex flex-col items-center justify-center text-center">
+                                <div
+                                    class="w-20 h-20 bg-secondary/10 rounded-full flex items-center justify-center mb-4">
+                                    <i class="pi pi-users text-3xl text-secondary"></i>
+                                </div>
+                                <h3 class="text-xl font-semibold opacity-70">
+                                    {{ t("user.no_suggested_friends") }}
+                                </h3>
+                                <p class="text-sm opacity-50 max-w-xs mx-auto">
+                                    {{ t("user.no_suggested_friends_description") }}
+                                </p>
+                            </div>
+                        </AccordionContent>
+                    </AccordionPanel>
+                </Accordion>
 
             </div>
         </div>
