@@ -32,7 +32,7 @@ const getPlatforms = async () => {
 };
 
 watch(
-  () => route.query,
+  () => route.query.platforms,
   async () => {
     await getPlatforms();
     if (route.query.platforms) {

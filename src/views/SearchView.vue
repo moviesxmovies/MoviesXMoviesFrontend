@@ -2,8 +2,8 @@
 import MovieCardComponent from "@/components/movieCardComponent.vue";
 import PaginationComponent from "@/components/paginationComponent.vue";
 import SearchGenresComponent from "@/components/searchGenresComponent.vue";
-import SearchFiltersComponent from "@/components/searchGenresComponent.vue";
 import SearchPlatformsComponent from "@/components/searchPlatformsComponent.vue";
+import SearchStarsComponent from "@/components/searchStarsComponent.vue";
 import {
   movieSearching,
   type searchData,
@@ -125,6 +125,9 @@ watch(
       />
       <SearchPlatformsComponent
         @filter-platforms="(platforms: string[]) => updateRoute({ platforms })"
+      />
+      <SearchStarsComponent
+        @filter-stars="(stars: number[]) => updateRoute({ stars })"
       />
 
       <div class="movies-grid">

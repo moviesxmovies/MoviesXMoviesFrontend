@@ -33,7 +33,7 @@ const getGenres = async () => {
 };
 
 watch(
-  [() => route.query, () => langStore.language],
+  [() => route.query.genres, () => langStore.language],
   async () => {
     await getGenres();
     if (route.query.genres) {
