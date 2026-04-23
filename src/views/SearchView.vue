@@ -110,6 +110,7 @@ watch(
         <i v-else class="pi pi-spin pi-spinner search-icon" />
         <InputText
           v-model="search"
+          data-testid="search-input"
           :placeholder="$t('search.searchPlaceholder')"
           class="search-input"
           fluid
@@ -176,12 +177,16 @@ watch(
               v-for="movie in movies.results"
               :key="movie.id"
               :movie="movie"
+              data-testid="movie-card"
             />
           </template>
         </div>
 
         <div v-if="!loading && movies.total_pages > 1">
           <PaginationComponent
+            data-testid="PaginationComponent"
+            :data-total="movies.total_pages"
+            :data-current="movies.current_page"
             :total_pages="movies.total_pages"
             :current_page="movies.current_page"
             @change-page="changePage"
