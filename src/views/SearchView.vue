@@ -2,9 +2,6 @@
 import FilterComponent from "@/components/filterComponent.vue";
 import MovieCardComponent from "@/components/movieCardComponent.vue";
 import PaginationComponent from "@/components/paginationComponent.vue";
-import SearchGenresComponent from "@/components/searchGenresComponent.vue";
-import SearchPlatformsComponent from "@/components/searchPlatformsComponent.vue";
-import SearchStarsComponent from "@/components/searchStarsComponent.vue";
 import {
   movieSearching,
   type searchData,
@@ -28,7 +25,6 @@ const langStore = useLangStore();
 const filtersOpen = ref(false);
 
 const activeFiltersCount = computed(() => {
-  // para mostrar cuántos filtros activos hay en el badge
   return (
     (route.query.genres?.length ?? 0) +
     (route.query.platforms?.length ?? 0) +
@@ -136,7 +132,6 @@ watch(
       </span>
     </button>
 
-    <!-- Drawer móvil -->
     <Drawer
       v-model:visible="filtersOpen"
       :header="t('search.filters')"
@@ -152,7 +147,6 @@ watch(
     </Drawer>
 
     <div class="content-layout">
-      <!-- Sidebar de filtros -->
       <aside class="desktop-only filters-sidebar">
         <FilterComponent
           @filter-genres="(genres: string[]) => updateRoute({ genres })"
@@ -164,7 +158,6 @@ watch(
         />
       </aside>
 
-      <!-- Contenido principal -->
       <div class="main-content">
         <div class="movies-grid">
           <div v-if="loading" class="loading-state">
@@ -365,7 +358,11 @@ watch(
 
 @media (min-width: 641px) {
   .mobile-only {
-    display: none;
+    display: none !important;
+  }
+
+  .filters-sidebar {
+    width: 150px;
   }
 
   .desktop-only {
@@ -378,6 +375,10 @@ watch(
     padding: 1.5rem;
   }
 
+  .filters-sidebar {
+    width: 200px;
+  }
+
   .movies-grid {
     grid-template-columns: repeat(4, 1fr);
   }
@@ -386,6 +387,10 @@ watch(
 @media (min-width: 1024px) {
   .page {
     padding: 2.5rem;
+  }
+
+  .filters-sidebar {
+    width: 250px;
   }
 
   .movies-grid {
@@ -400,7 +405,7 @@ watch(
 }
 
 .filters-sidebar {
-  width: 220px;
+  max-width: 250px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -411,6 +416,49 @@ watch(
 
 .main-content {
   flex: 1;
-  min-width: 0; /* evita overflow del grid */
+  min-width: 0;
+}
+
+.filters-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.6rem 1.1rem;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--secondary) 20%, transparent);
+  background: color-mix(in srgb, var(--background) 95%, var(--text));
+  color: var(--text);
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 1rem;
+}
+
+.filters-toggle:hover {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 5%, var(--background));
+  transform: translateY(-1px);
+}
+
+.filters-toggle .pi-sliders-h {
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+.filters-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 2rem;
+  background: var(--primary);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
 }
 </style>

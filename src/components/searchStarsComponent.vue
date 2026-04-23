@@ -41,6 +41,7 @@ watch(
 
 <style scoped>
 :deep(.p-checkbox-box) {
+  background: color-mix(in srgb, var(--background) 50%, transparent);
   border-radius: 8px !important;
   border: 2px solid var(--secondary) !important;
   transition: all 0.2s ease;
