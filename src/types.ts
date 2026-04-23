@@ -59,8 +59,7 @@ export interface MoviePagination {
   current_page: number;
 }
 
-
-interface Platform {
+export interface Platform {
   id: number;
   name: string;
   slug: string;
@@ -68,7 +67,7 @@ interface Platform {
   image: string;
 }
 
-interface Genre {
+export interface Genre {
   id: number;
   name: string;
   slug: string;
@@ -124,19 +123,6 @@ export interface FriendRequest {
 export interface Friendship {
   is_friend: boolean;
   status: string;
-}
-interface Platform {
-  id: number;
-  name: string;
-  slug: string;
-  url: null;
-  image: string;
-}
-
-interface Genre {
-  id: number;
-  name: string;
-  slug: string;
 }
 
 export interface Rating {

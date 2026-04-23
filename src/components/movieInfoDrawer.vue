@@ -16,14 +16,14 @@ const { t } = useI18n();
 const actors = ref<Person[]>([]);
 const directors = ref<Person[]>([]);
 const loading = ref(false);
-const actorsScroll = ref()
-const directorsScroll = ref()
-const hasDragged = ref(false)
+const actorsScroll = ref();
+const directorsScroll = ref();
+const hasDragged = ref(false);
 
 const fetchDetails = async (finalList: Ref<Person[]>, list: string[]) => {
   if (!list) return;
   finalList.value = [];
-  
+
   for (const element of list) {
     try {
       const { data } = await api.get(element);
@@ -59,56 +59,63 @@ watch(
 );
 
 function useDragScroll() {
-  const isDown = ref(false)
-  const startX = ref(0)
-  const scrollLeft = ref(0)
+  const isDown = ref(false);
+  const startX = ref(0);
+  const scrollLeft = ref(0);
 
   function onMouseDown(e: MouseEvent, el: HTMLElement) {
-    isDown.value = true
-    hasDragged.value = false
-    startX.value = e.pageX - el.offsetLeft
-    scrollLeft.value = el.scrollLeft
+    isDown.value = true;
+    hasDragged.value = false;
+    startX.value = e.pageX - el.offsetLeft;
+    scrollLeft.value = el.scrollLeft;
   }
 
   function onMouseMove(e: MouseEvent, el: HTMLElement) {
-    if (!isDown.value) return
-    e.preventDefault()
-    const x = e.pageX - el.offsetLeft
-    const walk = (x - startX.value) * 1.2
+    if (!isDown.value) return;
+    e.preventDefault();
+    const x = e.pageX - el.offsetLeft;
+    const walk = (x - startX.value) * 1.2;
 
     if (Math.abs(x - startX.value) > 5) {
-      hasDragged.value = true
+      hasDragged.value = true;
     }
 
-    el.scrollLeft = scrollLeft.value - walk
+    el.scrollLeft = scrollLeft.value - walk;
   }
 
-
   function onMouseUp() {
-    isDown.value = false
+    isDown.value = false;
   }
 
   function onClick(e: MouseEvent) {
     if (hasDragged.value) {
-      e.preventDefault()
-      e.stopPropagation()
+      e.preventDefault();
+      e.stopPropagation();
     }
   }
 
-
-  return { onMouseDown, onMouseMove, onMouseUp, onClick }
+  return { onMouseDown, onMouseMove, onMouseUp, onClick };
 }
 
-const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll()
-
+const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll();
 </script>
 
 <template>
-  <Drawer v-model:visible="visible" :modal="false" :dismissable="false" position="right"
-    class="movie-drawer !w-full md:!w-[40rem]">
+  <Drawer
+    v-model:visible="visible"
+    :modal="false"
+    :dismissable="false"
+    position="right"
+    class="movie-drawer !w-full md:!w-[40rem]"
+  >
     <template #header>
       <div class="drawer-header-inner">
-        <img v-if="movie.cover" :src="movie.cover" :alt="movie.title" class="drawer-poster" />
+        <img
+          v-if="movie.cover"
+          :src="movie.cover"
+          :alt="movie.title"
+          class="drawer-poster"
+        />
         <div class="drawer-title-block">
           <h2 class="drawer-title">{{ movie.title }}</h2>
           <span class="drawer-year">{{ movie.release_date }}</span>
@@ -119,31 +126,73 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll()
     <div v-if="loading" class="drawer-loading">
       <!-- Synopsis -->
       <div class="drawer-section">
-        <Skeleton width="30%" height="0.7rem" border-radius="4px" class="mb-3" />
-        <Skeleton width="100%" height="0.9rem" border-radius="4px" class="mb-2" />
-        <Skeleton width="100%" height="0.9rem" border-radius="4px" class="mb-2" />
+        <Skeleton
+          width="30%"
+          height="0.7rem"
+          border-radius="4px"
+          class="mb-3"
+        />
+        <Skeleton
+          width="100%"
+          height="0.9rem"
+          border-radius="4px"
+          class="mb-2"
+        />
+        <Skeleton
+          width="100%"
+          height="0.9rem"
+          border-radius="4px"
+          class="mb-2"
+        />
         <Skeleton width="75%" height="0.9rem" border-radius="4px" />
       </div>
 
       <!-- Platforms -->
       <div class="drawer-section">
-        <Skeleton width="25%" height="0.7rem" border-radius="4px" class="mb-3" />
+        <Skeleton
+          width="25%"
+          height="0.7rem"
+          border-radius="4px"
+          class="mb-3"
+        />
         <div class="inline-list">
-          <Skeleton v-for="n in 3" :key="n" width="52px" height="52px" border-radius="10px" />
+          <Skeleton
+            v-for="n in 3"
+            :key="n"
+            width="52px"
+            height="52px"
+            border-radius="10px"
+          />
         </div>
       </div>
 
       <!-- Genres -->
       <div class="drawer-section">
-        <Skeleton width="20%" height="0.7rem" border-radius="4px" class="mb-3" />
+        <Skeleton
+          width="20%"
+          height="0.7rem"
+          border-radius="4px"
+          class="mb-3"
+        />
         <div class="genre-list">
-          <Skeleton v-for="n in 4" :key="n" width="72px" height="1.6rem" border-radius="99px" />
+          <Skeleton
+            v-for="n in 4"
+            :key="n"
+            width="72px"
+            height="1.6rem"
+            border-radius="99px"
+          />
         </div>
       </div>
 
       <!-- Actors -->
       <div class="drawer-section">
-        <Skeleton width="22%" height="0.7rem" border-radius="4px" class="mb-3" />
+        <Skeleton
+          width="22%"
+          height="0.7rem"
+          border-radius="4px"
+          class="mb-3"
+        />
         <div class="inline-list">
           <div v-for="n in 4" :key="n" class="person-item">
             <Skeleton width="64px" height="64px" border-radius="50%" />
@@ -154,7 +203,12 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll()
 
       <!-- Directors -->
       <div class="drawer-section">
-        <Skeleton width="24%" height="0.7rem" border-radius="4px" class="mb-3" />
+        <Skeleton
+          width="24%"
+          height="0.7rem"
+          border-radius="4px"
+          class="mb-3"
+        />
         <div class="inline-list">
           <div v-for="n in 2" :key="n" class="person-item">
             <Skeleton width="64px" height="64px" border-radius="50%" />
@@ -183,11 +237,23 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll()
             )
           }}
         </h3>
-        <ScrollPanel class="horizontal-scroll-panel" :pt="{ content: { class: 'scroll-content' } }">
+        <ScrollPanel
+          class="horizontal-scroll-panel"
+          :pt="{ content: { class: 'scroll-content' } }"
+        >
           <div class="inline-list">
-            <div v-for="platform in movie.platforms" :key="platform.id" class="platform-item">
-              <img :src="platform.image ?? ''" :alt="platform.name" class="platform-item__img" />
-            </div>
+            <RouterLink
+              v-for="platform in movie.platforms"
+              :key="platform.id"
+              class="platform-item"
+              :to="`/search?platforms=${platform.slug}`"
+            >
+              ><img
+                :src="platform.image ?? ''"
+                :alt="platform.name"
+                class="platform-item__img"
+              />
+            </RouterLink>
           </div>
         </ScrollPanel>
       </section>
@@ -202,11 +268,16 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll()
             )
           }}
         </h3>
-        <div class="genre-list">
-          <span v-for="genre in movie.genres" :key="genre.id" class="genre-tag">
+        <RouterLink
+          class="genre-list"
+          v-for="genre in movie.genres"
+          :key="genre.id"
+          :to="`/search?genres=${genre.slug}`"
+        >
+          <span class="genre-tag">
             {{ genre.name }}
           </span>
-        </div>
+        </RouterLink>
       </section>
 
       <!-- Actors -->
@@ -219,12 +290,29 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll()
             )
           }}
         </h3>
-        <div class="scroll-container" ref="actorsScroll" @mousedown="onMouseDown($event, actorsScroll)"
-          @mousemove="onMouseMove($event, actorsScroll)" @mouseup="onMouseUp" @mouseleave="onMouseUp">
+        <div
+          class="scroll-container"
+          ref="actorsScroll"
+          @mousedown="onMouseDown($event, actorsScroll)"
+          @mousemove="onMouseMove($event, actorsScroll)"
+          @mouseup="onMouseUp"
+          @mouseleave="onMouseUp"
+        >
           <div class="inline-list">
-            <RouterLink v-for="actor in actors" :key="actor.id" class="person-item" :to="`/profiles/${actor.slug}`"
-              draggable="false" @click="onClick">
-              <img :src="actor.image" :alt="actor.name" class="person-item__img" draggable="false" />
+            <RouterLink
+              v-for="actor in actors"
+              :key="actor.id"
+              class="person-item"
+              :to="`/profiles/${actor.slug}`"
+              draggable="false"
+              @click="onClick"
+            >
+              <img
+                :src="actor.image"
+                :alt="actor.name"
+                class="person-item__img"
+                draggable="false"
+              />
               <span class="person-item__name">{{ actor.name }}</span>
             </RouterLink>
           </div>
@@ -241,12 +329,29 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll()
             )
           }}
         </h3>
-        <div class="scroll-container" ref="directorsScroll" @mousedown="onMouseDown($event, directorsScroll)"
-          @mousemove="onMouseMove($event, directorsScroll)" @mouseup="onMouseUp" @mouseleave="onMouseUp">
+        <div
+          class="scroll-container"
+          ref="directorsScroll"
+          @mousedown="onMouseDown($event, directorsScroll)"
+          @mousemove="onMouseMove($event, directorsScroll)"
+          @mouseup="onMouseUp"
+          @mouseleave="onMouseUp"
+        >
           <div class="inline-list">
-            <RouterLink v-for="director in directors" :key="director.id" class="person-item" :to="`/profiles/${director.slug}`"
-              draggable="false" @click="onClick">
-              <img :src="director.image" :alt="director.name" class="person-item__img" draggable="false" />
+            <RouterLink
+              v-for="director in directors"
+              :key="director.id"
+              class="person-item"
+              :to="`/profiles/${director.slug}`"
+              draggable="false"
+              @click="onClick"
+            >
+              <img
+                :src="director.image"
+                :alt="director.name"
+                class="person-item__img"
+                draggable="false"
+              />
               <span class="person-item__name">{{ director.name }}</span>
             </RouterLink>
           </div>
