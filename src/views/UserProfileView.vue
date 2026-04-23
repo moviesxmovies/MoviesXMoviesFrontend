@@ -352,7 +352,7 @@ watch(
                                 <div class="user-grid">
                                     <ReviewOnUserComponent v-for="review in reviews.results" :key="review.id"
                                         :review="review" />
-                                   <div :ref="(el) => { reviewsSentinelRef = el as HTMLElement }" class="sentinel" />
+                                    <div :ref="(el) => { reviewsSentinelRef = el as HTMLElement }" class="sentinel" />
                                     <div v-if="loadingReviews" class="loading-footer">
                                         <i class="pi pi-spin pi-spinner"></i>
                                     </div>
@@ -395,10 +395,11 @@ watch(
                         </AccordionHeader>
                         <AccordionContent v-if="moviesLists.results" class="section-body">
                             <div class="scroll-container">
-                                <div class="user-grid">
+                                <div class="movies-lists-grid">
                                     <MoviesListComponent v-for="movieList in moviesLists.results" :key="movieList.id"
                                         :movieList="movieList" />
-                                    <div :ref="(el) => { moviesListsSentinelRef = el as HTMLElement }" class="sentinel" />
+                                    <div :ref="(el) => { moviesListsSentinelRef = el as HTMLElement }"
+                                        class="sentinel" />
                                     <div v-if="loadingMoviesLists" class="loading-footer">
                                         <i class="pi pi-spin pi-spinner"></i>
                                     </div>
@@ -447,7 +448,8 @@ watch(
                             <div class="scroll-container">
                                 <FriendRequestComponent v-for="request in friendRequests.results" :key="request.id"
                                     :request="request" @accept="acceptFriendRequest" @decline="rejectFriendRequest" />
-                                <div :ref="(el) => { friendRequestsSentinelRef = el as HTMLElement }" class="sentinel" />
+                                <div :ref="(el) => { friendRequestsSentinelRef = el as HTMLElement }"
+                                    class="sentinel" />
                                 <div v-if="loadingRequests" class="loading-footer">
                                     <i class="pi pi-spin pi-spinner"></i>
                                 </div>
@@ -539,7 +541,8 @@ watch(
                             <div class="scroll-container">
                                 <FriendWithFollow v-for="friend in suggestedFriends.results" :key="friend.id"
                                     :user="friend" :onAddFriend="sendFriendRequest" />
-                                <div :ref="(el) => { suggestedFriendsSentinelRef = el as HTMLElement }" class="sentinel" />
+                                <div :ref="(el) => { suggestedFriendsSentinelRef = el as HTMLElement }"
+                                    class="sentinel" />
                                 <div v-if="loadingSuggestedFriends" class="loading-footer">
                                     <i class="pi pi-spin pi-spinner"></i>
                                 </div>
@@ -595,6 +598,13 @@ watch(
     padding: 1rem;
 }
 
+
+:deep(.movies-lists-grid) {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
 @media (min-width: 768px) {
     .page {
         padding: 1.5rem;
@@ -605,6 +615,7 @@ watch(
     .page {
         padding: 2.5rem;
     }
+
 }
 
 /* ── Layout ────────────────────────────────────────────── */
@@ -656,6 +667,10 @@ watch(
 @media (min-width: 1024px) {
     .layout {
         grid-template-columns: 1.5fr 3fr 1.5fr;
+    }
+
+    :deep(.movies-lists-grid) {
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 

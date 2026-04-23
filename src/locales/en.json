@@ -37,6 +37,9 @@
       "logout": "Logout",
       "profile": "My Profile"
     },
+    "movieList": {
+      "moviesCount": "{count} film | {count} films"
+    },
     "lists": {
       "public": "Public",
       "private": "Private",

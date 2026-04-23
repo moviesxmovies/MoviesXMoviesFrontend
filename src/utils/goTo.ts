@@ -7,3 +7,7 @@ export const goToMovie = (slug: string | undefined) => {
 export const goToUser = (username: string | undefined) => {
     router.push({ name: 'user-profile', params: { slug:username } });
 };
+
+export const goToMovieList = (slug: string | undefined) => {
+    router.push({ name: 'movie-list', params: { slug } });
+}
