@@ -1,11 +1,12 @@
 import { api } from "@/composables/useAPI";
+import TranslatedError from "@/exceptions/TranslatedError";
 
 export const getSelfUserProfile = async () => {
   try {
     const { data } = await api.get(`/users/`);
     return data;
   } catch (error: any) {
-    throw error;
+    throw new TranslatedError(error, error.response?.data?.status);
   }
 };
 
@@ -14,7 +15,7 @@ export const getUserProfile = async (slug: string) => {
     const { data } = await api.get(`/users/${slug}/`);
     return data;
   } catch (error: any) {
-    throw error;
+    throw new TranslatedError(error, error.response?.data?.status);
   }
 };
 
@@ -25,7 +26,7 @@ export const getPersonProfile = async (slug: string) => {
     const { data } = await api.get(`/persons/${slug}/`);
     return data;
   } catch (error: any) {
-    throw error;
+    throw new TranslatedError(error, error.response?.data?.status);
   }
 };
 
@@ -34,7 +35,7 @@ export const getPersonMovieListsFromMovie = async (slug: string) => {
     const { data } = await api.get(`/movies/${slug}/movie-lists/`);
     return data;
   } catch (error: any) {
-    throw error;
+    throw new TranslatedError(error, error.response?.data?.status);
   }
 };
 
@@ -47,7 +48,7 @@ export const getPersonFilmography = async (slug: string, type: 'acted' | 'direct
     });
     return data;
   } catch (error: any) {
-    throw error;
+    throw new TranslatedError(error, error.response?.data?.status);
   }
 };
 export const getUserReviews = async (slug: string, lastId?: number) => {
@@ -59,7 +60,7 @@ export const getUserReviews = async (slug: string, lastId?: number) => {
     });
     return data;
   } catch (error: any) {
-    throw error;
+    throw new TranslatedError(error, error.response?.data?.status);
   }
 };
 
@@ -72,7 +73,7 @@ export const getFriendsRequests = async (lastId?: number) => {
     });
     return data;
   } catch (error: any) {
-    throw error;
+    throw new TranslatedError(error, error.response?.data?.status);
   }
 };
 
@@ -86,6 +87,20 @@ export const completeFriendRequest = async (fromUsername: string, accept: boolea
       return data;
     }
   } catch (error: any) {
-    throw error;
+    throw new TranslatedError(error, error.response?.data?.status);
+  }
+};
+
+export const getUserFriends = async (slug: string, lastId?: number) => {
+  try {
+    const { data } = await api.get(`/users/${slug}/friends/`, {
+      params: {
+        last_id: lastId,
+      },
+    });
+    console.log(data);
+    return data;
+  } catch (error: any) {
+    throw new TranslatedError(error, error.response?.data?.status);
   }
 };

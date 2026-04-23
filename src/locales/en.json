@@ -251,6 +251,8 @@
     "no_reviews": "No reviews available.",
     "no_reviews_description": "This user has not written any reviews yet.",
     "no_friends_requests": "No requests available",
-    "no_friends_requests_description": "You don't have any pending friend requests"
+    "no_friends_requests_description": "You don't have any pending friend requests",
+    "no_friends": "No friends available",
+    "no_friends_description": "This user doesn't have any friends yet."
   }
 }

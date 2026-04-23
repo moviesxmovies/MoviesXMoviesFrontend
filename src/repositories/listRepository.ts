@@ -1,4 +1,5 @@
 import { api } from "@/composables/useAPI";
+import TranslatedError from "@/exceptions/TranslatedError";
 import i18n from "@/i18n";
 import type { CreateList, MovieList } from "@/types";
 
@@ -37,7 +38,7 @@ export const fetchUserLists = async (
     );
     return data;
   } catch (error: any) {
-    throw error;
+    throw new TranslatedError(error, error.response?.data?.status);
   }
 };
 
@@ -47,7 +48,7 @@ export const fetchMovieListsFromMovie = async (movieSlug: string) => {
     const { data } = await api.get(`/movies/${movieSlug}/movie-lists/`);
     return data;
   } catch (error: any) {
-    throw error;
+    throw new TranslatedError(error, error.response?.data?.status);
   }
 };
 
@@ -61,7 +62,7 @@ export const addMovieToList = async (
       `/movies-lists/${userSlug}/${movieListSlug}/${movieSlug}/`,
     );
   } catch (error: any) {
-    throw error;
+    throw new TranslatedError(error, error.response?.data?.status);
   }
 };
 
@@ -75,7 +76,7 @@ export const removeMovieFromList = async (
       `/movies-lists/${userSlug}/${movieListSlug}/${movieSlug}/`,
     );
   } catch (error: any) {
-    throw error;
+    throw new TranslatedError(error, error.response?.data?.status);
   }
 };
 
@@ -84,6 +85,6 @@ export const createList = async (list: CreateList) => {
     const data = await api.post("/movies-lists/", list);
     return data;
   } catch (error: any) {
-    throw error;
+    throw new TranslatedError(error, error.response?.data?.status);
   }
 };

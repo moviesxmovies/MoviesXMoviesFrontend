@@ -17,12 +17,14 @@ import { Form, FormField, type FormSubmitEvent } from "@primevue/forms";
 import { zodResolver } from "@primevue/forms/resolvers/zod";
 import { loginSchema } from "@/schemas/loginSchema";
 import { useRouter } from "vue-router";
+import { useLangStore } from "@/stores/langStore";
 
 const { t } = useI18n();
 const resolver = zodResolver(loginSchema);
 const loading = ref(false);
 const toast = useToast();
 const router = useRouter();
+const langStore = useLangStore();
 
 const login = async ({
   valid,
@@ -32,7 +34,7 @@ const login = async ({
 
   loading.value = true;
   try {
-    await handleLogin(values as LoginPayload);
+    await handleLogin(values as LoginPayload, langStore.language);
     toast.add({
       severity: "success",
       summary: "Success",
@@ -44,7 +46,7 @@ const login = async ({
     toast.add({
       severity: "error",
       summary: "Error",
-      detail: error.response?.data?.detail,
+      detail: error.translatedMessage,
       life: 5000,
     });
   } finally {

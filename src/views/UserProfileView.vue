@@ -4,7 +4,8 @@ import {
     getUserProfile,
     getUserReviews,
     getFriendsRequests,
-    completeFriendRequest
+    completeFriendRequest,
+    getUserFriends
 } from "@/repositories/userRepository";
 import type { DynamicPagination, FriendRequest, Review, User } from "@/types";
 import {
@@ -23,17 +24,22 @@ import { useAuthStore } from "@/stores/authStore";
 import FriendRequestComponent from "@/components/friendRequestComponent.vue";
 import ReviewOnUserComponent from "@/components/reviewOnUserComponent.vue";
 import { useNotificationsStore } from "@/stores/notificationStore";
+import FriendWithFollow from "@/components/friendWithFollow.vue";
+import FriendshipStatusComponent from "@/components/friendshipStatusComponent.vue";
+import type TranslatedError from "@/exceptions/TranslatedError";
 
 const route = useRoute();
 const user = ref<User>({} as User);
 const loadingProfile = ref<boolean>(false);
 const loadingReviews = ref<boolean>(false);
 const loadingRequests = ref<boolean>(false);
+const loadingFriends = ref<boolean>(false);
 const toast = useToast();
 const { t } = useI18n();
 const router = useRouter();
 const reviews = ref<DynamicPagination<Review>>({} as DynamicPagination<Review>);
 const friendRequests = ref<DynamicPagination<FriendRequest>>({} as DynamicPagination<FriendRequest>);
+const friends = ref<DynamicPagination<User>>({} as DynamicPagination<User>);
 const langStore = useLangStore();
 const authStore = useAuthStore();
 const isSelfProfile = ref<boolean>(false);
@@ -111,6 +117,26 @@ const fetchUserFriendRequests = async (lastId?: number) => {
         loadingRequests.value = false;
     }
 }
+const fetchUserFriends = async (lastId?: number) => {
+    loadingFriends.value = true;
+    try {
+        const data = await getUserFriends(user.value.username, lastId);
+        if (!friends.value.results) {
+            friends.value = data;
+            return;
+        }
+        friends.value.results.push(...data.results);
+        friends.value.next_last_id = data.next_last_id;
+    } catch (error: any) {
+        toast.add({
+            severity: "error",
+            summary: t("toast.error"),
+            detail: error.response?.data?.message || t("user.error.fetchingFriends"),
+        });
+    } finally {
+        loadingFriends.value = false;
+    }
+};
 const acceptFriendRequest = async (username: string) => {
     try {
         await completeFriendRequest(username, true);
@@ -151,6 +177,25 @@ const rejectFriendRequest = async (username: string) => {
     }
 };
 
+const sendFriendRequest = async (username: string) => {
+    console.log("Sending friend request to", username);
+    try {
+        await completeFriendRequest(username, true);
+        toast.add({
+            severity: "success",
+            summary: t("toast.success"),
+            detail: t("user.friendRequestSent"),
+        });
+    } catch (error: any) {
+        toast.add({
+            severity: "error",
+            summary: t("toast.error"),
+            detail: error.translatedMessage
+        });
+        throw error;
+    }
+};
+
 
 const { sentinelRef: reviewsSentinelRef } = useInfiniteScroll(async () => {
     if (loadingReviews.value) return;
@@ -167,18 +212,26 @@ const { sentinelRef: friendRequestsSentinelRef } = useInfiniteScroll(async () =>
     if (lastId) await fetchUserFriendRequests(lastId);
     loadingRequests.value = false;
 });
-
+const { sentinelRef: friendsSentinelRef } = useInfiniteScroll(async () => {
+    if (loadingFriends.value) return;
+    loadingFriends.value = true;
+    const lastId = friends.value.next_last_id;
+    if (lastId) await fetchUserFriends(lastId);
+    loadingFriends.value = false;
+});
 
 watch(
     () => [route.params.slug, langStore.language],
     async () => {
         reviews.value = {} as DynamicPagination<Review>;
         friendRequests.value = {} as DynamicPagination<FriendRequest>;
+        friends.value = {} as DynamicPagination<User>;
         isSelfProfile.value = false;
         await Promise.all([
             await fetchUserProfile(),
             fetchUserFriendRequests(),
             fetchUserReviews(),
+            fetchUserFriends(),
         ]);
     }, { immediate: true }
 );
@@ -200,6 +253,7 @@ watch(
                         <button v-if="isSelfProfile" @click="editProfileModalVisible = true" class="btn-edit">
                             {{ $t("user.editProfile") }}
                         </button>
+                        <FriendshipStatusComponent v-else :user="user" :onAddFriend="sendFriendRequest" />
                     </div>
 
                 </div>
@@ -264,10 +318,13 @@ watch(
                         </AccordionContent>
                     </AccordionPanel>
                 </Accordion>
+                <!-- MOVIES LISTS -->
 
             </div>
-            <div v-if="isSelfProfile" class="content friends-section">
-                <Accordion :value="1">
+            <!-- FRIENDS SECTION -->
+            <div class="content friends-section">
+                <!-- FRIEND REQUESTS -->
+                <Accordion :value="1" v-if="isSelfProfile">
                     <AccordionPanel :value="1" v-if="friendRequests.results?.length" class="section">
                         <AccordionHeader class="section-header">
                             <i class="pi pi-users primary-icon" />
@@ -311,6 +368,54 @@ watch(
                         </AccordionContent>
                     </AccordionPanel>
                 </Accordion>
+
+                <!-- FRIENDS -->
+                <Accordion>
+                    <AccordionPanel :value="1" v-if="friends.results?.length" class="section">
+                        <AccordionHeader class="section-header">
+                            <i class="pi pi-users primary-icon" />
+                            <h2 class="section-title">
+                                {{ t("user.friends") }}
+                            </h2>
+                        </AccordionHeader>
+                        <AccordionContent v-if="friends.results" class="section-body">
+                            <div class="scroll-container">
+                                <FriendWithFollow v-for="friend in friends.results" :key="friend.id" :user="friend"
+                                    :isSelfUser="isSelfProfile" :onAddFriend="sendFriendRequest" />
+                                <div :ref="friendsSentinelRef as any" class="sentinel" />
+                                <div v-if="loadingFriends" class="loading-footer">
+                                    <i class="pi pi-spin pi-spinner"></i>
+                                </div>
+                            </div>
+                        </AccordionContent>
+                    </AccordionPanel>
+
+                    <AccordionPanel :value="2" v-if="!friends.results?.length" class="section">
+                        <AccordionHeader class="section-header">
+                            <i class="pi pi-users primary-icon" />
+                            <h2 class="section-title">
+                                {{ t("user.friends") }}
+                            </h2>
+                        </AccordionHeader>
+                        <AccordionContent
+                            class="bg-secondary/5 rounded-[2rem] p-10 md:p-20 border-2 border-dashed border-secondary/40">
+                            <div class="flex flex-col items-center justify-center text-center">
+                                <div
+                                    class="w-20 h-20 bg-secondary/10 rounded-full flex items-center justify-center mb-4">
+                                    <i class="pi pi-users text-3xl text-secondary"></i>
+                                </div>
+                                <h3 class="text-xl font-semibold opacity-70">
+                                    {{ t("user.no_friends") }}
+                                </h3>
+                                <p class="text-sm opacity-50 max-w-xs mx-auto">
+                                    {{ t("user.no_friends_description") }}
+                                </p>
+                            </div>
+                        </AccordionContent>
+                    </AccordionPanel>
+                </Accordion>
+
+                <!-- SUGGESTED FRIENDS -->
 
             </div>
         </div>
@@ -534,6 +639,9 @@ watch(
     max-height: 350px;
     overflow-y: auto;
     padding-right: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
 .scroll-container::-webkit-scrollbar {

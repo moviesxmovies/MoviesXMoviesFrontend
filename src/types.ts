@@ -121,7 +121,7 @@ export interface FriendRequest {
   to_user: string;
   status: string;
 }
-interface Friendship {
+export interface Friendship {
   is_friend: boolean;
   status: string;
 }
