@@ -31,9 +31,9 @@ watch(
       :value="star"
       @change="emit('filterStars', selectedStars)"
     />
-    <div class="star-label">
+    <label :for="String(star)" class="star-label">
       <i v-for="n in Number(star)" :key="n" class="pi pi-star-fill" />
-    </div>
+    </label>
   </div>
 </template>
 

@@ -3,31 +3,66 @@ import { useI18n } from "vue-i18n";
 import SearchGenresComponent from "./searchGenresComponent.vue";
 import SearchPlatformsComponent from "./searchPlatformsComponent.vue";
 import SearchStarsComponent from "./searchStarsComponent.vue";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionHeader,
+  AccordionPanel,
+} from "primevue";
 
 const { t } = useI18n();
 const emit = defineEmits(["filterGenres", "filterPlatforms", "filterStars"]);
 </script>
 
 <template>
-  <div class="filters-content">
-    <div class="filter-group">
-      <span class="filter-label">{{ t("components.filter.genres") }}</span>
-      <SearchGenresComponent @filter-genres="emit('filterGenres', $event)" />
-    </div>
-    <div class="filter-group">
-      <span class="filter-label">{{ t("components.filter.platforms") }}</span>
-      <SearchPlatformsComponent
-        @filter-platforms="emit('filterPlatforms', $event)"
-      />
-    </div>
-    <div class="filter-group">
-      <span class="filter-label">{{ t("components.filter.stars") }}</span>
-      <SearchStarsComponent @filter-stars="emit('filterStars', $event)" />
-    </div>
-  </div>
+  <Accordion class="filters-content" multiple :value="['0', '1', '2']">
+    <AccordionPanel value="0" class="filter-group">
+      <AccordionHeader class="filter-label">{{
+        t("components.filter.genres")
+      }}</AccordionHeader>
+      <AccordionContent>
+        <SearchGenresComponent @filter-genres="emit('filterGenres', $event)" />
+      </AccordionContent>
+    </AccordionPanel>
+    <AccordionPanel value="1" class="filter-group">
+      <AccordionHeader class="filter-label">{{
+        t("components.filter.platforms")
+      }}</AccordionHeader>
+      <AccordionContent>
+        <SearchPlatformsComponent
+          @filter-platforms="emit('filterPlatforms', $event)"
+        />
+      </AccordionContent>
+    </AccordionPanel>
+    <AccordionPanel value="2" class="filter-group">
+      <AccordionHeader class="filter-label">{{
+        t("components.filter.stars")
+      }}</AccordionHeader>
+      <AccordionContent>
+        <SearchStarsComponent @filter-stars="emit('filterStars', $event)" />
+      </AccordionContent>
+    </AccordionPanel>
+  </Accordion>
 </template>
 
 <style scoped>
+:deep(.p-accordion),
+:deep(.p-accordionpanel),
+:deep(.p-accordionheader),
+:deep(.p-accordioncontent-content) {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+}
+
+:deep(.p-accordionheader:hover),
+:deep(.p-accordionheader:focus-visible),
+:deep(.p-accordionpanel-active .p-accordionheader) {
+  color: var(--text) !important;
+}
+
 .filters-content {
   display: flex;
   flex-direction: column;
