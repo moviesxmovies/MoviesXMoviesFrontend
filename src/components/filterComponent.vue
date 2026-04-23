@@ -11,17 +11,17 @@ const emit = defineEmits(["filterGenres", "filterPlatforms", "filterStars"]);
 <template>
   <div class="filters-content">
     <div class="filter-group">
-      <span class="filter-label">{{ t("search.genres") }}</span>
+      <span class="filter-label">{{ t("components.filter.genres") }}</span>
       <SearchGenresComponent @filter-genres="emit('filterGenres', $event)" />
     </div>
     <div class="filter-group">
-      <span class="filter-label">{{ t("search.platforms") }}</span>
+      <span class="filter-label">{{ t("components.filter.platforms") }}</span>
       <SearchPlatformsComponent
         @filter-platforms="emit('filterPlatforms', $event)"
       />
     </div>
     <div class="filter-group">
-      <span class="filter-label">{{ t("search.stars") }}</span>
+      <span class="filter-label">{{ t("components.filter.stars") }}</span>
       <SearchStarsComponent @filter-stars="emit('filterStars', $event)" />
     </div>
   </div>
@@ -48,7 +48,6 @@ const emit = defineEmits(["filterGenres", "filterPlatforms", "filterStars"]);
   color: color-mix(in srgb, var(--text) 40%, transparent);
 }
 
-/* Inputs del MultiSelect */
 :deep(.p-multiselect) {
   background: color-mix(in srgb, var(--background) 95%, var(--text)) !important;
   border: 1px solid color-mix(in srgb, var(--secondary) 20%, transparent) !important;
@@ -80,7 +79,6 @@ const emit = defineEmits(["filterGenres", "filterPlatforms", "filterStars"]);
   color: color-mix(in srgb, var(--text) 35%, transparent) !important;
 }
 
-/* Chips de selección */
 :deep(.p-chip) {
   background: color-mix(in srgb, var(--primary) 15%, transparent) !important;
   color: var(--primary) !important;
@@ -99,7 +97,6 @@ const emit = defineEmits(["filterGenres", "filterPlatforms", "filterStars"]);
   opacity: 1;
 }
 
-/* Dropdown del MultiSelect */
 :deep(.p-multiselect-overlay) {
   background: var(--background) !important;
   border: 1px solid color-mix(in srgb, var(--secondary) 20%, transparent) !important;

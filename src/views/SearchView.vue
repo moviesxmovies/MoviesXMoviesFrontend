@@ -67,7 +67,7 @@ const searchMovies = async (data: searchData) => {
     toast.add({
       severity: "error",
       summary: t("toast.error"),
-      detail: error.response?.data?.message || t("search.error.searchMovies"),
+      detail: error.response?.data?.message || t("search.searchMoviesError"),
     });
   } finally {
     loading.value = false;
@@ -404,16 +404,6 @@ watch(
   align-items: flex-start;
 }
 
-.filters-sidebar {
-  max-width: 250px;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  position: sticky;
-  top: 1.5rem;
-}
-
 .main-content {
   flex: 1;
   min-width: 0;
@@ -460,5 +450,17 @@ watch(
   font-size: 0.7rem;
   font-weight: 700;
   line-height: 1;
+}
+
+.filters-sidebar {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: sticky;
+  top: 1.5rem;
+  border: 1px solid var(--secondary);
+  border-radius: 1.25rem;
+  padding: 1.25rem;
 }
 </style>

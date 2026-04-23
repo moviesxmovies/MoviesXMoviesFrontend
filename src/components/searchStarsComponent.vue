@@ -1,14 +1,12 @@
 <script lang="ts" setup>
 import { Checkbox } from "primevue";
 import { ref, watch } from "vue";
-import { useI18n } from "vue-i18n";
 import { useRoute } from "vue-router";
 
 const selectedStars = ref<string[]>([]);
 const route = useRoute();
 const STARS = ["1", "2", "3", "4", "5"];
 const emit = defineEmits(["filterStars"]);
-const { t } = useI18n();
 
 watch(
   () => route.query.stars,

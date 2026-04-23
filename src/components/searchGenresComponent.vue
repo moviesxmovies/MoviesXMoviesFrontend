@@ -25,7 +25,7 @@ const getGenres = async () => {
       severity: "error",
       summary: t("toast.error"),
       detail:
-        error.response?.data?.message || t("components.searchGenres.getGenres"),
+        error.response?.data?.message || t("components.searchGenres.getGenresError"),
     });
   } finally {
     isLoading.value = false;
@@ -60,7 +60,7 @@ watch(
       :placeholder="
         t(
           isLoading
-            ? 'components.searchGenres.loading'
+            ? 'loading'
             : 'components.searchGenres.genres',
         )
       "

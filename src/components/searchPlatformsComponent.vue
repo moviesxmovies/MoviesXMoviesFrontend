@@ -24,7 +24,7 @@ const getPlatforms = async () => {
       summary: t("toast.error"),
       detail:
         error.response?.data?.message ||
-        t("components.searchPlatforms.getPlatforms"),
+        t("components.searchPlatforms.getPlatformsError"),
     });
   } finally {
     isLoading.value = false;
@@ -59,7 +59,7 @@ watch(
       :placeholder="
         t(
           isLoading
-            ? 'components.searchPlatforms.loading'
+            ? 'loading'
             : 'components.searchPlatforms.platforms',
         )
       "
