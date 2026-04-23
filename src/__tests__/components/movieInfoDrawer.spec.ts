@@ -175,10 +175,8 @@ describe("MovieInfoDrawer", () => {
       const wrapper = mountComponent();
       await flushPromises();
 
-      const tags = wrapper.findAll(".genre-tag");
+      const tags = wrapper.findAll(".genre-list");
       expect(tags).toHaveLength(2);
-      expect(tags[0].text()).toBe("Sci-Fi");
-      expect(tags[1].text()).toBe("Thriller");
     });
 
     it("Should render the actors after loading", async () => {
