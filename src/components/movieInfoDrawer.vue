@@ -248,8 +248,8 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll();
               class="platform-item"
               :to="`/search?platforms=${platform.slug}`"
             >
-              ><img
-                :src="platform.image ?? ''"
+              <img
+                :src="platform.image"
                 :alt="platform.name"
                 class="platform-item__img"
               />
@@ -268,16 +268,16 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll();
             )
           }}
         </h3>
-        <RouterLink
-          class="genre-list"
-          v-for="genre in movie.genres"
-          :key="genre.id"
-          :to="`/search?genres=${genre.slug}`"
-        >
-          <span class="genre-tag">
+        <div class="genre-list">
+          <RouterLink
+            v-for="genre in movie.genres"
+            :key="genre.id"
+            :to="`/search?genres=${genre.slug}`"
+            class="genre-tag"
+          >
             {{ genre.name }}
-          </span>
-        </RouterLink>
+          </RouterLink>
+        </div>
       </section>
 
       <!-- Actors -->

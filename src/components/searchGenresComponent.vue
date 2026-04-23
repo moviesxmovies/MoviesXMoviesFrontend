@@ -25,7 +25,7 @@ const getGenres = async () => {
       severity: "error",
       summary: t("toast.error"),
       detail:
-        error.response?.data?.message || t("components.searchGenres.getGenres"),
+        error.response?.data?.message || t("components.searchGenres.getGenresError"),
     });
   } finally {
     isLoading.value = false;
@@ -51,19 +51,21 @@ watch(
     <MultiSelect
       v-model="selectedGenres"
       :loading="isLoading"
+      :disabled="isLoading"
       display="chip"
+      :appendTo="'self'"
       :options="genres"
       optionLabel="name"
       filter
       :placeholder="
         t(
           isLoading
-            ? 'components.searchGenres.loading'
+            ? 'loading'
             : 'components.searchGenres.genres',
         )
       "
       :maxSelectedLabels="99"
-      class="w-full md:w-80"
+      class="w-full multiselect-expandable"
       @change="
         emit(
           'filterGenres',
@@ -73,3 +75,59 @@ watch(
     />
   </div>
 </template>
+
+<style scoped>
+:deep(.p-multiselect-overlay) {
+  background: var(--background) !important;
+  border: 1px solid color-mix(in srgb, var(--secondary) 20%, transparent) !important;
+  border-radius: 1.25rem !important;
+}
+
+:deep(.p-multiselect-overlay .p-checkbox .p-checkbox-box) {
+  background: var(--background) !important;
+  border-color: color-mix(
+    in srgb,
+    var(--secondary) 40%,
+    transparent
+  ) !important;
+  border-radius: 6px !important;
+}
+
+:deep(.p-multiselect-filter) {
+  background: color-mix(in srgb, var(--background) 95%, var(--text)) !important;
+  border: 1px solid color-mix(in srgb, var(--secondary) 20%, transparent) !important;
+  border-radius: 0.75rem !important;
+  color: var(--text) !important;
+}
+
+:deep(.p-multiselect-filter:focus) {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 1px var(--primary) !important;
+}
+
+:deep(.p-multiselect-option) {
+  color: var(--text) !important;
+  border-radius: 0.5rem !important;
+  transition: all 0.2s ease;
+}
+
+:deep(.p-multiselect-option:hover) {
+  background: color-mix(in srgb, var(--primary) 10%, transparent) !important;
+}
+
+:deep(.p-multiselect-option.p-selected) {
+  background: color-mix(in srgb, var(--primary) 15%, transparent) !important;
+  color: var(--primary) !important;
+}
+
+:deep(.p-multiselect-option.p-selected .p-checkbox .p-checkbox-box) {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+}
+
+:deep(
+  .p-multiselect-option.p-selected .p-checkbox .p-checkbox-box .p-checkbox-icon
+) {
+  color: white !important;
+}
+</style>
