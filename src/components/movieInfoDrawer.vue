@@ -4,7 +4,7 @@ import { Drawer, ScrollPanel, Skeleton, useToast } from "primevue";
 import { ref, watch, type Ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { api } from "@/composables/useAPI";
-import { RouterLink, useRouter } from "vue-router";
+import { RouterLink } from "vue-router";
 
 const props = defineProps<{
   movie: Movie;
@@ -269,13 +269,16 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll();
             )
           }}
         </h3>
-        <div class="genre-list">
-          <span v-for="genre in movie.genres" :key="genre.id" class="genre-tag">
-            <RouterLink :to="`/search?genres=${genre.slug}`">
-              {{ genre.name }}
-            </RouterLink>
+        <RouterLink
+          class="genre-list"
+          v-for="genre in movie.genres"
+          :key="genre.id"
+          :to="`/search?genres=${genre.slug}`"
+        >
+          <span class="genre-tag">
+            {{ genre.name }}
           </span>
-        </div>
+        </RouterLink>
       </section>
 
       <!-- Actors -->
