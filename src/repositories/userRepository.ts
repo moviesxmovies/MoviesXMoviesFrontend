@@ -51,11 +51,12 @@ export const getPersonFilmography = async (slug: string, type: 'acted' | 'direct
     throw new TranslatedError(error, error.response?.data?.status);
   }
 };
-export const getUserReviews = async (slug: string, lastId?: number) => {
+export const getUserReviews = async (slug: string, lastId?: number, limit: number = 5) => {
   try {
     const { data } = await api.get(`/users/${slug}/reviews/`, {
       params: {
         last_id: lastId,
+        limit: limit,
       },
     });
     return data;
@@ -64,11 +65,12 @@ export const getUserReviews = async (slug: string, lastId?: number) => {
   }
 };
 
-export const getFriendsRequests = async (lastId?: number) => {
+export const getFriendsRequests = async (lastId?: number, limit: number = 5) => {
   try {
     const { data } = await api.get(`/users/friend-requests/`, {
       params: {
         last_id: lastId,
+        limit: limit,
       },
     });
     return data;
@@ -91,26 +93,40 @@ export const completeFriendRequest = async (fromUsername: string, accept: boolea
   }
 };
 
-export const getUserFriends = async (slug: string, lastId?: number) => {
+export const getUserFriends = async (slug: string, lastId?: number, limit: number = 5) => {
   try {
     const { data } = await api.get(`/users/${slug}/friends/`, {
       params: {
         last_id: lastId,
+        limit: limit,
       },
     });
-    console.log(data);
+    return data;
+  } catch (error: any) {
+    throw new TranslatedError(error, error.response?.data?.status);
+  }
+};
+export const getUserMoviesLists = async (slug: string, lastId?: number, limit: number = 6) => {
+  try {
+    const { data } = await api.get(`/movies-lists/${slug}/`, {
+      params: {
+        last_id: lastId,
+        limit: limit,
+      },
+    });
     return data;
   } catch (error: any) {
     throw new TranslatedError(error, error.response?.data?.status);
   }
 };
 
-export const getSuggestedFriends = async (slug: string, lastId?: number) => {
+export const getSuggestedFriends = async (slug: string, lastId?: number, limit: number = 5) => {
   try {
     const { data } = await api.get(`/users/suggested-users/`, {
       params: {
         last_id: lastId,
         recomender_for: slug,
+        limit: limit,
       },
     });
     return data;

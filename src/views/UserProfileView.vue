@@ -7,8 +7,9 @@ import {
     completeFriendRequest,
     getUserFriends,
     getSuggestedFriends,
+    getUserMoviesLists
 } from "@/repositories/userRepository";
-import type { DynamicPagination, FriendRequest, Review, User } from "@/types";
+import type { DynamicPagination, FriendRequest, MovieList, Review, User } from "@/types";
 import {
     Accordion,
     AccordionContent,
@@ -27,6 +28,7 @@ import ReviewOnUserComponent from "@/components/reviewOnUserComponent.vue";
 import { useNotificationsStore } from "@/stores/notificationStore";
 import FriendWithFollow from "@/components/friendWithFollow.vue";
 import FriendshipStatusComponent from "@/components/friendshipStatusComponent.vue";
+import MoviesListComponent from "@/components/moviesListComponent.vue";
 
 const route = useRoute();
 const user = ref<User>({} as User);
@@ -35,6 +37,7 @@ const loadingReviews = ref<boolean>(false);
 const loadingRequests = ref<boolean>(false);
 const loadingFriends = ref<boolean>(false);
 const loadingSuggestedFriends = ref<boolean>(false);
+const loadingMoviesLists = ref<boolean>(false);
 const toast = useToast();
 const { t } = useI18n();
 const router = useRouter();
@@ -42,6 +45,7 @@ const reviews = ref<DynamicPagination<Review>>({} as DynamicPagination<Review>);
 const friendRequests = ref<DynamicPagination<FriendRequest>>({} as DynamicPagination<FriendRequest>);
 const friends = ref<DynamicPagination<User>>({} as DynamicPagination<User>);
 const suggestedFriends = ref<DynamicPagination<User>>({} as DynamicPagination<User>);
+const moviesLists = ref<DynamicPagination<any>>({} as DynamicPagination<any>);
 const langStore = useLangStore();
 const authStore = useAuthStore();
 const isSelfProfile = ref<boolean>(false);
@@ -144,7 +148,6 @@ const fetchSuggestedFriends = async (lastId?: number) => {
     loadingSuggestedFriends.value = true;
     try {
         const data = await getSuggestedFriends(user.value.username, lastId);
-        suggestedFriends.value = data;
         if (!suggestedFriends.value.results) {
             suggestedFriends.value = data;
             return;
@@ -159,6 +162,27 @@ const fetchSuggestedFriends = async (lastId?: number) => {
         });
     } finally {
         loadingSuggestedFriends.value = false;
+    }
+};
+const fetchMoviesLists = async (lastId?: number) => {
+    loadingMoviesLists.value = true;
+    try {
+        const data = await getUserMoviesLists(user.value.username, lastId);
+        if (!moviesLists.value.results) {
+            moviesLists.value = data;
+            return;
+        }
+        moviesLists.value.results.push(...data.results);
+        console.log("Fetched movies lists:", moviesLists.value.results);
+        moviesLists.value.next_last_id = data.next_last_id;
+    } catch (error: any) {
+        toast.add({
+            severity: "error",
+            summary: t("toast.error"),
+            detail: error.translatedMessage
+        });
+    } finally {
+        loadingMoviesLists.value = false;
     }
 };
 const acceptFriendRequest = async (username: string) => {
@@ -202,7 +226,6 @@ const rejectFriendRequest = async (username: string) => {
 };
 
 const sendFriendRequest = async (username: string) => {
-    console.log("Sending friend request to", username);
     try {
         await completeFriendRequest(username, true);
         toast.add({
@@ -243,6 +266,20 @@ const { sentinelRef: friendsSentinelRef } = useInfiniteScroll(async () => {
     if (lastId) await fetchUserFriends(lastId);
     loadingFriends.value = false;
 });
+const { sentinelRef: suggestedFriendsSentinelRef } = useInfiniteScroll(async () => {
+    if (loadingSuggestedFriends.value) return;
+    loadingSuggestedFriends.value = true;
+    const lastId = suggestedFriends.value.next_last_id;
+    if (lastId) await fetchSuggestedFriends(lastId);
+    loadingSuggestedFriends.value = false;
+});
+const { sentinelRef: moviesListsSentinelRef } = useInfiniteScroll(async () => {
+    if (loadingMoviesLists.value) return;
+    loadingMoviesLists.value = true;
+    const lastId = moviesLists.value.next_last_id;
+    if (lastId) await fetchMoviesLists(lastId);
+    loadingMoviesLists.value = false;
+});
 
 watch(
     () => [route.params.slug, langStore.language],
@@ -251,6 +288,7 @@ watch(
         friendRequests.value = {} as DynamicPagination<FriendRequest>;
         friends.value = {} as DynamicPagination<User>;
         suggestedFriends.value = {} as DynamicPagination<User>;
+        moviesLists.value = {} as DynamicPagination<MovieList>;
         isSelfProfile.value = false;
 
         await Promise.all([
@@ -258,7 +296,8 @@ watch(
             fetchUserFriendRequests(),
             fetchUserReviews(),
             fetchUserFriends(),
-            fetchSuggestedFriends()
+            fetchSuggestedFriends(),
+            fetchMoviesLists()
         ]);
     }, { immediate: true }
 );
@@ -313,7 +352,7 @@ watch(
                                 <div class="user-grid">
                                     <ReviewOnUserComponent v-for="review in reviews.results" :key="review.id"
                                         :review="review" />
-                                    <div :ref="reviewsSentinelRef as any" class="sentinel" />
+                                   <div :ref="(el) => { reviewsSentinelRef = el as HTMLElement }" class="sentinel" />
                                     <div v-if="loadingReviews" class="loading-footer">
                                         <i class="pi pi-spin pi-spinner"></i>
                                     </div>
@@ -346,6 +385,51 @@ watch(
                     </AccordionPanel>
                 </Accordion>
                 <!-- MOVIES LISTS -->
+                <Accordion>
+                    <AccordionPanel value="0" v-if="moviesLists.results?.length" class="section">
+                        <AccordionHeader class="section-header">
+                            <i class="pi pi-folder accent-icon" />
+                            <h2 class="section-title">
+                                {{ t("user.movies_lists") }}
+                            </h2>
+                        </AccordionHeader>
+                        <AccordionContent v-if="moviesLists.results" class="section-body">
+                            <div class="scroll-container">
+                                <div class="user-grid">
+                                    <MoviesListComponent v-for="movieList in moviesLists.results" :key="movieList.id"
+                                        :movieList="movieList" />
+                                    <div :ref="(el) => { moviesListsSentinelRef = el as HTMLElement }" class="sentinel" />
+                                    <div v-if="loadingMoviesLists" class="loading-footer">
+                                        <i class="pi pi-spin pi-spinner"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </AccordionContent>
+                    </AccordionPanel>
+                    <AccordionPanel v-else value="1" class="section">
+                        <AccordionHeader class="section-header">
+                            <i class="pi pi-folder accent-icon" />
+                            <h2 class="section-title">
+                                {{ t("user.movies_lists") }}
+                            </h2>
+                        </AccordionHeader>
+                        <AccordionContent
+                            class="bg-secondary/5 rounded-[2rem] p-10 md:p-20 border-2 border-dashed border-secondary/40">
+                            <div class="flex flex-col items-center justify-center text-center">
+                                <div
+                                    class="w-20 h-20 bg-secondary/10 rounded-full flex items-center justify-center mb-4">
+                                    <i class="pi pi-folder text-3xl text-secondary"></i>
+                                </div>
+                                <h3 class="text-xl font-semibold opacity-70">
+                                    {{ t("user.no_movies_lists") }}
+                                </h3>
+                                <p class="text-sm opacity-50 max-w-xs mx-auto">
+                                    {{ t("user.no_movies_lists_description") }}
+                                </p>
+                            </div>
+                        </AccordionContent>
+                    </AccordionPanel>
+                </Accordion>
 
             </div>
             <!-- FRIENDS SECTION -->
@@ -363,7 +447,7 @@ watch(
                             <div class="scroll-container">
                                 <FriendRequestComponent v-for="request in friendRequests.results" :key="request.id"
                                     :request="request" @accept="acceptFriendRequest" @decline="rejectFriendRequest" />
-                                <div :ref="friendRequestsSentinelRef as any" class="sentinel" />
+                                <div :ref="(el) => { friendRequestsSentinelRef = el as HTMLElement }" class="sentinel" />
                                 <div v-if="loadingRequests" class="loading-footer">
                                     <i class="pi pi-spin pi-spinner"></i>
                                 </div>
@@ -409,7 +493,7 @@ watch(
                             <div class="scroll-container">
                                 <FriendWithFollow v-for="friend in friends.results" :key="friend.id" :user="friend"
                                     :isSelfUser="isSelfProfile" :onAddFriend="sendFriendRequest" />
-                                <div :ref="friendsSentinelRef as any" class="sentinel" />
+                                <div :ref="(el) => { friendsSentinelRef = el as HTMLElement }" class="sentinel" />
                                 <div v-if="loadingFriends" class="loading-footer">
                                     <i class="pi pi-spin pi-spinner"></i>
                                 </div>
@@ -455,8 +539,8 @@ watch(
                             <div class="scroll-container">
                                 <FriendWithFollow v-for="friend in suggestedFriends.results" :key="friend.id"
                                     :user="friend" :onAddFriend="sendFriendRequest" />
-                                <div :ref="friendsSentinelRef as any" class="sentinel" />
-                                <div v-if="loadingFriends" class="loading-footer">
+                                <div :ref="(el) => { suggestedFriendsSentinelRef = el as HTMLElement }" class="sentinel" />
+                                <div v-if="loadingSuggestedFriends" class="loading-footer">
                                     <i class="pi pi-spin pi-spinner"></i>
                                 </div>
                             </div>
