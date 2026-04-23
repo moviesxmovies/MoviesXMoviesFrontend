@@ -82,7 +82,7 @@ describe("AuthRepository", () => {
     expect(mockPost).toHaveBeenCalledWith("/auth/login/", {
       username: "johndoe",
       password: "Password123!",
-    });
+    },{ params: { lang: undefined } });
     expect(mockSetTokens).toHaveBeenCalledWith("access-token", "refresh-token");
   });
 
