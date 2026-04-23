@@ -249,7 +249,7 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll();
               :to="`/search?platforms=${platform.slug}`"
             >
               <img
-                :src="platform.image ?? ''"
+                :src="platform.image"
                 :alt="platform.name"
                 class="platform-item__img"
               />
