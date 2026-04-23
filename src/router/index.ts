@@ -96,12 +96,14 @@ export const router = createRouter({
   routes,
 });
 
+const ONBOARDING_PATHS = ["/login", "/signup", "/verify-email", "/onboarding"];
+
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
   const user = authStore.user;
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    return next({ path: "/login" });
+    return next("/login");
   }
 
   if (to.meta.forbiddenWhenAuthenticated && authStore.isAuthenticated) {
@@ -115,14 +117,7 @@ router.beforeEach((to, from, next) => {
     if (user.verified && !user.boarded && to.path !== "/onboarding") {
       return next("/onboarding");
     }
-    if (
-      user.verified &&
-      user.boarded &&
-      (to.path === "/login" ||
-        to.path === "/signup" ||
-        to.path === "/verify-email" ||
-        to.path === "/onboarding")
-    ) {
+    if (user.verified && user.boarded && ONBOARDING_PATHS.includes(to.path)) {
       return next("/");
     }
   }
