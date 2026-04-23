@@ -6,16 +6,19 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/accounts/google/login/callback/",
     component: () => import("../views/OauthCallbackView.vue"),
+    name: "oauth-callback",
     meta: { forbiddenWhenAuthenticated: true },
   },
   {
     path: "/onboarding",
     component: () => import("../views/OnBoardingView.vue"),
+    name: "onboarding",
     meta: { requiresAuth: true },
   },
   {
     path: "/verify-email",
     component: () => import("../views/VerifyEmailView.vue"),
+    name: "verify-email",
     meta: { requiresAuth: true },
   },
   {
@@ -32,44 +35,53 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/forgot-password",
+    name: "forgot-password",
     component: () => import("../views/ForgotPasswordView.vue"),
   },
   {
     path: "/reset-password",
     component: () => import("../views/ResetPasswordView.vue"),
+    name: "reset-password",
   },
   {
     path: "/check-email",
     component: () => import("../views/CheckEmailView.vue"),
+    name: "check-email",
   },
   {
     path: "/home",
     component: () => import("../views/HomeView.vue"),
+    name: "home",
     meta: { requiresAuth: true },
   },
   {
     path: "/",
     component: () => import("../views/WelcomeView.vue"),
+    name: "welcome",
     meta: { forbiddenWhenAuthenticated: true },
   },
   {
     path: "/profiles/:slug",
     component: () => import("../views/CelebrityView.vue"),
+    name: "celebrity",
     meta: { requiresAuth: true },
   },
   {
     path: "/users/:slug",
     component: () => import("../views/UserProfileView.vue"),
+    name: "user-profile",
     meta: { requiresAuth: true },
   },
   {
     path: "/users",
     component: () => import("../views/UserProfileView.vue"),
+    name: "self-profile",
     meta: { requiresAuth: true },
   },
   {
     path: "/search",
     component: () => import("../views/SearchView.vue"),
+    name: "search",
     meta: { requiresAuth: true },
   },
   {

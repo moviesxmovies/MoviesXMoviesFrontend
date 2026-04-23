@@ -14,7 +14,7 @@ import {
     AccordionPanel,
     useToast,
 } from "primevue";
-import { onMounted, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 import { useInfiniteScroll } from "@/composables/useInfiniteScroll";
@@ -169,21 +169,20 @@ const { sentinelRef: friendRequestsSentinelRef } = useInfiniteScroll(async () =>
 });
 
 
-onMounted(async () => {
-    await Promise.all([
-        await fetchUserProfile(),
-        fetchUserFriendRequests(),
-        fetchUserReviews(),
-
-    ]);
-});
 watch(
-    () => langStore.language, async (newLang, oldLang) => {
-        if (newLang !== oldLang) {
-            await fetchUserProfile();
-        }
-    }
-)
+    () => [route.params.slug, langStore.language],
+    async () => {
+        reviews.value = {} as DynamicPagination<Review>;
+        friendRequests.value = {} as DynamicPagination<FriendRequest>;
+        isSelfProfile.value = false;
+        await Promise.all([
+            await fetchUserProfile(),
+            fetchUserFriendRequests(),
+            fetchUserReviews(),
+        ]);
+    }, { immediate: true }
+);
+
 </script>
 
 <template>
@@ -198,7 +197,7 @@ watch(
                     <div class="card-body">
                         <h1 class="user-name" :style="isSelfProfile ? 'text-align: start' : 'text-align: center'">{{
                             user.username }}</h1>
-                        <button v-if="isSelfProfile" @click="editProfileModalVisible = true">
+                        <button v-if="isSelfProfile" @click="editProfileModalVisible = true" class="btn-edit">
                             {{ $t("user.editProfile") }}
                         </button>
                     </div>
@@ -441,7 +440,8 @@ watch(
     padding: 1.25rem;
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: space-between;
+    align-items: center;
     gap: 0.75rem;
 }
 
@@ -451,6 +451,7 @@ watch(
     line-height: 1.2;
     color: var(--primary);
     margin: 0;
+    vertical-align: middle;
 }
 
 .dates {
@@ -556,5 +557,31 @@ watch(
     display: flex;
     justify-content: center;
     padding: 1rem;
+}
+
+.btn-edit {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid var(--primary);
+    background: transparent;
+    color: var(--primary);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, transform 0.1s;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.btn-edit:hover {
+    background: var(--primary);
+    color: var(--background);
+}
+
+.btn-edit:active {
+    transform: scale(0.97);
 }
 </style>

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { api } from '@/composables/useAPI';
 import type { FriendRequest, User } from '@/types';
+import { goToUser } from '@/utils/goTo';
 import { Button } from 'primevue';
 import { onMounted, ref } from 'vue';
 
@@ -30,8 +31,8 @@ onMounted(() => {
 
     <div class="friend-request">
         <div class="request-info">
-            <img :src="user?.picture" :alt="user?.username" class="profile-image" />
-            <span class="username">{{ user?.username }}</span>
+            <img :src="user?.picture" :alt="user?.username" class="profile-image cursor-pointer" @click="goToUser(user?.username)" />
+            <span class="username cursor-pointer" @click="goToUser(user?.username)">{{ user?.username }}</span>
         </div>
         <div class="request-actions">
             <button class="btn btn-accept" @click="$emit('accept', user?.username)">

@@ -191,7 +191,7 @@ describe("UserRepository", () => {
       const result = await getFriendsRequests(1, 10);
 
       expect(mockGet).toHaveBeenCalledWith("/users/friend-requests/", {
-        params: { limit: 10, page: 1 },
+        params: { last_id: 1 },
       });
       expect(result).toEqual(mockRequests);
     });

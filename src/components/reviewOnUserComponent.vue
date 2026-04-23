@@ -1,15 +1,14 @@
 <script lang="ts" setup>
 import { api } from '@/composables/useAPI';
 import { type Movie, type Review } from '@/types';
+import { goToMovie } from '@/utils/goTo';
 import { onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
 
 const props = defineProps<{
     review: Review;
 }>();
 
 const movie = ref<Movie | null>(null);
-const router = useRouter();
 
 const fetchMovieData = async () => {
     try {
@@ -20,11 +19,8 @@ const fetchMovieData = async () => {
     }
 };
 
-const goToMovie = () => {
-    if (movie.value?.slug) {
-        router.push({ name: 'Movie', params: { slug: movie.value.slug } });
-    }
-};
+
+
 
 onMounted(() => {
     fetchMovieData();
@@ -37,12 +33,12 @@ onMounted(() => {
             class="movie-cover"
             :src="movie?.cover"
             :alt="movie?.title"
-            @click="goToMovie"
+            @click="goToMovie(movie?.slug)"
         />
         <div class="review-body">
             <div class="review-header">
                 <div class="review-meta">
-                    <span class="movie-name" @click="goToMovie">{{ movie?.title }}</span>
+                    <span class="movie-name" @click="goToMovie(movie?.slug)">{{ movie?.title }}</span>
                     <span class="review-date">{{ new Date(review.created_at).toLocaleDateString() }}</span>
                 </div>
                 <span class="badge" :class="review.is_positive ? 'badge-positive' : 'badge-negative'">
