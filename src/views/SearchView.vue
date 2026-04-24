@@ -12,7 +12,7 @@ import debounce from "@/utils/debounce";
 import { Drawer, InputText, useToast } from "primevue";
 import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute, useRouter, type LocationQueryValue } from "vue-router";
 
 const route = useRoute();
 const router = useRouter();
@@ -32,6 +32,16 @@ const activeFiltersCount = computed(() => {
   );
 });
 
+const getBoolean = (
+  path: LocationQueryValue | LocationQueryValue[] | undefined,
+  value?: string,
+) => {
+  if (value) {
+    return value === "true" ? "true" : undefined;
+  }
+  return path === "true" ? "true" : undefined;
+};
+
 const updateRoute = (newData: searchData) => {
   router.push({
     path: route.path,
@@ -39,8 +49,12 @@ const updateRoute = (newData: searchData) => {
       ...route.query,
       ...newData,
       name: search.value || undefined,
-      marked_unseen: newData.marked_unseen ? "true" : undefined,
-      reviewed: newData.reviewed ? "true" : undefined,
+      marked_unseen: newData.marked_unseen
+        ? getBoolean(route.query.marked_unseen, newData.marked_unseen)
+        : getBoolean(route.query.marked_unseen),
+      reviewed: newData.reviewed
+        ? getBoolean(route.query.reviewed, newData.reviewed)
+        : getBoolean(route.query.reviewed),
     },
   });
 };
@@ -143,6 +157,10 @@ watch(
         @filter-genres="(genres: string[]) => updateRoute({ genres })"
         @filter-platforms="(platforms: string[]) => updateRoute({ platforms })"
         @filter-stars="(stars: number[]) => updateRoute({ stars })"
+        @filter-unseen="
+          (marked_unseen: string) => updateRoute({ marked_unseen })
+        "
+        @filter-reviewed="(reviewed: string) => updateRoute({ reviewed })"
         @close="filtersOpen = false"
       />
     </Drawer>
@@ -155,6 +173,10 @@ watch(
             (platforms: string[]) => updateRoute({ platforms })
           "
           @filter-stars="(stars: number[]) => updateRoute({ stars })"
+          @filter-unseen="
+            (marked_unseen: string) => updateRoute({ marked_unseen })
+          "
+          @filter-reviewed="(reviewed: string) => updateRoute({ reviewed })"
           @close="filtersOpen = false"
         />
       </aside>
