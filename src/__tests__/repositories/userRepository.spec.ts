@@ -6,17 +6,26 @@ import {
   getPersonFilmography,
   getUserProfile,
   getFriendsRequests,
+  getUserReviews,
+  completeFriendRequest,
+  getUserFriends,
+  getSuggestedFriends,
+  getUserMoviesLists,
 } from "@/repositories/userRepository";
 
 // ── Mocks ────────────────────────────────────────────────────────────────────
 
-const { mockGet } = vi.hoisted(() => ({
+const { mockGet, mockPost, mockDelete } = vi.hoisted(() => ({
   mockGet: vi.fn(),
+  mockPost: vi.fn(),
+  mockDelete: vi.fn(),
 }));
 
 vi.mock("@/composables/useAPI", () => ({
   api: {
     get: mockGet,
+    post: mockPost,
+    delete: mockDelete,
   },
 }));
 
@@ -187,7 +196,7 @@ describe("UserRepository", () => {
         { id: 2, from_user: "user2", to_user: "user3", status: "pending" },
       ];
 
-      mockGet.mockResolvedValueOnce({ data: mockRequests}, );
+      mockGet.mockResolvedValueOnce({ data: mockRequests },);
       const result = await getFriendsRequests(1, 10);
 
       expect(mockGet).toHaveBeenCalledWith("/users/friend-requests/", {
@@ -199,7 +208,138 @@ describe("UserRepository", () => {
     it("throws when API fails", async () => {
       mockGet.mockRejectedValueOnce(new Error("Server error"));
 
-      await expect(getFriendsRequests(1,10)).rejects.toThrow("Server error");
+      await expect(getFriendsRequests(1, 10)).rejects.toThrow("Server error");
+    });
+  });
+  // ── getUserReviews ───────────────────────────────────────────────────────────────
+  describe("getUserReviews", () => {
+    it("calls API with correct endpoint and returns user reviews", async () => {
+      const mockReviews = [
+        { id: 1, movie: "Inception", rating: 5, comment: "Great movie!" },
+        { id: 2, movie: "Interstellar", rating: 4, comment: "Very good!" },
+      ];
+
+      mockGet.mockResolvedValueOnce({ data: mockReviews });
+      const result = await getUserReviews("testuser", 1, 10);
+
+      expect(mockGet).toHaveBeenCalledWith("/users/testuser/reviews/", {
+        params: { last_id: 1, limit: 10 },
+      });
+      expect(result).toEqual(mockReviews);
+    });
+
+    it("throws when API fails", async () => {
+      mockGet.mockRejectedValueOnce(new Error("Network error"));
+
+      await expect(getUserReviews("testuser", 1, 10)).rejects.toThrow("Network error");
+    });
+
+  });
+  // ── getFriendsRequests ───────────────────────────────────────────────────────────────
+  describe("getFriendsRequests", () => {
+    it("calls API with correct endpoint and returns friend requests", async () => {
+      const mockRequests = [
+        { id: 1, from_user: "user1", to_user: "user2", status: "pending" },
+        { id: 2, from_user: "user2", to_user: "user3", status: "pending" },
+      ];
+
+      mockGet.mockResolvedValueOnce({ data: mockRequests });
+      const result = await getFriendsRequests(1, 10);
+
+      expect(mockGet).toHaveBeenCalledWith("/users/friend-requests/", {
+        params: { last_id: 1, limit: 10 },
+      });
+      expect(result).toEqual(mockRequests);
+    });
+
+    it("throws when API fails", async () => {
+      mockGet.mockRejectedValueOnce(new Error("Server error"));
+
+      await expect(getFriendsRequests(1, 10)).rejects.toThrow("Server error");
+    });
+  });
+  // ── completeFriendRequest ───────────────────────────────────────────────────────────────
+  describe("completeFriendRequest", () => {
+    it("calls API with correct endpoint and payload to accept request", async () => {
+      const fromUsername = "user1";
+      const accept = true;
+
+      mockPost.mockResolvedValueOnce({ data: {} });
+      await completeFriendRequest(fromUsername, accept);
+
+      expect(mockPost).toHaveBeenCalledWith(`/users/${fromUsername}/friend-requests/`);
+    });
+
+    it("calls API with correct endpoint and payload to reject request", async () => {
+      const fromUsername = "user1";
+      const accept = false;
+
+      mockDelete.mockResolvedValueOnce({ data: {} });
+      await completeFriendRequest(fromUsername, accept);
+
+      expect(mockDelete).toHaveBeenCalledWith(`/users/${fromUsername}/friend-requests/`);
+    });
+    it("throws when API fails on accept", async () => {
+      const fromUsername = "user1";
+      const accept = true;
+
+      mockPost.mockRejectedValueOnce(new Error("Network error"));
+      await expect(completeFriendRequest(fromUsername, accept)).rejects.toThrow("Network error");
+    });
+
+    it("throws when API fails on reject", async () => {
+      const fromUsername = "user1";
+      const accept = false;
+
+      mockDelete.mockRejectedValueOnce(new Error("Server error"));
+      await expect(completeFriendRequest(fromUsername, accept)).rejects.toThrow("Server error");
+    });
+  });
+
+  // ── getUserFriends ───────────────────────────────────────────────────────────────
+  describe("getUserFriends", () => {
+    it("calls API with correct endpoint and returns user friends", async () => {
+      const mockFriends = [
+        { id: 1, username: "friend1" },
+        { id: 2, username: "friend2" },
+      ];
+
+      mockGet.mockResolvedValueOnce({ data: mockFriends });
+      const result = await getUserFriends("testuser", 1, 10);
+
+      expect(mockGet).toHaveBeenCalledWith("/users/testuser/friends/", {
+        params: { last_id: 1, limit: 10 },
+      });
+      expect(result).toEqual(mockFriends);
+    });
+
+    it("throws when API fails", async () => {
+      mockGet.mockRejectedValueOnce(new Error("Network error"));
+
+      await expect(getUserFriends("testuser", 1, 10)).rejects.toThrow("Network error");
+    });
+  });
+  // ── getSuggestedFriends ───────────────────────────────────────────────────────────────
+  describe("getSuggestedFriends", () => {
+    it("calls API with correct endpoint and returns suggested friends", async () => {
+      const mockSuggestions = [
+        { id: 1, username: "suggestion1" },
+        { id: 2, username: "suggestion2" },
+      ];
+
+      mockGet.mockResolvedValueOnce({ data: mockSuggestions });
+      const result = await getSuggestedFriends("testuser", 1, 10);
+
+      expect(mockGet).toHaveBeenCalledWith("/users/suggested-users/", {
+        params: { last_id: 1, limit: 10, recomender_for: "testuser" },
+      });
+      expect(result).toEqual(mockSuggestions);
+    });
+
+    it("throws when API fails", async () => {
+      mockGet.mockRejectedValueOnce(new Error("Server error"));
+
+      await expect(getSuggestedFriends("testuser", 1, 10)).rejects.toThrow("Server error");
     });
   });
 });
