@@ -28,7 +28,9 @@ const activeFiltersCount = computed(() => {
   return (
     (route.query.genres?.length ?? 0) +
     (route.query.platforms?.length ?? 0) +
-    (route.query.stars?.length ?? 0)
+    (route.query.stars?.length ?? 0) +
+    (route.query.marked_unseen ? 1 : 0) +
+    (route.query.reviewed ? 1 : 0)
   );
 });
 
@@ -389,7 +391,7 @@ watch(
   }
 
   .filters-sidebar {
-    width: 150px;
+    width: 200px;
   }
 
   .desktop-only {
@@ -400,10 +402,6 @@ watch(
 @media (min-width: 768px) {
   .page {
     padding: 1.5rem;
-  }
-
-  .filters-sidebar {
-    width: 200px;
   }
 
   .movies-grid {

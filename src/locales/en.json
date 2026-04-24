@@ -66,13 +66,16 @@
       "getGenresError": "Error obtaining genres"
     },
     "searchPlatforms": {
-      "platforms":"Platforms",
+      "platforms": "Platforms",
       "getPlatformsError": "Error obtaining platforms"
     },
     "filter": {
       "genres": "Filter by Genre",
-      "platforms":"Filter Platform",
-      "stars": "Filter by Stars"
+      "platforms": "Filter Platform",
+      "stars": "Filter by Stars",
+      "preferences": "Preferences",
+      "unseen": "Show only unseen movies",
+      "reviewed": "Show only reviewed movies"
     }
   },
   "signup": {
@@ -255,6 +258,6 @@
     "noFilms": "No films found",
     "help": "Try with other values",
     "searchMoviesError": "Error fetching movies",
-    "filters": "filters"
+    "filters": "Filters"
   }
 }
