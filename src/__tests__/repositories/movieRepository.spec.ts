@@ -8,6 +8,7 @@ import {
   type searchData,
 } from "@/repositories/movieRepository";
 import type { MoviePagination } from "@/types";
+import TranslatedError from "@/exceptions/TranslatedError";
 
 // ── Mocks ────────────────────────────────────────────────────────────────────
 const { mockGet, mockPost } = vi.hoisted(() => ({
@@ -155,9 +156,10 @@ describe("MovieRepository", () => {
           data: { message: "Invalid parameters" },
         },
       };
+      const translatedApiError = new TranslatedError(apiError, undefined);
       mockGet.mockRejectedValueOnce(apiError);
       const params: searchData = { name: "Error" };
-      await expect(movieSearching(params)).rejects.toEqual(apiError);
+      await expect(movieSearching(params)).rejects.toEqual(translatedApiError);
     });
 
     it("Throws error if anything goes wrong", async () => {

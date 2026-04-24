@@ -1,0 +1,46 @@
+import { api } from "@/composables/useAPI";
+import type { ReactionResponse } from "@/types";
+
+export const getReviewReactions = async (id: number) => {
+    try {
+        const { data }: { data: ReactionResponse } = await api.get(`reviews/${id}/reactions/`);
+        return data;
+    } catch (error: any) {
+        throw error;
+    }
+};
+
+export const getCommentReactions = async (reviewId: number, commentId: number) => {
+    try {
+        const { data }: { data: ReactionResponse } = await api.get(`reviews/${reviewId}/comments/${commentId}/reactions/`);
+        return data;
+    } catch (error: any) {
+        throw error;
+    }
+};
+
+export const postReactionApi = async (reviewId: number, type: string, commentId?: number) => {
+    try {
+        if (commentId) {
+            const { data } = await api.post(`reviews/${reviewId}/comments/${commentId}/reactions/`, { emoji_code: type });
+            return data;
+        }
+        const { data } = await api.post(`reviews/${reviewId}/reactions/`, { emoji_code: type });
+        return data;
+    } catch (error: any) {
+        throw error;
+    }
+};
+
+export const deleteReactionApi = async (reviewId: number, id: number, commentId?: number) => {
+    try {
+        if (commentId) {
+            const { data } = await api.delete(`reviews/${reviewId}/comments/${commentId}/reactions/${id}/`);
+            return data;
+        }
+        const { data } = await api.delete(`reviews/${reviewId}/reactions/${id}/`);
+        return data;
+    } catch (error: any) {
+        throw error;
+    }
+};

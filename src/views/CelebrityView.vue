@@ -3,7 +3,7 @@ import {
   getPersonFilmography,
   getPersonProfile,
 } from "@/repositories/userRepository";
-import type { MovieDynamicPagination, Person } from "@/types";
+import type { DynamicPagination, Movie, Person } from "@/types";
 import {
   Accordion,
   AccordionContent,
@@ -27,8 +27,8 @@ const loadingDirectors = ref<boolean>(false);
 const toast = useToast();
 const { t } = useI18n();
 const router = useRouter();
-const acted_movies = ref<MovieDynamicPagination>({} as MovieDynamicPagination);
-const directed_movies = ref<MovieDynamicPagination>({} as MovieDynamicPagination);
+const acted_movies = ref<DynamicPagination<Movie>>({} as DynamicPagination<Movie>);
+const directed_movies = ref<DynamicPagination<Movie>>({} as DynamicPagination<Movie>);
 const langStore = useLangStore();
 
 const genderMap: Record<string, { color: string; icon: string }> = {
@@ -136,8 +136,8 @@ onMounted(async () => {
 watch(
   () => langStore.language, async (newLang, oldLang) => {
     if (newLang !== oldLang) {
-      acted_movies.value = {} as MovieDynamicPagination;
-      directed_movies.value = {} as MovieDynamicPagination;
+      acted_movies.value = {} as DynamicPagination<Movie>;
+      directed_movies.value = {} as DynamicPagination<Movie>;
       await fetchPersonProfile();
       await fetchFilmography("acted");
       await fetchFilmography("directed");

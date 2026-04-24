@@ -199,7 +199,7 @@ describe("NavbarComponent", () => {
     await nextTick();
     await wrapper.find("#profile-btn-mobile").trigger("click");
     await nextTick();
-    expect(mockPush).toHaveBeenCalledWith("/profile");
+    expect(mockPush).toHaveBeenCalledWith("/users");
     expect(wrapper.find(".mobile-menu").exists()).toBe(false);
   });
 
@@ -256,7 +256,7 @@ describe("NavbarComponent", () => {
       const wrapper = factory(true);
       const vm = wrapper.vm as any;
       vm.menuItems[0].command();
-      expect(mockPush).toHaveBeenCalledWith("/profile");
+      expect(mockPush).toHaveBeenCalledWith("/users");
     });
 
     it("logout command calls authStore.logout and navigates to /", () => {
@@ -400,21 +400,31 @@ describe("NavbarComponent", () => {
         },
       })
       await flushPromises()
-      expect((wrapper.vm as any).pendingFriendsRequests).toBe(3)
+
+      // ← accede al store en vez de vm
+      const { useNotificationsStore } = await import("@/stores/notificationStore")
+      const notificationsStore = useNotificationsStore()
+      expect(notificationsStore.pendingFriendRequests).toBe(3)
 
       authState.isAuthenticated = false
       await nextTick()
 
-      expect((wrapper.vm as any).pendingFriendsRequests).toBe(0)
+      expect(notificationsStore.pendingFriendRequests).toBe(0)
       expect(wrapper.find(".notification-badge").exists()).toBe(false)
     })
+
 
     it("sets pendingFriendsRequests to 0 when getFriendsRequests throws", async () => {
       vi.mocked(getFriendsRequests).mockRejectedValue(new Error("Network error"))
       const wrapper = factory(true)
       await flushPromises()
-      expect((wrapper.vm as any).pendingFriendsRequests).toBe(0)
+
+      // ← accede al store en vez de vm
+      const { useNotificationsStore } = await import("@/stores/notificationStore")
+      const notificationsStore = useNotificationsStore()
+      expect(notificationsStore.pendingFriendRequests).toBe(0)
       expect(wrapper.find(".notification-badge").exists()).toBe(false)
     })
+
   })
 });

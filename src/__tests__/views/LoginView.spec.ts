@@ -173,7 +173,7 @@ describe("LoginView login() success", () => {
     const wrapper = mountComponent();
     await submitForm(wrapper);
 
-    expect(mockHandleLogin).toHaveBeenCalledWith(validValues);
+    expect(mockHandleLogin).toHaveBeenCalledWith(validValues,"en" );
   });
 
   it("shows a success toast", async () => {
@@ -240,19 +240,20 @@ describe("LoginView login() error handling", () => {
   };
 
   it("shows the API detail message on error", async () => {
-    mockHandleLogin.mockRejectedValue(
-      makeAxiosError(401, "Invalid credentials"),
-    );
+    const error = makeAxiosError(401, { detail: "Invalid credentials" });
+    (error as TranslatedError).translatedMessage = "Invalid credentials"; 
+    mockHandleLogin.mockRejectedValue(error);
+
     const wrapper = mountComponent();
     await submitForm(wrapper);
 
     expect(mockToastAdd).toHaveBeenCalledWith(
-      expect.objectContaining({
-        severity: "error",
-        detail: "Invalid credentials",
-      }),
+        expect.objectContaining({
+            severity: "error",
+            detail: "Invalid credentials",
+        }),
     );
-  });
+});
 
   it("shows undefined detail when error has no response body", async () => {
     mockHandleLogin.mockRejectedValue(new Error("Network error"));
