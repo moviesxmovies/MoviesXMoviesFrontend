@@ -30,7 +30,7 @@ const emit = defineEmits(["filterUnseen", "filterReviewed"]);
     input-id="unseen"
     @change="emit('filterUnseen', String(marked_unseen))"
   />
-  <label for="unseen">Show reviewed movies</label>
+  <label for="reviewed" class="text-text">Show reviewed movies</label>
   <ToggleSwitch
     v-model="reviewed"
     input-id="reviewed"
