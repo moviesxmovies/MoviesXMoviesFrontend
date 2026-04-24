@@ -163,4 +163,9 @@ export type CreateList = {
   name: string,
   description?: string,
   privacity: string,
+};
+
+export type ReactionResponse = {
+    reactions: Record<string, number>;
+    your_reactions: Record<string, number>;
 }

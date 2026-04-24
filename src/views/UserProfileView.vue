@@ -147,9 +147,6 @@ watch(
     },
     { immediate: true }
 );
-watch(reviewsSentinelRef, (val) => {
-    console.log('[UserProfileView] reviewsSentinelRef changed:', val);
-});
 </script>
 
 <template>
@@ -215,8 +212,7 @@ watch(reviewsSentinelRef, (val) => {
                     :isEmpty="!friendRequests.results?.length" :emptyIcon="'pi pi-users'"
                     :emptyTitle="t('user.no_friends_requests')"
                     :emptyDescription="t('user.no_friends_requests_description')" :loading="loadingRequests"
-                    :panelHeight="'200px'"
-                    :defaultOpen="!!friendRequests.results?.length">
+                    :panelHeight="'200px'" :defaultOpen="!!friendRequests.results?.length">
                     <FriendRequestComponent v-for="request in friendRequests.results" :key="request.id"
                         :request="request" @accept="acceptFriendRequest" @decline="rejectFriendRequest" />
                     <div :ref="(el) => { friendRequestsSentinelRef = el as HTMLElement }" class="sentinel" />

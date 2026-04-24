@@ -3,6 +3,7 @@ import { api } from '@/composables/useAPI';
 import { type Movie, type Review } from '@/types';
 import { goToMovie } from '@/utils/goTo';
 import { onMounted, ref } from 'vue';
+import ReactionsComponent from './reactionsComponent.vue';
 
 const props = defineProps<{
     review: Review;
@@ -29,39 +30,43 @@ onMounted(() => {
 
 <template>
     <div class="review">
-        <img
-            class="movie-cover"
-            :src="movie?.cover"
-            :alt="movie?.title"
-            @click="goToMovie(movie?.slug)"
-        />
-        <div class="review-body">
-            <div class="review-header">
-                <div class="review-meta">
-                    <span class="movie-name" @click="goToMovie(movie?.slug)">{{ movie?.title }}</span>
-                    <span class="review-date">{{ new Date(review.created_at).toLocaleDateString() }}</span>
+        <div class="review-main">
+            <img class="movie-cover" :src="movie?.cover" :alt="movie?.title" @click="goToMovie(movie?.slug)" />
+            <div class="review-body">
+                <div class="review-header">
+                    <div class="review-meta">
+                        <span class="movie-name" @click="goToMovie(movie?.slug)">{{ movie?.title }}</span>
+                        <span class="review-date">{{ new Date(review.created_at).toLocaleDateString() }}</span>
+                    </div>
+                    <span class="badge" :class="review.is_positive ? 'badge-positive' : 'badge-negative'">
+                        <i :class="review.is_positive ? 'pi pi-thumbs-up' : 'pi pi-thumbs-down'" />
+                    </span>
                 </div>
-                <span class="badge" :class="review.is_positive ? 'badge-positive' : 'badge-negative'">
-                    <i :class="review.is_positive ? 'pi pi-thumbs-up' : 'pi pi-thumbs-down'" />
-                </span>
+                <h3 class="review-title">{{ review.title }}</h3>
+                <p class="review-content">{{ review.content }}</p>
             </div>
-            <h3 class="review-title">{{ review.title }}</h3>
-            <p class="review-content">{{ review.content }}</p>
         </div>
+        <ReactionsComponent :reviewId="review.id" type="review" />
     </div>
 </template>
 
 <style scoped>
 .review {
     display: flex;
-    flex-direction: row;
-    gap: 1rem;
+    flex-direction: column;
+    gap: 0.75rem;
     padding: 1rem;
     border-radius: 1rem;
     border: 1px solid var(--secondary);
     background: var(--background);
     transition: background 0.2s;
     margin-bottom: 0.75rem;
+}
+
+.review-main {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
 }
 
 .review:hover {

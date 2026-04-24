@@ -26,7 +26,6 @@ const props = defineProps<{
 
 
 const handleSentinelRef = (el: HTMLElement | null) => {
-    console.log('[SectionAccordion] sentinel ref callback fired, el:', el, 'title:', props.title);
     emit('update:sentinelRef', el);
 };
 </script>
