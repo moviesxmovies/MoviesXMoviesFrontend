@@ -30,14 +30,15 @@ export const privacityConfig: Record<
 };
 
 export const fetchUserLists = async (
-  userSlug: string, lastId?: number
+  userSlug: string, lastId?: number, limit: number = 6
 ) => {
   try {
     const { data }: { data: DynamicPagination<MovieList> } = await api.get(
       `/movies-lists/${userSlug}/`,
       {
         params: {
-          lastId,
+          last_id:lastId,
+          limit
         },
       }
     );

@@ -12,6 +12,7 @@ import { useI18n } from "vue-i18n";
 import CreateListDialog from "./createListDialog.vue";
 import ListComponent from "./listComponent.vue";
 import { useAuthStore } from "@/stores/authStore";
+import { useInfinitePagination } from "@/composables/useInfinitePagination";
 
 const { t } = useI18n();
 const toast = useToast();
@@ -68,11 +69,24 @@ const removeFromList = async (listSlug: string) => {
   }
 };
 
-const getUserLists = async () => {
+const getUserLists = async (lastId?: number) => {
   loading.value = true;
   try {
-    moviesListResponse.value = await fetchUserLists(authStore.user?.username || "");
-    userList.value = moviesListResponse.value.results.map((list) => ({ list }));
+    const response = await fetchUserLists(authStore.user?.username || "", lastId);
+    // Si hay lastId es una página adicional, acumulamos; si no, reemplazamos
+    if (lastId) {
+      moviesListResponse.value.results.push(...response.results);
+      moviesListResponse.value.next_last_id = response.next_last_id;
+    } else {
+      moviesListResponse.value = response;
+      userList.value = response.results.map((list) => ({ list }));
+    }
+    // Marcar containsMovie en los nuevos items añadidos
+    const slugs = await fetchMovieListsFromMovie(props.movie.slug);
+    userList.value = moviesListResponse.value.results.map((list) => ({
+      list,
+      containsMovie: slugs.includes(list.slug),
+    }));
   } catch (error: any) {
     toast.add({
       severity: "error",
@@ -90,8 +104,8 @@ const getUserLists = async () => {
 const checkMovieInLists = async () => {
   try {
     const slugs = await fetchMovieListsFromMovie(props.movie.slug);
-    userList.value.forEach((list) => {
-      list.containsMovie = slugs.includes(list.list.slug);
+    userList.value.forEach((item) => {
+      item.containsMovie = slugs.includes(item.list.slug);
     });
   } catch (error: any) {
     toast.add({
@@ -106,9 +120,16 @@ const checkMovieInLists = async () => {
 };
 
 const reloadData = async () => {
+  moviesListResponse.value = {} as DynamicPagination<MovieList>;
+  userList.value = [];
   await getUserLists();
-  await checkMovieInLists();
 };
+
+const { sentinelRef } = useInfinitePagination(
+  moviesListResponse,
+  loading,
+  getUserLists,
+);
 
 watch(
   () => props.movie,
@@ -143,7 +164,8 @@ watch(
       {{ t("components.addToList.description", [props.movie.title]) }}
     </p>
 
-    <ListComponent :items="userList" :loading="loading" @add="addToList" @remove="removeFromList" />
+    <ListComponent :items="userList" :loading="loading" v-model:sentinelRef="sentinelRef" @add="addToList"
+      @remove="removeFromList" />
 
     <template #footer>
       <div class="w-full pt-4">
