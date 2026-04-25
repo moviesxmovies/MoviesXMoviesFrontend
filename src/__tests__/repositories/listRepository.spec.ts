@@ -40,11 +40,11 @@ describe("ListRepository", () => {
     it("calls API with correct user slug and returns data", async () => {
       const userSlug = "user-123";
       const mockLists = [{ id: 1, name: "Favorites" }];
-      mockGet.mockResolvedValueOnce({ data: mockLists });
+      mockGet.mockResolvedValueOnce({ data: mockLists});
 
       const result = await fetchUserLists(userSlug);
 
-      expect(mockGet).toHaveBeenCalledWith(`/movies-lists/${userSlug}/`);
+      expect(mockGet).toHaveBeenCalledWith(`/movies-lists/${userSlug}/`, { params: { last_id: undefined, limit: 6 } });
       expect(result).toEqual(mockLists);
     });
 

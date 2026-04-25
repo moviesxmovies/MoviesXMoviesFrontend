@@ -73,7 +73,6 @@ const getUserLists = async (lastId?: number) => {
   loading.value = true;
   try {
     const response = await fetchUserLists(authStore.user?.username || "", lastId);
-    // Si hay lastId es una página adicional, acumulamos; si no, reemplazamos
     if (lastId) {
       moviesListResponse.value.results.push(...response.results);
       moviesListResponse.value.next_last_id = response.next_last_id;
@@ -81,7 +80,6 @@ const getUserLists = async (lastId?: number) => {
       moviesListResponse.value = response;
       userList.value = response.results.map((list) => ({ list }));
     }
-    // Marcar containsMovie en los nuevos items añadidos
     const slugs = await fetchMovieListsFromMovie(props.movie.slug);
     userList.value = moviesListResponse.value.results.map((list) => ({
       list,

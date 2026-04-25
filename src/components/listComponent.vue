@@ -57,10 +57,8 @@ const props = defineProps<{
           </div>
         </div>
 
-        <!-- Sentinel para el infinite scroll -->
         <div :ref="(el) => $emit('update:sentinelRef', el as HTMLElement | null)" class="h-px" />
 
-        <!-- Spinner al cargar más páginas -->
         <div v-if="props.loading && props.items.length" class="flex justify-center py-3">
           <i class="pi pi-spin pi-spinner text-[var(--primary)]" />
         </div>
