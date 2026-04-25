@@ -9,76 +9,58 @@ const { t } = useI18n();
 const emit = defineEmits<{
   (event: "add", listSlug: string): void;
   (event: "remove", listSlug: string): void;
+  (event: "update:sentinelRef", el: HTMLElement | null): void;
 }>();
 
 const props = defineProps<{
   items: UserMovieList[];
   loading: boolean;
+  sentinelRef?: HTMLElement | null;
 }>();
 </script>
 
 <template>
   <div class="max-h-[350px] flex flex-col gap-3">
-    <div v-if="props.loading" class="flex flex-col gap-3">
+    <div v-if="props.loading && !props.items.length" class="flex flex-col gap-3">
       <div v-for="i in 5" :key="i" class="h-20 rounded-2xl overflow-hidden">
         <Skeleton height="100%" class="custom-skeleton" />
       </div>
     </div>
 
-    <ScrollPanel v-else class="w-full pr-2">
-      <div class="flex flex-col gap-2.5 py-1">
-        <div
-          v-for="item in props.items"
-          :key="item.list.id"
-          class="list-item group"
-          :class="{ 'item-selected': item.containsMovie }"
-          @click="
+    <ScrollPanel v-else class="w-full" style="height: 350px">
+      <div class="flex flex-col gap-2.5 py-1 pr-2">
+        <div v-for="item in props.items" :key="item.list.id" class="list-item group"
+          :class="{ 'item-selected': item.containsMovie }" @click="
             item.containsMovie
               ? emit('remove', item.list.slug)
               : emit('add', item.list.slug)
-          "
-        >
+            ">
           <div class="flex items-center gap-4">
             <div class="icon-wrapper">
-              <i
-                :class="[
-                  item.containsMovie ? 'pi pi-check' : 'pi pi-bookmark',
-                  'main-icon',
-                ]"
-              ></i>
+              <i :class="[
+                item.containsMovie ? 'pi pi-check' : 'pi pi-bookmark',
+                'main-icon',
+              ]"></i>
             </div>
 
             <div class="flex flex-col gap-0.5">
-              <span class="list-name">
-                {{ item.list.name }}
-              </span>
-
-              <div
-                v-if="item.list.privacity"
-                :class="[
-                  'privacity-badge',
-                  privacityConfig[item.list.privacity]?.class,
-                ]"
-              >
-                <i
-                  :class="[
-                    privacityConfig[item.list.privacity]?.icon,
-                    'text-[10px]',
-                  ]"
-                />
+              <span class="list-name">{{ item.list.name }}</span>
+              <div v-if="item.list.privacity" :class="['privacity-badge', privacityConfig[item.list.privacity]?.class]">
+                <i :class="[privacityConfig[item.list.privacity]?.icon, 'text-[10px]']" />
                 <span>{{ privacityConfig[item.list.privacity]?.text }}</span>
               </div>
             </div>
           </div>
 
           <div class="flex items-center">
-            <Checkbox
-              :binary="true"
-              :modelValue="item.containsMovie"
-              class="custom-checkbox"
-              @click.stop
-            />
+            <Checkbox :binary="true" :modelValue="item.containsMovie" class="custom-checkbox" @click.stop />
           </div>
+        </div>
+
+        <div :ref="(el) => $emit('update:sentinelRef', el as HTMLElement | null)" class="h-px" />
+
+        <div v-if="props.loading && props.items.length" class="flex justify-center py-3">
+          <i class="pi pi-spin pi-spinner text-[var(--primary)]" />
         </div>
       </div>
     </ScrollPanel>
@@ -88,9 +70,7 @@ const props = defineProps<{
         <i class="pi pi-folder-open"></i>
       </div>
       <p class="empty-title">{{ t("components.lists.noLists") }}</p>
-      <p class="empty-desc">
-        {{ t("components.lists.noListsDesc") }}
-      </p>
+      <p class="empty-desc">{{ t("components.lists.noListsDesc") }}</p>
     </div>
   </div>
 </template>

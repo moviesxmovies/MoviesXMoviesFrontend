@@ -1,7 +1,7 @@
 import { api } from "@/composables/useAPI";
 import TranslatedError from "@/exceptions/TranslatedError";
 import i18n from "@/i18n";
-import type { CreateList, MovieList } from "@/types";
+import type { CreateList, DynamicPagination, MovieList } from "@/types";
 
 const { t } = i18n.global;
 
@@ -30,11 +30,17 @@ export const privacityConfig: Record<
 };
 
 export const fetchUserLists = async (
-  userSlug: string,
+  userSlug: string, lastId?: number, limit: number = 6
 ) => {
   try {
-    const { data }: { data: MovieList[] } = await api.get(
+    const { data }: { data: DynamicPagination<MovieList> } = await api.get(
       `/movies-lists/${userSlug}/`,
+      {
+        params: {
+          last_id:lastId,
+          limit
+        },
+      }
     );
     return data;
   } catch (error: any) {
