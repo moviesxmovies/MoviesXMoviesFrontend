@@ -92,6 +92,8 @@ const acceptFriendRequest = async (username: string) => {
         await completeFriendRequest(username, true);
         resetRequests();
         await fetchUserFriendRequests();
+        resetFriends();
+        fetchUserFriends();
         notificationsStore.set(friendRequests.value.count ?? 0);
         toast.add({ severity: 'success', summary: t('toast.success'), detail: t('user.friendRequestAccepted') });
     } catch (error: any) {
