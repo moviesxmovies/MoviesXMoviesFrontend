@@ -5,7 +5,7 @@ import {
   fetchUserLists,
   removeMovieFromList,
 } from "@/repositories/listRepository";
-import type { Movie, UserMovieList } from "@/types";
+import { type DynamicPagination, type Movie, type MovieList, type UserMovieList } from "@/types";
 import { Dialog, useToast } from "primevue";
 import { watch, ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -23,6 +23,8 @@ const props = defineProps<{
 }>();
 const visible = defineModel<boolean>("visible", { default: false });
 const visibleCreateList = ref(false);
+
+const moviesListResponse = ref<DynamicPagination<MovieList>>({} as DynamicPagination<MovieList>);
 
 const addToList = async (listSlug: string) => {
   try {
@@ -69,8 +71,8 @@ const removeFromList = async (listSlug: string) => {
 const getUserLists = async () => {
   loading.value = true;
   try {
-    const lists = await fetchUserLists(authStore.user?.username || "");
-    userList.value = lists.map((list) => ({ list }));
+    moviesListResponse.value = await fetchUserLists(authStore.user?.username || "");
+    userList.value = moviesListResponse.value.results.map((list) => ({ list }));
   } catch (error: any) {
     toast.add({
       severity: "error",
@@ -119,19 +121,9 @@ watch(
 </script>
 
 <template>
-  <CreateListDialog
-    :movie="props.movie"
-    v-model:visible="visibleCreateList"
-    @reloadLists="reloadData"
-  />
-  <Dialog
-    v-model:visible="visible"
-    modal
-    :draggable="false"
-    :dismissableMask="true"
-    :header="t('components.addToList.title')"
-    :style="{ width: '90vw', maxWidth: '400px' }"
-    :pt="{
+  <CreateListDialog :movie="props.movie" v-model:visible="visibleCreateList" @reloadLists="reloadData" />
+  <Dialog v-model:visible="visible" modal :draggable="false" :dismissableMask="true"
+    :header="t('components.addToList.title')" :style="{ width: '90vw', maxWidth: '400px' }" :pt="{
       root: {
         class:
           'rounded-[2rem] border-none shadow-2xl bg-[var(--background)] overflow-hidden',
@@ -146,27 +138,18 @@ watch(
         class:
           'bg-[var(--background)] border-t border-[var(--secondary)]',
       },
-    }"
-  >
-    <p
-      class="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--gray)] opacity-60 mb-6"
-    >
+    }">
+    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--gray)] opacity-60 mb-6">
       {{ t("components.addToList.description", [props.movie.title]) }}
     </p>
 
-    <ListComponent
-      :items="userList"
-      :loading="loading"
-      @add="addToList"
-      @remove="removeFromList"
-    />
+    <ListComponent :items="userList" :loading="loading" @add="addToList" @remove="removeFromList" />
 
     <template #footer>
       <div class="w-full pt-4">
         <button
           class="w-full py-4 rounded-xl flex items-center justify-center gap-2 text-sm font-bold text-[var(--accent)] hover:bg-[var(--accent)]/20 transition-all cursor-pointer"
-          @click="visibleCreateList = true"
-        >
+          @click="visibleCreateList = true">
           <i class="pi pi-plus-circle"></i>
           {{ t("components.addToList.createList") }}
         </button>
@@ -197,6 +180,7 @@ div[v-for] {
     transform: translateY(10px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
