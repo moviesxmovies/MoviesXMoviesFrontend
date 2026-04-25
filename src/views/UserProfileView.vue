@@ -11,7 +11,7 @@ import {
 } from '@/repositories/userRepository';
 import type { FriendRequest, MovieList, Review, User } from '@/types';
 import { Accordion, AccordionContent, AccordionHeader, AccordionPanel, useToast } from 'primevue';
-import { ref, watch } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useLangStore } from '@/stores/langStore';
@@ -38,6 +38,12 @@ const user = ref<User>({} as User);
 const loadingProfile = ref(false);
 const isSelfProfile = ref(false);
 const editProfileModalVisible = ref(false);
+
+const isMobile = ref(window.innerWidth < 640);
+const handleResize = () => {
+    isMobile.value = window.innerWidth < 640;
+};
+
 
 const { data: reviews, loading: loadingReviews, fetch: fetchReviews, reset: resetReviews } = usePaginatedFetch<Review>();
 const { data: friendRequests, loading: loadingRequests, fetch: fetchRequests, reset: resetRequests } = usePaginatedFetch<FriendRequest>();
@@ -121,15 +127,27 @@ const sendFriendRequest = async (username: string) => {
     }
 };
 
+const logout = () => {
+    authStore.logout();
+    router.push({ name: 'welcome' });
+};
+
 const { sentinelRef: reviewsSentinelRef } = useInfinitePagination(reviews, loadingReviews, fetchUserReviews);
 const { sentinelRef: friendRequestsSentinelRef } = useInfinitePagination(friendRequests, loadingRequests, fetchUserFriendRequests);
 const { sentinelRef: friendsSentinelRef } = useInfinitePagination(friends, loadingFriends, fetchUserFriends);
 const { sentinelRef: suggestedFriendsSentinelRef } = useInfinitePagination(suggestedFriends, loadingSuggestedFriends, fetchUserSuggestedFriends);
 const { sentinelRef: moviesListsSentinelRef } = useInfinitePagination(moviesLists, loadingMoviesLists, fetchMoviesLists);
+onMounted(() => {
+    window.addEventListener('resize', handleResize);
 
+    onUnmounted(() => {
+        window.removeEventListener('resize', handleResize);
+    });
+});
 watch(
     () => [route.params.slug, langStore.language],
     async () => {
+
         resetReviews();
         resetRequests();
         resetFriends();
@@ -161,9 +179,13 @@ watch(
                         <h1 class="user-name" :style="isSelfProfile ? 'text-align: start' : 'text-align: center'">
                             {{ user.username }}
                         </h1>
+                        <button v-if="isSelfProfile && isMobile" class="btn-logout" @click="logout">
+                            {{ $t('user.logout') }}
+                        </button>
                         <button v-if="isSelfProfile" @click="editProfileModalVisible = true" class="btn-edit">
                             {{ $t('user.editProfile') }}
                         </button>
+
                         <FriendshipStatusComponent v-else :user="user" :onAddFriend="sendFriendRequest" />
                     </div>
                 </div>
@@ -448,6 +470,32 @@ watch(
 }
 
 .btn-edit:active {
+    transform: scale(0.97);
+}
+
+.btn-logout {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid var(--red);
+    background: transparent;
+    color: var(--red);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, transform 0.1s;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.btn-logout:hover {
+    background: var(--red);
+    color: var(--background);
+}
+
+.btn-logout:active {
     transform: scale(0.97);
 }
 </style>
