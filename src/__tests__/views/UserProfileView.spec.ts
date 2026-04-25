@@ -15,6 +15,7 @@ const {
     mockGetSuggestedFriends,
     mockGetUserMoviesLists,
     mockToast,
+    mockLogout,
 } = vi.hoisted(() => ({
     mockGetSelfUserProfile: vi.fn(),
     mockGetUserProfile: vi.fn(),
@@ -25,6 +26,8 @@ const {
     mockGetSuggestedFriends: vi.fn(),
     mockGetUserMoviesLists: vi.fn(),
     mockToast: { add: vi.fn() },
+    mockLogout: vi.fn(),
+
 }));
 
 vi.mock('@/repositories/userRepository', () => ({
@@ -69,7 +72,7 @@ vi.mock('@/stores/langStore', () => ({
 }));
 
 vi.mock('@/stores/authStore', () => ({
-    useAuthStore: () => ({ user: { user_id: 1 }, isAuthenticated: true }),
+    useAuthStore: () => ({ user: { user_id: 1 }, isAuthenticated: true, logout: mockLogout }),
 }));
 vi.mock("primevue/usetoast", () => ({
     useToast: () => mockToast,
@@ -91,8 +94,8 @@ const mockUser: any = { id: 1, username: 'testuser', picture: 'pic.jpg', bio: 'b
 const factory = (routeSlug = '') => {
     mockUseRoute.mockReturnValue({ params: { slug: routeSlug } });
     return mount(UserProfileView, {
-        global: { plugins: [i18n,ToastService] },
-        
+        global: { plugins: [i18n, ToastService] },
+
     });
 };
 
@@ -296,5 +299,39 @@ describe('UserProfileView', () => {
         const wrapper = factory('');
         await flushPromises();
         expect(wrapper.find('.movies-list-stub').exists()).toBe(true);
+    });
+
+    // ── Logout on mobile ─────────────────────────────────────────────
+    describe('logout on mobile', () => {
+        it('shows logout button on mobile for self profile', async () => {
+            vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(500);
+            const wrapper = factory('');
+            await flushPromises();
+            expect(wrapper.find('.btn-logout').exists()).toBe(true);
+        });
+
+        it('does not show logout button on desktop for self profile', async () => {
+            vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(1024);
+            const wrapper = factory('');
+            await flushPromises();
+            expect(wrapper.find('.btn-logout').exists()).toBe(false);
+        });
+
+        it('does not show logout button on mobile for other profile', async () => {
+            vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(500);
+            mockGetUserProfile.mockResolvedValue({ ...mockUser, id: 999 });
+            const wrapper = factory('otheruser');
+            await flushPromises();
+            expect(wrapper.find('.btn-logout').exists()).toBe(false);
+        });
+
+        it('calls logout and redirects on click', async () => {
+            vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(500);
+            const wrapper = factory('');
+            await flushPromises();
+            await wrapper.find('.btn-logout').trigger('click');
+            expect(mockLogout).toHaveBeenCalled();
+            expect(mockPush).toHaveBeenCalledWith({ name: 'welcome' });
+        });
     });
 });
