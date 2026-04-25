@@ -2,6 +2,7 @@
 import { api } from "@/composables/useAPI";
 import { friendsRatings } from "@/repositories/movieRepository";
 import type { Rating, User } from "@/types";
+import { goToUser } from "@/utils/goTo";
 import { ref, onMounted, watch, onUnmounted } from "vue";
 
 const props = defineProps<{
@@ -184,7 +185,7 @@ onUnmounted(() => { if (bubbleTimer) clearInterval(bubbleTimer); });
             <div v-for="bubble in visibleBubbles" :key="bubble.key" class="bubble" :style="{
                 '--bubble-color': RATING_COLORS[bubble.rating] ?? 'var(--primary)',
                 '--x-offset': bubble.xOffset,
-            }">
+            }" @click="goToUser(bubble.profile?.username)">
                 <div class="bubble-avatar">
                     <img v-if="bubble.profile?.picture" :src="bubble.profile.picture" :alt="bubble.user"
                         class="avatar-img" />
@@ -241,6 +242,9 @@ onUnmounted(() => { if (bubbleTimer) clearInterval(bubbleTimer); });
     animation: float-up 6s ease-in forwards;
     font-family: 'DM Sans', sans-serif;
     transform-origin: left center;
+    cursor: pointer;
+    pointer-events: all;
+    user-select: none;
 }
 
 .bubble-avatar {
