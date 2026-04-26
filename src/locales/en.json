@@ -261,6 +261,7 @@
   },
   "user": {
     "editProfile": "Edit",
+    "editProfileTitle": "Edit Profile",
     "friendsRequests": "Friend Requests",
     "friends": "Friends",
     "biography": "Biography",

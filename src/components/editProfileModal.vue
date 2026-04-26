@@ -131,7 +131,7 @@ watch(visible, (val) => {
 </script>
 
 <template>
-    <Dialog v-model:visible="visible" modal :draggable="false" :dismissableMask="true" :header="t('user.editProfile')"
+    <Dialog v-model:visible="visible" modal :draggable="false" :dismissableMask="true" :header="t('user.editProfileTitle')"
         :style="{ width: '90vw', maxWidth: '480px' }" :pt="{
             root: { class: 'rounded-[2rem] border-none shadow-2xl bg-[var(--background)] overflow-hidden' },
             header: { class: 'bg-[var(--background)] pb-0' },
