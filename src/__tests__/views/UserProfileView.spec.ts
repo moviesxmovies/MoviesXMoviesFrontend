@@ -17,6 +17,8 @@ const {
     mockToast,
     mockLogout,
     mockRefreshToken,
+    mockProfileStoreRefresh,
+
 } = vi.hoisted(() => ({
     mockGetSelfUserProfile: vi.fn(),
     mockGetUserProfile: vi.fn(),
@@ -29,6 +31,7 @@ const {
     mockToast: { add: vi.fn() },
     mockLogout: vi.fn(),
     mockRefreshToken: vi.fn(),
+    mockProfileStoreRefresh: vi.fn(),
 }));
 
 vi.mock('@/repositories/userRepository', () => ({
@@ -41,8 +44,11 @@ vi.mock('@/repositories/userRepository', () => ({
     getSuggestedFriends: mockGetSuggestedFriends,
     getUserMoviesLists: mockGetUserMoviesLists,
 }));
+vi.mock('@/stores/profileStore', () => ({
+    useProfileStore: () => ({ refresh: mockProfileStoreRefresh }),
+}));
 vi.mock('@/repositories/auth/authRepository', () => ({
-  refreshToken: mockRefreshToken,
+    refreshToken: mockRefreshToken,
 }));
 
 const { mockPush, mockUseRoute } = vi.hoisted(() => ({
@@ -338,22 +344,79 @@ describe('UserProfileView', () => {
             expect(mockPush).toHaveBeenCalledWith({ name: 'welcome' });
         });
     });
-    // ── emailChanged ──────────────────────────────────────────────────────────
-    describe('emailChanged', () => {
-        it('calls refreshToken when emailChanged is triggered', async () => {
+    // ── onUpdated ─────────────────────────────────────────────────────────────
+    describe('onUpdated', () => {
+        it('updates user value with the new user', async () => {
             const wrapper = factory('');
             await flushPromises();
             const vm = wrapper.vm as any;
-            await vm.emailChanged();
+
+            const updatedUser = { ...mockUser, username: 'newusername' };
+            await vm.onUpdated(updatedUser);
+
+            expect(vm.user.username).toBe('newusername');
+        });
+
+        it('calls refreshToken after profile update', async () => {
+            mockRefreshToken.mockResolvedValue({});
+            const wrapper = factory('');
+            await flushPromises();
+            const vm = wrapper.vm as any;
+
+            await vm.onUpdated(mockUser);
+
             expect(mockRefreshToken).toHaveBeenCalled();
         });
 
-        it('redirects to /verify-email after emailChanged', async () => {
+        it('calls profileStore.refresh after profile update', async () => {
+            mockRefreshToken.mockResolvedValue({});
+            const wrapper = factory('');
+            await flushPromises();
+            const vm = wrapper.vm as any;
+
+            await vm.onUpdated(mockUser);
+
+            expect(mockProfileStoreRefresh).toHaveBeenCalled();
+        });
+
+        it('calls profileStore.refresh after refreshToken', async () => {
+            let refreshTokenResolved = false;
+            mockRefreshToken.mockImplementation(() => {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        refreshTokenResolved = true;
+                        resolve({});
+                    }, 0);
+                });
+            });
+
+            const wrapper = factory('');
+            await flushPromises();
+            const vm = wrapper.vm as any;
+
+            await vm.onUpdated(mockUser);
+
+            expect(refreshTokenResolved).toBe(true);
+            expect(mockProfileStoreRefresh).toHaveBeenCalled();
+        });
+    });
+    // ── emailChanged ──────────────────────────────────────────────────────────
+    describe('emailChanged', () => {
+        it('redirects to /verify-email', async () => {
             const wrapper = factory('');
             await flushPromises();
             const vm = wrapper.vm as any;
             await vm.emailChanged();
             expect(mockPush).toHaveBeenCalledWith('/verify-email');
+        });
+
+        it('does not call refreshToken directly', async () => {
+            const wrapper = factory('');
+            await flushPromises();
+            const vm = wrapper.vm as any;
+            mockRefreshToken.mockClear();
+            await vm.emailChanged();
+            expect(mockRefreshToken).not.toHaveBeenCalled();
         });
     });
 });

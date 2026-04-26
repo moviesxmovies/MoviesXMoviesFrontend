@@ -27,6 +27,7 @@ import MoviesListComponent from '@/components/moviesListComponent.vue';
 import SectionAccordion from '@/components/sectionAccordion.vue';
 import EditProfileModal from '@/components/editProfileModal.vue';
 import { refreshToken } from '@/repositories/auth/authRepository';
+import { useProfileStore } from '@/stores/profileStore';
 
 const route = useRoute();
 const router = useRouter();
@@ -35,6 +36,7 @@ const toast = useToast();
 const langStore = useLangStore();
 const authStore = useAuthStore();
 const notificationsStore = useNotificationsStore();
+const profileStore = useProfileStore();
 
 const user = ref<User>({} as User);
 const loadingProfile = ref(false);
@@ -143,8 +145,13 @@ const { sentinelRef: suggestedFriendsSentinelRef } = useInfinitePagination(sugge
 const { sentinelRef: moviesListsSentinelRef } = useInfinitePagination(moviesLists, loadingMoviesLists, fetchMoviesLists);
 
 const emailChanged = async () => {
-    await refreshToken();
     router.push('/verify-email');
+};
+
+const onUpdated = async (userUpdated: User) => {
+    user.value = userUpdated;
+    await refreshToken();
+    profileStore.refresh(); 
 };
 onMounted(() => {
     window.addEventListener('resize', handleResize);
@@ -177,8 +184,7 @@ watch(
 </script>
 
 <template>
-    <EditProfileModal v-model:visible="editProfileModalVisible" @updated="(updatedUser) => user = updatedUser"
-        @emailChanged="emailChanged" />
+    <EditProfileModal v-model:visible="editProfileModalVisible" @updated="onUpdated" @emailChanged="emailChanged" />
     <div class="page">
         <div class="layout">
             <aside class="sidebar">
