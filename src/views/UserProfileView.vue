@@ -9,7 +9,7 @@ import {
     getSuggestedFriends,
     getUserMoviesLists,
 } from '@/repositories/userRepository';
-import type { FriendRequest, MovieList, Review, SelfUser, User } from '@/types';
+import type { FriendRequest, MovieList, Review, User } from '@/types';
 import { Accordion, AccordionContent, AccordionHeader, AccordionPanel, Skeleton, useToast } from 'primevue';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
