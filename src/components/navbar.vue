@@ -10,6 +10,7 @@ import { useI18n } from "vue-i18n";
 import { useThemeStore } from "@/stores/themeStore";
 import { useNotificationsStore } from "@/stores/notificationStore";
 import { Skeleton } from "primevue";
+import { useProfileStore } from "@/stores/profileStore";
 
 const { t } = useI18n();
 const router = useRouter();
@@ -21,6 +22,7 @@ const notificationsStore = useNotificationsStore();
 const profileImageLoaded = ref(false);
 const loadingProfile = ref(true);
 const profileImageLoadedMobile = ref(false);
+const profileStore = useProfileStore();
 const loadProfilePicture = async () => {
   if (!authStore.isAuthenticated) {
     profilePicture.value = null;
@@ -92,6 +94,12 @@ watch(() => authStore.isAuthenticated, (isAuthenticated) => {
     profilePicture.value = null;
     notificationsStore.set(0);
   }
+});
+
+watch(() => profileStore.refreshKey, () => {
+  profileImageLoaded.value = false;
+  profileImageLoadedMobile.value = false;
+  loadProfilePicture();
 });
 </script>
 
