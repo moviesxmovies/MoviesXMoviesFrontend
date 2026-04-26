@@ -9,7 +9,7 @@ import {
     getSuggestedFriends,
     getUserMoviesLists,
 } from '@/repositories/userRepository';
-import type { FriendRequest, MovieList, Review, User } from '@/types';
+import type { FriendRequest, MovieList, Review, SelfUser, User } from '@/types';
 import { Accordion, AccordionContent, AccordionHeader, AccordionPanel, Skeleton, useToast } from 'primevue';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -26,6 +26,7 @@ import FriendshipStatusComponent from '@/components/friendshipStatusComponent.vu
 import MoviesListComponent from '@/components/moviesListComponent.vue';
 import SectionAccordion from '@/components/sectionAccordion.vue';
 import EditProfileModal from '@/components/editProfileModal.vue';
+import { refreshToken } from '@/repositories/auth/authRepository';
 
 const route = useRoute();
 const router = useRouter();
@@ -140,6 +141,11 @@ const { sentinelRef: friendRequestsSentinelRef } = useInfinitePagination(friendR
 const { sentinelRef: friendsSentinelRef } = useInfinitePagination(friends, loadingFriends, fetchUserFriends);
 const { sentinelRef: suggestedFriendsSentinelRef } = useInfinitePagination(suggestedFriends, loadingSuggestedFriends, fetchUserSuggestedFriends);
 const { sentinelRef: moviesListsSentinelRef } = useInfinitePagination(moviesLists, loadingMoviesLists, fetchMoviesLists);
+
+const emailChanged = async () => {
+    await refreshToken();
+    router.push('/verify-email');
+};
 onMounted(() => {
     window.addEventListener('resize', handleResize);
 
@@ -171,7 +177,8 @@ watch(
 </script>
 
 <template>
-    <EditProfileModal v-model:visible="editProfileModalVisible" @updated="(updatedUser) => user = updatedUser" />
+    <EditProfileModal v-model:visible="editProfileModalVisible" @updated="(updatedUser) => user = updatedUser"
+        @emailChanged="emailChanged" />
     <div class="page">
         <div class="layout">
             <aside class="sidebar">
