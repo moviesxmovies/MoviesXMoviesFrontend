@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { Dialog, useToast } from 'primevue';
+import { Dialog, Skeleton, useToast } from 'primevue';
 import { getSelfUserProfile, updateSelfUserProfile } from '@/repositories/userRepository';
 import type { SelfUser, User } from '@/types';
 import { editProfileSchema } from '@/schemas/editProfileSchema';
@@ -15,7 +15,7 @@ const emit = defineEmits<{
     emailChanged: [];
 }>();
 
-const loading = ref(false);
+const loading = ref(true);
 const picturePreview = ref<string | null>(null);
 const pictureFile = ref<File | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
@@ -144,7 +144,60 @@ watch(visible, (val) => {
             footer: { class: 'bg-[var(--background)] border-t border-[var(--secondary)]' },
             closeButton: { class: 'hover:bg-[var(--secondary)]/20 transition-colors' },
         }">
-        <div class="form">
+        <!-- SKELETON -->
+        <div v-if="loading" class="form">
+            <!-- Avatar -->
+            <div class="avatar-section">
+                <Skeleton shape="circle" width="90px" height="90px" />
+                <Skeleton width="140px" height="11px" border-radius="4px" />
+            </div>
+
+            <!-- Fields -->
+            <div class="fields">
+                <!-- first_name + last_name -->
+                <div class="field-row">
+                    <div class="field">
+                        <Skeleton width="80px" height="11px" border-radius="4px" />
+                        <Skeleton width="100%" height="40px" border-radius="0.75rem" />
+                    </div>
+                    <div class="field">
+                        <Skeleton width="80px" height="11px" border-radius="4px" />
+                        <Skeleton width="100%" height="40px" border-radius="0.75rem" />
+                    </div>
+                </div>
+
+                <!-- username -->
+                <div class="field">
+                    <Skeleton width="70px" height="11px" border-radius="4px" />
+                    <Skeleton width="100%" height="40px" border-radius="0.75rem" />
+                </div>
+
+                <!-- email -->
+                <div class="field">
+                    <Skeleton width="50px" height="11px" border-radius="4px" />
+                    <Skeleton width="100%" height="40px" border-radius="0.75rem" />
+                </div>
+
+                <!-- bio (textarea más alta) -->
+                <div class="field">
+                    <Skeleton width="30px" height="11px" border-radius="4px" />
+                    <Skeleton width="100%" height="80px" border-radius="0.75rem" />
+                </div>
+
+                <!-- password -->
+                <div class="field">
+                    <Skeleton width="110px" height="11px" border-radius="4px" />
+                    <Skeleton width="100%" height="40px" border-radius="0.75rem" />
+                </div>
+
+                <!-- confirm_password -->
+                <div class="field">
+                    <Skeleton width="140px" height="11px" border-radius="4px" />
+                    <Skeleton width="100%" height="40px" border-radius="0.75rem" />
+                </div>
+            </div>
+        </div>
+        <div v-else class="form">
             <!-- Profile Picture -->
             <div class="avatar-section">
                 <div class="avatar-wrapper" @click="fileInput?.click()">

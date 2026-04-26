@@ -59,6 +59,11 @@ vi.mock("primevue", async () => {
             : null;
       },
     }),
+    Skeleton: defineComponent({
+      name: "Skeleton",
+      props: ["width", "height", "shape", "borderRadius"],
+      template: "<div class='p-skeleton' />",
+    }),
     useToast: () => ({ add: mockToastAdd }),
   };
 });
