@@ -43,8 +43,9 @@ describe('ReactionsComponent', () => {
         expect(wrapper.find('.reactions-wrapper').exists()).toBe(true);
     });
 
-    it('renders the add reaction button', () => {
+    it('renders the add reaction button', async () => {
         const wrapper = mountComponent();
+        await flushPromises();
         expect(wrapper.find('.add-reaction-btn').exists()).toBe(true);
     });
 
@@ -55,12 +56,14 @@ describe('ReactionsComponent', () => {
 
     it('shows picker when add button is clicked', async () => {
         const wrapper = mountComponent();
+        await flushPromises();
         await wrapper.find('.add-reaction-btn').trigger('click');
         expect(wrapper.find('.emoji-picker').exists()).toBe(true);
     });
 
     it('hides picker when add button is clicked again', async () => {
         const wrapper = mountComponent();
+        await flushPromises();
         await wrapper.find('.add-reaction-btn').trigger('click');
         await wrapper.find('.add-reaction-btn').trigger('click');
         expect(wrapper.find('.emoji-picker').exists()).toBe(false);
@@ -82,7 +85,7 @@ describe('ReactionsComponent', () => {
     });
 
     it('logs error when fetch fails', async () => {
-        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
         mockGetReviewReactions.mockRejectedValue(new Error('Network error'));
         mountComponent();
         await flushPromises();
@@ -162,7 +165,7 @@ describe('ReactionsComponent', () => {
         });
 
         it('reverts optimistic update on error', async () => {
-            const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+            const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
             mockPostReactionApi.mockRejectedValue(new Error('Network error'));
             const wrapper = mountComponent();
             await flushPromises();
@@ -174,7 +177,7 @@ describe('ReactionsComponent', () => {
         });
 
         it('logs error when postReactionApi fails', async () => {
-            const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+            const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
             mockPostReactionApi.mockRejectedValue(new Error('Network error'));
             const wrapper = mountComponent();
             await flushPromises();
@@ -229,7 +232,7 @@ describe('ReactionsComponent', () => {
         });
 
         it('logs error when deleteReactionApi fails', async () => {
-            const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+            const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
             mockGetReviewReactions.mockResolvedValue(reactionsWithYourLike);
             mockDeleteReactionApi.mockRejectedValue(new Error('Network error'));
             const wrapper = mountComponent();
@@ -254,6 +257,7 @@ describe('ReactionsComponent', () => {
     // ── emoji picker options ──────────────────────────────────────────────────
     it('renders all 16 emoji options in picker', async () => {
         const wrapper = mountComponent();
+        await flushPromises();
         await wrapper.find('.add-reaction-btn').trigger('click');
         expect(wrapper.findAll('.emoji-option')).toHaveLength(16);
     });

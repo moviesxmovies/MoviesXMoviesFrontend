@@ -48,11 +48,12 @@ describe('FriendComponent', () => {
         expect(wrapper.find('.username').text()).toBe(mockUser.username);
     });
 
-    it('renders slot content', () => {
+    it('renders slot content', async () => {
         const wrapper = mount(FriendComponent, {
             props: { username: 'testuser' },
             slots: { default: '<button class="slot-btn">Action</button>' },
         });
+        await flushPromises(); 
         expect(wrapper.find('.slot-btn').exists()).toBe(true);
     });
 
