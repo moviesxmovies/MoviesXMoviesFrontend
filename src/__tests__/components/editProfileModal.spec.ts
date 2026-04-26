@@ -53,9 +53,9 @@ vi.mock("primevue", async () => {
         return () =>
           props.visible
             ? h("div", { "data-testid": "Dialog" }, [
-                slots.default?.(),
-                slots.footer?.(),
-              ])
+              slots.default?.(),
+              slots.footer?.(),
+            ])
             : null;
       },
     }),
@@ -422,6 +422,46 @@ describe("EditProfileModal", () => {
 
       const formData: FormData = mockUpdateSelfUserProfile.mock.calls[0][0];
       expect(formData.get("picture")).toBe(file);
+    });
+  });
+  // ── Email change ──────────────────────────────────────────────────────────
+  describe("email change", () => {
+    it("emits 'emailChanged' when the returned user has a different email", async () => {
+      const updatedUser = { ...mockSelfUser, email: "new@example.com" };
+      mockUpdateSelfUserProfile.mockResolvedValue(updatedUser);
+
+      const wrapper = await mountComponent(true);
+      await flushPromises();
+
+      await wrapper.find(".btn-save").trigger("click");
+      await flushPromises();
+
+      expect(wrapper.emitted("emailChanged")).toBeTruthy();
+    });
+
+    it("does not emit 'emailChanged' when email is unchanged", async () => {
+      mockUpdateSelfUserProfile.mockResolvedValue(mockSelfUser);
+
+      const wrapper = await mountComponent(true);
+      await flushPromises();
+
+      await wrapper.find(".btn-save").trigger("click");
+      await flushPromises();
+
+      expect(wrapper.emitted("emailChanged")).toBeFalsy();
+    });
+
+    it("does not emit 'emailChanged' when email field is empty", async () => {
+      const wrapper = await mountComponent(true);
+      await flushPromises();
+
+      const vm = wrapper.vm as any;
+      vm.form.email = "";
+
+      await wrapper.find(".btn-save").trigger("click");
+      await flushPromises();
+
+      expect(wrapper.emitted("emailChanged")).toBeFalsy();
     });
   });
 });
