@@ -10,7 +10,9 @@ const { t } = useI18n();
 const toast = useToast();
 const user = ref<SelfUser>();
 const visible = defineModel<boolean>('visible', { default: false });
-const emit = defineEmits<{ (e: 'updated', user: User): void }>();
+const emit = defineEmits<{
+    updated: [user: User];
+}>();
 
 const loading = ref(false);
 const picturePreview = ref<string | null>(null);
@@ -29,24 +31,7 @@ const form = ref({
     confirm_password: '',
 });
 
-watch(visible, async (val) => {
-    if (val) {
-        await fetchUserData();
-        form.value = {
-            username: user.value?.username ?? '',
-            email: user.value?.email ?? '',
-            first_name: user.value?.first_name ?? '',
-            last_name: user.value?.last_name ?? '',
-            bio: user.value?.bio ?? '',
-            password: '',
-            confirm_password: '',
-        };
-        picturePreview.value = user.value?.picture ?? null;
-        pictureFile.value = null;
-        fieldErrors.value = {};
-        serverErrors.value = [];
-    }
-});
+
 
 const clearError = (field: string) => {
     if (fieldErrors.value[field]?.length) {
@@ -112,11 +97,37 @@ const submit = async () => {
 
 const fetchUserData = async () => {
     try {
+        loading.value = true;
         user.value = await getSelfUserProfile();
     } catch (error) {
         console.error('Error fetching user data:', error);
+    }finally {
+        loading.value = false;
     }
 };
+
+const resetForm = async () => {
+    await fetchUserData();
+
+    form.value = {
+        username: user.value?.username ?? '',
+        email: user.value?.email ?? '',
+        first_name: user.value?.first_name ?? '',
+        last_name: user.value?.last_name ?? '',
+        bio: user.value?.bio ?? '',
+        password: '',
+        confirm_password: '',
+    };
+    picturePreview.value = user.value?.picture ?? null;
+    pictureFile.value = null;
+    fieldErrors.value = {};
+    serverErrors.value = [];
+};
+watch(visible, (val) => {
+    if (val) {
+        resetForm();
+    }
+});
 </script>
 
 <template>
@@ -130,7 +141,7 @@ const fetchUserData = async () => {
             closeButton: { class: 'hover:bg-[var(--secondary)]/20 transition-colors' },
         }">
         <div class="form">
-            <!-- Avatar -->
+            <!-- Profile Picture -->
             <div class="avatar-section">
                 <div class="avatar-wrapper" @click="fileInput?.click()">
                     <img :src="picturePreview ?? ''" class="avatar-img" :alt="t('user.yourProfile')" />
@@ -142,7 +153,7 @@ const fetchUserData = async () => {
                 <p class="avatar-hint">{{ t('user.clickToChangePicture') }}</p>
             </div>
 
-            <!-- Errores globales del servidor -->
+            <!-- Global Errors -->
             <div v-if="serverErrors.length" class="server-errors">
                 <i class="pi pi-exclamation-circle" />
                 <ul>
@@ -229,6 +240,10 @@ const fetchUserData = async () => {
             <div class="footer-actions">
                 <button class="btn-cancel" @click="visible = false">
                     {{ t('common.cancel') }}
+                </button>
+                <button class="btn-reset" :disabled="loading" @click="resetForm">
+                    <i v-if="loading" class="pi pi-spin pi-spinner" />
+                    <span>{{ t('common.reset') }}</span>
                 </button>
                 <button class="btn-save" :disabled="loading" @click="submit">
                     <i v-if="loading" class="pi pi-spin pi-spinner" />
@@ -435,5 +450,30 @@ label {
 
 .btn-save:hover:not(:disabled) {
     opacity: 0.85;
+}
+
+.btn-reset {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1.4rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--orange) 60%, transparent);
+    background: transparent;
+    color: var(--text);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.btn-reset:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-reset:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--orange) 15%, transparent);
+    border-color: color-mix(in srgb, var(--orange) 80%, transparent);
 }
 </style>

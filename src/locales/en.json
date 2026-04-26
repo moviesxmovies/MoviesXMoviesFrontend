@@ -288,10 +288,12 @@
     "newPassword": "New Password",
     "confirmPassword": "Confirm New Password",
     "leaveBlankToKeep": "Leave blank to keep current password",
-    "yourProfile": "Your Profile Picture"
+    "yourProfile": "Your Profile Picture",
+    "profileUpdated": "Profile updated successfully"
   },
   "common": {
     "save": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "reset": "Reset"
   }
 }
