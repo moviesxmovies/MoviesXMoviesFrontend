@@ -278,7 +278,8 @@
      "no_suggested_friends_description": "We couldn't find any suggested friends for you at the moment",
      "movies_lists": "Movies Lists",
      "no_movies_lists": "No movies lists available",
-     "no_movies_lists_description": "This user hasn't created any movies lists yet."
+     "no_movies_lists_description": "This user hasn't created any movies lists yet.",
+     "logout": "Logout"
      
   }
 }

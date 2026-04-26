@@ -10,7 +10,7 @@ import {
     getUserMoviesLists,
 } from '@/repositories/userRepository';
 import type { FriendRequest, MovieList, Review, User } from '@/types';
-import { Accordion, AccordionContent, AccordionHeader, AccordionPanel, useToast } from 'primevue';
+import { Accordion, AccordionContent, AccordionHeader, AccordionPanel, Skeleton, useToast } from 'primevue';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -174,22 +174,32 @@ watch(
         <div class="layout">
             <aside class="sidebar">
                 <div class="card">
-                    <div class="card-image">
-                        <img :src="user.picture" :alt="user.username" class="card-img" />
-                    </div>
-                    <div class="card-body">
-                        <h1 class="user-name" :style="isSelfProfile ? 'text-align: start' : 'text-align: center'">
-                            {{ user.username }}
-                        </h1>
-                        <button v-if="isSelfProfile && isMobile" class="btn-logout" @click="logout">
-                            {{ $t('user.logout') }}
-                        </button>
-                        <button v-if="isSelfProfile" @click="editProfileModalVisible = true" class="btn-edit">
-                            {{ $t('user.editProfile') }}
-                        </button>
-
-                        <FriendshipStatusComponent v-else :user="user" :onAddFriend="sendFriendRequest" />
-                    </div>
+                    <template v-if="loadingProfile">
+                        <div class="card-image">
+                            <Skeleton width="100%" height="100%" />
+                        </div>
+                        <div class="card-body">
+                            <Skeleton width="120px" height="20px" border-radius="8px" />
+                            <Skeleton width="80px" height="32px" border-radius="999px" />
+                        </div>
+                    </template>
+                    <template v-else>
+                        <div class="card-image">
+                            <img :src="user.picture" :alt="user.username" class="card-img" />
+                        </div>
+                        <div class="card-body">
+                            <h1 class="user-name" :style="isSelfProfile ? 'text-align: start' : 'text-align: center'">
+                                {{ user.username }}
+                            </h1>
+                            <button v-if="isSelfProfile && isMobile" class="btn-logout" @click="logout">
+                                {{ $t('user.logout') }}
+                            </button>
+                            <button v-if="isSelfProfile" @click="editProfileModalVisible = true" class="btn-edit">
+                                {{ $t('user.editProfile') }}
+                            </button>
+                            <FriendshipStatusComponent v-else :user="user" :onAddFriend="sendFriendRequest" />
+                        </div>
+                    </template>
                 </div>
             </aside>
 

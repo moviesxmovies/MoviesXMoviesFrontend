@@ -4,12 +4,14 @@ import { type Movie, type Review } from '@/types';
 import { goToMovie } from '@/utils/goTo';
 import { onMounted, ref } from 'vue';
 import ReactionsComponent from './reactionsComponent.vue';
+import { Skeleton } from 'primevue';
 
 const props = defineProps<{
     review: Review;
 }>();
 
 const movie = ref<Movie | null>(null);
+const loading = ref(true);
 
 const fetchMovieData = async () => {
     try {
@@ -17,6 +19,8 @@ const fetchMovieData = async () => {
         movie.value = response.data;
     } catch (error) {
         console.error('Error fetching movie data:', error);
+    } finally {
+        loading.value = false;
     }
 };
 
@@ -30,23 +34,49 @@ onMounted(() => {
 
 <template>
     <div class="review">
-        <div class="review-main">
-            <img class="movie-cover" :src="movie?.cover" :alt="movie?.title" @click="goToMovie(movie?.slug)" />
-            <div class="review-body">
-                <div class="review-header">
-                    <div class="review-meta">
-                        <span class="movie-name" @click="goToMovie(movie?.slug)">{{ movie?.title }}</span>
-                        <span class="review-date">{{ new Date(review.created_at).toLocaleDateString() }}</span>
+        <!-- SKELETON -->
+        <template v-if="loading">
+            <div class="review-main">
+                <Skeleton width="4rem" height="6rem" border-radius="0.5rem" style="flex-shrink: 0" />
+                <div class="review-body">
+                    <div class="review-header">
+                        <div class="review-meta">
+                            <Skeleton width="120px" height="14px" border-radius="4px" />
+                            <Skeleton width="70px" height="11px" border-radius="4px" style="margin-top: 4px" />
+                        </div>
+                        <Skeleton width="2rem" height="2rem" border-radius="50%" />
                     </div>
-                    <span class="badge" :class="review.is_positive ? 'badge-positive' : 'badge-negative'">
-                        <i :class="review.is_positive ? 'pi pi-thumbs-up' : 'pi pi-thumbs-down'" />
-                    </span>
+                    <Skeleton width="55%" height="15px" border-radius="4px" style="margin-top: 4px" />
+                    <Skeleton width="100%" height="11px" border-radius="4px" style="margin-top: 8px" />
+                    <Skeleton width="80%" height="11px" border-radius="4px" style="margin-top: 4px" />
+                    <Skeleton width="65%" height="11px" border-radius="4px" style="margin-top: 4px" />
                 </div>
-                <h3 class="review-title">{{ review.title }}</h3>
-                <p class="review-content">{{ review.content }}</p>
             </div>
-        </div>
-        <ReactionsComponent :reviewId="review.id" type="review" />
+            <div class="reactions-skeleton">
+                <Skeleton v-for="i in 3" :key="i" width="48px" height="28px" border-radius="999px" />
+            </div>
+        </template>
+
+        <!-- CONTENT -->
+        <template v-else>
+            <div class="review-main">
+                <img class="movie-cover" :src="movie?.cover" :alt="movie?.title" @click="goToMovie(movie?.slug)" />
+                <div class="review-body">
+                    <div class="review-header">
+                        <div class="review-meta">
+                            <span class="movie-name" @click="goToMovie(movie?.slug)">{{ movie?.title }}</span>
+                            <span class="review-date">{{ new Date(review.created_at).toLocaleDateString() }}</span>
+                        </div>
+                        <span class="badge" :class="review.is_positive ? 'badge-positive' : 'badge-negative'">
+                            <i :class="review.is_positive ? 'pi pi-thumbs-up' : 'pi pi-thumbs-down'" />
+                        </span>
+                    </div>
+                    <h3 class="review-title">{{ review.title }}</h3>
+                    <p class="review-content">{{ review.content }}</p>
+                </div>
+            </div>
+            <ReactionsComponent :reviewId="review.id" type="review" />
+        </template>
     </div>
 </template>
 
@@ -62,6 +92,7 @@ onMounted(() => {
     transition: background 0.2s;
     margin-bottom: 0.75rem;
 }
+
 
 .review-main {
     display: flex;
@@ -117,9 +148,10 @@ onMounted(() => {
     text-transform: uppercase;
     letter-spacing: 0.1em;
     cursor: pointer;
-    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    word-break: break-word;
+    line-height: 1.3;
 }
 
 .movie-name:hover {
@@ -167,5 +199,10 @@ onMounted(() => {
     opacity: 0.8;
     margin: 0;
     white-space: pre-line;
+}
+
+.reactions-skeleton {
+    display: flex;
+    gap: 8px;
 }
 </style>

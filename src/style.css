@@ -56,16 +56,14 @@
 }
 
 .p-skeleton {
-  background-color: #1a1a1a !important;
+  background-color: color-mix(in srgb, var(--secondary) 30%, transparent) !important;
 }
 
 .p-skeleton::after {
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.1),
-    transparent
-  ) !important;
+  background: linear-gradient(90deg,
+      transparent,
+      color-mix(in srgb, var(--secondary) 20%, var(--background)),
+      transparent) !important;
 }
 
 .p-drawer,
