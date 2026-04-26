@@ -69,12 +69,12 @@
       "getGenresError": "Error obtaining genres"
     },
     "searchPlatforms": {
-      "platforms":"Platforms",
+      "platforms": "Platforms",
       "getPlatformsError": "Error obtaining platforms"
     },
     "filter": {
       "genres": "Filter by Genre",
-      "platforms":"Filter Platform",
+      "platforms": "Filter Platform",
       "stars": "Filter by Stars"
     }
   },
@@ -111,7 +111,6 @@
     "password": "Password",
     "noAccount": "Don't have an account?",
     "signup": "Sign up here",
-
     "forgotPassword": "Forgot your password?"
   },
   "notFound": {
@@ -260,8 +259,9 @@
     "searchMoviesError": "Error fetching movies",
     "filters": "filters"
   },
-  "user":{
+  "user": {
     "editProfile": "Edit",
+    "editProfileTitle": "Edit Profile",
     "friendsRequests": "Friend Requests",
     "friends": "Friends",
     "biography": "Biography",
@@ -274,12 +274,27 @@
     "no_friends": "No friends available",
     "no_friends_description": "This user doesn't have any friends yet.",
     "suggested_friends": "Suggested Friends",
-     "no_suggested_friends": "No suggested friends available",
-     "no_suggested_friends_description": "We couldn't find any suggested friends for you at the moment",
-     "movies_lists": "Movies Lists",
-     "no_movies_lists": "No movies lists available",
-     "no_movies_lists_description": "This user hasn't created any movies lists yet.",
-     "logout": "Logout"
-     
+    "no_suggested_friends": "No suggested friends available",
+    "no_suggested_friends_description": "We couldn't find any suggested friends for you at the moment",
+    "movies_lists": "Movies Lists",
+    "no_movies_lists": "No movies lists available",
+    "no_movies_lists_description": "This user hasn't created any movies lists yet.",
+    "logout": "Logout",
+    "clickToChangePicture": "Click to change picture",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "username": "Username",
+    "email": "Email",
+    "bio": "Biography",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm New Password",
+    "leaveBlankToKeep": "Leave blank to keep current password",
+    "yourProfile": "Your Profile Picture",
+    "profileUpdated": "Profile updated successfully"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "reset": "Reset"
   }
 }

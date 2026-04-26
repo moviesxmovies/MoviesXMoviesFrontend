@@ -169,3 +169,13 @@ export type ReactionResponse = {
     reactions: Record<string, number>;
     your_reactions: Record<string, number>;
 }
+
+export type SelfUser ={
+  id: number;
+  username: string;
+  bio: string;
+  picture: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+}

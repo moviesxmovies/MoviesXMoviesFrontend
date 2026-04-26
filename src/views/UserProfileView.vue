@@ -25,6 +25,7 @@ import FriendWithFollow from '@/components/friendWithFollow.vue';
 import FriendshipStatusComponent from '@/components/friendshipStatusComponent.vue';
 import MoviesListComponent from '@/components/moviesListComponent.vue';
 import SectionAccordion from '@/components/sectionAccordion.vue';
+import EditProfileModal from '@/components/editProfileModal.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -170,6 +171,7 @@ watch(
 </script>
 
 <template>
+    <EditProfileModal v-model:visible="editProfileModalVisible" @updated="(updatedUser) => user = updatedUser" />
     <div class="page">
         <div class="layout">
             <aside class="sidebar">

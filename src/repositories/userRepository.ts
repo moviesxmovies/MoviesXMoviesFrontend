@@ -10,6 +10,12 @@ export const getSelfUserProfile = async () => {
   }
 };
 
+export const updateSelfUserProfile = async (formData: FormData) => {
+  const { data } = await api.put('/users/', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return data;
+};
 export const getUserProfile = async (slug: string) => {
   try {
     const { data } = await api.get(`/users/${slug}/`);
