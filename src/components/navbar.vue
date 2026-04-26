@@ -9,6 +9,7 @@ import Menu from "primevue/menu";
 import { useI18n } from "vue-i18n";
 import { useThemeStore } from "@/stores/themeStore";
 import { useNotificationsStore } from "@/stores/notificationStore";
+import { Skeleton } from "primevue";
 
 const { t } = useI18n();
 const router = useRouter();
@@ -17,17 +18,22 @@ const themeStore = useThemeStore();
 const menuOpen = ref(false);
 const profilePicture = ref<string | null>(null);
 const notificationsStore = useNotificationsStore();
-
+const profileImageLoaded = ref(false);
+const loadingProfile = ref(true);
+const profileImageLoadedMobile = ref(false);
 const loadProfilePicture = async () => {
   if (!authStore.isAuthenticated) {
     profilePicture.value = null;
     return;
   }
   try {
+    loadingProfile.value = true;
     const profile = await getSelfUserProfile();
     profilePicture.value = profile?.picture ?? null;
   } catch {
     profilePicture.value = null;
+  } finally {
+    loadingProfile.value = false;
   }
 };
 
@@ -115,7 +121,10 @@ watch(() => authStore.isAuthenticated, (isAuthenticated) => {
       <template v-if="authStore.isAuthenticated">
         <button class="btn-profile" @click="(e) => profileMenu.toggle(e)">
           <div class="profile-wrapper">
-            <img :src="profilePicture ?? ''" :alt="$t('home.profile')" />
+            <Skeleton v-if="loadingProfile || !profileImageLoaded" shape="circle" width="2.5rem" height="2.5rem" />
+            <img :src="profilePicture ?? ''" :alt="$t('home.profile')"
+              :style="{ display: loadingProfile || !profileImageLoaded ? 'none' : 'block' }"
+              @load="profileImageLoaded = true" />
             <span v-if="notificationsStore.pendingFriendRequests > 0" class="notification-badge">
               {{ notificationsStore.pendingFriendRequests >= 6 ? '5+' : notificationsStore.pendingFriendRequests }}
             </span>
@@ -153,7 +162,11 @@ watch(() => authStore.isAuthenticated, (isAuthenticated) => {
           <button id="profile-btn-mobile" class="btn-ghost" @click="navigate('/users')"
             v-if="authStore.isAuthenticated">
             <div class="profile-wrapper">
-              <img :src="profilePicture ?? ''" :alt="$t('home.profile')" class="btn-profile-img" />
+              <Skeleton v-if="loadingProfile || !profileImageLoadedMobile" shape="circle" width="1.5rem"
+                height="1.5rem" />
+              <img :src="profilePicture ?? ''" :alt="$t('home.profile')" class="btn-profile-img"
+                :style="{ display: loadingProfile || !profileImageLoadedMobile ? 'none' : 'block' }"
+                @load="profileImageLoadedMobile = true" />
               <span v-if="notificationsStore.pendingFriendRequests > 0"
                 class="notification-badge notification-badge--sm">
                 {{ notificationsStore.pendingFriendRequests >= 6 ? '5+' : notificationsStore.pendingFriendRequests }}

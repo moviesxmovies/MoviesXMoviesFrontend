@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { deleteReactionApi, getCommentReactions, getReviewReactions, postReactionApi } from '@/repositories/reviewRepository';
 import type { ReactionResponse } from '@/types';
+import { Skeleton } from 'primevue';
 import { ref, watch } from 'vue';
 
 const props = defineProps<{
@@ -11,6 +12,7 @@ const props = defineProps<{
 
 const reactionResponse = ref<ReactionResponse>();
 const showPicker = ref(false);
+const loading = ref(false);
 
 const EMOJI_MAP: Record<string, string> = {
     LIKE: '👍',
@@ -119,6 +121,7 @@ watch(
     () => [props.reviewId, props.commentId],
     async (newObjectId) => {
         if (newObjectId) {
+            loading.value = true;
             let response;
             try {
                 if (props.commentId) {
@@ -131,6 +134,8 @@ watch(
                 reactionResponse.value = response;
             } catch (error) {
                 console.error('Error fetching reactions:', error);
+            }finally {
+                loading.value = false;  
             }
         }
     },
@@ -140,7 +145,14 @@ watch(
 
 <template>
     <div class="reactions-wrapper">
+        <!-- SKELETON -->
+        <div v-if="loading" class="reactions-bar">
+            <Skeleton v-for="i in 3" :key="i" height="26px" :width="`${40 + i * 10}px`" border-radius="999px" />
+            <Skeleton width="32px" height="26px" border-radius="999px" />
+        </div>
+        <template v-else>
         <!-- Active Reactions -->
+        
         <div class="reactions-bar">
             <button v-for="[emoji, count] in activeReactions()" :key="emoji" class="reaction-pill"
                 :class="{ 'reacted': hasReacted(emoji) }" @click="toggleReaction(emoji)">
@@ -161,7 +173,9 @@ watch(
                 {{ emoji }}
             </button>
         </div>
+        </template>
     </div>
+
 </template>
 
 <style scoped>

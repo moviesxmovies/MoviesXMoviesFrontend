@@ -3,6 +3,7 @@ import { api } from '@/composables/useAPI';
 import { getUserProfile } from '@/repositories/userRepository';
 import type { User } from '@/types';
 import { goToUser } from '@/utils/goTo';
+import { Skeleton } from 'primevue';
 import { onMounted, ref } from 'vue';
 
 const props = defineProps<{
@@ -11,7 +12,7 @@ const props = defineProps<{
 }>();
 
 const user = ref<User | null>(null);
-
+const loading = ref(true);
 const fetchUserData = async () => {
     if (!props.fromUser && !props.username) {
         console.warn('No user identifier provided to FriendComponent');
@@ -30,6 +31,8 @@ const fetchUserData = async () => {
         }
     } catch (error) {
         console.error('Error fetching user data:', error);
+    } finally {
+        loading.value = false;
     }
 };
 
@@ -40,15 +43,24 @@ onMounted(() => {
 
 <template>
     <div class="friend-card">
-        <div class="user-info">
-            <img :src="user?.picture" :alt="user?.username" class="profile-image cursor-pointer"
-                @click="goToUser(user?.username)" />
-            <span class="username cursor-pointer" @click="goToUser(user?.username)">{{ user?.username }}</span>
-        </div>
+        <template v-if="loading">
+            <div class="user-info">
+                <skeleton shape="circle" width="2.5rem" height="2.5rem" />
+                <Skeleton width="100px" height="14px" border-radius="6px" />
+            </div>
+            <Skeleton width="80px" height="32px" border-radius="8px" />
+        </template>
+        <template v-else>
+            <div class="user-info">
+                <img :src="user?.picture" :alt="user?.username" class="profile-image cursor-pointer"
+                    @click="goToUser(user?.username)" />
+                <span class="username cursor-pointer" @click="goToUser(user?.username)">{{ user?.username }}</span>
+            </div>
 
-        <div class="actions-slot">
-            <slot :username="user?.username" />
-        </div>
+            <div class="actions-slot">
+                <slot :username="user?.username" />
+            </div>
+        </template>
     </div>
 </template>
 
