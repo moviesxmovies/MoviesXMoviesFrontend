@@ -193,7 +193,8 @@
   },
   "schema": {
     "username": {
-      "required": "Nom d'utilisateur requis"
+      "required": "Nom d'utilisateur requis",
+      "maxLength": "Le nom d'utilisateur ne peut pas dépasser 15 caractères"
     },
     "firstName": {
       "required": "Prénom requis"

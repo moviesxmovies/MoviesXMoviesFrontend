@@ -193,7 +193,8 @@
   },
   "schema": {
     "username": {
-      "required": "El usuario es obligatorio"
+      "required": "El usuario es obligatorio",
+      "maxLength": "El usuario no puede exceder los 15 caracteres"
     },
     "firstName": {
       "required": "El nombre es obligatorio"

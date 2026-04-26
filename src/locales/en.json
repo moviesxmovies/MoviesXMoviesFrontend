@@ -193,7 +193,8 @@
   },
   "schema": {
     "username": {
-      "required": "Username is required"
+      "required": "Username is required",
+      "maxLength": "Username cannot exceed 15 characters"
     },
     "firstName": {
       "required": "First name is required"
