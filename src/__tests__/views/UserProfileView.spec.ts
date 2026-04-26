@@ -16,6 +16,7 @@ const {
     mockGetUserMoviesLists,
     mockToast,
     mockLogout,
+    mockRefreshToken,
 } = vi.hoisted(() => ({
     mockGetSelfUserProfile: vi.fn(),
     mockGetUserProfile: vi.fn(),
@@ -27,7 +28,7 @@ const {
     mockGetUserMoviesLists: vi.fn(),
     mockToast: { add: vi.fn() },
     mockLogout: vi.fn(),
-
+    mockRefreshToken: vi.fn(),
 }));
 
 vi.mock('@/repositories/userRepository', () => ({
@@ -39,6 +40,9 @@ vi.mock('@/repositories/userRepository', () => ({
     getUserFriends: mockGetUserFriends,
     getSuggestedFriends: mockGetSuggestedFriends,
     getUserMoviesLists: mockGetUserMoviesLists,
+}));
+vi.mock('@/repositories/auth/authRepository', () => ({
+  refreshToken: mockRefreshToken,
 }));
 
 const { mockPush, mockUseRoute } = vi.hoisted(() => ({
@@ -332,6 +336,24 @@ describe('UserProfileView', () => {
             await wrapper.find('.btn-logout').trigger('click');
             expect(mockLogout).toHaveBeenCalled();
             expect(mockPush).toHaveBeenCalledWith({ name: 'welcome' });
+        });
+    });
+    // ── emailChanged ──────────────────────────────────────────────────────────
+    describe('emailChanged', () => {
+        it('calls refreshToken when emailChanged is triggered', async () => {
+            const wrapper = factory('');
+            await flushPromises();
+            const vm = wrapper.vm as any;
+            await vm.emailChanged();
+            expect(mockRefreshToken).toHaveBeenCalled();
+        });
+
+        it('redirects to /verify-email after emailChanged', async () => {
+            const wrapper = factory('');
+            await flushPromises();
+            const vm = wrapper.vm as any;
+            await vm.emailChanged();
+            expect(mockPush).toHaveBeenCalledWith('/verify-email');
         });
     });
 });

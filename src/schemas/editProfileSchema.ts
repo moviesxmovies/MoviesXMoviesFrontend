@@ -4,8 +4,10 @@ import z from "zod";
 const t = i18n.global.t;
 
 export const editProfileSchema = z.object({
-  username: z.string().min(1, t("schema.username.required")).or(z.literal("")),
-  email: z.email(t("schema.email.invalid")).or(z.literal("")),
+  username: z.string().min(1, t("schema.username.required")).max(15, t("schema.username.maxLength")),
+  email: z
+    .email(t("schema.email.invalid"))
+    .min(1, t("schema.email.required")),
   first_name: z.string().optional(),
   last_name: z.string().optional(),
   bio: z.string().optional(),

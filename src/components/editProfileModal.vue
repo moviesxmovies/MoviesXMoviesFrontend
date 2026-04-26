@@ -12,6 +12,7 @@ const user = ref<SelfUser>();
 const visible = defineModel<boolean>('visible', { default: false });
 const emit = defineEmits<{
     updated: [user: User];
+    emailChanged: [];
 }>();
 
 const loading = ref(false);
@@ -74,6 +75,9 @@ const submit = async () => {
 
         const updated = await updateSelfUserProfile(formData);
         emit('updated', updated);
+        if (updated.email !== user.value?.email) {
+            emit('emailChanged');
+        }
         visible.value = false;
         toast.add({ severity: 'success', summary: t('toast.success'), detail: t('user.profileUpdated'), life: 3000 });
     } catch (error: any) {
@@ -101,7 +105,7 @@ const fetchUserData = async () => {
         user.value = await getSelfUserProfile();
     } catch (error) {
         console.error('Error fetching user data:', error);
-    }finally {
+    } finally {
         loading.value = false;
     }
 };
@@ -131,8 +135,8 @@ watch(visible, (val) => {
 </script>
 
 <template>
-    <Dialog v-model:visible="visible" modal :draggable="false" :dismissableMask="true" :header="t('user.editProfileTitle')"
-        :style="{ width: '90vw', maxWidth: '480px' }" :pt="{
+    <Dialog v-model:visible="visible" modal :draggable="false" :dismissableMask="true"
+        :header="t('user.editProfileTitle')" :style="{ width: '90vw', maxWidth: '480px' }" :pt="{
             root: { class: 'rounded-[2rem] border-none shadow-2xl bg-[var(--background)] overflow-hidden' },
             header: { class: 'bg-[var(--background)] pb-0' },
             title: { class: 'text-xl font-bold text-[var(--primary)]' },
