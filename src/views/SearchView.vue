@@ -127,7 +127,8 @@ watch(
     </button>
 
     <Drawer v-model:visible="filtersOpen" :header="t('search.filters')" position="left"
-      class="mobile-only !w-full md:!w-[40rem]">
+      class="mobile-only !w-full md:!w-[40rem]"
+      :pt="{ root: { style: 'transition: none' }, mask: { style: 'transition: none' } }">
       <FilterComponent @filter-genres="(genres: string[]) => updateRoute({ genres })"
         @filter-platforms="(platforms: string[]) => updateRoute({ platforms })"
         @filter-stars="(stars: number[]) => updateRoute({ stars })" @close="filtersOpen = false" />
