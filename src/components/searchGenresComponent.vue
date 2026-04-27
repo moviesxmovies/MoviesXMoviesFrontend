@@ -48,31 +48,18 @@ watch(
 
 <template>
   <div class="genre">
-    <MultiSelect
-      v-model="selectedGenres"
-      :loading="isLoading"
-      :disabled="isLoading"
-      display="chip"
-      :appendTo="'self'"
-      :options="genres"
-      optionLabel="name"
-      filter
-      :placeholder="
-        t(
-          isLoading
-            ? 'loading'
-            : 'components.searchGenres.genres',
-        )
-      "
-      :maxSelectedLabels="99"
-      class="w-full multiselect-expandable"
-      @change="
-        emit(
-          'filterGenres',
-          selectedGenres?.map((g) => g.slug),
-        )
-      "
-    />
+    <MultiSelect v-model="selectedGenres" :loading="isLoading" :disabled="isLoading" display="chip" :appendTo="'self'"
+      :options="genres" optionLabel="name" filter :placeholder="t(
+        isLoading
+          ? 'loading'
+          : 'components.searchGenres.genres',
+      )
+        " :maxSelectedLabels="99" class="w-full multiselect-expandable" @change="
+          emit(
+            'filterGenres',
+            selectedGenres?.map((g) => g.slug),
+          )
+          " />
   </div>
 </template>
 
@@ -85,14 +72,16 @@ watch(
 
 :deep(.p-multiselect-overlay .p-checkbox .p-checkbox-box) {
   background: var(--background) !important;
-  border-color: color-mix(
-    in srgb,
-    var(--secondary) 40%,
-    transparent
-  ) !important;
+  border-color: color-mix(in srgb,
+      var(--secondary) 40%,
+      transparent) !important;
   border-radius: 6px !important;
 }
-
+:deep(.p-multiselect-overlay .p-checkbox .p-checkbox-box[data-p="checked"]) {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: white !important;
+}
 :deep(.p-multiselect-filter) {
   background: color-mix(in srgb, var(--background) 95%, var(--text)) !important;
   border: 1px solid color-mix(in srgb, var(--secondary) 20%, transparent) !important;
@@ -118,16 +107,5 @@ watch(
 :deep(.p-multiselect-option.p-selected) {
   background: color-mix(in srgb, var(--primary) 15%, transparent) !important;
   color: var(--primary) !important;
-}
-
-:deep(.p-multiselect-option.p-selected .p-checkbox .p-checkbox-box) {
-  background: var(--primary) !important;
-  border-color: var(--primary) !important;
-}
-
-:deep(
-  .p-multiselect-option.p-selected .p-checkbox .p-checkbox-box .p-checkbox-icon
-) {
-  color: white !important;
 }
 </style>
