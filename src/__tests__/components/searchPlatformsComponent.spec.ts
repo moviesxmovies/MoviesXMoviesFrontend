@@ -7,7 +7,6 @@ import { reactive } from "vue";
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 const mockFetchPlatforms = vi.fn();
 const mockToastAdd = vi.fn();
-const mockLangStore = reactive({ language: "en" });
 const mockRoute = reactive({ query: {} as Record<string, any> });
 
 vi.mock("@/repositories/platformRepository", () => ({
@@ -24,15 +23,20 @@ vi.mock("vue-i18n", () => ({
 
 vi.mock("primevue", () => ({
   useToast: vi.fn(() => ({ add: mockToastAdd })),
-  MultiSelect: {
-    name: "MultiSelect",
-    template: `<div data-testid="multiselect"
-      :data-loading="loading"
-      :data-disabled="disabled"
-      :data-placeholder="placeholder"
+}));
+
+// Mock MultiSelectComponent instead of primevue's MultiSelect directly
+vi.mock("@/components/multiSelectComponent.vue", () => ({
+  default: {
+    name: "MultiSelectComponent",
+    template: `<div
+      data-testid="multiselect"
+      :data-loading="isLoading"
+      :data-disabled="isLoading"
+      :data-placeholder="message"
       @change="$emit('change')"
     />`,
-    props: ["modelValue", "loading", "disabled", "options", "placeholder"],
+    props: ["modelValue", "isLoading", "items", "message"],
     emits: ["update:modelValue", "change"],
   },
 }));
@@ -56,7 +60,6 @@ describe("SearchPlatformsComponent", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockRoute.query = {};
-    mockLangStore.language = "en";
     mockFetchPlatforms.mockResolvedValue(makePlatforms());
   });
 
@@ -68,62 +71,52 @@ describe("SearchPlatformsComponent", () => {
       expect(mockFetchPlatforms).toHaveBeenCalledTimes(1);
     });
 
-    it("renders the MultiSelect", async () => {
+    it("renders the MultiSelectComponent", async () => {
       const wrapper = mountComponent();
       await flushPromises();
       expect(wrapper.find("[data-testid='multiselect']").exists()).toBe(true);
     });
 
-    it("passes the fetched platforms as options", async () => {
+    it("passes the fetched platforms as items", async () => {
       const wrapper = mountComponent();
       await flushPromises();
-      const ms = wrapper.findComponent({ name: "MultiSelect" });
-      expect(ms.props("options")).toEqual(makePlatforms());
+      const ms = wrapper.findComponent({ name: "MultiSelectComponent" });
+      expect(ms.props("items")).toEqual(makePlatforms());
     });
   });
 
   // ── Loading state ───────────────────────────────────────────────────────────
   describe("loading state", () => {
-    it("sets loading and disabled to true while fetching", async () => {
+    it("sets isLoading to true while fetching", async () => {
       mockFetchPlatforms.mockReturnValue(new Promise(() => {}));
       const wrapper = mountComponent();
       await flushPromises();
-      const ms = wrapper.findComponent({ name: "MultiSelect" });
-      expect(ms.props("loading")).toBe(true);
-      expect(ms.props("disabled")).toBe(true);
+      const ms = wrapper.findComponent({ name: "MultiSelectComponent" });
+      expect(ms.props("isLoading")).toBe(true);
     });
 
-    it("shows the loading placeholder while fetching", async () => {
-      mockFetchPlatforms.mockReturnValue(new Promise(() => {}));
+    it("sets isLoading to false after fetch resolves", async () => {
       const wrapper = mountComponent();
       await flushPromises();
-      const ms = wrapper.findComponent({ name: "MultiSelect" });
-      expect(ms.props("placeholder")).toBe("loading");
+      const ms = wrapper.findComponent({ name: "MultiSelectComponent" });
+      expect(ms.props("isLoading")).toBe(false);
     });
 
-    it("sets loading to false after fetch resolves", async () => {
+    it("passes the computed message as placeholder", async () => {
       const wrapper = mountComponent();
       await flushPromises();
-      const ms = wrapper.findComponent({ name: "MultiSelect" });
-      expect(ms.props("loading")).toBe(false);
-      expect(ms.props("disabled")).toBe(false);
-    });
-
-    it("shows the platforms placeholder after fetch resolves", async () => {
-      const wrapper = mountComponent();
-      await flushPromises();
-      const ms = wrapper.findComponent({ name: "MultiSelect" });
-      expect(ms.props("placeholder")).toBe("components.searchPlatforms.platforms");
+      const ms = wrapper.findComponent({ name: "MultiSelectComponent" });
+      expect(ms.props("message")).toBe("components.searchPlatforms.platforms");
     });
   });
 
   // ── Query sync ──────────────────────────────────────────────────────────────
   describe("query sync", () => {
-    it("pre-selects platforms matching route.query.genres on mount", async () => {
+    it("pre-selects platforms matching route.query.platforms on mount", async () => {
       mockRoute.query = { platforms: "netflix" };
       const wrapper = mountComponent();
       await flushPromises();
-      const ms = wrapper.findComponent({ name: "MultiSelect" });
+      const ms = wrapper.findComponent({ name: "MultiSelectComponent" });
       expect(ms.props("modelValue")).toEqual([
         { id: "1", name: "Netflix", slug: "netflix" },
       ]);
@@ -133,7 +126,7 @@ describe("SearchPlatformsComponent", () => {
       mockRoute.query = { platforms: ["hbo", "amazon-prime"] };
       const wrapper = mountComponent();
       await flushPromises();
-      const ms = wrapper.findComponent({ name: "MultiSelect" });
+      const ms = wrapper.findComponent({ name: "MultiSelectComponent" });
       expect(ms.props("modelValue")).toEqual([
         { id: "2", name: "HBO", slug: "hbo" },
         { id: "3", name: "Amazon Prime", slug: "amazon-prime" },
@@ -144,7 +137,7 @@ describe("SearchPlatformsComponent", () => {
       mockRoute.query = {};
       const wrapper = mountComponent();
       await flushPromises();
-      const ms = wrapper.findComponent({ name: "MultiSelect" });
+      const ms = wrapper.findComponent({ name: "MultiSelectComponent" });
       expect(ms.props("modelValue")).toBeFalsy();
     });
 
@@ -162,7 +155,7 @@ describe("SearchPlatformsComponent", () => {
 
   // ── Emit ────────────────────────────────────────────────────────────────────
   describe("filterPlatforms emit", () => {
-    it("emits filterPlatforms with the selected slugs when MultiSelect changes", async () => {
+    it("emits filterPlatforms with the selected slugs when MultiSelectComponent changes", async () => {
       const wrapper = mountComponent();
       await flushPromises();
 
@@ -171,7 +164,7 @@ describe("SearchPlatformsComponent", () => {
         { id: "1", name: "Netflix", slug: "netflix" },
         { id: "2", name: "HBO", slug: "hbo" },
       ];
-      await wrapper.findComponent({ name: "MultiSelect" }).trigger("change");
+      await wrapper.findComponent({ name: "MultiSelectComponent" }).trigger("change");
 
       expect(wrapper.emitted("filterPlatforms")?.[0]).toEqual([
         ["netflix", "hbo"],
@@ -184,7 +177,7 @@ describe("SearchPlatformsComponent", () => {
 
       const vm = wrapper.vm as unknown as { selectedPlatforms: any[] };
       vm.selectedPlatforms = [];
-      await wrapper.findComponent({ name: "MultiSelect" }).trigger("change");
+      await wrapper.findComponent({ name: "MultiSelectComponent" }).trigger("change");
 
       expect(wrapper.emitted("filterPlatforms")?.[0]).toEqual([[]]);
     });
@@ -192,7 +185,7 @@ describe("SearchPlatformsComponent", () => {
 
   // ── Error handling ──────────────────────────────────────────────────────────
   describe("error handling", () => {
-    it("shows an error toast when fetchGenres fails with server message", async () => {
+    it("shows an error toast when fetchPlatforms fails with server message", async () => {
       mockFetchPlatforms.mockRejectedValue({
         response: { data: { message: "Server error" } },
       });
@@ -220,17 +213,17 @@ describe("SearchPlatformsComponent", () => {
       );
     });
 
-    it("sets loading to false after a failed fetch", async () => {
+    it("sets isLoading to false after a failed fetch", async () => {
       mockFetchPlatforms.mockRejectedValue(new Error("fail"));
       const wrapper = mountComponent();
       await flushPromises();
-      const ms = wrapper.findComponent({ name: "MultiSelect" });
-      expect(ms.props("loading")).toBe(false);
+      const ms = wrapper.findComponent({ name: "MultiSelectComponent" });
+      expect(ms.props("isLoading")).toBe(false);
     });
 
-    it("does not crash if genres is undefined after a failed fetch", async () => {
+    it("does not crash if platforms is undefined after a failed fetch", async () => {
       mockFetchPlatforms.mockRejectedValue(new Error("fail"));
-      mockRoute.query = { genres: "action" };
+      mockRoute.query = { platforms: "netflix" };
       const wrapper = mountComponent();
       await flushPromises();
       expect(wrapper.find("[data-testid='multiselect']").exists()).toBe(true);

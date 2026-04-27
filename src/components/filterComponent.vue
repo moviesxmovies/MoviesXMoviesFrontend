@@ -9,13 +9,20 @@ import {
   AccordionHeader,
   AccordionPanel,
 } from "primevue";
+import FilterPreferencesComponent from "./filterPreferencesComponent.vue";
 
 const { t } = useI18n();
-const emit = defineEmits(["filterGenres", "filterPlatforms", "filterStars"]);
+const emit = defineEmits([
+  "filterGenres",
+  "filterPlatforms",
+  "filterStars",
+  "filterUnseen",
+  "filterReviewed",
+]);
 </script>
 
 <template>
-  <Accordion class="filters-content" multiple :value="['0', '1', '2']">
+  <Accordion class="filters-content" multiple :value="['0', '1', '2', '3']">
     <AccordionPanel value="0" class="filter-group">
       <AccordionHeader class="filter-label">{{
         t("components.filter.genres")
@@ -40,6 +47,17 @@ const emit = defineEmits(["filterGenres", "filterPlatforms", "filterStars"]);
       }}</AccordionHeader>
       <AccordionContent>
         <SearchStarsComponent @filter-stars="emit('filterStars', $event)" />
+      </AccordionContent>
+    </AccordionPanel>
+    <AccordionPanel value="3" class="filter-group">
+      <AccordionHeader class="filter-label">{{
+        t("components.filter.preferences")
+      }}</AccordionHeader>
+      <AccordionContent>
+        <FilterPreferencesComponent
+          @filter-unseen="emit('filterUnseen', $event)"
+          @filter-reviewed="emit('filterReviewed', $event)"
+        />
       </AccordionContent>
     </AccordionPanel>
   </Accordion>

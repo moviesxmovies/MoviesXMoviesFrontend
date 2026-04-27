@@ -12,7 +12,7 @@ import debounce from "@/utils/debounce";
 import { Drawer, InputText, useToast } from "primevue";
 import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute, useRouter, type LocationQueryValue } from "vue-router";
 
 const route = useRoute();
 const router = useRouter();
@@ -26,11 +26,23 @@ const filtersOpen = ref(false);
 
 const activeFiltersCount = computed(() => {
   return (
-    (route.query.genres?.length ?? 0) +
-    (route.query.platforms?.length ?? 0) +
-    (route.query.stars?.length ?? 0)
+    (typeof route.query.genres === "string" ? 1 : route.query.genres?.length ?? 0) +
+    (typeof route.query.stars === "string" ? 1 : route.query.stars?.length ?? 0) +
+    (typeof route.query.platforms === "string" ? 1 : route.query.platforms?.length ?? 0) +
+    (route.query.marked_unseen === "true" ? 1 : 0) +
+    (route.query.reviewed === "true" ? 1 : 0)
   );
 });
+
+const getBoolean = (
+  path: LocationQueryValue | LocationQueryValue[] | undefined,
+  value?: string,
+) => {
+  if (value) {
+    return value === "true" ? "true" : undefined;
+  }
+  return path === "true" ? "true" : undefined;
+};
 
 const updateRoute = (newData: searchData) => {
   router.push({
@@ -39,8 +51,12 @@ const updateRoute = (newData: searchData) => {
       ...route.query,
       ...newData,
       name: search.value || undefined,
-      marked_unseen: newData.marked_unseen ? "true" : undefined,
-      reviewed: newData.reviewed ? "true" : undefined,
+      marked_unseen: newData.marked_unseen
+        ? getBoolean(route.query.marked_unseen, newData.marked_unseen)
+        : getBoolean(route.query.marked_unseen),
+      reviewed: newData.reviewed
+        ? getBoolean(route.query.reviewed, newData.reviewed)
+        : getBoolean(route.query.reviewed),
     },
   });
 };
@@ -108,18 +124,9 @@ watch(
       <div class="search-wrapper">
         <i v-if="!loading" class="pi pi-search search-icon" />
         <i v-else class="pi pi-spin pi-spinner search-icon" />
-        <InputText
-          v-model="search"
-          data-testid="search-input"
-          :placeholder="$t('search.searchPlaceholder')"
-          class="search-input"
-          fluid
-        />
-        <button
-          v-if="search && !loading"
-          class="clear-btn"
-          @click="search = ''"
-        >
+        <InputText v-model="search" data-testid="search-input" :placeholder="$t('search.searchPlaceholder')"
+          class="search-input" fluid />
+        <button v-if="search && !loading" class="clear-btn" @click="search = ''">
           <i class="pi pi-times" />
         </button>
       </div>
@@ -133,16 +140,16 @@ watch(
       </span>
     </button>
 
-    <Drawer
-      v-model:visible="filtersOpen"
-      :header="t('search.filters')"
-      position="left"
+    <Drawer v-model:visible="filtersOpen" :header="t('search.filters')" position="left"
       class="mobile-only !w-full md:!w-[40rem]"
-    >
-      <FilterComponent
-        @filter-genres="(genres: string[]) => updateRoute({ genres })"
+      :pt="{ root: { style: 'transition: none' }, mask: { style: 'transition: none' } }">
+      <FilterComponent @filter-genres="(genres: string[]) => updateRoute({ genres })"
         @filter-platforms="(platforms: string[]) => updateRoute({ platforms })"
         @filter-stars="(stars: number[]) => updateRoute({ stars })"
+        @filter-unseen="
+          (marked_unseen: string) => updateRoute({ marked_unseen })
+        "
+        @filter-reviewed="(reviewed: string) => updateRoute({ reviewed })"
         @close="filtersOpen = false"
       />
     </Drawer>
@@ -155,6 +162,10 @@ watch(
             (platforms: string[]) => updateRoute({ platforms })
           "
           @filter-stars="(stars: number[]) => updateRoute({ stars })"
+          @filter-unseen="
+            (marked_unseen: string) => updateRoute({ marked_unseen })
+          "
+          @filter-reviewed="(reviewed: string) => updateRoute({ reviewed })"
           @close="filtersOpen = false"
         />
       </aside>
@@ -173,24 +184,15 @@ watch(
             <span>{{ t("search.help") }}</span>
           </div>
           <template v-else>
-            <MovieCardComponent
-              v-for="movie in movies.results"
-              :key="movie.id"
-              :movie="movie"
-              data-testid="movie-card"
-            />
+            <MovieCardComponent v-for="movie in movies.results" :key="movie.id" :movie="movie"
+              data-testid="movie-card" />
           </template>
         </div>
 
         <div v-if="!loading && movies.total_pages > 1">
-          <PaginationComponent
-            data-testid="PaginationComponent"
-            :data-total="movies.total_pages"
-            :data-current="movies.current_page"
-            :total_pages="movies.total_pages"
-            :current_page="movies.current_page"
-            @change-page="changePage"
-          />
+          <PaginationComponent data-testid="PaginationComponent" :data-total="movies.total_pages"
+            :data-current="movies.current_page" :total_pages="movies.total_pages" :current_page="movies.current_page"
+            @change-page="changePage" />
         </div>
       </div>
     </div>
@@ -279,6 +281,7 @@ watch(
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -367,7 +370,7 @@ watch(
   }
 
   .filters-sidebar {
-    width: 150px;
+    width: 200px;
   }
 
   .desktop-only {
@@ -378,10 +381,6 @@ watch(
 @media (min-width: 768px) {
   .page {
     padding: 1.5rem;
-  }
-
-  .filters-sidebar {
-    width: 200px;
   }
 
   .movies-grid {

@@ -50,6 +50,11 @@ const mountComponent = () =>
           template: '<div data-testid="search-stars" />',
           emits: ["filterStars"],
         },
+        FilterPreferencesComponent: {
+          name: "FilterPreferencesComponent",
+          template: '<div data-testid="filter-preferences" />',
+          emits: ["filterUnseen", "filterReviewed"],
+        },
       },
     },
   });
@@ -67,10 +72,12 @@ describe("FilterComponent", () => {
       expect(wrapper.find("[data-testid='accordion']").exists()).toBe(true);
     });
 
-    it("renders 3 accordion panels", async () => {
+    it("renders 4 accordion panels", async () => {
       const wrapper = mountComponent();
       await flushPromises();
-      expect(wrapper.findAll("[data-testid='accordion-panel']")).toHaveLength(3);
+      expect(wrapper.findAll("[data-testid='accordion-panel']")).toHaveLength(
+        4,
+      );
     });
 
     it("renders the genres header with the i18n key", async () => {
@@ -103,13 +110,23 @@ describe("FilterComponent", () => {
     it("renders SearchPlatformsComponent", async () => {
       const wrapper = mountComponent();
       await flushPromises();
-      expect(wrapper.find("[data-testid='search-platforms']").exists()).toBe(true);
+      expect(wrapper.find("[data-testid='search-platforms']").exists()).toBe(
+        true,
+      );
     });
 
     it("renders SearchStarsComponent", async () => {
       const wrapper = mountComponent();
       await flushPromises();
       expect(wrapper.find("[data-testid='search-stars']").exists()).toBe(true);
+    });
+
+    it("renders FilterPreferencesComponent", async () => {
+      const wrapper = mountComponent();
+      await flushPromises();
+      expect(wrapper.find("[data-testid='filter-preferences']").exists()).toBe(
+        true,
+      );
     });
   });
 
@@ -123,7 +140,9 @@ describe("FilterComponent", () => {
         .findComponent({ name: "SearchGenresComponent" })
         .vm.$emit("filterGenres", ["action", "drama"]);
 
-      expect(wrapper.emitted("filterGenres")?.[0]).toEqual([["action", "drama"]]);
+      expect(wrapper.emitted("filterGenres")?.[0]).toEqual([
+        ["action", "drama"],
+      ]);
     });
 
     it("emits filterPlatforms when SearchPlatformsComponent emits filterPlatforms", async () => {
@@ -146,6 +165,28 @@ describe("FilterComponent", () => {
         .vm.$emit("filterStars", ["4", "5"]);
 
       expect(wrapper.emitted("filterStars")?.[0]).toEqual([["4", "5"]]);
+    });
+
+    it("emits filterUnseen when FilterPreferencesComponent emits filterUnseen", async () => {
+      const wrapper = mountComponent();
+      await flushPromises();
+
+      await wrapper
+        .findComponent({ name: "FilterPreferencesComponent" })
+        .vm.$emit("filterUnseen", true);
+
+      expect(wrapper.emitted("filterUnseen")?.[0]).toEqual([true]);
+    });
+
+    it("emits filterReviewed when FilterPreferencesComponent emits filterReviewed", async () => {
+      const wrapper = mountComponent();
+      await flushPromises();
+
+      await wrapper
+        .findComponent({ name: "FilterPreferencesComponent" })
+        .vm.$emit("filterReviewed", true);
+
+      expect(wrapper.emitted("filterReviewed")?.[0]).toEqual([true]);
     });
 
     it("propagates the exact payload received from SearchGenresComponent", async () => {

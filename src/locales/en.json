@@ -75,7 +75,10 @@
     "filter": {
       "genres": "Filter by Genre",
       "platforms": "Filter Platform",
-      "stars": "Filter by Stars"
+      "stars": "Filter by Stars",
+      "preferences": "Preferences",
+      "unseen": "Show only unseen movies",
+      "reviewed": "Show only reviewed movies"
     }
   },
   "signup": {
@@ -258,7 +261,7 @@
     "noFilms": "No films found",
     "help": "Try with other values",
     "searchMoviesError": "Error fetching movies",
-    "filters": "filters"
+    "filters": "Filters"
   },
   "user": {
     "editProfile": "Edit",
