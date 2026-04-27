@@ -124,7 +124,11 @@ watch(
   background: var(--primary) !important;
   border-color: var(--primary) !important;
 }
-
+:deep(.p-multiselect-overlay .p-checkbox .p-checkbox-box[data-p="checked"]) {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: white !important;
+}
 :deep(
   .p-multiselect-option.p-selected .p-checkbox .p-checkbox-box .p-checkbox-icon
 ) {

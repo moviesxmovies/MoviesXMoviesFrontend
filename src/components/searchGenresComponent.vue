@@ -55,11 +55,11 @@ watch(
           : 'components.searchGenres.genres',
       )
         " :maxSelectedLabels="99" class="w-full multiselect-expandable" @change="
-        emit(
-          'filterGenres',
-          selectedGenres?.map((g) => g.slug),
-        )
-        " />
+          emit(
+            'filterGenres',
+            selectedGenres?.map((g) => g.slug),
+          )
+          " />
   </div>
 </template>
 
@@ -77,7 +77,11 @@ watch(
       transparent) !important;
   border-radius: 6px !important;
 }
-
+:deep(.p-multiselect-overlay .p-checkbox .p-checkbox-box[data-p="checked"]) {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: white !important;
+}
 :deep(.p-multiselect-filter) {
   background: color-mix(in srgb, var(--background) 95%, var(--text)) !important;
   border: 1px solid color-mix(in srgb, var(--secondary) 20%, transparent) !important;
@@ -103,14 +107,5 @@ watch(
 :deep(.p-multiselect-option.p-selected) {
   background: color-mix(in srgb, var(--primary) 15%, transparent) !important;
   color: var(--primary) !important;
-}
-
-:deep(.p-multiselect-option.p-selected .p-checkbox .p-checkbox-box) {
-  background: var(--primary) !important;
-  border-color: var(--primary) !important;
-}
-
-:deep(.p-multiselect-option.p-selected .p-checkbox .p-checkbox-box .p-checkbox-icon) {
-  color: white !important;
 }
 </style>
