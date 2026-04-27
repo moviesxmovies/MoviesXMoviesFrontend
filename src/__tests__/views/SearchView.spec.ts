@@ -84,7 +84,7 @@ const mountView = () =>
         },
         FilterComponent: {
           template: '<div data-testid="mock-filter" />',
-          emits: ["filterGenres", "filterPlatforms", "filterStars", "close"],
+          emits: ["filterGenres", "filterPlatforms", "filterStars", "filterUnseen", "filterReviewed", "close"],
         },
       },
     },
@@ -320,11 +320,9 @@ describe("SearchView", () => {
       await flushPromises();
       mockRouterPush.mockClear();
 
-      // buscamos por data-testid en lugar de por name para evitar el error
       const paginator = wrapper.find("[data-testid='PaginationComponent']");
       await paginator.trigger("change-page");
 
-      // alternativa más fiable: llamar changePage directamente
       const vm = wrapper.vm as unknown as { changePage: (p: number) => void };
       vm.changePage(2);
 
@@ -429,11 +427,10 @@ describe("SearchView", () => {
   // ── Language store watch ──────────────────────────────────────────────────
   describe("language change triggers re-search", () => {
     it("calls movieSearching again when the language changes", async () => {
-      const wrapper = mountView();
+      mountView();
       await flushPromises();
       const callsBefore = mockMovieSearching.mock.calls.length;
 
-      // reactive() hace que Vue detecte el cambio y dispare el watch
       mockLangStore.language = "es";
       await nextTick();
       await flushPromises();
