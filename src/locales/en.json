@@ -62,7 +62,10 @@
       "error": "Error creating list",
       "description": "Create a new list",
       "formName": "Name",
-      "formDescription": "description"
+      "formDescription": "Description",
+      "header": "Create List",
+      "submit": "Create",
+      "cancel": "Cancel"
     },
     "searchGenres": {
       "genres": "Genres",
@@ -294,7 +297,10 @@
     "confirmPassword": "Confirm New Password",
     "leaveBlankToKeep": "Leave blank to keep current password",
     "yourProfile": "Your Profile Picture",
-    "profileUpdated": "Profile updated successfully"
+    "profileUpdated": "Profile updated successfully",
+    "chooseMoviesListType": "Choose the type of list",
+    "createNormalList": "Normal List",
+    "createIntelligentList": "Intelligent List"
   },
   "common": {
     "save": "Save",
