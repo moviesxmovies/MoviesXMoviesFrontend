@@ -12,7 +12,7 @@ import debounce from "@/utils/debounce";
 import { Drawer, InputText, useToast } from "primevue";
 import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute, useRouter, type LocationQueryValue } from "vue-router";
 
 const route = useRoute();
 const router = useRouter();
@@ -34,6 +34,16 @@ const activeFiltersCount = computed(() => {
   );
 });
 
+const getBoolean = (
+  path: LocationQueryValue | LocationQueryValue[] | undefined,
+  value?: string,
+) => {
+  if (value) {
+    return value === "true" ? "true" : undefined;
+  }
+  return path === "true" ? "true" : undefined;
+};
+
 const updateRoute = (newData: searchData) => {
   router.push({
     path: route.path,
@@ -41,8 +51,12 @@ const updateRoute = (newData: searchData) => {
       ...route.query,
       ...newData,
       name: search.value || undefined,
-      marked_unseen: newData.marked_unseen ? "true" : undefined,
-      reviewed: newData.reviewed ? "true" : undefined,
+      marked_unseen: newData.marked_unseen
+        ? getBoolean(route.query.marked_unseen, newData.marked_unseen)
+        : getBoolean(route.query.marked_unseen),
+      reviewed: newData.reviewed
+        ? getBoolean(route.query.reviewed, newData.reviewed)
+        : getBoolean(route.query.reviewed),
     },
   });
 };
@@ -131,14 +145,29 @@ watch(
       :pt="{ root: { style: 'transition: none' }, mask: { style: 'transition: none' } }">
       <FilterComponent @filter-genres="(genres: string[]) => updateRoute({ genres })"
         @filter-platforms="(platforms: string[]) => updateRoute({ platforms })"
-        @filter-stars="(stars: number[]) => updateRoute({ stars })" @close="filtersOpen = false" />
+        @filter-stars="(stars: number[]) => updateRoute({ stars })"
+        @filter-unseen="
+          (marked_unseen: string) => updateRoute({ marked_unseen })
+        "
+        @filter-reviewed="(reviewed: string) => updateRoute({ reviewed })"
+        @close="filtersOpen = false"
+      />
     </Drawer>
 
     <div class="content-layout">
       <aside class="desktop-only filters-sidebar">
-        <FilterComponent @filter-genres="(genres: string[]) => updateRoute({ genres })" @filter-platforms="
-          (platforms: string[]) => updateRoute({ platforms })
-        " @filter-stars="(stars: number[]) => updateRoute({ stars })" @close="filtersOpen = false" />
+        <FilterComponent
+          @filter-genres="(genres: string[]) => updateRoute({ genres })"
+          @filter-platforms="
+            (platforms: string[]) => updateRoute({ platforms })
+          "
+          @filter-stars="(stars: number[]) => updateRoute({ stars })"
+          @filter-unseen="
+            (marked_unseen: string) => updateRoute({ marked_unseen })
+          "
+          @filter-reviewed="(reviewed: string) => updateRoute({ reviewed })"
+          @close="filtersOpen = false"
+        />
       </aside>
 
       <div class="main-content">
@@ -341,7 +370,7 @@ watch(
   }
 
   .filters-sidebar {
-    width: 150px;
+    width: 200px;
   }
 
   .desktop-only {
@@ -352,10 +381,6 @@ watch(
 @media (min-width: 768px) {
   .page {
     padding: 1.5rem;
-  }
-
-  .filters-sidebar {
-    width: 200px;
   }
 
   .movies-grid {

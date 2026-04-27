@@ -28,15 +28,19 @@ vi.mock("vue-i18n", () => ({
 
 vi.mock("primevue", () => ({
   useToast: vi.fn(() => ({ add: mockToastAdd })),
-  MultiSelect: {
-    name: "MultiSelect",
-    template: `<div data-testid="multiselect"
-      :data-loading="loading"
-      :data-disabled="disabled"
-      :data-placeholder="placeholder"
+}));
+
+vi.mock("@/components/multiSelectComponent.vue", () => ({
+  default: {
+    name: "MultiSelectComponent",
+    template: `<div
+      data-testid="multiselect"
+      :data-loading="isLoading"
+      :data-disabled="isLoading"
+      :data-placeholder="message"
       @change="$emit('change')"
     />`,
-    props: ["modelValue", "loading", "disabled", "options", "placeholder"],
+    props: ["modelValue", "isLoading", "items", "message"],
     emits: ["update:modelValue", "change"],
   },
 }));
@@ -81,8 +85,8 @@ describe("SearchGenresComponent", () => {
     it("passes the fetched genres as options", async () => {
       const wrapper = mountComponent();
       await flushPromises();
-      const ms = wrapper.findComponent({ name: "MultiSelect" });
-      expect(ms.props("options")).toEqual(makeGenres());
+      const ms = wrapper.findComponent({ name: "MultiSelectComponent" });
+      expect(ms.props("items")).toEqual(makeGenres());
     });
   });
 
@@ -92,32 +96,15 @@ describe("SearchGenresComponent", () => {
       mockFetchGenres.mockReturnValue(new Promise(() => {}));
       const wrapper = mountComponent();
       await flushPromises();
-      const ms = wrapper.findComponent({ name: "MultiSelect" });
-      expect(ms.props("loading")).toBe(true);
-      expect(ms.props("disabled")).toBe(true);
-    });
-
-    it("shows the loading placeholder while fetching", async () => {
-      mockFetchGenres.mockReturnValue(new Promise(() => {}));
-      const wrapper = mountComponent();
-      await flushPromises();
-      const ms = wrapper.findComponent({ name: "MultiSelect" });
-      expect(ms.props("placeholder")).toBe("loading");
+      const ms = wrapper.findComponent({ name: "MultiSelectComponent" });
+      expect(ms.props("isLoading")).toBe(true);
     });
 
     it("sets loading to false after fetch resolves", async () => {
       const wrapper = mountComponent();
       await flushPromises();
-      const ms = wrapper.findComponent({ name: "MultiSelect" });
-      expect(ms.props("loading")).toBe(false);
-      expect(ms.props("disabled")).toBe(false);
-    });
-
-    it("shows the genres placeholder after fetch resolves", async () => {
-      const wrapper = mountComponent();
-      await flushPromises();
-      const ms = wrapper.findComponent({ name: "MultiSelect" });
-      expect(ms.props("placeholder")).toBe("components.searchGenres.genres");
+      const ms = wrapper.findComponent({ name: "MultiSelectComponent" });
+      expect(ms.props("isLoading")).toBe(false);
     });
   });
 
@@ -127,7 +114,7 @@ describe("SearchGenresComponent", () => {
       mockRoute.query = { genres: "action" };
       const wrapper = mountComponent();
       await flushPromises();
-      const ms = wrapper.findComponent({ name: "MultiSelect" });
+      const ms = wrapper.findComponent({ name: "MultiSelectComponent" });
       expect(ms.props("modelValue")).toEqual([
         { id: 1, name: "Action", slug: "action" },
       ]);
@@ -137,7 +124,7 @@ describe("SearchGenresComponent", () => {
       mockRoute.query = { genres: ["action", "drama"] };
       const wrapper = mountComponent();
       await flushPromises();
-      const ms = wrapper.findComponent({ name: "MultiSelect" });
+      const ms = wrapper.findComponent({ name: "MultiSelectComponent" });
       expect(ms.props("modelValue")).toEqual([
         { id: 1, name: "Action", slug: "action" },
         { id: 2, name: "Drama", slug: "drama" },
@@ -148,8 +135,7 @@ describe("SearchGenresComponent", () => {
       mockRoute.query = {};
       const wrapper = mountComponent();
       await flushPromises();
-      const ms = wrapper.findComponent({ name: "MultiSelect" });
-      // selectedGenres queda undefined cuando no hay query
+      const ms = wrapper.findComponent({ name: "MultiSelectComponent" });
       expect(ms.props("modelValue")).toBeFalsy();
     });
 
@@ -182,13 +168,12 @@ describe("SearchGenresComponent", () => {
       const wrapper = mountComponent();
       await flushPromises();
 
-      // simula selección manual poniendo selectedGenres en el vm
       const vm = wrapper.vm as unknown as { selectedGenres: any[] };
       vm.selectedGenres = [
         { id: 1, name: "Action", slug: "action" },
         { id: 2, name: "Drama", slug: "drama" },
       ];
-      await wrapper.findComponent({ name: "MultiSelect" }).trigger("change");
+      await wrapper.findComponent({ name: "MultiSelectComponent" }).trigger("change");
 
       expect(wrapper.emitted("filterGenres")?.[0]).toEqual([
         ["action", "drama"],
@@ -201,7 +186,7 @@ describe("SearchGenresComponent", () => {
 
       const vm = wrapper.vm as unknown as { selectedGenres: any[] };
       vm.selectedGenres = [];
-      await wrapper.findComponent({ name: "MultiSelect" }).trigger("change");
+      await wrapper.findComponent({ name: "MultiSelectComponent" }).trigger("change");
 
       expect(wrapper.emitted("filterGenres")?.[0]).toEqual([[]]);
     });
@@ -241,8 +226,8 @@ describe("SearchGenresComponent", () => {
       mockFetchGenres.mockRejectedValue(new Error("fail"));
       const wrapper = mountComponent();
       await flushPromises();
-      const ms = wrapper.findComponent({ name: "MultiSelect" });
-      expect(ms.props("loading")).toBe(false);
+      const ms = wrapper.findComponent({ name: "MultiSelectComponent" });
+      expect(ms.props("isLoading")).toBe(false);
     });
 
     it("does not crash if genres is undefined after a failed fetch", async () => {

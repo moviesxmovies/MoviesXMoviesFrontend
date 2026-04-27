@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import { fetchPlatforms } from "@/repositories/platformRepository";
 import type { Platform } from "@/types";
-import { MultiSelect, useToast } from "primevue";
+import { useToast } from "primevue";
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute } from "vue-router";
+import MultiSelectComponent from "./multiSelectComponent.vue";
 
 const { t } = useI18n();
 const route = useRoute();
@@ -13,6 +14,7 @@ const isLoading = ref(false);
 const selectedPlatforms = ref<Platform[]>();
 const platforms = ref<Platform[]>();
 const emit = defineEmits(["filterPlatforms"]);
+const message = t("components.searchPlatforms.platforms");
 
 const getPlatforms = async () => {
   isLoading.value = true;
@@ -46,33 +48,18 @@ watch(
 </script>
 
 <template>
-  <div class="platform">
-    <MultiSelect
-      v-model="selectedPlatforms"
-      :loading="isLoading"
-      :disabled="isLoading"
-      display="chip"
-      :appendTo="'self'"
-      :options="platforms"
-      optionLabel="name"
-      filter
-      :placeholder="
-        t(
-          isLoading
-            ? 'loading'
-            : 'components.searchPlatforms.platforms',
-        )
-      "
-      :maxSelectedLabels="99"
-      class="w-full multiselect-expandable"
-      @change="
-        emit(
-          'filterPlatforms',
-          selectedPlatforms?.map((g) => g.slug),
-        )
-      "
-    />
-  </div>
+  <MultiSelectComponent
+    :message="message"
+    :isLoading="isLoading"
+    :items="platforms as Platform[]"
+    v-model="selectedPlatforms as Platform[]"
+    @change="
+      emit(
+        'filterPlatforms',
+        selectedPlatforms?.map((g) => g.slug),
+      )
+    "
+  />
 </template>
 
 <style scoped>
