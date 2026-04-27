@@ -49,7 +49,7 @@ const emit = defineEmits([
         <SearchStarsComponent @filter-stars="emit('filterStars', $event)" />
       </AccordionContent>
     </AccordionPanel>
-    <!-- <AccordionPanel value="3" class="filter-group">
+    <AccordionPanel value="3" class="filter-group">
       <AccordionHeader class="filter-label">{{
         t("components.filter.preferences")
       }}</AccordionHeader>
@@ -59,7 +59,7 @@ const emit = defineEmits([
           @filter-reviewed="emit('filterReviewed', $event)"
         />
       </AccordionContent>
-    </AccordionPanel> -->
+    </AccordionPanel>
   </Accordion>
 </template>
 

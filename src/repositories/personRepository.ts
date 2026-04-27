@@ -4,7 +4,7 @@ export const fetchPersons = async (type: "actors" | "directors") => {
   try {
     const { data } = await api.get(type);
     return data;
-  } catch (error) {
+  } catch (error: any) {
     throw error;
   }
 };
