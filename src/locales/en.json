@@ -37,6 +37,9 @@
       "logout": "Logout",
       "profile": "My Profile"
     },
+    "movieList": {
+      "moviesCount": "{count} film | {count} films"
+    },
     "lists": {
       "public": "Public",
       "private": "Private",
@@ -111,7 +114,6 @@
     "password": "Password",
     "noAccount": "Don't have an account?",
     "signup": "Sign up here",
-
     "forgotPassword": "Forgot your password?"
   },
   "notFound": {
@@ -194,7 +196,8 @@
   },
   "schema": {
     "username": {
-      "required": "Username is required"
+      "required": "Username is required",
+      "maxLength": "Username cannot exceed 15 characters"
     },
     "firstName": {
       "required": "First name is required"
@@ -259,5 +262,43 @@
     "help": "Try with other values",
     "searchMoviesError": "Error fetching movies",
     "filters": "Filters"
+  },
+  "user": {
+    "editProfile": "Edit",
+    "editProfileTitle": "Edit Profile",
+    "friendsRequests": "Friend Requests",
+    "friends": "Friends",
+    "biography": "Biography",
+    "no_biography": "No biography available.",
+    "reviews": "Reviews",
+    "no_reviews": "No reviews available.",
+    "no_reviews_description": "This user has not written any reviews yet.",
+    "no_friends_requests": "No requests available",
+    "no_friends_requests_description": "You don't have any pending friend requests",
+    "no_friends": "No friends available",
+    "no_friends_description": "This user doesn't have any friends yet.",
+    "suggested_friends": "Suggested Friends",
+    "no_suggested_friends": "No suggested friends available",
+    "no_suggested_friends_description": "We couldn't find any suggested friends for you at the moment",
+    "movies_lists": "Movies Lists",
+    "no_movies_lists": "No movies lists available",
+    "no_movies_lists_description": "This user hasn't created any movies lists yet.",
+    "logout": "Logout",
+    "clickToChangePicture": "Click to change picture",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "username": "Username",
+    "email": "Email",
+    "bio": "Biography",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm New Password",
+    "leaveBlankToKeep": "Leave blank to keep current password",
+    "yourProfile": "Your Profile Picture",
+    "profileUpdated": "Profile updated successfully"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "reset": "Reset"
   }
 }

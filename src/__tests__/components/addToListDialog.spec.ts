@@ -52,10 +52,10 @@ vi.mock("primevue", async () => {
         return () =>
           props.visible
             ? h("div", { "data-testid": "Dialog" }, [
-                h("div", { "data-testid": "dialog-header" }, props.header),
-                slots.default?.(),
-                slots.footer?.(),
-              ])
+              h("div", { "data-testid": "dialog-header" }, props.header),
+              slots.default?.(),
+              slots.footer?.(),
+            ])
             : null;
       },
     }),
@@ -114,7 +114,11 @@ const mountComponent = (visible = true, movieOverride?: Partial<Movie>) =>
 describe("AddToListDialog", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockFetchUserLists.mockResolvedValue(makeLists(["list-1", "list-2"]));
+    mockFetchUserLists.mockResolvedValue({
+      results: makeLists(["list-1", "list-2"]),
+      next_last_id: undefined,
+      count: 2,
+    });
     mockFetchMovieListsFromMovie.mockResolvedValue([]);
   });
 
@@ -146,7 +150,7 @@ describe("AddToListDialog", () => {
     it("calls fetchUserLists with the user's username on mount", async () => {
       mountComponent();
       await flushPromises();
-      expect(mockFetchUserLists).toHaveBeenCalledWith("testuser");
+      expect(mockFetchUserLists).toHaveBeenCalledWith("testuser", undefined);
     });
 
     it("calls fetchMovieListsFromMovie with the movie slug on mount", async () => {
@@ -176,7 +180,7 @@ describe("AddToListDialog", () => {
     });
 
     it("shows the loading state in ListComponent while fetching", async () => {
-      mockFetchUserLists.mockReturnValue(new Promise(() => {}));
+      mockFetchUserLists.mockReturnValue(new Promise(() => { }));
       const wrapper = mountComponent();
       // Don't flush — check intermediate loading=true state
       const list = wrapper.find("[data-testid='ListComponent']");
@@ -452,7 +456,7 @@ describe("AddToListDialog", () => {
       expect(mockToastAdd).toHaveBeenCalledWith(
         expect.objectContaining({
           severity: "error",
-          detail: "components.addToList.checkMovieInListsError",
+          detail: "components.addToList.fetchListsError",
         }),
       );
     });

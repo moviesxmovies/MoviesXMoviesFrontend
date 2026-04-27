@@ -1,4 +1,5 @@
 import { api } from "@/composables/useAPI";
+import TranslatedError from "@/exceptions/TranslatedError";
 import type { Movie, MoviePagination } from "@/types";
 
 export type searchData = {
@@ -18,7 +19,7 @@ export const getRecommendedMovies = async () => {
     const { data }: { data: Movie[] } = await api.get("/movies/");
     return data;
   } catch (error: any) {
-    throw error;
+    throw new TranslatedError(error, error.response?.data?.status);
   }
 };
 
@@ -26,7 +27,7 @@ export const submitRating = async (movieSlug: string, rating: number) => {
   try {
     await api.post(`/movies/${movieSlug}/ratings/`, { rating });
   } catch (error: any) {
-    throw error;
+    throw new TranslatedError(error, error.response?.data?.status);
   }
 };
 
@@ -34,7 +35,7 @@ export const setAsNotSeen = async (movieSlug: string) => {
   try {
     await api.post(`/movies/${movieSlug}/unseen/`);
   } catch (error: any) {
-    throw error;
+    throw new TranslatedError(error, error.response?.data?.status);
   }
 };
 
@@ -51,7 +52,7 @@ export const movieSearching = async (
     );
     return data;
   } catch (error: any) {
-    throw error;
+    throw new TranslatedError(error, error.response?.data?.status);
   }
 };
 
@@ -67,9 +68,8 @@ export const friendsRatings = async (
         params: { limit, page },
       },
     );
-    console.log("Fetched friends ratings:", data);
     return data;
   } catch (error: any) {
-    throw error;
+    throw new TranslatedError(error, error.response?.data?.status);
   }
 };

@@ -44,9 +44,10 @@ export interface ForgotPasswordPayload {
   email: string;
 }
 
-export interface MovieDynamicPagination {
-  results: Movie[];
+export interface DynamicPagination<T> {
+  results: T[];
   next_last_id: number;
+  count: number;
 }
 
 export interface MoviePagination {
@@ -104,7 +105,22 @@ export interface User {
   friendship: Friendship;
   picture: string;
 }
-interface Friendship {
+export interface Review {
+  id: number;
+  title: string;
+  movie: string;
+  user: string;
+  content: string;
+  is_positive: boolean;
+  created_at: string;
+}
+export interface FriendRequest {
+  id: number;
+  from_user: string;
+  to_user: string;
+  status: string;
+}
+export interface Friendship {
   is_friend: boolean;
   status: string;
 }
@@ -147,4 +163,19 @@ export type CreateList = {
   name: string,
   description?: string,
   privacity: string,
+};
+
+export type ReactionResponse = {
+    reactions: Record<string, number>;
+    your_reactions: Record<string, number>;
+}
+
+export type SelfUser ={
+  id: number;
+  username: string;
+  bio: string;
+  picture: string;
+  first_name: string;
+  last_name: string;
+  email: string;
 }

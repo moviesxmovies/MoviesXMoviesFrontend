@@ -1,17 +1,18 @@
 import { api } from "@/composables/useAPI";
+import TranslatedError from "@/exceptions/TranslatedError";
 import { useAuthStore } from "@/stores/authStore";
 import type { LoginPayload, RegisterPayload } from "@/types";
 import { defineComponent, h } from "vue";
 
 
-export const handleLogin = async (values: LoginPayload) => {
+export const handleLogin = async (values: LoginPayload, lang: string | undefined) => {
   try {
     const authStore = useAuthStore();
 
-    const { data } = await api.post("/auth/login/", values);
+    const { data } = await api.post("/auth/login/", values, { params: { lang } });
     authStore.setTokens(data.access, data.refresh);
   } catch (error: any) {
-    throw error;
+    throw new TranslatedError(error, error.response?.data?.detail);
   }
 };
 

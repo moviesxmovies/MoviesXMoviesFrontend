@@ -5,7 +5,7 @@ const t = i18n.global.t;
 
 export const step1Schema = z
   .object({
-    username: z.string().min(1, t("schema.username.required")),
+    username: z.string().min(1, t("schema.username.required")).max(15, t("schema.username.maxLength")),
     email: z
       .email(t("schema.email.invalid"))
       .min(1, t("schema.email.required")),
@@ -50,7 +50,7 @@ export const schema = z
   .object({
     first_name: z.string().min(1, t("schema.firstName.required")),
     last_name: z.string().min(1, t("schema.lastName.required")),
-    username: z.string().min(1, t("schema.username.required")),
+    username: z.string().min(1, t("schema.username.required")).max(15, t("schema.username.maxLength")),
     email: z
       .email(t("schema.email.invalid"))
       .min(1, t("schema.email.required")),

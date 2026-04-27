@@ -8,6 +8,9 @@ import { getFriendsRequests, getSelfUserProfile } from "@/repositories/userRepos
 import Menu from "primevue/menu";
 import { useI18n } from "vue-i18n";
 import { useThemeStore } from "@/stores/themeStore";
+import { useNotificationsStore } from "@/stores/notificationStore";
+import { Skeleton } from "primevue";
+import { useProfileStore } from "@/stores/profileStore";
 
 const { t } = useI18n();
 const router = useRouter();
@@ -15,33 +18,37 @@ const authStore = useAuthStore();
 const themeStore = useThemeStore();
 const menuOpen = ref(false);
 const profilePicture = ref<string | null>(null);
-const pendingFriendsRequests = ref(0);
-
+const notificationsStore = useNotificationsStore();
+const profileImageLoaded = ref(false);
+const loadingProfile = ref(true);
+const profileImageLoadedMobile = ref(false);
+const profileStore = useProfileStore();
 const loadProfilePicture = async () => {
   if (!authStore.isAuthenticated) {
     profilePicture.value = null;
     return;
   }
   try {
+    loadingProfile.value = true;
     const profile = await getSelfUserProfile();
     profilePicture.value = profile?.picture ?? null;
   } catch {
     profilePicture.value = null;
+  } finally {
+    loadingProfile.value = false;
   }
 };
 
 const loadPendingFriendsRequests = async () => {
-
   if (!authStore.isAuthenticated) {
-
-    pendingFriendsRequests.value = 0;
+    notificationsStore.set(0);
     return;
   }
   try {
-    const response = await getFriendsRequests(1, 6);
-    pendingFriendsRequests.value = response.count;
+    const response = await getFriendsRequests();
+    notificationsStore.set(response.count);
   } catch {
-    pendingFriendsRequests.value = 0;
+    notificationsStore.set(0);
   }
 };
 
@@ -59,7 +66,7 @@ const menuItems = computed(() => [
   {
     label: t("components.navbar.profile"),
     icon: "pi pi-user",
-    command: () => router.push("/profile"),
+    command: () => router.push("/users"),
   },
   {
     separator: true,
@@ -85,8 +92,14 @@ watch(() => authStore.isAuthenticated, (isAuthenticated) => {
     loadPendingFriendsRequests();
   } else {
     profilePicture.value = null;
-    pendingFriendsRequests.value = 0;
+    notificationsStore.set(0);
   }
+});
+
+watch(() => profileStore.refreshKey, () => {
+  profileImageLoaded.value = false;
+  profileImageLoadedMobile.value = false;
+  loadProfilePicture();
 });
 </script>
 
@@ -116,9 +129,12 @@ watch(() => authStore.isAuthenticated, (isAuthenticated) => {
       <template v-if="authStore.isAuthenticated">
         <button class="btn-profile" @click="(e) => profileMenu.toggle(e)">
           <div class="profile-wrapper">
-            <img :src="profilePicture ?? ''" :alt="$t('home.profile')" />
-            <span v-if="pendingFriendsRequests > 0" class="notification-badge">
-              {{ pendingFriendsRequests >= 6 ? '5+' : pendingFriendsRequests }}
+            <Skeleton v-if="loadingProfile || !profileImageLoaded" shape="circle" width="2.5rem" height="2.5rem" />
+            <img :src="profilePicture ?? ''" :alt="$t('home.profile')"
+              :style="{ display: loadingProfile || !profileImageLoaded ? 'none' : 'block' }"
+              @load="profileImageLoaded = true" />
+            <span v-if="notificationsStore.pendingFriendRequests > 0" class="notification-badge">
+              {{ notificationsStore.pendingFriendRequests >= 6 ? '5+' : notificationsStore.pendingFriendRequests }}
             </span>
           </div>
         </button>
@@ -151,12 +167,17 @@ watch(() => authStore.isAuthenticated, (isAuthenticated) => {
             <LangComponent />
           </div>
 
-          <button id="profile-btn-mobile" class="btn-ghost" @click="navigate('/profile')"
+          <button id="profile-btn-mobile" class="btn-ghost" @click="navigate('/users')"
             v-if="authStore.isAuthenticated">
             <div class="profile-wrapper">
-              <img :src="profilePicture ?? ''" :alt="$t('home.profile')" class="btn-profile-img" />
-              <span v-if="pendingFriendsRequests > 0" class="notification-badge notification-badge--sm">
-                {{ pendingFriendsRequests >= 6 ? '5+' : pendingFriendsRequests }}
+              <Skeleton v-if="loadingProfile || !profileImageLoadedMobile" shape="circle" width="1.5rem"
+                height="1.5rem" />
+              <img :src="profilePicture ?? ''" :alt="$t('home.profile')" class="btn-profile-img"
+                :style="{ display: loadingProfile || !profileImageLoadedMobile ? 'none' : 'block' }"
+                @load="profileImageLoadedMobile = true" />
+              <span v-if="notificationsStore.pendingFriendRequests > 0"
+                class="notification-badge notification-badge--sm">
+                {{ notificationsStore.pendingFriendRequests >= 6 ? '5+' : notificationsStore.pendingFriendRequests }}
               </span>
             </div>
             {{ $t("home.profile") }}

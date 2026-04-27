@@ -22,7 +22,18 @@ vi.mock("primevue", () => ({
   useToast: vi.fn(() => ({ add: mockToastAdd })),
   Button: { template: "<button type='submit'><slot /></button>" },
 }));
-
+vi.mock("vue-router", () => ({
+  useRouter: vi.fn(),
+  useRoute: vi.fn(),
+  createRouter: vi.fn(() => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    beforeEach: vi.fn(),
+    afterEach: vi.fn(),
+    currentRoute: { value: {} },
+  })),
+  createWebHistory: vi.fn(() => ({})),
+}));
 describe("Onboarding Component", () => {
   let wrapper: any;
   const mockRouter = { push: vi.fn() };
