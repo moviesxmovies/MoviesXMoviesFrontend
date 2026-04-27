@@ -345,7 +345,7 @@ onUnmounted(() => { if (bubbleTimer) clearInterval(bubbleTimer); });
 
     .bubble {
         bottom: unset;
-        left: -280px;
+        left: -100px;
         right: unset;
         top: var(--x-offset, 30%);
         max-width: 240px;
