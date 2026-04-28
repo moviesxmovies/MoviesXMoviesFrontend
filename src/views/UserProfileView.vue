@@ -28,7 +28,7 @@ import SectionAccordion from '@/components/sectionAccordion.vue';
 import EditProfileModal from '@/components/editProfileModal.vue';
 import { refreshToken } from '@/repositories/auth/authRepository';
 import { useProfileStore } from '@/stores/profileStore';
-import ChoiceMovieListTypeModal from '@/components/ChoiceMovieListTypeModal.vue';
+import ChoiceMovieListTypeModal from '@/components/choiceMovieListTypeModal.vue';
 
 const route = useRoute();
 const router = useRouter();
