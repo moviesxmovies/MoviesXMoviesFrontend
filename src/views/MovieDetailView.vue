@@ -14,6 +14,7 @@ import { useInfinitePagination } from '@/composables/useInfinitePagination';
 import ReviewOnUserComponent from '@/components/reviewOnUserComponent.vue';
 import SectionAccordion from '@/components/sectionAccordion.vue';
 import { api } from '@/composables/useAPI';
+import AddReviewDialog from '@/components/addReviewDialog.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -120,6 +121,8 @@ watch(
 </script>
 
 <template>
+    <AddReviewDialog v-model:visible="addReviewDialogVisible" :movieSlug="movie.slug"
+        @reload="() => { resetReviews(); fetchMovieReviews() }" />
     <div class="page">
         <div class="layout">
             <!-- Movie Details -->

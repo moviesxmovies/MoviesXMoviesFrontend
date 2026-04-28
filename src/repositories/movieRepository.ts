@@ -1,6 +1,6 @@
 import { api } from "@/composables/useAPI";
 import TranslatedError from "@/exceptions/TranslatedError";
-import type { Movie, MoviePagination } from "@/types";
+import type { Movie, MoviePagination, Review } from "@/types";
 
 export type searchData = {
   name?: string;
@@ -84,10 +84,43 @@ export const getMovie = async (movieSlug: string) => {
 };
 
 export const getMovieReviews = async (movieSlug: string, lastId?: number, limit: number = 10) => {
-  try {    const { data }: { data: any } = await api.get(`/movies/${movieSlug}/reviews/`, {
+  try {
+    const { data }: { data: any } = await api.get(`/movies/${movieSlug}/reviews/`, {
       params: { last_id: lastId, limit },
     });
     return data;
+  } catch (error: any) {
+    throw new TranslatedError(error, error.response?.data?.status);
+  }
+}
+
+export const submitReview = async (movieSlug: string, body: { content: string; title: string; isPositive: boolean }) => {
+  try {
+    await api.post(`/movies/${movieSlug}/reviews/`, {
+      content: body.content,
+      title: body.title,
+      is_positive: body.isPositive,
+    });
+  } catch (error: any) {
+    throw new TranslatedError(error, error.response?.data?.status);
+  }
+}
+
+export const editReview = async (reviewId: number, body: { content: string; title: string; isPositive: boolean }) => {
+  try {
+    await api.put(`/reviews/${reviewId}/`, {
+      content: body.content,
+      title: body.title,
+      is_positive: body.isPositive,
+    });
+  } catch (error: any) {
+    throw new TranslatedError(error, error.response?.data?.status);
+  }
+}
+
+export const deleteReview = async (reviewId: number) => {
+  try {
+    await api.delete(`/reviews/${reviewId}/`);
   } catch (error: any) {
     throw new TranslatedError(error, error.response?.data?.status);
   }
