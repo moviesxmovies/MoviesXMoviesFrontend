@@ -131,7 +131,7 @@ watch(() => profileStore.refreshKey, () => {
           <div class="profile-wrapper">
             <Skeleton v-if="loadingProfile || !profileImageLoaded" shape="circle" width="2.5rem" height="2.5rem" />
             <img :src="profilePicture ?? ''" :alt="$t('home.profile')"
-              :style="{ display: loadingProfile || !profileImageLoaded ? 'none' : 'block'}" class="btn-profile-img"
+              :style="{ display: loadingProfile || !profileImageLoaded ? 'none' : 'block' }" class="btn-profile-img"
               @load="profileImageLoaded = true" />
             <span v-if="notificationsStore.pendingFriendRequests > 0" class="notification-badge">
               {{ notificationsStore.pendingFriendRequests >= 6 ? '5+' : notificationsStore.pendingFriendRequests }}
@@ -257,16 +257,20 @@ watch(() => profileStore.refreshKey, () => {
 
 .btn-profile img,
 .btn-profile-img {
-  width: 100%;
-  height: 100%;
   border-radius: 100%;
   object-fit: cover;
 }
 
 .btn-profile-img {
-  aspect-ratio: 1 / 1;
-  width: 100%;
+  width: 2.5rem;
+  aspect-ratio: 1/1;
 }
+
+#profile-btn-mobile .btn-profile-img {
+  width: 1.5rem;
+  aspect-ratio: 1 / 1;
+}
+
 
 /* MENU */
 :deep(.profile-menu.p-menu) {
