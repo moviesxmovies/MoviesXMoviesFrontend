@@ -236,12 +236,12 @@ describe("CreateListDialog", () => {
 
     it("renders submit button", () => {
       const wrapper = mountDialog();
-      expect(wrapper.find("[data-testid='button-create-list']").exists()).toBe(true);
+      expect(wrapper.find("button[type='submit']").exists()).toBe(true);
     });
 
     it("renders cancel button", () => {
       const wrapper = mountDialog();
-      expect(wrapper.find("[data-testid='button-cancel']").exists()).toBe(true);
+      expect(wrapper.find(".cancel-btn").exists()).toBe(true);
     });
   });
 
@@ -401,7 +401,7 @@ describe("CreateListDialog", () => {
   describe("cancel button", () => {
     it("closes dialog when clicking Cancel", async () => {
       const wrapper = mountDialog();
-      await wrapper.find("[data-testid='button-cancel']").trigger("click");
+      await wrapper.find(".cancel-btn").trigger("click");
       await flushPromises();
 
       expect(wrapper.emitted("update:visible")).toBeTruthy();
@@ -411,7 +411,7 @@ describe("CreateListDialog", () => {
 
     it("does not call createList when clicking Cancel", async () => {
       const wrapper = mountDialog();
-      await wrapper.find("[data-testid='button-cancel']").trigger("click");
+      await wrapper.find(".cancel-btn").trigger("click");
       expect(mockCreateList).not.toHaveBeenCalled();
     });
   });

@@ -28,6 +28,7 @@ import SectionAccordion from '@/components/sectionAccordion.vue';
 import EditProfileModal from '@/components/editProfileModal.vue';
 import { refreshToken } from '@/repositories/auth/authRepository';
 import { useProfileStore } from '@/stores/profileStore';
+import ChoiceMovieListTypeModal from '@/components/choiceMovieListTypeModal.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -42,6 +43,7 @@ const user = ref<User>({} as User);
 const loadingProfile = ref(false);
 const isSelfProfile = ref(false);
 const editProfileModalVisible = ref(false);
+const choiceMovieListTypeModalVisible = ref(false);
 
 const isMobile = ref(window.innerWidth < 640);
 const handleResize = () => {
@@ -151,8 +153,31 @@ const emailChanged = async () => {
 const onUpdated = async (userUpdated: User) => {
     user.value = userUpdated;
     await refreshToken();
-    profileStore.refresh(); 
+    profileStore.refresh();
 };
+
+const createNormalList = () => {
+};
+
+const createIntelligentList = () => {
+};
+
+const movieListDialogConfig = {
+    icon: 'pi pi-plus',
+    label: t('user.addMoviesList'),
+
+    onClick: () => {
+        choiceMovieListTypeModalVisible.value = true
+    },
+}
+
+const reloadLists = async () => {
+    resetMoviesLists();
+    fetchMoviesLists();
+};
+
+
+
 onMounted(() => {
     window.addEventListener('resize', handleResize);
 
@@ -184,6 +209,8 @@ watch(
 </script>
 
 <template>
+    <ChoiceMovieListTypeModal v-model:visible="choiceMovieListTypeModalVisible" @create-normal-list="createNormalList"
+        @create-intelligent-list="createIntelligentList" @reload-lists="reloadLists" />
     <EditProfileModal v-model:visible="editProfileModalVisible" @updated="onUpdated" @emailChanged="emailChanged" />
     <div class="page">
         <div class="layout">
@@ -246,7 +273,8 @@ watch(
                 <SectionAccordion icon="pi pi-folder accent-icon" :title="t('user.movies_lists')"
                     :isEmpty="!moviesLists.results?.length" :emptyIcon="'pi pi-folder'"
                     :emptyTitle="t('user.no_movies_lists')" :emptyDescription="t('user.no_movies_lists_description')"
-                    :loading="loadingMoviesLists" v-model:sentinelRef="moviesListsSentinelRef">
+                    :loading="loadingMoviesLists" v-model:sentinelRef="moviesListsSentinelRef"
+                    :dialogOptions="movieListDialogConfig">
                     <div class="movies-lists-grid">
                         <MoviesListComponent v-for="movieList in moviesLists.results" :key="movieList.id"
                             :movieList="movieList" />
