@@ -73,3 +73,22 @@ export const friendsRatings = async (
     throw new TranslatedError(error, error.response?.data?.status);
   }
 };
+
+export const getMovie = async (movieSlug: string) => {
+  try {
+    const { data }: { data: Movie } = await api.get(`/movies/${movieSlug}/`);
+    return data;
+  } catch (error: any) {
+    throw new TranslatedError(error, error.response?.data?.status);
+  }
+};
+
+export const getMovieReviews = async (movieSlug: string, lastId?: number, limit: number = 10) => {
+  try {    const { data }: { data: any } = await api.get(`/movies/${movieSlug}/reviews/`, {
+      params: { last_id: lastId, limit },
+    });
+    return data;
+  } catch (error: any) {
+    throw new TranslatedError(error, error.response?.data?.status);
+  }
+}

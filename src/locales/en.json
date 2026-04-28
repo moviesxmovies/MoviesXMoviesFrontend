@@ -302,6 +302,26 @@
     "createNormalList": "Normal List",
     "createIntelligentList": "Intelligent List"
   },
+  "movie": {
+    "synopsis": "Synopsis",
+    "platforms": "Platform | Platforms",
+    "genres": "Genre | Genres",
+    "actors": "Actor | Actors",
+    "directors": "Director | Directors",
+    "reviews": "Reviews",
+    "no_reviews": "No reviews available",
+    "no_directors": "No directors available",
+    "no_actors": "No actors available",
+    "no_genres": "No genres available",
+    "no_platforms": "No platforms available",
+    "no_synopsis": "No synopsis available.",
+    "no_reviews_description": "This movie hasn't received any reviews yet.",
+    "no_directors_description": "No directors available for this movie.",
+    "no_actors_description": "No actors available for this movie.",
+    "no_genres_description": "No genres available for this movie.",
+    "no_platforms_description": "No platforms available for this movie.",
+    "no_synopsis_description": "No synopsis available for this movie."
+  },
   "common": {
     "save": "Save",
     "cancel": "Cancel",

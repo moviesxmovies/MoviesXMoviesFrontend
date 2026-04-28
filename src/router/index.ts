@@ -73,6 +73,12 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true },
   },
   {
+    path: "/movies/:slug",
+    component: () => import("../views/MovieDetailView.vue"),
+    name: "movie-detail",
+    meta: { requiresAuth: true },
+  },
+  {
     path: "/users",
     component: () => import("../views/UserProfileView.vue"),
     name: "self-profile",

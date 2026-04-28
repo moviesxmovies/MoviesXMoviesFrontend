@@ -16,7 +16,12 @@ const mockLangStore = reactive({ language: "en" });
 vi.mock("@/repositories/movieRepository", () => ({
   movieSearching: (...a: unknown[]) => mockMovieSearching(...a),
 }));
-
+vi.mock("@/components/movieCardComponent.vue", () => ({
+  default: {
+    template: '<div data-testid="movie-card" />',
+    props: ['movie'] 
+  }
+}));
 vi.mock("@/stores/langStore", () => ({
   useLangStore: () => mockLangStore,
 }));
@@ -135,14 +140,14 @@ describe("SearchView", () => {
   // ── Loading state ─────────────────────────────────────────────────────────
   describe("loading state", () => {
     it("shows the loading spinner while the search is in progress", async () => {
-      mockMovieSearching.mockReturnValue(new Promise(() => {}));
+      mockMovieSearching.mockReturnValue(new Promise(() => { }));
       const wrapper = mountView();
       await flushPromises();
       expect(wrapper.find(".loading-state").exists()).toBe(true);
     });
 
     it("shows the spinning search icon while loading", async () => {
-      mockMovieSearching.mockReturnValue(new Promise(() => {}));
+      mockMovieSearching.mockReturnValue(new Promise(() => { }));
       const wrapper = mountView();
       await flushPromises();
       expect(wrapper.find(".pi-spinner").exists()).toBe(true);
@@ -220,7 +225,7 @@ describe("SearchView", () => {
     });
 
     it("does not show the clear button while loading even if search has a value", async () => {
-      mockMovieSearching.mockReturnValue(new Promise(() => {}));
+      mockMovieSearching.mockReturnValue(new Promise(() => { }));
       const wrapper = mountView();
       const vm = wrapper.vm as unknown as { search: string };
       vm.search = "batman";
@@ -384,7 +389,7 @@ describe("SearchView", () => {
     });
 
     it("hides PaginationComponent while loading", async () => {
-      mockMovieSearching.mockReturnValue(new Promise(() => {}));
+      mockMovieSearching.mockReturnValue(new Promise(() => { }));
       const wrapper = mountView();
       await flushPromises();
       expect(wrapper.find("[data-testid='PaginationComponent']").exists()).toBe(false);
