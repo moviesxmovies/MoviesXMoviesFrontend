@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import { submitReview } from '@/repositories/movieRepository';
+import { getReview, updateReview } from '@/repositories/movieRepository';
 import { ref, watch } from 'vue';
-import { Dialog, useToast } from 'primevue';
+import { Dialog, Skeleton, useToast } from 'primevue';
 import { useI18n } from 'vue-i18n';
 
 const props = defineProps<{
     visible: boolean;
-    movieSlug: string;
+    reviewId: number;
 }>();
 
 const emit = defineEmits<{
@@ -16,7 +16,8 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 const toast = useToast();
-const loading = ref(false);
+const loadingFetch = ref(false);
+const loadingSubmit = ref(false);
 
 const form = ref({
     title: '',
@@ -34,10 +35,23 @@ const clearError = (field: string) => {
     serverErrors.value = [];
 };
 
-const resetForm = () => {
-    form.value = { title: '', content: '', isPositive: true };
+const fetchReview = async () => {
+    loadingFetch.value = true;
     fieldErrors.value = {};
     serverErrors.value = [];
+    try {
+        const review = await getReview(props.reviewId);
+        form.value = {
+            title: review.title,
+            content: review.content,
+            isPositive: review.is_positive,
+        };
+    } catch (error: any) {
+        toast.add({ severity: 'error', summary: t('toast.error'), detail: t('review.error.fetching'), life: 3000 });
+        emit('update:visible', false);
+    } finally {
+        loadingFetch.value = false;
+    }
 };
 
 const validate = () => {
@@ -53,16 +67,16 @@ const validate = () => {
 
 const submit = async () => {
     if (!validate()) return;
-    loading.value = true;
+    loadingSubmit.value = true;
     try {
-        await submitReview(props.movieSlug, {
+        await updateReview(props.reviewId, {
             title: form.value.title,
             content: form.value.content,
             isPositive: form.value.isPositive,
         });
         emit('reload');
         emit('update:visible', false);
-        toast.add({ severity: 'success', summary: t('toast.success'), detail: t('review.submitted'), life: 3000 });
+        toast.add({ severity: 'success', summary: t('toast.success'), detail: t('review.updated'), life: 3000 });
     } catch (error: any) {
         const data = error.response?.data;
         if (data) {
@@ -72,21 +86,21 @@ const submit = async () => {
                 else fieldErrors.value[key] = messages;
             });
         } else {
-            toast.add({ severity: 'error', summary: t('toast.error'), detail: t('review.error.submitting'), life: 3000 });
+            toast.add({ severity: 'error', summary: t('toast.error'), detail: t('review.error.updating'), life: 3000 });
         }
     } finally {
-        loading.value = false;
+        loadingSubmit.value = false;
     }
 };
 
 watch(() => props.visible, (val) => {
-    if (val) resetForm();
+    if (val) fetchReview();
 });
 </script>
 
 <template>
     <Dialog :visible="visible" @update:visible="emit('update:visible', $event)" modal :draggable="false"
-        :dismissableMask="true" :header="t('review.addReview')" :style="{ width: '90vw', maxWidth: '480px' }" :pt="{
+        :dismissableMask="true" :header="t('review.editReview')" :style="{ width: '90vw', maxWidth: '480px' }" :pt="{
             root: { class: 'rounded-[2rem] border-none shadow-2xl bg-[var(--background)] overflow-hidden' },
             header: { class: 'bg-[var(--background)] pb-0' },
             title: { class: 'text-xl font-bold text-[var(--primary)]' },
@@ -95,7 +109,32 @@ watch(() => props.visible, (val) => {
             closeButton: { class: 'hover:bg-[var(--secondary)]/20 transition-colors' },
         }">
 
-        <div class="form">
+        <!-- SKELETON -->
+        <div v-if="loadingFetch" class="form">
+            <div class="fields">
+                <!-- Sentiment -->
+                <div class="field">
+                    <Skeleton width="70px" height="11px" border-radius="4px" />
+                    <div class="sentiment-toggle">
+                        <Skeleton width="100%" height="40px" border-radius="0.75rem" />
+                        <Skeleton width="100%" height="40px" border-radius="0.75rem" />
+                    </div>
+                </div>
+                <!-- Title -->
+                <div class="field">
+                    <Skeleton width="50px" height="11px" border-radius="4px" />
+                    <Skeleton width="100%" height="40px" border-radius="0.75rem" />
+                </div>
+                <!-- Content -->
+                <div class="field">
+                    <Skeleton width="65px" height="11px" border-radius="4px" />
+                    <Skeleton width="100%" height="120px" border-radius="0.75rem" />
+                </div>
+            </div>
+        </div>
+
+        <!-- FORM -->
+        <div v-else class="form">
             <!-- Global Errors -->
             <div v-if="serverErrors.length" class="server-errors">
                 <i class="pi pi-exclamation-circle" />
@@ -126,8 +165,8 @@ watch(() => props.visible, (val) => {
 
                 <!-- TITLE -->
                 <div class="field">
-                    <label for="review-title">{{ t('review.title') }}</label>
-                    <input id="review-title" v-model="form.title" type="text" class="input"
+                    <label for="edit-review-title">{{ t('review.title') }}</label>
+                    <input id="edit-review-title" v-model="form.title" type="text" class="input"
                         :class="{ 'input-error': fieldErrors.title?.length }"
                         :placeholder="t('review.titlePlaceholder')" @input="clearError('title')" />
                     <span v-if="fieldErrors.title?.length" class="field-error">
@@ -137,8 +176,8 @@ watch(() => props.visible, (val) => {
 
                 <!-- CONTENT -->
                 <div class="field">
-                    <label for="review-content">{{ t('review.content') }}</label>
-                    <textarea id="review-content" v-model="form.content" class="input textarea" rows="5"
+                    <label for="edit-review-content">{{ t('review.content') }}</label>
+                    <textarea id="edit-review-content" v-model="form.content" class="input textarea" rows="5"
                         :class="{ 'input-error': fieldErrors.content?.length }"
                         :placeholder="t('review.contentPlaceholder')" @input="clearError('content')" />
                     <span v-if="fieldErrors.content?.length" class="field-error">
@@ -150,12 +189,12 @@ watch(() => props.visible, (val) => {
 
         <template #footer>
             <div class="footer-actions">
-                <button class="btn-cancel" @click="emit('update:visible', false)">
+                <button class="btn-cancel" :disabled="loadingFetch" @click="emit('update:visible', false)">
                     {{ t('common.cancel') }}
                 </button>
-                <button class="btn-save" :disabled="loading" @click="submit">
-                    <i v-if="loading" class="pi pi-spin pi-spinner" />
-                    <span>{{ t('common.submit') }}</span>
+                <button class="btn-save" :disabled="loadingFetch || loadingSubmit" @click="submit">
+                    <i v-if="loadingSubmit" class="pi pi-spin pi-spinner" />
+                    <span>{{ t('common.save') }}</span>
                 </button>
             </div>
         </template>
@@ -319,8 +358,13 @@ label {
     font-family: inherit;
 }
 
-.btn-cancel:hover {
+.btn-cancel:hover:not(:disabled) {
     background: color-mix(in srgb, var(--secondary) 15%, transparent);
+}
+
+.btn-cancel:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .btn-save {

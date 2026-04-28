@@ -93,7 +93,7 @@ vi.mock("primevue", async (importOriginal) => {
 });
 // Stub child components to keep tests focused
 vi.mock('@/components/friendRequestComponent.vue', () => ({ default: { template: '<div class="friend-request-stub" />' } }));
-vi.mock('@/components/reviewOnUserComponent.vue', () => ({ default: { template: '<div class="review-stub" />' } }));
+vi.mock('@/components/reviewComponent.vue', () => ({ default: { template: '<div class="review-stub" />' } }));
 vi.mock('@/components/friendWithFollow.vue', () => ({ default: { template: '<div class="friend-with-follow-stub" />' } }));
 vi.mock('@/components/friendshipStatusComponent.vue', () => ({ default: { template: '<div class="friendship-status-stub" />' } }));
 vi.mock('@/components/moviesListComponent.vue', () => ({ default: { template: '<div class="movies-list-stub" />' } }));

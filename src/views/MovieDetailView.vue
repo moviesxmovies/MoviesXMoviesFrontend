@@ -11,7 +11,7 @@ import { useRoute, useRouter, RouterLink } from 'vue-router';
 import { useLangStore } from '@/stores/langStore';
 import { usePaginatedFetch } from '@/composables/usePaginatedFetch';
 import { useInfinitePagination } from '@/composables/useInfinitePagination';
-import ReviewOnUserComponent from '@/components/reviewOnUserComponent.vue';
+import ReviewComponent from '@/components/reviewComponent.vue';
 import SectionAccordion from '@/components/sectionAccordion.vue';
 import { api } from '@/composables/useAPI';
 import AddReviewDialog from '@/components/addReviewDialog.vue';
@@ -190,7 +190,8 @@ watch(
                     :emptyTitle="t('movie.no_reviews')" :emptyDescription="t('movie.no_reviews_description')"
                     :dialog-options="reviewDialogConfig" :loading="loadingReviews"
                     v-model:sentinelRef="reviewsSentinelRef" defaultOpen>
-                    <ReviewOnUserComponent v-for="review in reviews.results" :key="review.id" :review="review" />
+                    <ReviewComponent v-for="review in reviews.results" :key="review.id" :review="review"
+                        @deleted="() => { resetReviews(); fetchMovieReviews() }" />
                 </SectionAccordion>
             </div>
 
