@@ -167,7 +167,6 @@ const movieListDialogConfig = {
     label: t('user.addMoviesList'),
 
     onClick: () => {
-        console.log('open modal');
         choiceMovieListTypeModalVisible.value = true
     },
 }

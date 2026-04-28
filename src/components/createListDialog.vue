@@ -45,7 +45,6 @@ const handleSubmit = async ({
     if (props.movie) {
       await addToList(data.data.slug, props.movie);
     }
-    console.log(data);
     toast.add({
       severity: "success",
       summary: t("toast.success"),
