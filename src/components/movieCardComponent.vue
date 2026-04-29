@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { Movie } from "@/types";
+import { goToMovie } from "@/utils/goTo";
 
 const props = defineProps<{
   movie: Movie;
@@ -7,7 +8,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div class="movie-card">
+  <div class="movie-card" @click="goToMovie(movie.slug)">
     <div class="movie-poster-wrap">
       <img :src="movie.cover" :alt="movie.title" class="movie-poster" />
     </div>

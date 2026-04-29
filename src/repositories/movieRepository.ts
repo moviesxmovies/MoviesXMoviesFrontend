@@ -73,3 +73,64 @@ export const friendsRatings = async (
     throw new TranslatedError(error, error.response?.data?.status);
   }
 };
+
+export const getMovie = async (movieSlug: string) => {
+  try {
+    const { data }: { data: Movie } = await api.get(`/movies/${movieSlug}/`);
+    return data;
+  } catch (error: any) {
+    throw new TranslatedError(error, error.response?.data?.status);
+  }
+};
+
+export const getMovieReviews = async (movieSlug: string, lastId?: number, limit: number = 10) => {
+  try {
+    const { data }: { data: any } = await api.get(`/movies/${movieSlug}/reviews/`, {
+      params: { last_id: lastId, limit },
+    });
+    return data;
+  } catch (error: any) {
+    throw new TranslatedError(error, error.response?.data?.status);
+  }
+}
+
+export const submitReview = async (movieSlug: string, body: { content: string; title: string; isPositive: boolean }) => {
+  try {
+    await api.post(`/movies/${movieSlug}/reviews/`, {
+      content: body.content,
+      title: body.title,
+      is_positive: body.isPositive,
+    });
+  } catch (error: any) {
+    throw error;
+  }
+}
+
+export const updateReview = async (reviewId: number, body: { content: string; title: string; isPositive: boolean }) => {
+  try {
+    await api.put(`/reviews/${reviewId}/`, {
+      content: body.content,
+      title: body.title,
+      is_positive: body.isPositive,
+    });
+  } catch (error: any) {
+    throw error;
+  }
+}
+
+export const deleteReview = async (reviewId: number) => {
+  try {
+    await api.delete(`/reviews/${reviewId}/`);
+  } catch (error: any) {
+    throw new TranslatedError(error, error.response?.data?.status);
+  }
+}
+
+export const getReview = async (reviewId: number) => {
+  try {
+    const { data }: { data: any } = await api.get(`/reviews/${reviewId}/`);
+    return data;
+  } catch (error: any) {
+    throw new TranslatedError(error, error.response?.data?.status);
+  }
+}

@@ -61,6 +61,8 @@ const handleSentinelRef = (el: HTMLElement | null) => {
             <AccordionHeader class="section-header">
                 <i :class="[icon, iconClass]" />
                 <h2 class="section-title">{{ title }}</h2>
+                <Button v-if="dialogOptions" class="dialog-button" :class="dialogOptions.icon"
+                    label="{{ dialogOptions.label }}" @click.stop="dialogOptions.onClick" />
             </AccordionHeader>
             <AccordionContent
                 class="bg-secondary/5 rounded-[2rem] p-10 md:p-20 border-2 border-dashed border-secondary/40">
@@ -209,6 +211,7 @@ const handleSentinelRef = (el: HTMLElement | null) => {
     background: var(--accent);
     border-color: var(--accent);
 }
+
 .dialog-button:hover i,
 .dialog-button:hover::before {
     color: white !important;

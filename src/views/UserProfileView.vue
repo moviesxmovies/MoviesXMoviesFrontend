@@ -20,7 +20,7 @@ import { useNotificationsStore } from '@/stores/notificationStore';
 import { usePaginatedFetch } from '@/composables/usePaginatedFetch';
 import { useInfinitePagination } from '@/composables/useInfinitePagination';
 import FriendRequestComponent from '@/components/friendRequestComponent.vue';
-import ReviewOnUserComponent from '@/components/reviewOnUserComponent.vue';
+import ReviewComponent from '@/components/reviewComponent.vue';
 import FriendWithFollow from '@/components/friendWithFollow.vue';
 import FriendshipStatusComponent from '@/components/friendshipStatusComponent.vue';
 import MoviesListComponent from '@/components/moviesListComponent.vue';
@@ -265,7 +265,8 @@ watch(
                     :isEmpty="!reviews.results?.length" :emptyIcon="'pi pi-file-word'"
                     :emptyTitle="t('user.no_reviews')" :emptyDescription="t('user.no_reviews_description')"
                     :loading="loadingReviews" v-model:sentinelRef="reviewsSentinelRef" defaultOpen>
-                    <ReviewOnUserComponent v-for="review in reviews.results" :key="review.id" :review="review" />
+                    <ReviewComponent v-for="review in reviews.results" :key="review.id" :review="review"
+                        @deleted="() => { resetReviews(); fetchUserReviews() }" />
 
                 </SectionAccordion>
 
