@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { Dialog, Skeleton } from 'primevue';
 import { useI18n } from 'vue-i18n';
+import { MdEditor } from 'md-editor-v3'
+import 'md-editor-v3/lib/style.css'
 
 const props = defineProps<{
     visible: boolean;
@@ -100,9 +102,10 @@ const form = defineModel<{ title: string; content: string; isPositive: boolean }
                 <!-- CONTENT -->
                 <div class="field">
                     <label for="review-content">{{ t('review.content') }}</label>
-                    <textarea id="review-content" v-model="form.content" class="input textarea" rows="5"
-                        :class="{ 'input-error': fieldErrors?.content?.length }"
-                        :placeholder="t('review.contentPlaceholder')" @input="emit('clearError', 'content')" />
+                    <MdEditor v-model="form.content" language="en-US" :preview="false"
+                        :toolbars="['bold', 'italic', 'strikeThrough', 'title', 'unorderedList', 'orderedList', 'code', 'link', 'preview']"
+                        :class="fieldErrors?.content?.length ? 'input-error' : ''"
+                        @onChange="emit('clearError', 'content')" />
                     <span v-if="fieldErrors?.content?.length" class="field-error">
                         {{ fieldErrors.content[0] }}
                     </span>
@@ -336,5 +339,46 @@ label {
 .btn-reset:hover:not(:disabled) {
     background: color-mix(in srgb, var(--orange) 15%, transparent);
     border-color: color-mix(in srgb, var(--orange) 80%, transparent);
+}
+
+/* MD EDITOR */
+:deep(.md-editor) {
+    border-radius: 0.75rem;
+    border: 1px solid color-mix(in srgb, var(--secondary) 50%, transparent);
+    --md-color: var(--text) !important;
+    --md-hover-color: var(--primary) !important;
+    --md-bk-color: color-mix(in srgb, var(--text) 5%, transparent) !important;
+    --md-bk-color-outstand: color-mix(in srgb, var(--text) 8%, transparent) !important;
+    --md-border-color: color-mix(in srgb, var(--secondary) 40%, transparent) !important;
+    --md-color-disable: color-mix(in srgb, var(--text) 30%, transparent) !important;
+}
+
+:deep(.md-editor-toolbar-wrapper) {
+    background: color-mix(in srgb, var(--text) 8%, transparent) !important;
+    border-radius: 0.75rem 0.75rem 0 0;
+}
+
+:deep(.md-editor-content) {
+    background: transparent !important;
+}
+
+:deep(.md-editor-input-wrapper),
+:deep(.md-editor-input) {
+    background: transparent !important;
+    color: var(--text) !important;
+    font-family: inherit !important;
+}
+
+:deep(.md-editor-custom-scrollbar__track) {
+    background: color-mix(in srgb, var(--secondary) 20%, transparent) !important;
+}
+
+:deep(.md-editor-custom-scrollbar__thumb) {
+    background: color-mix(in srgb, var(--secondary) 60%, transparent) !important;
+    border-radius: 999px;
+}
+
+:deep(.md-editor-custom-scrollbar__thumb:hover) {
+    background: var(--secondary) !important;
 }
 </style>

@@ -191,7 +191,8 @@ watch(
                     :dialog-options="reviewDialogConfig" :loading="loadingReviews"
                     v-model:sentinelRef="reviewsSentinelRef" defaultOpen>
                     <ReviewComponent v-for="review in reviews.results" :key="review.id" :review="review"
-                        @deleted="() => { resetReviews(); fetchMovieReviews() }" />
+                        @deleted="() => { resetReviews(); fetchMovieReviews() }"
+                        @reload="() => { resetReviews(); fetchMovieReviews() }" />
                 </SectionAccordion>
             </div>
 

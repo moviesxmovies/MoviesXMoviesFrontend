@@ -2,7 +2,7 @@
 import { api } from '@/composables/useAPI';
 import { type User, type Movie, type Review } from '@/types';
 import { goToMovie } from '@/utils/goTo';
-import { computed, onMounted, ref } from 'vue';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import ReactionsComponent from './reactionsComponent.vue';
 import { Dialog, Skeleton } from 'primevue';
 import { RouterLink } from 'vue-router';
@@ -10,6 +10,7 @@ import { useAuthStore } from '@/stores/authStore';
 import EditReviewDialog from './editReviewDialog.vue';
 import { useI18n } from 'vue-i18n';
 import { deleteReview } from '@/repositories/movieRepository';
+import DOMPurify from 'dompurify'
 
 const props = defineProps<{
     review: Review;
@@ -17,6 +18,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
     deleted: [id: number];
+    reload: [];
 }>();
 
 const { t } = useI18n();
@@ -26,10 +28,20 @@ const user = ref<User>();
 const authStore = useAuthStore();
 const editModalVisible = ref(false);
 const confirmDeleteVisible = ref(false);
+import { marked } from 'marked'
 
 const isSelf = computed(() => {
     return authStore.isAuthenticated && Number(user.value?.id) === Number(authStore.user?.user_id);
 });
+const isExpanded = ref(false)
+const contentRef = ref<HTMLElement | null>(null)
+const isLongContent = ref(false)
+const LINE_HEIGHT_THRESHOLD = 10
+
+const renderedContent = computed(() => {
+    const html = marked.parse(props.review.content) as string
+    return DOMPurify.sanitize(html)
+})
 
 const fetchMovieData = async () => {
     try {
@@ -55,6 +67,7 @@ const confirmDelete = () => {
     confirmDeleteVisible.value = true;
 };
 
+
 const deleteReviewConfirm = () => {
     confirmDeleteVisible.value = false;
     deleteReview(props.review.id)
@@ -69,12 +82,22 @@ const deleteReviewConfirm = () => {
 onMounted(() => {
     fetchMovieData();
     fetchUserData();
+
 });
+watch(loading, async (newVal) => {
+    if (!newVal) {
+        await nextTick()
+        if (contentRef.value) {
+            isLongContent.value = contentRef.value.scrollHeight > 76
+        }
+    }
+})
+
 </script>
 
 <template>
     <EditReviewDialog v-if="isSelf" :reviewId="props.review.id" v-model:visible="editModalVisible"
-        @reload="fetchMovieData" />
+        @reload="emit('reload')" />
 
     <!-- CONFIRM DELETE DIALOG -->
     <Dialog v-model:visible="confirmDeleteVisible" modal :draggable="false" :dismissableMask="true"
@@ -149,28 +172,31 @@ onMounted(() => {
                             <span class="movie-name" @click="goToMovie(movie?.slug)">{{ movie?.title }}</span>
                             <span class="review-date">{{ new Date(review.created_at).toLocaleDateString() }}</span>
                         </div>
-
                         <div class="review-header-right">
-                            <div class="right-top">
-                                <RouterLink v-if="user" :to="`/users/${user.username}`" class="user-avatar-link">
-                                    <img class="user-avatar" :src="user.picture" :alt="user.username" />
-                                </RouterLink>
-                                <span class="badge" :class="review.is_positive ? 'badge-positive' : 'badge-negative'">
-                                    <i :class="review.is_positive ? 'pi pi-thumbs-up' : 'pi pi-thumbs-down'" />
-                                </span>
-                            </div>
-                            <div v-if="isSelf" class="right-actions">
-                                <button class="action-btn action-btn--edit" @click="editModalVisible = true">
-                                    <i class="pi pi-pencil" />
-                                </button>
-                                <button class="action-btn action-btn--delete" @click="confirmDelete">
-                                    <i class="pi pi-trash" />
-                                </button>
-                            </div>
+                            <RouterLink v-if="user" :to="`/users/${user.username}`" class="user-avatar-link">
+                                <img class="user-avatar" :src="user.picture" :alt="user.username" />
+                            </RouterLink>
+                            <span class="badge" :class="review.is_positive ? 'badge-positive' : 'badge-negative'">
+                                <i :class="review.is_positive ? 'pi pi-thumbs-up' : 'pi pi-thumbs-down'" />
+                            </span>
                         </div>
                     </div>
                     <h3 class="review-title">{{ review.title }}</h3>
-                    <p class="review-content">{{ review.content }}</p>
+                    <div class="review-content-wrapper" :class="{ expanded: isExpanded }">
+                        <p class="review-content" ref="contentRef" v-html="renderedContent"></p>
+                    </div>
+                    <button v-if="isLongContent" class="expand-btn" @click="isExpanded = !isExpanded">
+                        {{ isExpanded ? t('common.seeLess') : t('common.seeMore') }}
+                    </button>
+                </div>
+
+                <div v-if="isSelf" class="review-actions">
+                    <button class="action-btn action-btn--edit" @click="editModalVisible = true">
+                        <i class="pi pi-pencil" />
+                    </button>
+                    <button class="action-btn action-btn--delete" @click="confirmDelete">
+                        <i class="pi pi-trash" />
+                    </button>
                 </div>
             </div>
 
@@ -188,6 +214,7 @@ onMounted(() => {
     border-radius: 1rem;
     border: 1px solid var(--secondary);
     background: var(--background);
+    --review-bg: var(--background);
     transition: background 0.2s;
     margin-bottom: 0.75rem;
 }
@@ -199,7 +226,7 @@ onMounted(() => {
 }
 
 .review:hover {
-    background: rgba(255, 255, 255, 0.05);
+    --review-bg: var(--accent);
 }
 
 .movie-cover {
@@ -264,11 +291,20 @@ onMounted(() => {
 /* RIGHT COLUMN */
 .review-header-right {
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.4rem;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
     flex-shrink: 0;
 }
+
+.review-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    align-self: flex-start;
+    flex-shrink: 0;
+}
+
 
 .right-top {
     display: flex;
@@ -361,6 +397,8 @@ onMounted(() => {
     font-weight: 700;
     color: var(--text);
     margin: 0;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 .review-content {
@@ -371,6 +409,8 @@ onMounted(() => {
     opacity: 0.8;
     margin: 0;
     white-space: pre-line;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 .reactions-skeleton {
@@ -457,5 +497,127 @@ onMounted(() => {
 
 .btn-delete:hover {
     opacity: 0.85;
+}
+
+.review-content-wrapper {
+    max-height: 4.8rem;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    position: relative;
+}
+
+.review-content-wrapper.expanded {
+    max-height: 1000px;
+}
+
+.review-content-wrapper::after,
+.review-content-wrapper::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4rem;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.review-content-wrapper::after {
+    background: linear-gradient(to bottom,
+            transparent 0%,
+            color-mix(in srgb, var(--background) 60%, transparent) 40%,
+            var(--background) 100%);
+    opacity: 1;
+}
+
+.review-content-wrapper::before {
+    background: linear-gradient(to bottom,
+            transparent 0%,
+            color-mix(in srgb, var(--background) 50%, transparent) 40%,
+            color-mix(in srgb, var(--background) 95%, transparent) 100%);
+    opacity: 0;
+}
+
+.review:hover .review-content-wrapper::after {
+    opacity: 0;
+}
+
+.review:hover .review-content-wrapper::before {
+    opacity: 1;
+}
+
+.review-content-wrapper.expanded::after,
+.review-content-wrapper.expanded::before {
+    opacity: 0 !important;
+}
+
+.expand-btn {
+    font-size: 0.75rem;
+    color: var(--primary);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    font-family: inherit;
+    opacity: 0.8;
+}
+
+.expand-btn:hover {
+    opacity: 1;
+}
+
+.review-content :deep(p) {
+    margin: 0 0 0.5rem;
+}
+
+.review-content :deep(strong) {
+    font-weight: 600;
+}
+
+.review-content :deep(em) {
+    font-style: italic;
+}
+
+.review-content :deep(ul),
+.review-content :deep(ol) {
+    padding-left: 1.2rem;
+}
+
+.review-content :deep(code) {
+    font-family: monospace;
+    font-size: 0.8rem;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 0.1rem 0.3rem;
+    border-radius: 4px;
+}
+
+.review-content :deep(h1),
+.review-content :deep(h2),
+.review-content :deep(h3),
+.review-content :deep(h4) {
+    font-weight: 600;
+    line-height: 1.3;
+    margin: 0.75rem 0 0.25rem;
+    color: var(--text);
+}
+
+.review-content :deep(h1) {
+    font-size: 1.1rem;
+}
+
+.review-content :deep(h2) {
+    font-size: 1rem;
+}
+
+.review-content :deep(h3) {
+    font-size: 0.95rem;
+}
+
+.review-content :deep(h4) {
+    font-size: 0.9rem;
+}
+
+.review-content-wrapper.expanded::after {
+    opacity: 0;
 }
 </style>

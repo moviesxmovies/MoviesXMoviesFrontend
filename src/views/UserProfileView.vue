@@ -266,7 +266,8 @@ watch(
                     :emptyTitle="t('user.no_reviews')" :emptyDescription="t('user.no_reviews_description')"
                     :loading="loadingReviews" v-model:sentinelRef="reviewsSentinelRef" defaultOpen>
                     <ReviewComponent v-for="review in reviews.results" :key="review.id" :review="review"
-                        @deleted="() => { resetReviews(); fetchUserReviews() }" />
+                        @deleted="() => { resetReviews(); fetchUserReviews() }"
+                        @reload="() => { resetReviews(); fetchUserReviews() }" />
 
                 </SectionAccordion>
 
