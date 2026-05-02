@@ -337,7 +337,10 @@
     "error": {
       "titleRequired": "Title is required",
       "contentRequired": "Content is required"
-    }
+    },
+    "updated": "Review updated successfully",
+    "submitted": "Review created successfully",
+    "deleted": "Review deleted successfully"
   },
   "common": {
     "save": "Save",
@@ -347,6 +350,8 @@
     "delete": "Delete",
     "edit": "Edit",
     "close": "Close",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "seeMore": "See more",
+    "seeLess": "See less"
   }
 }
