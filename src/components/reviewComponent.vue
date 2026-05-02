@@ -226,8 +226,7 @@ watch(loading, async (newVal) => {
 }
 
 .review:hover {
-    background: rgba(255, 255, 255, 0.05);
-    --review-bg: rgba(255, 255, 255, 0.05);
+    --review-bg: var(--accent);
 }
 
 .movie-cover {
@@ -511,19 +510,45 @@ watch(loading, async (newVal) => {
     max-height: 1000px;
 }
 
-
-.review-content-wrapper::after {
+.review-content-wrapper::after,
+.review-content-wrapper::before {
     content: '';
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 2.5rem;
-    border-radius: 0 0 0.5rem 0.5rem;
-    background: linear-gradient(transparent, var(--review-bg));
-    transition: opacity 0.3s ease, background 0.2s;
-    opacity: 1;
+    height: 4rem;
     pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.review-content-wrapper::after {
+    background: linear-gradient(to bottom,
+            transparent 0%,
+            color-mix(in srgb, var(--background) 60%, transparent) 40%,
+            var(--background) 100%);
+    opacity: 1;
+}
+
+.review-content-wrapper::before {
+    background: linear-gradient(to bottom,
+            transparent 0%,
+            color-mix(in srgb, var(--background) 50%, transparent) 40%,
+            color-mix(in srgb, var(--background) 95%, transparent) 100%);
+    opacity: 0;
+}
+
+.review:hover .review-content-wrapper::after {
+    opacity: 0;
+}
+
+.review:hover .review-content-wrapper::before {
+    opacity: 1;
+}
+
+.review-content-wrapper.expanded::after,
+.review-content-wrapper.expanded::before {
+    opacity: 0 !important;
 }
 
 .expand-btn {
