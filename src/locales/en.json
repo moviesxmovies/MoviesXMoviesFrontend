@@ -260,8 +260,7 @@
   },
   "search": {
     "searchPlaceholder": "Search",
-    "loading": "Searching for films...",
-    "noFilms": "No films found",
+    "empty": "No results found",
     "help": "Try with other values",
     "searchMoviesError": "Error fetching movies",
     "filters": "Filters"

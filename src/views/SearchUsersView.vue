@@ -46,14 +46,14 @@ watch(
   <div class="users-list">
     <div v-if="loading" class="state-box">
       <i class="pi pi-spin pi-spinner" style="font-size: 1.25rem;" />
-      <span>{{ t("search.loading") }}</span>
+      <span>{{ t("loading") }}</span>
     </div>
 
     <div v-else-if="!users.results?.length" class="state-box">
       <div class="empty-icon">
         <i class="pi pi-search" style="font-size: 1rem;" />
       </div>
-      <p class="empty-title">{{ t("search.noUsers") }}</p>
+      <p class="empty-title">{{ t("search.empty") }}</p>
       <span class="empty-sub">{{ t("search.help") }}</span>
     </div>
 
