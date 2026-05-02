@@ -4,38 +4,40 @@ import SearchMovieView from "./SearchMovieView.vue";
 import SearchUsersView from "./SearchUsersView.vue";
 import { ref, watch } from "vue";
 import debounce from "@/utils/debounce";
-import { InputText } from "primevue";
+import { InputText, SelectButton } from "primevue";
+
+const type = ref("movies");
+const options = ref(["movies", "users",  "lists", "actors", "directors"]);
 
 const route = useRoute();
 const router = useRouter();
 const search = ref<string>("");
-const loading = ref<boolean>(false);
 
-const updateRoute = () => {
+const updateRoute = (type: string) => {
   router.push({
     path: route.path,
     query: {
       ...route.query,
+      type,
       name: search.value || undefined,
       page: 1,
     },
   });
 };
 
-const debouncedUpdate = debounce(() => updateRoute(), 500);
+const debouncedUpdate = debounce(() => updateRoute(type.value), 500);
 
 watch(
   () => route.query,
   (query) => {
     search.value = String(query.name || "");
+    type.value = String(query.type || "movies");
   },
   { immediate: true },
 );
 
 watch(search, () => {
-  loading.value = true;
   debouncedUpdate();
-  loading.value = false;
 });
 </script>
 
@@ -43,8 +45,7 @@ watch(search, () => {
   <div class="page">
     <div class="search-container">
       <div class="search-wrapper">
-        <i v-if="!loading" class="pi pi-search search-icon" />
-        <i v-else class="pi pi-spin pi-spinner search-icon" />
+        <i class="pi pi-search search-icon" />
         <InputText
           v-model="search"
           data-testid="search-input"
@@ -52,15 +53,20 @@ watch(search, () => {
           class="search-input"
           fluid
         />
-        <button
-          v-if="search && !loading"
-          class="clear-btn"
-          @click="search = ''"
-        >
+        <button v-if="search" class="clear-btn" @click="search = ''">
           <i class="pi pi-times" />
         </button>
       </div>
     </div>
+
+    <div class="type-container">
+      <SelectButton
+        v-model="type"
+        :options="options"
+        @change="updateRoute(type)"
+      />
+    </div>
+
     <SearchUsersView v-if="route.query.type === 'users'" key="users" />
     <SearchMovieView v-else />
   </div>
@@ -70,7 +76,6 @@ watch(search, () => {
 .page {
   min-height: 100vh;
   background: var(--background);
-  color: var(--text);
   font-family: "Inter", sans-serif;
   padding: 1rem;
 }
@@ -160,5 +165,45 @@ watch(search, () => {
   .page {
     padding: 2.5rem;
   }
+}
+
+.type-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+:deep(.p-selectbutton .p-togglebutton) {
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  color: color-mix(in srgb, var(--text) 50%, transparent);
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.95rem;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease;
+  box-shadow: none !important;
+}
+
+:deep(.p-selectbutton .p-togglebutton:hover) {
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  color: var(--text);
+}
+
+:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked) {
+  background: var(--primary) !important;
+  color: white !important;
+  font-weight: 500;
+}
+
+:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked:hover) {
+  background: var(--primary) !important;
+  opacity: 0.9;
+}
+
+:deep(.p-selectbutton .p-togglebutton:focus) {
+  box-shadow: none !important;
+  outline: none;
 }
 </style>
