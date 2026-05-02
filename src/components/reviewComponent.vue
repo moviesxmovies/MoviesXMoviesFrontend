@@ -29,6 +29,7 @@ const authStore = useAuthStore();
 const editModalVisible = ref(false);
 const confirmDeleteVisible = ref(false);
 import { marked } from 'marked'
+import CommentsDialog from './commentsDialog.vue';
 
 const isSelf = computed(() => {
     return authStore.isAuthenticated && Number(user.value?.id) === Number(authStore.user?.user_id);
@@ -98,6 +99,7 @@ watch(loading, async (newVal) => {
 <template>
     <EditReviewDialog v-if="isSelf" :reviewId="props.review.id" v-model:visible="editModalVisible"
         @reload="emit('reload')" />
+    <CommentsDialog v-if="commentModalVisible" :reviewId="props.review.id" v-model:visible="commentModalVisible" />
 
     <!-- CONFIRM DELETE DIALOG -->
     <Dialog v-model:visible="confirmDeleteVisible" modal :draggable="false" :dismissableMask="true"

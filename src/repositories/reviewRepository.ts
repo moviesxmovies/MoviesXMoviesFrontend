@@ -44,3 +44,12 @@ export const deleteReactionApi = async (reviewId: number, id: number, commentId?
         throw error;
     }
 };
+
+export const fetchComments = async (reviewId: number, lastId?: number, limit = 10) => {
+    try {
+        const { data } = await api.get(`reviews/${reviewId}/comments/`, { params: { last_id: lastId, limit } });
+        return data;
+    } catch (error: any) {
+        throw error;
+    }
+}
