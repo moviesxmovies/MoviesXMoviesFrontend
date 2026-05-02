@@ -260,11 +260,15 @@
   },
   "search": {
     "searchPlaceholder": "Search",
-    "loading": "Searching for films...",
-    "noFilms": "No films found",
+    "empty": "No results found",
     "help": "Try with other values",
     "searchMoviesError": "Error fetching movies",
-    "filters": "Filters"
+    "filters": "Filters",
+    "movies": "Movies",
+    "users": "Users",
+    "lists": "Lists",
+    "actors": "Actors",
+    "directors": "Directors"
   },
   "user": {
     "editProfile": "Edit",

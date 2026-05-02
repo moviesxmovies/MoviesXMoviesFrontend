@@ -11,8 +11,8 @@ export const getSelfUserProfile = async () => {
 };
 
 export const updateSelfUserProfile = async (formData: FormData) => {
-  const { data } = await api.put('/users/', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
+  const { data } = await api.put("/users/", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
   });
   return data;
 };
@@ -24,8 +24,6 @@ export const getUserProfile = async (slug: string) => {
     throw new TranslatedError(error, error.response?.data?.status);
   }
 };
-
-
 
 export const getPersonProfile = async (slug: string) => {
   try {
@@ -45,7 +43,11 @@ export const getPersonMovieListsFromMovie = async (slug: string) => {
   }
 };
 
-export const getPersonFilmography = async (slug: string, type: 'acted' | 'directed', lastId?: number) => {
+export const getPersonFilmography = async (
+  slug: string,
+  type: "acted" | "directed",
+  lastId?: number,
+) => {
   try {
     const { data } = await api.get(`/persons/${slug}/${type}-movies/`, {
       params: {
@@ -57,7 +59,11 @@ export const getPersonFilmography = async (slug: string, type: 'acted' | 'direct
     throw new TranslatedError(error, error.response?.data?.status);
   }
 };
-export const getUserReviews = async (slug: string, lastId?: number, limit: number = 5) => {
+export const getUserReviews = async (
+  slug: string,
+  lastId?: number,
+  limit: number = 5,
+) => {
   try {
     const { data } = await api.get(`/users/${slug}/reviews/`, {
       params: {
@@ -71,7 +77,10 @@ export const getUserReviews = async (slug: string, lastId?: number, limit: numbe
   }
 };
 
-export const getFriendsRequests = async (lastId?: number, limit: number = 5) => {
+export const getFriendsRequests = async (
+  lastId?: number,
+  limit: number = 5,
+) => {
   try {
     const { data } = await api.get(`/users/friend-requests/`, {
       params: {
@@ -85,13 +94,20 @@ export const getFriendsRequests = async (lastId?: number, limit: number = 5) => 
   }
 };
 
-export const completeFriendRequest = async (fromUsername: string, accept: boolean) => {
+export const completeFriendRequest = async (
+  fromUsername: string,
+  accept: boolean,
+) => {
   try {
     if (accept) {
-      const { data } = await api.post(`/users/${fromUsername}/friend-requests/`);
+      const { data } = await api.post(
+        `/users/${fromUsername}/friend-requests/`,
+      );
       return data;
     } else {
-      const { data } = await api.delete(`/users/${fromUsername}/friend-requests/`);
+      const { data } = await api.delete(
+        `/users/${fromUsername}/friend-requests/`,
+      );
       return data;
     }
   } catch (error: any) {
@@ -99,7 +115,11 @@ export const completeFriendRequest = async (fromUsername: string, accept: boolea
   }
 };
 
-export const getUserFriends = async (slug: string, lastId?: number, limit: number = 5) => {
+export const getUserFriends = async (
+  slug: string,
+  lastId?: number,
+  limit: number = 5,
+) => {
   try {
     const { data } = await api.get(`/users/${slug}/friends/`, {
       params: {
@@ -112,7 +132,11 @@ export const getUserFriends = async (slug: string, lastId?: number, limit: numbe
     throw new TranslatedError(error, error.response?.data?.status);
   }
 };
-export const getUserMoviesLists = async (slug: string, lastId?: number, limit: number = 6) => {
+export const getUserMoviesLists = async (
+  slug: string,
+  lastId?: number,
+  limit: number = 6,
+) => {
   try {
     const { data } = await api.get(`/movies-lists/${slug}/`, {
       params: {
@@ -126,7 +150,11 @@ export const getUserMoviesLists = async (slug: string, lastId?: number, limit: n
   }
 };
 
-export const getSuggestedFriends = async (slug: string, lastId?: number, limit: number = 5) => {
+export const getSuggestedFriends = async (
+  slug: string,
+  lastId?: number,
+  limit: number = 5,
+) => {
   try {
     const { data } = await api.get(`/users/suggested-users/`, {
       params: {
@@ -136,6 +164,30 @@ export const getSuggestedFriends = async (slug: string, lastId?: number, limit: 
       },
     });
     return data;
+  } catch (error: any) {
+    throw new TranslatedError(error, error.response?.data?.status);
+  }
+};
+
+export type userSearchingData = {
+  name?: string;
+  is_friend?: boolean;
+  page?: number;
+};
+
+export const userSearching = async (
+  data: userSearchingData,
+  limit: number = 15,
+) => {
+  try {
+    const response = await api.get(`/users/searching/`, {
+      params: {
+        ...data,
+        limit: limit,
+        search_query: data.name || undefined,
+      },
+    });
+    return response.data;
   } catch (error: any) {
     throw new TranslatedError(error, error.response?.data?.status);
   }

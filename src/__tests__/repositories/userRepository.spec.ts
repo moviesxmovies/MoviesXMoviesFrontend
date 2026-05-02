@@ -11,6 +11,7 @@ import {
   getUserFriends,
   getSuggestedFriends,
   getUserMoviesLists,
+  userSearching,
 } from "@/repositories/userRepository";
 
 // ── Mocks ────────────────────────────────────────────────────────────────────
@@ -37,7 +38,11 @@ describe("UserRepository", () => {
   // ── getUserProfile ──────────────────────────────────────────────────────────
   describe("getUserProfile", () => {
     it("calls API with correct endpoint and returns user data", async () => {
-      const mockProfile = { id: "1", name: "Christopher Nolan", slug: "christopher-nolan" };
+      const mockProfile = {
+        id: "1",
+        name: "Christopher Nolan",
+        slug: "christopher-nolan",
+      };
 
       mockGet.mockResolvedValueOnce({ data: mockProfile });
       const result = await getSelfUserProfile();
@@ -52,11 +57,16 @@ describe("UserRepository", () => {
       await expect(getSelfUserProfile()).rejects.toThrow("Not found");
     });
   });
+  // // ── updateUserProfile ──────────────────────────────────────────────────────────
 
   // ── getPersonProfile ──────────────────────────────────────────────────────────
   describe("getPersonProfile", () => {
     it("calls API with correct endpoint and returns profile data", async () => {
-      const mockProfile = { id: "1", name: "Christopher Nolan", slug: "christopher-nolan" };
+      const mockProfile = {
+        id: "1",
+        name: "Christopher Nolan",
+        slug: "christopher-nolan",
+      };
 
       mockGet.mockResolvedValueOnce({ data: mockProfile });
       const result = await getPersonProfile("christopher-nolan");
@@ -75,7 +85,9 @@ describe("UserRepository", () => {
     it("throws when API fails", async () => {
       mockGet.mockRejectedValueOnce(new Error("Not found"));
 
-      await expect(getPersonProfile("unknown-slug")).rejects.toThrow("Not found");
+      await expect(getPersonProfile("unknown-slug")).rejects.toThrow(
+        "Not found",
+      );
     });
   });
 
@@ -105,7 +117,9 @@ describe("UserRepository", () => {
     it("throws when API fails", async () => {
       mockGet.mockRejectedValueOnce(new Error("Server error"));
 
-      await expect(getPersonMovieListsFromMovie("inception")).rejects.toThrow("Server error");
+      await expect(getPersonMovieListsFromMovie("inception")).rejects.toThrow(
+        "Server error",
+      );
     });
   });
 
@@ -118,9 +132,12 @@ describe("UserRepository", () => {
       mockGet.mockResolvedValueOnce({ data: mockFilmography });
       const result = await getPersonFilmography("leonardo-dicaprio", "acted");
 
-      expect(mockGet).toHaveBeenCalledWith("/persons/leonardo-dicaprio/acted-movies/", {
-        params: { last_id: undefined },
-      });
+      expect(mockGet).toHaveBeenCalledWith(
+        "/persons/leonardo-dicaprio/acted-movies/",
+        {
+          params: { last_id: undefined },
+        },
+      );
       expect(result).toEqual(mockFilmography);
     });
 
@@ -128,18 +145,24 @@ describe("UserRepository", () => {
       mockGet.mockResolvedValueOnce({ data: [] });
       await getPersonFilmography("christopher-nolan", "directed");
 
-      expect(mockGet).toHaveBeenCalledWith("/persons/christopher-nolan/directed-movies/", {
-        params: { last_id: undefined },
-      });
+      expect(mockGet).toHaveBeenCalledWith(
+        "/persons/christopher-nolan/directed-movies/",
+        {
+          params: { last_id: undefined },
+        },
+      );
     });
 
     it("passes lastId as param when provided", async () => {
       mockGet.mockResolvedValueOnce({ data: [] });
       await getPersonFilmography("christopher-nolan", "directed", 42);
 
-      expect(mockGet).toHaveBeenCalledWith("/persons/christopher-nolan/directed-movies/", {
-        params: { last_id: 42 },
-      });
+      expect(mockGet).toHaveBeenCalledWith(
+        "/persons/christopher-nolan/directed-movies/",
+        {
+          params: { last_id: 42 },
+        },
+      );
     });
 
     it("does not pass lastId when undefined", async () => {
@@ -172,7 +195,11 @@ describe("UserRepository", () => {
   // ── getUserProfile ──────────────────────────────────────────────────────────
   describe("getUserProfile", () => {
     it("calls API with correct endpoint and returns user profile", async () => {
-      const mockProfile = { id: "1", name: "Christopher Nolan", slug: "christopher-nolan" };
+      const mockProfile = {
+        id: "1",
+        name: "Christopher Nolan",
+        slug: "christopher-nolan",
+      };
 
       mockGet.mockResolvedValueOnce({ data: mockProfile });
       const result = await getUserProfile(mockProfile.slug);
@@ -184,8 +211,7 @@ describe("UserRepository", () => {
       mockGet.mockRejectedValueOnce(new Error("Not found"));
 
       await expect(getUserProfile()).rejects.toThrow("Not found");
-    }
-    )
+    });
   });
 
   // ── getFriendsRequests ─────────────────────────────────────────────────────────
@@ -196,7 +222,7 @@ describe("UserRepository", () => {
         { id: 2, from_user: "user2", to_user: "user3", status: "pending" },
       ];
 
-      mockGet.mockResolvedValueOnce({ data: mockRequests },);
+      mockGet.mockResolvedValueOnce({ data: mockRequests });
       const result = await getFriendsRequests(1, 10);
 
       expect(mockGet).toHaveBeenCalledWith("/users/friend-requests/", {
@@ -231,9 +257,10 @@ describe("UserRepository", () => {
     it("throws when API fails", async () => {
       mockGet.mockRejectedValueOnce(new Error("Network error"));
 
-      await expect(getUserReviews("testuser", 1, 10)).rejects.toThrow("Network error");
+      await expect(getUserReviews("testuser", 1, 10)).rejects.toThrow(
+        "Network error",
+      );
     });
-
   });
   // ── getFriendsRequests ───────────────────────────────────────────────────────────────
   describe("getFriendsRequests", () => {
@@ -267,7 +294,9 @@ describe("UserRepository", () => {
       mockPost.mockResolvedValueOnce({ data: {} });
       await completeFriendRequest(fromUsername, accept);
 
-      expect(mockPost).toHaveBeenCalledWith(`/users/${fromUsername}/friend-requests/`);
+      expect(mockPost).toHaveBeenCalledWith(
+        `/users/${fromUsername}/friend-requests/`,
+      );
     });
 
     it("calls API with correct endpoint and payload to reject request", async () => {
@@ -277,14 +306,18 @@ describe("UserRepository", () => {
       mockDelete.mockResolvedValueOnce({ data: {} });
       await completeFriendRequest(fromUsername, accept);
 
-      expect(mockDelete).toHaveBeenCalledWith(`/users/${fromUsername}/friend-requests/`);
+      expect(mockDelete).toHaveBeenCalledWith(
+        `/users/${fromUsername}/friend-requests/`,
+      );
     });
     it("throws when API fails on accept", async () => {
       const fromUsername = "user1";
       const accept = true;
 
       mockPost.mockRejectedValueOnce(new Error("Network error"));
-      await expect(completeFriendRequest(fromUsername, accept)).rejects.toThrow("Network error");
+      await expect(completeFriendRequest(fromUsername, accept)).rejects.toThrow(
+        "Network error",
+      );
     });
 
     it("throws when API fails on reject", async () => {
@@ -292,7 +325,9 @@ describe("UserRepository", () => {
       const accept = false;
 
       mockDelete.mockRejectedValueOnce(new Error("Server error"));
-      await expect(completeFriendRequest(fromUsername, accept)).rejects.toThrow("Server error");
+      await expect(completeFriendRequest(fromUsername, accept)).rejects.toThrow(
+        "Server error",
+      );
     });
   });
 
@@ -316,7 +351,34 @@ describe("UserRepository", () => {
     it("throws when API fails", async () => {
       mockGet.mockRejectedValueOnce(new Error("Network error"));
 
-      await expect(getUserFriends("testuser", 1, 10)).rejects.toThrow("Network error");
+      await expect(getUserFriends("testuser", 1, 10)).rejects.toThrow(
+        "Network error",
+      );
+    });
+  });
+  // ── getUserMoviesLists ───────────────────────────────────────────────────────────────
+  describe("getUserMoviesLists", () => {
+    it("calls API with correct endpoint and returns user movie lists", async () => {
+      const mockLists = [
+        { id: 1, name: "Favourites" },
+        { id: 2, name: "Watch Later" },
+      ];
+
+      mockGet.mockResolvedValueOnce({ data: mockLists });
+      const result = await getUserMoviesLists("testuser");
+
+      expect(mockGet).toHaveBeenCalledWith("/movies-lists/testuser/", {
+        params: { limit: 6, last_id: undefined },
+      });
+      expect(result).toEqual(mockLists);
+    });
+
+    it("throws when API fails", async () => {
+      mockGet.mockRejectedValueOnce(new Error("Server error"));
+
+      await expect(getUserMoviesLists("testuser")).rejects.toThrow(
+        "Server error",
+      );
     });
   });
   // ── getSuggestedFriends ───────────────────────────────────────────────────────────────
@@ -339,7 +401,45 @@ describe("UserRepository", () => {
     it("throws when API fails", async () => {
       mockGet.mockRejectedValueOnce(new Error("Server error"));
 
-      await expect(getSuggestedFriends("testuser", 1, 10)).rejects.toThrow("Server error");
+      await expect(getSuggestedFriends("testuser", 1, 10)).rejects.toThrow(
+        "Server error",
+      );
+    });
+  });
+  // ── getUserSearching ───────────────────────────────────────────────────────────────
+  describe("userSearching", () => {
+    it("calls API with correct endpoint and returns users", async () => {
+      const apiParams = {
+        page: 1,
+        name: "testUser",
+      };
+      const mockResults = [
+        { id: 1, username: "testUser1" },
+        { id: 2, username: "testUser2" },
+      ];
+
+      mockGet.mockResolvedValueOnce({ data: mockResults });
+      const result = await userSearching(apiParams);
+
+      expect(mockGet).toHaveBeenCalledWith("/users/searching/", {
+        params: {
+          page: 1,
+          limit: 15,
+          search_query: "testUser",
+          name: "testUser",
+        },
+      });
+      expect(result).toEqual(mockResults);
+    });
+
+    it("throws when API fails", async () => {
+      const apiParams = {
+        page: 1,
+        name: "testUser",
+      };
+      mockGet.mockRejectedValueOnce(new Error("Server error"));
+
+      await expect(userSearching(apiParams)).rejects.toThrow("Server error");
     });
   });
 });
