@@ -5,13 +5,22 @@ import SearchUsersView from "./SearchUsersView.vue";
 import { ref, watch } from "vue";
 import debounce from "@/utils/debounce";
 import { InputText, SelectButton } from "primevue";
-
-const type = ref("movies");
-const options = ref(["movies", "users",  "lists", "actors", "directors"]);
+import { useI18n } from "vue-i18n";
 
 const route = useRoute();
 const router = useRouter();
 const search = ref<string>("");
+const { t } = useI18n();
+
+const type = ref(route.query.type?.toString() || "movies");
+
+const options = ref([
+  { label: t("search.movies"), value: "movies" },
+  { label: t("search.users"), value: "users" },
+  { label: t("search.lists"), value: "lists" },
+  { label: t("search.actors"), value: "actors" },
+  { label: t("search.directors"), value: "directors" },
+]);
 
 const updateRoute = (type: string) => {
   router.push({
@@ -39,6 +48,19 @@ watch(
 watch(search, () => {
   debouncedUpdate();
 });
+
+watch(
+  () => t("search.movies"),
+  () => {
+    options.value = [
+      { label: t("search.movies"), value: "movies" },
+      { label: t("search.users"), value: "users" },
+      { label: t("search.lists"), value: "lists" },
+      { label: t("search.actors"), value: "actors" },
+      { label: t("search.directors"), value: "directors" },
+    ];
+  },
+);
 </script>
 
 <template>
@@ -63,6 +85,8 @@ watch(search, () => {
       <SelectButton
         v-model="type"
         :options="options"
+        option-label="label"
+        option-value="value"
         @change="updateRoute(type)"
       />
     </div>

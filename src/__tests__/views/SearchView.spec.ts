@@ -14,6 +14,10 @@ vi.mock("@/utils/debounce", () => ({
   default: (fn: Function) => fn,
 }));
 
+vi.mock("vue-i18n", () => ({
+  useI18n: () => ({ t: (key: string) => key }),
+}));
+
 const mockPush = vi.fn();
 const mockQuery = ref<Record<string, string>>({});
 
@@ -53,20 +57,32 @@ describe("SearchView", () => {
       const wrapper = createWrapper();
       const buttons = wrapper.findAll(".p-togglebutton");
       expect(buttons.map((b) => b.text())).toEqual([
-        "movies", "users", "lists", "actors", "directors",
+        "search.movies",
+        "search.users",
+        "search.lists",
+        "search.actors",
+        "search.directors",
       ]);
     });
 
     it("shows SearchMovieView by default", () => {
       const wrapper = createWrapper();
-      expect(wrapper.find('[data-testid="search-movie-view"]').exists()).toBe(true);
-      expect(wrapper.find('[data-testid="search-users-view"]').exists()).toBe(false);
+      expect(wrapper.find('[data-testid="search-movie-view"]').exists()).toBe(
+        true,
+      );
+      expect(wrapper.find('[data-testid="search-users-view"]').exists()).toBe(
+        false,
+      );
     });
 
     it("shows SearchUsersView when type is users", () => {
       const wrapper = createWrapper({ type: "users" });
-      expect(wrapper.find('[data-testid="search-users-view"]').exists()).toBe(true);
-      expect(wrapper.find('[data-testid="search-movie-view"]').exists()).toBe(false);
+      expect(wrapper.find('[data-testid="search-users-view"]').exists()).toBe(
+        true,
+      );
+      expect(wrapper.find('[data-testid="search-movie-view"]').exists()).toBe(
+        false,
+      );
     });
   });
 
