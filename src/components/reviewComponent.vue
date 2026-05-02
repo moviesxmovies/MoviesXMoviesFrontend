@@ -36,8 +36,8 @@ const isSelf = computed(() => {
 const isExpanded = ref(false)
 const contentRef = ref<HTMLElement | null>(null)
 const isLongContent = ref(false)
-const LINE_HEIGHT_THRESHOLD = 10
-
+const commentModalVisible = ref(false)
+const LINE_HEIGHT_THRESHOLD = 76
 const renderedContent = computed(() => {
     const html = marked.parse(props.review.content) as string
     return DOMPurify.sanitize(html)
@@ -88,7 +88,7 @@ watch(loading, async (newVal) => {
     if (!newVal) {
         await nextTick()
         if (contentRef.value) {
-            isLongContent.value = contentRef.value.scrollHeight > 76
+            isLongContent.value = contentRef.value.scrollHeight > LINE_HEIGHT_THRESHOLD
         }
     }
 })
@@ -165,7 +165,12 @@ watch(loading, async (newVal) => {
         <!-- CONTENT -->
         <template v-else>
             <div class="review-main">
-                <img class="movie-cover" :src="movie?.cover" :alt="movie?.title" @click="goToMovie(movie?.slug)" />
+                <div class="cover-col">
+                    <img class="movie-cover" :src="movie?.cover" :alt="movie?.title" @click="goToMovie(movie?.slug)" />
+                    <button class="action-btn action-btn--comment" @click="commentModalVisible = true">
+                        <i class="pi pi-comment" />
+                    </button>
+                </div>
                 <div class="review-body">
                     <div class="review-header">
                         <div class="review-meta">
@@ -619,5 +624,25 @@ watch(loading, async (newVal) => {
 
 .review-content-wrapper.expanded::after {
     opacity: 0;
+}
+
+.cover-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    flex-shrink: 0;
+}
+
+.action-btn--comment {
+    border: 1px solid color-mix(in srgb, var(--primary) 40%, transparent);
+    color: var(--primary);
+    width: 100%;
+    border-radius: 0.5rem;
+}
+
+.action-btn--comment:hover {
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    border-color: var(--primary);
 }
 </style>
