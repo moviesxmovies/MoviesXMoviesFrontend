@@ -175,13 +175,16 @@ export type userSearchingData = {
   page?: number;
 };
 
-export const userSearching = async (data: userSearchingData, limit: number = 15) => {
+export const userSearching = async (
+  data: userSearchingData,
+  limit: number = 15,
+) => {
   try {
     const response = await api.get(`/users/searching/`, {
       params: {
         ...data,
         limit: limit,
-        search_query: data.name,
+        search_query: data.name || undefined,
       },
     });
     return response.data;
