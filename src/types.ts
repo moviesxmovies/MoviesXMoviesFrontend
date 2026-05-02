@@ -186,4 +186,5 @@ export type Comment = {
   content: string;
   created_at: string;
   reply_comment: string;
+  has_replies: boolean;
 }

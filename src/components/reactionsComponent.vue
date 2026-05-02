@@ -4,11 +4,13 @@ import type { ReactionResponse } from '@/types';
 import { Skeleton } from 'primevue';
 import { ref, watch } from 'vue';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
     reviewId: number;
     commentId?: number;
-
-}>();
+    pickerUp?: boolean;
+}>(), {
+    pickerUp: true
+})
 
 const reactionResponse = ref<ReactionResponse>();
 const showPicker = ref(false);
@@ -134,8 +136,8 @@ watch(
                 reactionResponse.value = response;
             } catch (error) {
                 console.error('Error fetching reactions:', error);
-            }finally {
-                loading.value = false;  
+            } finally {
+                loading.value = false;
             }
         }
     },
@@ -151,28 +153,28 @@ watch(
             <Skeleton width="32px" height="26px" border-radius="999px" />
         </div>
         <template v-else>
-        <!-- Active Reactions -->
-        
-        <div class="reactions-bar">
-            <button v-for="[emoji, count] in activeReactions()" :key="emoji" class="reaction-pill"
-                :class="{ 'reacted': hasReacted(emoji) }" @click="toggleReaction(emoji)">
-                <span class="reaction-emoji">{{ emoji }}</span>
-                <span class="reaction-count">{{ count }}</span>
-            </button>
+            <!-- Active Reactions -->
 
-            <!-- Picker Open -->
-            <button class="add-reaction-btn" @click="showPicker = !showPicker">
-                <span>＋</span>
-            </button>
-        </div>
+            <div class="reactions-bar">
+                <button v-for="[emoji, count] in activeReactions()" :key="emoji" class="reaction-pill"
+                    :class="{ 'reacted': hasReacted(emoji) }" @click="toggleReaction(emoji)">
+                    <span class="reaction-emoji">{{ emoji }}</span>
+                    <span class="reaction-count">{{ count }}</span>
+                </button>
 
-        <!-- Emoji picker -->
-        <div v-if="showPicker" class="emoji-picker">
-            <button v-for="emoji in Object.values(EMOJI_MAP)" :key="emoji" class="emoji-option"
-                :class="{ 'reacted': hasReacted(emoji) }" @click="toggleReaction(emoji)">
-                {{ emoji }}
-            </button>
-        </div>
+                <!-- Picker Open -->
+                <button class="add-reaction-btn" @click="showPicker = !showPicker">
+                    <span>＋</span>
+                </button>
+            </div>
+
+            <!-- Emoji picker -->
+            <div v-if="showPicker" class="emoji-picker" :class="pickerUp != false ? 'picker-up' : 'picker-down'">
+                <button v-for="emoji in Object.values(EMOJI_MAP)" :key="emoji" class="emoji-option"
+                    :class="{ 'reacted': hasReacted(emoji) }" @click="toggleReaction(emoji)">
+                    {{ emoji }}
+                </button>
+            </div>
         </template>
     </div>
 
@@ -254,7 +256,6 @@ watch(
 
 .emoji-picker {
     position: absolute;
-    bottom: calc(100% + 0.5rem);
     left: 0;
     display: flex;
     flex-wrap: wrap;
@@ -265,7 +266,16 @@ watch(
     border-radius: 1rem;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     z-index: 10;
+    width: 280px;
     max-width: 280px;
+}
+
+.picker-up {
+    bottom: calc(100% + 0.5rem);
+}
+
+.picker-down {
+    top: calc(100% + 0.5rem);
 }
 
 .emoji-option {

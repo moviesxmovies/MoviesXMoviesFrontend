@@ -141,7 +141,10 @@ watch(loading, async (newVal) => {
         <!-- SKELETON -->
         <template v-if="loading">
             <div class="review-main">
-                <Skeleton width="4rem" height="6rem" border-radius="0.5rem" style="flex-shrink: 0" />
+                <div class="cover-col">
+                    <Skeleton width="4rem" height="6rem" border-radius="0.5rem" />
+                    <Skeleton width="4rem" height="2rem" border-radius="0.5rem" />
+                </div>
                 <div class="review-body">
                     <div class="review-header">
                         <div class="review-meta">

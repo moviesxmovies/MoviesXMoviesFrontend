@@ -342,6 +342,23 @@
     "submitted": "Review created successfully",
     "deleted": "Review deleted successfully"
   },
+  "commentsDialog": {
+    "title": "Comments",
+    "noComments": "No comments available",
+    "noCommentsDescription": "Be the first to comment on this review.",
+    "addComment": "Add Comment",
+    "placeholder": "Write your comment here...",
+    "submit": "Submit",
+    "error": {
+      "contentRequired": "Comment content is required"
+    },
+    "commentAdded": "Comment added successfully"
+  },
+  "comment":{
+    "reply": "Reply",
+    "replyingTo": "Replying to {0}",
+    "placeholder": "Write your comment here..."
+  },
   "common": {
     "save": "Save",
     "cancel": "Cancel",
