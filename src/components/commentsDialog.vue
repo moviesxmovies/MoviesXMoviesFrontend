@@ -74,17 +74,15 @@ const submitComment = async () => {
             openRepliesForCommentId.value = parentCommentId;
             await nextTick();
             openRepliesForCommentId.value = null;
-
-            if (newId !== null) {
-                highlightTarget.value = { id: newId, ts: Date.now() };
-            }
-        } else {
-            if (newId !== null) {
-                highlightTarget.value = { id: newId, ts: Date.now() };
-            } else {
-                if (scrollAreaRef.value) scrollAreaRef.value.scrollTop = 0;
-            }
         }
+
+        if (newId !== null) {
+            highlightTarget.value = { id: newId, ts: Date.now() };
+        } else if (parentCommentId === null && scrollAreaRef.value) {
+            scrollAreaRef.value.scrollTop = 0;
+        }
+
+
     } catch (error: any) {
         console.error('[Dialog] submitComment ERROR:', error);
         toast.add({
@@ -142,15 +140,10 @@ watch(() => props.visible, (val) => {
 
             <!-- COMMENT LIST -->
             <template v-else>
-                <CommentComponent
-                    v-for="comment in commentsResponse.results"
-                    :key="comment.id"
-                    :comment="comment"
-                    :review-id="props.reviewId"
-                    :highlight-target="highlightTarget"
+                <CommentComponent v-for="comment in commentsResponse.results" :key="comment.id" :comment="comment"
+                    :review-id="props.reviewId" :highlight-target="highlightTarget"
                     :force-open-replies="openRepliesForCommentId === comment.id"
-                    @reply="(c, username) => replyingTo = { comment: c, username }"
-                />
+                    @reply="(c, username) => replyingTo = { comment: c, username }" />
             </template>
 
             <!-- LOADING SKELETONS -->
@@ -312,13 +305,19 @@ watch(() => props.visible, (val) => {
     scrollbar-color: color-mix(in srgb, var(--secondary) 40%, transparent) transparent;
 }
 
-.scroll-area::-webkit-scrollbar { width: 4px; }
+.scroll-area::-webkit-scrollbar {
+    width: 4px;
+}
+
 .scroll-area::-webkit-scrollbar-thumb {
     background: color-mix(in srgb, var(--secondary) 40%, transparent);
     border-radius: 999px;
 }
 
-.sentinel { height: 1px; flex-shrink: 0; }
+.sentinel {
+    height: 1px;
+    flex-shrink: 0;
+}
 
 .empty-state {
     display: flex;
@@ -332,8 +331,14 @@ watch(() => props.visible, (val) => {
     opacity: 0.6;
 }
 
-.empty-icon { font-size: 2rem; }
-.empty-state p { font-size: 0.85rem; margin: 0; }
+.empty-icon {
+    font-size: 2rem;
+}
+
+.empty-state p {
+    font-size: 0.85rem;
+    margin: 0;
+}
 
 .input-area {
     border-top: 1px solid color-mix(in srgb, var(--secondary) 40%, transparent);
@@ -358,9 +363,21 @@ watch(() => props.visible, (val) => {
     opacity: 0.9;
 }
 
-.replying-info { display: flex; align-items: center; gap: 0.4rem; }
-.replying-icon { color: var(--primary); font-size: 0.7rem; }
-.replying-banner strong { color: var(--primary); font-weight: 700; }
+.replying-info {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.replying-icon {
+    color: var(--primary);
+    font-size: 0.7rem;
+}
+
+.replying-banner strong {
+    color: var(--primary);
+    font-weight: 700;
+}
 
 .cancel-reply-btn {
     display: flex;
@@ -381,7 +398,11 @@ watch(() => props.visible, (val) => {
     background: color-mix(in srgb, var(--secondary) 20%, transparent);
 }
 
-.input-row { display: flex; align-items: flex-end; gap: 0.5rem; }
+.input-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
 
 .comment-input {
     flex: 1;
@@ -398,8 +419,13 @@ watch(() => props.visible, (val) => {
     transition: border-color 0.2s;
 }
 
-.comment-input:focus { border-color: var(--primary); }
-.comment-input:disabled { opacity: 0.5; }
+.comment-input:focus {
+    border-color: var(--primary);
+}
+
+.comment-input:disabled {
+    opacity: 0.5;
+}
 
 .send-btn {
     display: flex;
@@ -417,13 +443,26 @@ watch(() => props.visible, (val) => {
     transition: opacity 0.2s, transform 0.15s;
 }
 
-.send-btn:hover:not(:disabled) { opacity: 0.85; transform: scale(1.05); }
-.send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.send-btn:hover:not(:disabled) {
+    opacity: 0.85;
+    transform: scale(1.05);
+}
+
+.send-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
 
 .slide-down-enter-active,
-.slide-down-leave-active { transition: all 0.2s ease; }
+.slide-down-leave-active {
+    transition: all 0.2s ease;
+}
+
 .slide-down-enter-from,
-.slide-down-leave-to { opacity: 0; transform: translateY(-6px); }
+.slide-down-leave-to {
+    opacity: 0;
+    transform: translateY(-6px);
+}
 </style>
 <style>
 .comments-root {
@@ -433,11 +472,22 @@ watch(() => props.visible, (val) => {
     background: var(--background) !important;
     overflow: hidden !important;
 }
+
 .comments-header {
     background: var(--background) !important;
     border-bottom: 1px solid color-mix(in srgb, var(--secondary) 50%, transparent) !important;
 }
-.comments-content { background: var(--background) !important; padding: 0 !important; }
-.comments-close-btn { border-radius: 50% !important; }
-.comments-close-btn:hover { background: color-mix(in srgb, var(--secondary) 20%, transparent) !important; }
+
+.comments-content {
+    background: var(--background) !important;
+    padding: 0 !important;
+}
+
+.comments-close-btn {
+    border-radius: 50% !important;
+}
+
+.comments-close-btn:hover {
+    background: color-mix(in srgb, var(--secondary) 20%, transparent) !important;
+}
 </style>
