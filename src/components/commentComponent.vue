@@ -11,7 +11,7 @@ const props = defineProps<{
     comment: Comment;
     reviewId: number;
     highlightTarget?: { id: number; ts: number } | null;
-    forceOpenReplies?: boolean;
+    forceOpenRepliesId?: number | null;
 }>();
 
 const emit = defineEmits<{
@@ -82,9 +82,7 @@ const fetchUser = async () => {
 
 const triggerHighlight = async () => {
     await nextTick();
-    if (!commentEl.value) {
-        return;
-    }
+    if (!commentEl.value) return;
     commentEl.value.scrollIntoView({ behavior: 'smooth', block: 'center' });
     isHighlighted.value = true;
     setTimeout(() => {
@@ -108,8 +106,10 @@ watch(() => props.comment.user, () => {
     if (props.comment.user) fetchUser();
 }, { immediate: true });
 
-watch(() => props.forceOpenReplies, (val) => {
-    if (val) reloadReplies();
+watch(() => props.forceOpenRepliesId, (id) => {
+    if (id === props.comment.id) {
+        reloadReplies();
+    }
 });
 </script>
 
@@ -180,8 +180,14 @@ watch(() => props.forceOpenReplies, (val) => {
 
                 <template v-else>
                     <div class="reply-indent" v-for="reply in repliesResponse?.results" :key="reply.id">
-                        <CommentComponent :comment="reply" :review-id="reviewId" :highlight-target="highlightTarget"
-                            @reply="(c, username) => emit('reply', c, username)" />
+                        <!-- Propagamos AMBAS props hacia abajo sin modificar -->
+                        <CommentComponent
+                            :comment="reply"
+                            :review-id="reviewId"
+                            :highlight-target="highlightTarget"
+                            :force-open-replies-id="forceOpenRepliesId"
+                            @reply="(c, username) => emit('reply', c, username)"
+                        />
                     </div>
 
                     <!-- LOAD MORE SKELETON -->
@@ -227,17 +233,9 @@ watch(() => props.forceOpenReplies, (val) => {
 }
 
 @keyframes comment-flash {
-    0% {
-        background: color-mix(in srgb, var(--primary) 20%, transparent);
-    }
-
-    50% {
-        background: color-mix(in srgb, var(--primary) 12%, transparent);
-    }
-
-    100% {
-        background: transparent;
-    }
+    0%   { background: color-mix(in srgb, var(--primary) 20%, transparent); }
+    50%  { background: color-mix(in srgb, var(--primary) 12%, transparent); }
+    100% { background: transparent; }
 }
 
 .comment--highlight {

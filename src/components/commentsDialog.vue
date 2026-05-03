@@ -18,7 +18,7 @@ const replyingTo = ref<{ comment: Comment; username: string } | null>(null);
 const scrollAreaRef = ref<HTMLElement | null>(null);
 
 const highlightTarget = ref<{ id: number; ts: number } | null>(null);
-const openRepliesForCommentId = ref<number | null>(null);
+const forceOpenRepliesId = ref<number | null>(null);
 
 const { t } = useI18n();
 const toast = useToast();
@@ -47,6 +47,17 @@ const getComments = async (lastId?: number) => {
 
 const { sentinelRef } = useInfinitePagination(commentsResponse, loading, getComments);
 
+const scrollToReplyingTo = async () => {
+    if (!replyingTo.value) return;
+    const targetId = replyingTo.value.comment.id;
+
+    forceOpenRepliesId.value = targetId;
+    await nextTick();
+    forceOpenRepliesId.value = null;
+
+    highlightTarget.value = { id: targetId, ts: Date.now() };
+};
+
 const submitComment = async () => {
     const content = newComment.value.trim();
     if (!content) return;
@@ -71,9 +82,9 @@ const submitComment = async () => {
         await getComments();
 
         if (parentCommentId !== null) {
-            openRepliesForCommentId.value = parentCommentId;
+            forceOpenRepliesId.value = parentCommentId;
             await nextTick();
-            openRepliesForCommentId.value = null;
+            forceOpenRepliesId.value = null;
         }
 
         if (newId !== null) {
@@ -82,9 +93,7 @@ const submitComment = async () => {
             scrollAreaRef.value.scrollTop = 0;
         }
 
-
     } catch (error: any) {
-        console.error('[Dialog] submitComment ERROR:', error);
         toast.add({
             severity: 'error',
             summary: t('toast.error'),
@@ -109,6 +118,7 @@ watch(() => props.visible, (val) => {
         replyingTo.value = null;
         newComment.value = '';
         highlightTarget.value = null;
+        forceOpenRepliesId.value = null;
     }
 }, { immediate: true });
 </script>
@@ -132,21 +142,23 @@ watch(() => props.visible, (val) => {
 
         <!-- SCROLL AREA -->
         <div class="scroll-area" ref="scrollAreaRef">
-            <!-- EMPTY STATE -->
             <div v-if="!loading && !commentsResponse.results?.length" class="empty-state">
                 <i class="pi pi-comment empty-icon" />
                 <p>{{ $t('commentsDialog.empty') }}</p>
             </div>
 
-            <!-- COMMENT LIST -->
             <template v-else>
-                <CommentComponent v-for="comment in commentsResponse.results" :key="comment.id" :comment="comment"
-                    :review-id="props.reviewId" :highlight-target="highlightTarget"
-                    :force-open-replies="openRepliesForCommentId === comment.id"
-                    @reply="(c, username) => replyingTo = { comment: c, username }" />
+                <CommentComponent
+                    v-for="comment in commentsResponse.results"
+                    :key="comment.id"
+                    :comment="comment"
+                    :review-id="props.reviewId"
+                    :highlight-target="highlightTarget"
+                    :force-open-replies-id="forceOpenRepliesId"
+                    @reply="(c, username) => replyingTo = { comment: c, username }"
+                />
             </template>
 
-            <!-- LOADING SKELETONS -->
             <div v-if="loading" v-for="i in 3" :key="i" class="comment">
                 <div class="comment-avatar-col">
                     <Skeleton shape="circle" width="2rem" height="2rem" />
@@ -162,22 +174,20 @@ watch(() => props.visible, (val) => {
                 </div>
             </div>
 
-            <!-- INFINITE SCROLL SENTINEL -->
             <div ref="sentinelRef" class="sentinel" />
         </div>
 
         <!-- INPUT AREA -->
         <div class="input-area">
-            <!-- REPLYING TO BANNER -->
             <Transition name="slide-down">
-                <div v-if="replyingTo" class="replying-banner">
+                <div v-if="replyingTo" class="replying-banner" @click="scrollToReplyingTo">
                     <div class="replying-info">
                         <i class="pi pi-reply replying-icon" />
                         <span>{{ $t('comment.replyingTo') }}
                             <strong>{{ replyingTo.username }}</strong>
                         </span>
                     </div>
-                    <button class="cancel-reply-btn" @click="replyingTo = null">
+                    <button class="cancel-reply-btn" @click.stop="replyingTo = null">
                         <i class="pi pi-times" />
                     </button>
                 </div>
@@ -305,19 +315,13 @@ watch(() => props.visible, (val) => {
     scrollbar-color: color-mix(in srgb, var(--secondary) 40%, transparent) transparent;
 }
 
-.scroll-area::-webkit-scrollbar {
-    width: 4px;
-}
-
+.scroll-area::-webkit-scrollbar { width: 4px; }
 .scroll-area::-webkit-scrollbar-thumb {
     background: color-mix(in srgb, var(--secondary) 40%, transparent);
     border-radius: 999px;
 }
 
-.sentinel {
-    height: 1px;
-    flex-shrink: 0;
-}
+.sentinel { height: 1px; flex-shrink: 0; }
 
 .empty-state {
     display: flex;
@@ -331,14 +335,8 @@ watch(() => props.visible, (val) => {
     opacity: 0.6;
 }
 
-.empty-icon {
-    font-size: 2rem;
-}
-
-.empty-state p {
-    font-size: 0.85rem;
-    margin: 0;
-}
+.empty-icon { font-size: 2rem; }
+.empty-state p { font-size: 0.85rem; margin: 0; }
 
 .input-area {
     border-top: 1px solid color-mix(in srgb, var(--secondary) 40%, transparent);
@@ -361,6 +359,13 @@ watch(() => props.visible, (val) => {
     font-size: 0.78rem;
     color: var(--text);
     opacity: 0.9;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.replying-banner:hover {
+    background: color-mix(in srgb, var(--primary) 14%, transparent);
+    border-color: color-mix(in srgb, var(--primary) 35%, transparent);
 }
 
 .replying-info {
@@ -419,13 +424,8 @@ watch(() => props.visible, (val) => {
     transition: border-color 0.2s;
 }
 
-.comment-input:focus {
-    border-color: var(--primary);
-}
-
-.comment-input:disabled {
-    opacity: 0.5;
-}
+.comment-input:focus { border-color: var(--primary); }
+.comment-input:disabled { opacity: 0.5; }
 
 .send-btn {
     display: flex;
@@ -443,26 +443,13 @@ watch(() => props.visible, (val) => {
     transition: opacity 0.2s, transform 0.15s;
 }
 
-.send-btn:hover:not(:disabled) {
-    opacity: 0.85;
-    transform: scale(1.05);
-}
-
-.send-btn:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-}
+.send-btn:hover:not(:disabled) { opacity: 0.85; transform: scale(1.05); }
+.send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
 .slide-down-enter-active,
-.slide-down-leave-active {
-    transition: all 0.2s ease;
-}
-
+.slide-down-leave-active { transition: all 0.2s ease; }
 .slide-down-enter-from,
-.slide-down-leave-to {
-    opacity: 0;
-    transform: translateY(-6px);
-}
+.slide-down-leave-to { opacity: 0; transform: translateY(-6px); }
 </style>
 <style>
 .comments-root {
@@ -472,22 +459,11 @@ watch(() => props.visible, (val) => {
     background: var(--background) !important;
     overflow: hidden !important;
 }
-
 .comments-header {
     background: var(--background) !important;
     border-bottom: 1px solid color-mix(in srgb, var(--secondary) 50%, transparent) !important;
 }
-
-.comments-content {
-    background: var(--background) !important;
-    padding: 0 !important;
-}
-
-.comments-close-btn {
-    border-radius: 50% !important;
-}
-
-.comments-close-btn:hover {
-    background: color-mix(in srgb, var(--secondary) 20%, transparent) !important;
-}
+.comments-content { background: var(--background) !important; padding: 0 !important; }
+.comments-close-btn { border-radius: 50% !important; }
+.comments-close-btn:hover { background: color-mix(in srgb, var(--secondary) 20%, transparent) !important; }
 </style>
