@@ -352,7 +352,8 @@
     "error": {
       "contentRequired": "Comment content is required"
     },
-    "commentAdded": "Comment added successfully"
+    "commentAdded": "Comment added successfully",
+    "empty": "No comments yet"
   },
   "comment":{
     "reply": "Reply",

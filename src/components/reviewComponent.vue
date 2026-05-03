@@ -194,7 +194,7 @@ watch(loading, async (newVal) => {
                         </div>
                     </div>
                     <h3 class="review-title">{{ review.title }}</h3>
-                    <div class="review-content-wrapper" :class="{ expanded: isExpanded }">
+                    <div :class="{ expanded: isExpanded, 'review-content-wrapper': isLongContent }">
                         <p class="review-content" ref="contentRef" v-html="renderedContent"></p>
                     </div>
                     <button v-if="isLongContent" class="expand-btn" @click="isExpanded = !isExpanded">
@@ -420,7 +420,6 @@ watch(loading, async (newVal) => {
     color: var(--text);
     opacity: 0.8;
     margin: 0;
-    white-space: pre-line;
     word-break: break-word;
     overflow-wrap: break-word;
 }
@@ -590,9 +589,16 @@ watch(loading, async (newVal) => {
     font-style: italic;
 }
 
-.review-content :deep(ul),
 .review-content :deep(ol) {
-    padding-left: 1.2rem;
+    list-style-type: decimal;
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+}
+
+.review-content :deep(ul) {
+    list-style-type: disc;
+    margin: 1rem 0;
+    padding-left: 1.5rem;
 }
 
 .review-content :deep(code) {
@@ -631,6 +637,52 @@ watch(loading, async (newVal) => {
 
 .review-content-wrapper.expanded::after {
     opacity: 0;
+}
+
+.review-content :deep(li) {
+    display: list-item;
+    margin-bottom: 0.25rem;
+}
+
+.review-content :deep(a) {
+    color: var(--accent);
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+.review-content :deep(a:hover) {
+    opacity: 0.8;
+}
+
+.review-content :deep(ul ul),
+.review-content :deep(ol ol),
+.review-content :deep(ul ol),
+.review-content :deep(ol ul) {
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+}
+
+.review-content :deep(pre) {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1rem 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: block;         
+    width: 0;               
+    min-width: 100%;       
+    box-sizing: border-box;
+    line-height: 1.4;
+}
+
+.review-content :deep(pre code) {
+    background: transparent;
+    padding: 0;
+    font-size: 0.85rem;
+    font-family: 'Fira Code', 'Cascadia Code', monospace;
+    white-space: pre;
 }
 
 .cover-col {
