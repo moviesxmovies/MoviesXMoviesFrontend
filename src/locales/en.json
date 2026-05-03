@@ -357,7 +357,10 @@
   "comment":{
     "reply": "Reply",
     "replyingTo": "Replying to {0}",
-    "placeholder": "Write your comment here..."
+    "placeholder": "Write your comment here...",
+    "hideReplies": "Hide Replies",
+    "showReplies": "Show Replies",
+    "loadMoreReplies": "Load more replies"
   },
   "common": {
     "save": "Save",

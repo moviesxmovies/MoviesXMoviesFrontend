@@ -2,18 +2,26 @@
 import { api } from '@/composables/useAPI';
 import { type User, type Comment, type DynamicPagination } from '@/types';
 import { Skeleton } from 'primevue';
-import { ref, watch } from 'vue';
+import { ref, watch, nextTick } from 'vue';
 import ReactionsComponent from './reactionsComponent.vue';
 import { getCommentReplies } from '@/repositories/reviewRepository';
+import { useDate } from '@/composables/useDate';
+
 const props = defineProps<{
     comment: Comment;
     reviewId: number;
+    highlightTarget?: { id: number; ts: number } | null;
+    forceOpenReplies?: boolean;
 }>();
 
-const user = ref<User>();
 const emit = defineEmits<{
     reply: [comment: Comment, username: string];
 }>();
+
+const user = ref<User>();
+const commentEl = ref<HTMLElement | null>(null);
+const isHighlighted = ref(false);
+const { formatRelativeTime } = useDate();
 
 // ── Replies ──────────────────────────────────────────────────
 const repliesResponse = ref<DynamicPagination<Comment> | null>(null);
@@ -24,9 +32,7 @@ const loadReplies = async () => {
     repliesLoading.value = true;
     try {
         const lastId = repliesResponse.value?.next_last_id ?? undefined;
-
         const response = await getCommentReplies(props.reviewId, props.comment.id, lastId);
-
         if (repliesResponse.value?.results?.length) {
             repliesResponse.value.results.push(...response.results);
             repliesResponse.value.next_last_id = response.next_last_id;
@@ -36,6 +42,19 @@ const loadReplies = async () => {
         repliesVisible.value = true;
     } catch (error) {
         console.error('Error fetching replies:', error);
+    } finally {
+        repliesLoading.value = false;
+    }
+};
+
+const reloadReplies = async () => {
+    repliesLoading.value = true;
+    try {
+        const response = await getCommentReplies(props.reviewId, props.comment.id, undefined);
+        repliesResponse.value = response;
+        repliesVisible.value = true;
+    } catch (error) {
+        console.error('Error reloading replies:', error);
     } finally {
         repliesLoading.value = false;
     }
@@ -61,10 +80,37 @@ const fetchUser = async () => {
     }
 };
 
+const triggerHighlight = async () => {
+    await nextTick();
+    if (!commentEl.value) {
+        return;
+    }
+    commentEl.value.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    isHighlighted.value = true;
+    setTimeout(() => {
+        isHighlighted.value = false;
+    }, 1800);
+};
+
+watch(user, async (loadedUser) => {
+    if (loadedUser && props.highlightTarget?.id === props.comment.id) {
+        await triggerHighlight();
+    }
+});
+
+watch(() => props.highlightTarget, async (target) => {
+    if (target?.id === props.comment.id && user.value) {
+        await triggerHighlight();
+    }
+}, { deep: true });
+
 watch(() => props.comment.user, () => {
-    console.log('Comment:', props.comment);
     if (props.comment.user) fetchUser();
 }, { immediate: true });
+
+watch(() => props.forceOpenReplies, (val) => {
+    if (val) reloadReplies();
+});
 </script>
 
 <template>
@@ -85,7 +131,7 @@ watch(() => props.comment.user, () => {
     </div>
 
     <!-- CONTENT -->
-    <div v-else class="comment">
+    <div v-else ref="commentEl" class="comment" :class="{ 'comment--highlight': isHighlighted }">
         <div class="comment-avatar-col">
             <img class="comment-avatar" :src="user.picture" :alt="user.username" />
             <div class="comment-thread-line" />
@@ -93,7 +139,7 @@ watch(() => props.comment.user, () => {
         <div class="comment-body">
             <div class="comment-header">
                 <span class="comment-username">{{ user.username }}</span>
-                <span class="comment-date">{{ new Date(comment.created_at).toLocaleDateString() }}</span>
+                <span class="comment-date">{{ formatRelativeTime(comment.created_at) }}</span>
             </div>
             <p class="comment-content">{{ comment.content }}</p>
 
@@ -108,9 +154,7 @@ watch(() => props.comment.user, () => {
             <!-- TOGGLE REPLIES BUTTON -->
             <button v-if="comment.has_replies" class="toggle-replies-btn" @click="toggleReplies">
                 <i :class="repliesVisible ? 'pi pi-chevron-up' : 'pi pi-chevron-down'" />
-                <span v-if="!repliesVisible">
-                    {{ $t('comment.showReplies') }}
-                </span>
+                <span v-if="!repliesVisible">{{ $t('comment.showReplies') }}</span>
                 <span v-else>{{ $t('comment.hideReplies') }}</span>
             </button>
 
@@ -136,7 +180,7 @@ watch(() => props.comment.user, () => {
 
                 <template v-else>
                     <div class="reply-indent" v-for="reply in repliesResponse?.results" :key="reply.id">
-                        <CommentComponent :comment="reply" :review-id="reviewId"
+                        <CommentComponent :comment="reply" :review-id="reviewId" :highlight-target="highlightTarget"
                             @reply="(c, username) => emit('reply', c, username)" />
                     </div>
 
@@ -179,6 +223,25 @@ watch(() => props.comment.user, () => {
     display: flex;
     gap: 0.75rem;
     padding: 0.5rem 0;
+    border-radius: 0.75rem;
+}
+
+@keyframes comment-flash {
+    0% {
+        background: color-mix(in srgb, var(--primary) 20%, transparent);
+    }
+
+    50% {
+        background: color-mix(in srgb, var(--primary) 12%, transparent);
+    }
+
+    100% {
+        background: transparent;
+    }
+}
+
+.comment--highlight {
+    animation: comment-flash 1.8s ease-out forwards;
 }
 
 .comment-avatar-col {
@@ -247,7 +310,6 @@ watch(() => props.comment.user, () => {
     overflow-wrap: break-word;
 }
 
-/* ── Reply / action buttons ────────────────────────────────── */
 .reply-btn {
     display: flex;
     align-items: center;
@@ -275,7 +337,6 @@ watch(() => props.comment.user, () => {
     font-size: 0.68rem;
 }
 
-/* ── Toggle replies ────────────────────────────────────────── */
 .toggle-replies-btn {
     display: flex;
     align-items: center;
@@ -302,7 +363,6 @@ watch(() => props.comment.user, () => {
     font-size: 0.65rem;
 }
 
-/* ── Replies container ─────────────────────────────────────── */
 .replies {
     display: flex;
     flex-direction: column;
@@ -315,7 +375,6 @@ watch(() => props.comment.user, () => {
     padding: 0.3rem 0;
 }
 
-/* ── Load more ─────────────────────────────────────────────── */
 .load-more-btn {
     display: flex;
     align-items: center;

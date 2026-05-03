@@ -11,7 +11,9 @@ import EditReviewDialog from './editReviewDialog.vue';
 import { useI18n } from 'vue-i18n';
 import { deleteReview } from '@/repositories/movieRepository';
 import DOMPurify from 'dompurify'
-
+import { marked } from 'marked'
+import CommentsDialog from './commentsDialog.vue';
+import { useDate } from '@/composables/useDate';
 const props = defineProps<{
     review: Review;
 }>();
@@ -26,10 +28,10 @@ const movie = ref<Movie | null>(null);
 const loading = ref(true);
 const user = ref<User>();
 const authStore = useAuthStore();
+const { formatRelativeTime } = useDate();
 const editModalVisible = ref(false);
 const confirmDeleteVisible = ref(false);
-import { marked } from 'marked'
-import CommentsDialog from './commentsDialog.vue';
+
 
 const isSelf = computed(() => {
     return authStore.isAuthenticated && Number(user.value?.id) === Number(authStore.user?.user_id);
@@ -180,7 +182,7 @@ watch(loading, async (newVal) => {
                     <div class="review-header">
                         <div class="review-meta">
                             <span class="movie-name" @click="goToMovie(movie?.slug)">{{ movie?.title }}</span>
-                            <span class="review-date">{{ new Date(review.created_at).toLocaleDateString() }}</span>
+                            <span class="review-date">{{ formatRelativeTime(review.created_at) }}</span>
                         </div>
                         <div class="review-header-right">
                             <RouterLink v-if="user" :to="`/users/${user.username}`" class="user-avatar-link">

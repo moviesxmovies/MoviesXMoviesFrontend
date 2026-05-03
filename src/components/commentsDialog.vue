@@ -3,7 +3,7 @@ import { useInfinitePagination } from '@/composables/useInfinitePagination';
 import { fetchComments, postComment, replyComment } from '@/repositories/reviewRepository';
 import type { Comment, DynamicPagination } from '@/types';
 import { Dialog, Skeleton, useToast } from 'primevue';
-import { ref, watch } from 'vue';
+import { ref, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import CommentComponent from './commentComponent.vue';
 
@@ -17,10 +17,13 @@ const newComment = ref('');
 const replyingTo = ref<{ comment: Comment; username: string } | null>(null);
 const scrollAreaRef = ref<HTMLElement | null>(null);
 
+const highlightTarget = ref<{ id: number; ts: number } | null>(null);
+const openRepliesForCommentId = ref<number | null>(null);
+
 const { t } = useI18n();
 const toast = useToast();
 
-const getUserLists = async (lastId?: number) => {
+const getComments = async (lastId?: number) => {
     loading.value = true;
     try {
         const response = await fetchComments(props.reviewId, lastId);
@@ -42,23 +45,48 @@ const getUserLists = async (lastId?: number) => {
     }
 };
 
-const { sentinelRef } = useInfinitePagination(commentsResponse, loading, getUserLists);
+const { sentinelRef } = useInfinitePagination(commentsResponse, loading, getComments);
 
 const submitComment = async () => {
     const content = newComment.value.trim();
     if (!content) return;
     sending.value = true;
+
+    const parentCommentId = replyingTo.value?.comment.id ?? null;
+
     try {
+        let newId: number | null = null;
+
         if (replyingTo.value) {
-            await replyComment(props.reviewId, replyingTo.value.comment.id, content);
+            const created = await replyComment(props.reviewId, replyingTo.value.comment.id, content);
+            newId = created?.id ?? null;
         } else {
-            await postComment(props.reviewId, content);
+            const created = await postComment(props.reviewId, content);
+            newId = created?.id ?? null;
         }
+
         newComment.value = '';
         replyingTo.value = null;
-        await getUserLists();
-        if (scrollAreaRef.value) scrollAreaRef.value.scrollTop = 0;
+
+        await getComments();
+
+        if (parentCommentId !== null) {
+            openRepliesForCommentId.value = parentCommentId;
+            await nextTick();
+            openRepliesForCommentId.value = null;
+
+            if (newId !== null) {
+                highlightTarget.value = { id: newId, ts: Date.now() };
+            }
+        } else {
+            if (newId !== null) {
+                highlightTarget.value = { id: newId, ts: Date.now() };
+            } else {
+                if (scrollAreaRef.value) scrollAreaRef.value.scrollTop = 0;
+            }
+        }
     } catch (error: any) {
+        console.error('[Dialog] submitComment ERROR:', error);
         toast.add({
             severity: 'error',
             summary: t('toast.error'),
@@ -78,10 +106,11 @@ const handleKeydown = (e: KeyboardEvent) => {
 };
 
 watch(() => props.visible, (val) => {
-    if (val) getUserLists();
+    if (val) getComments();
     else {
         replyingTo.value = null;
         newComment.value = '';
+        highlightTarget.value = null;
     }
 }, { immediate: true });
 </script>
@@ -113,8 +142,15 @@ watch(() => props.visible, (val) => {
 
             <!-- COMMENT LIST -->
             <template v-else>
-                <CommentComponent v-for="comment in commentsResponse.results" :key="comment.id" :comment="comment"
-                    :review-id="props.reviewId" @reply="(c, username) => replyingTo = { comment: c, username }" />
+                <CommentComponent
+                    v-for="comment in commentsResponse.results"
+                    :key="comment.id"
+                    :comment="comment"
+                    :review-id="props.reviewId"
+                    :highlight-target="highlightTarget"
+                    :force-open-replies="openRepliesForCommentId === comment.id"
+                    @reply="(c, username) => replyingTo = { comment: c, username }"
+                />
             </template>
 
             <!-- LOADING SKELETONS -->
@@ -238,7 +274,6 @@ watch(() => props.visible, (val) => {
     background: color-mix(in srgb, var(--secondary) 20%, transparent);
 }
 
-/* HEADER */
 .header-inner {
     display: flex;
     align-items: center;
@@ -265,7 +300,6 @@ watch(() => props.visible, (val) => {
     color: var(--text);
 }
 
-/* SCROLL AREA */
 .scroll-area {
     flex: 1;
     overflow-y: auto;
@@ -278,21 +312,14 @@ watch(() => props.visible, (val) => {
     scrollbar-color: color-mix(in srgb, var(--secondary) 40%, transparent) transparent;
 }
 
-.scroll-area::-webkit-scrollbar {
-    width: 4px;
-}
-
+.scroll-area::-webkit-scrollbar { width: 4px; }
 .scroll-area::-webkit-scrollbar-thumb {
     background: color-mix(in srgb, var(--secondary) 40%, transparent);
     border-radius: 999px;
 }
 
-.sentinel {
-    height: 1px;
-    flex-shrink: 0;
-}
+.sentinel { height: 1px; flex-shrink: 0; }
 
-/* EMPTY STATE */
 .empty-state {
     display: flex;
     flex-direction: column;
@@ -305,59 +332,9 @@ watch(() => props.visible, (val) => {
     opacity: 0.6;
 }
 
-.empty-icon {
-    font-size: 2rem;
-}
+.empty-icon { font-size: 2rem; }
+.empty-state p { font-size: 0.85rem; margin: 0; }
 
-.empty-state p {
-    font-size: 0.85rem;
-    margin: 0;
-}
-
-/* LOADING SKELETONS */
-
-@keyframes pulse {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.4;
-    }
-}
-
-.skeleton-avatar {
-    width: 2rem;
-    height: 2rem;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-
-.skeleton-lines {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    padding-top: 0.1rem;
-}
-
-.skeleton-name {
-    width: 80px;
-    height: 10px;
-}
-
-.skeleton-text {
-    width: 100%;
-    height: 10px;
-}
-
-.skeleton-text.short {
-    width: 60%;
-}
-
-/* INPUT AREA */
 .input-area {
     border-top: 1px solid color-mix(in srgb, var(--secondary) 40%, transparent);
     padding: 0.75rem 1.25rem 1rem;
@@ -368,7 +345,6 @@ watch(() => props.visible, (val) => {
     background: var(--background);
 }
 
-/* REPLYING BANNER */
 .replying-banner {
     display: flex;
     align-items: center;
@@ -382,21 +358,9 @@ watch(() => props.visible, (val) => {
     opacity: 0.9;
 }
 
-.replying-info {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-}
-
-.replying-icon {
-    color: var(--primary);
-    font-size: 0.7rem;
-}
-
-.replying-banner strong {
-    color: var(--primary);
-    font-weight: 700;
-}
+.replying-info { display: flex; align-items: center; gap: 0.4rem; }
+.replying-icon { color: var(--primary); font-size: 0.7rem; }
+.replying-banner strong { color: var(--primary); font-weight: 700; }
 
 .cancel-reply-btn {
     display: flex;
@@ -417,12 +381,7 @@ watch(() => props.visible, (val) => {
     background: color-mix(in srgb, var(--secondary) 20%, transparent);
 }
 
-/* INPUT ROW */
-.input-row {
-    display: flex;
-    align-items: flex-end;
-    gap: 0.5rem;
-}
+.input-row { display: flex; align-items: flex-end; gap: 0.5rem; }
 
 .comment-input {
     flex: 1;
@@ -439,13 +398,8 @@ watch(() => props.visible, (val) => {
     transition: border-color 0.2s;
 }
 
-.comment-input:focus {
-    border-color: var(--primary);
-}
-
-.comment-input:disabled {
-    opacity: 0.5;
-}
+.comment-input:focus { border-color: var(--primary); }
+.comment-input:disabled { opacity: 0.5; }
 
 .send-btn {
     display: flex;
@@ -463,34 +417,13 @@ watch(() => props.visible, (val) => {
     transition: opacity 0.2s, transform 0.15s;
 }
 
-.send-btn:hover:not(:disabled) {
-    opacity: 0.85;
-    transform: scale(1.05);
-}
+.send-btn:hover:not(:disabled) { opacity: 0.85; transform: scale(1.05); }
+.send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
-.send-btn:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-}
-
-.input-hint {
-    font-size: 0.68rem;
-    color: var(--gray);
-    opacity: 0.6;
-    padding-left: 0.2rem;
-}
-
-/* REPLY TRANSITION */
 .slide-down-enter-active,
-.slide-down-leave-active {
-    transition: all 0.2s ease;
-}
-
+.slide-down-leave-active { transition: all 0.2s ease; }
 .slide-down-enter-from,
-.slide-down-leave-to {
-    opacity: 0;
-    transform: translateY(-6px);
-}
+.slide-down-leave-to { opacity: 0; transform: translateY(-6px); }
 </style>
 <style>
 .comments-root {
@@ -500,22 +433,11 @@ watch(() => props.visible, (val) => {
     background: var(--background) !important;
     overflow: hidden !important;
 }
-
 .comments-header {
     background: var(--background) !important;
     border-bottom: 1px solid color-mix(in srgb, var(--secondary) 50%, transparent) !important;
 }
-
-.comments-content {
-    background: var(--background) !important;
-    padding: 0 !important;
-}
-
-.comments-close-btn {
-    border-radius: 50% !important;
-}
-
-.comments-close-btn:hover {
-    background: color-mix(in srgb, var(--secondary) 20%, transparent) !important;
-}
+.comments-content { background: var(--background) !important; padding: 0 !important; }
+.comments-close-btn { border-radius: 50% !important; }
+.comments-close-btn:hover { background: color-mix(in srgb, var(--secondary) 20%, transparent) !important; }
 </style>

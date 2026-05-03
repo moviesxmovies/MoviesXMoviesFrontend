@@ -72,7 +72,7 @@ export const replyComment = async (reviewId: number, commentId: number, content:
     }
 }
 
-export const getCommentReplies = async (reviewId: number, commentId: number, lastId?: number, limit = 10) => {
+export const getCommentReplies = async (reviewId: number, commentId: number, lastId?: number, limit = 5) => {
     try {
         const { data } = await api.get(`reviews/${reviewId}/comments/${commentId}/replies/`, { params: { last_id: lastId, limit } });
         return data;
