@@ -127,4 +127,136 @@ describe("SignupView", () => {
     const formData = mockPost.mock.calls[0][1] as FormData;
     expect(formData.get("picture")).toBeNull();
   });
+  describe("handleError", () => {
+  it("should set __general__ error when response has detail", async () => {
+    const wrapper = factory();
+    wrapper.vm.handleError({
+      response: { data: { detail: "No autorizado." } },
+    });
+    await flushPromises();
+
+    expect(wrapper.vm.fieldErrors["__general__"]).toEqual(["No autorizado."]);
+  });
+
+  it("should set __general__ error when response has error array", async () => {
+    const wrapper = factory();
+    wrapper.vm.handleError({
+      response: { data: { error: ["Esta contraseña es demasiado común."] } },
+    });
+    await flushPromises();
+
+    expect(wrapper.vm.fieldErrors["__general__"]).toEqual([
+      "Esta contraseña es demasiado común.",
+    ]);
+  });
+
+  it("should set field errors for username and email", async () => {
+    const wrapper = factory();
+    wrapper.vm.handleError({
+      response: {
+        data: {
+          username: ["Ya existe un usuario con este nombre."],
+          email: ["Ya existe Usuario con este Email."],
+        },
+      },
+    });
+    await flushPromises();
+
+    expect(wrapper.vm.fieldErrors["username"]).toEqual([
+      "Ya existe un usuario con este nombre.",
+    ]);
+    expect(wrapper.vm.fieldErrors["email"]).toEqual([
+      "Ya existe Usuario con este Email.",
+    ]);
+  });
+
+  it("should navigate to step 1 when username error is present", async () => {
+    const wrapper = factory();
+    wrapper.vm.currentStep = 2;
+    wrapper.vm.handleError({
+      response: {
+        data: { username: ["Ya existe un usuario con este nombre."] },
+      },
+    });
+    await flushPromises();
+
+    expect(wrapper.vm.currentStep).toBe(1);
+  });
+
+  it("should navigate to step 1 when email error is present", async () => {
+    const wrapper = factory();
+    wrapper.vm.currentStep = 2;
+    wrapper.vm.handleError({
+      response: {
+        data: { email: ["Ya existe Usuario con este Email."] },
+      },
+    });
+    await flushPromises();
+
+    expect(wrapper.vm.currentStep).toBe(1);
+  });
+
+  it("should navigate to step 1 when error array is present", async () => {
+    const wrapper = factory();
+    wrapper.vm.currentStep = 2;
+    wrapper.vm.handleError({
+      response: {
+        data: { error: ["Esta contraseña es demasiado común."] },
+      },
+    });
+    await flushPromises();
+
+    expect(wrapper.vm.currentStep).toBe(1);
+  });
+
+  it("should NOT navigate to step 1 when only step 2 field errors are present", async () => {
+    const wrapper = factory();
+    wrapper.vm.currentStep = 2;
+    wrapper.vm.handleError({
+      response: {
+        data: { first_name: ["Este campo es obligatorio."] },
+      },
+    });
+    await flushPromises();
+
+    expect(wrapper.vm.currentStep).toBe(2);
+  });
+
+  it("should do nothing when response data is missing", async () => {
+    const wrapper = factory();
+    wrapper.vm.handleError({});
+    await flushPromises();
+
+    expect(Object.keys(wrapper.vm.fieldErrors)).toHaveLength(0);
+  });
+
+  it("should do nothing when response data is not an object", async () => {
+    const wrapper = factory();
+    wrapper.vm.handleError({ response: { data: "Internal Server Error" } });
+    await flushPromises();
+
+    expect(Object.keys(wrapper.vm.fieldErrors)).toHaveLength(0);
+  });
+
+  it("should clear previous field errors before setting new ones", async () => {
+    const wrapper = factory();
+
+    wrapper.vm.handleError({
+      response: { data: { username: ["Error anterior."] } },
+    });
+    await flushPromises();
+
+    Object.keys(wrapper.vm.fieldErrors).forEach(
+      (k) => delete wrapper.vm.fieldErrors[k],
+    );
+
+    wrapper.vm.handleError({
+      response: { data: { email: ["Nuevo error."] } },
+    });
+    await flushPromises();
+
+    expect(wrapper.vm.fieldErrors["username"]).toBeUndefined();
+    expect(wrapper.vm.fieldErrors["email"]).toEqual(["Nuevo error."]);
+  });
+});
 });
