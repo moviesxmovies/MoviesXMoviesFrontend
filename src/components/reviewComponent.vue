@@ -11,7 +11,9 @@ import EditReviewDialog from './editReviewDialog.vue';
 import { useI18n } from 'vue-i18n';
 import { deleteReview } from '@/repositories/movieRepository';
 import DOMPurify from 'dompurify'
-
+import { marked } from 'marked'
+import CommentsDialog from './commentsDialog.vue';
+import { useDate } from '@/composables/useDate';
 const props = defineProps<{
     review: Review;
 }>();
@@ -26,9 +28,10 @@ const movie = ref<Movie | null>(null);
 const loading = ref(true);
 const user = ref<User>();
 const authStore = useAuthStore();
+const { formatRelativeTime } = useDate();
 const editModalVisible = ref(false);
 const confirmDeleteVisible = ref(false);
-import { marked } from 'marked'
+
 
 const isSelf = computed(() => {
     return authStore.isAuthenticated && Number(user.value?.id) === Number(authStore.user?.user_id);
@@ -36,8 +39,8 @@ const isSelf = computed(() => {
 const isExpanded = ref(false)
 const contentRef = ref<HTMLElement | null>(null)
 const isLongContent = ref(false)
-const LINE_HEIGHT_THRESHOLD = 10
-
+const commentModalVisible = ref(false)
+const LINE_HEIGHT_THRESHOLD = 76
 const renderedContent = computed(() => {
     const html = marked.parse(props.review.content) as string
     return DOMPurify.sanitize(html)
@@ -88,7 +91,7 @@ watch(loading, async (newVal) => {
     if (!newVal) {
         await nextTick()
         if (contentRef.value) {
-            isLongContent.value = contentRef.value.scrollHeight > 76
+            isLongContent.value = contentRef.value.scrollHeight > LINE_HEIGHT_THRESHOLD
         }
     }
 })
@@ -98,6 +101,7 @@ watch(loading, async (newVal) => {
 <template>
     <EditReviewDialog v-if="isSelf" :reviewId="props.review.id" v-model:visible="editModalVisible"
         @reload="emit('reload')" />
+    <CommentsDialog v-if="commentModalVisible" :reviewId="props.review.id" v-model:visible="commentModalVisible" />
 
     <!-- CONFIRM DELETE DIALOG -->
     <Dialog v-model:visible="confirmDeleteVisible" modal :draggable="false" :dismissableMask="true"
@@ -139,7 +143,10 @@ watch(loading, async (newVal) => {
         <!-- SKELETON -->
         <template v-if="loading">
             <div class="review-main">
-                <Skeleton width="4rem" height="6rem" border-radius="0.5rem" style="flex-shrink: 0" />
+                <div class="cover-col">
+                    <Skeleton width="4rem" height="6rem" border-radius="0.5rem" />
+                    <Skeleton width="4rem" height="2rem" border-radius="0.5rem" />
+                </div>
                 <div class="review-body">
                     <div class="review-header">
                         <div class="review-meta">
@@ -165,12 +172,17 @@ watch(loading, async (newVal) => {
         <!-- CONTENT -->
         <template v-else>
             <div class="review-main">
-                <img class="movie-cover" :src="movie?.cover" :alt="movie?.title" @click="goToMovie(movie?.slug)" />
+                <div class="cover-col">
+                    <img class="movie-cover" :src="movie?.cover" :alt="movie?.title" @click="goToMovie(movie?.slug)" />
+                    <button class="action-btn action-btn--comment" @click="commentModalVisible = true">
+                        <i class="pi pi-comment" />
+                    </button>
+                </div>
                 <div class="review-body">
                     <div class="review-header">
                         <div class="review-meta">
                             <span class="movie-name" @click="goToMovie(movie?.slug)">{{ movie?.title }}</span>
-                            <span class="review-date">{{ new Date(review.created_at).toLocaleDateString() }}</span>
+                            <span class="review-date">{{ formatRelativeTime(review.created_at) }}</span>
                         </div>
                         <div class="review-header-right">
                             <RouterLink v-if="user" :to="`/users/${user.username}`" class="user-avatar-link">
@@ -182,7 +194,7 @@ watch(loading, async (newVal) => {
                         </div>
                     </div>
                     <h3 class="review-title">{{ review.title }}</h3>
-                    <div class="review-content-wrapper" :class="{ expanded: isExpanded }">
+                    <div :class="{ expanded: isExpanded, 'review-content-wrapper': isLongContent }">
                         <p class="review-content" ref="contentRef" v-html="renderedContent"></p>
                     </div>
                     <button v-if="isLongContent" class="expand-btn" @click="isExpanded = !isExpanded">
@@ -408,7 +420,6 @@ watch(loading, async (newVal) => {
     color: var(--text);
     opacity: 0.8;
     margin: 0;
-    white-space: pre-line;
     word-break: break-word;
     overflow-wrap: break-word;
 }
@@ -578,9 +589,16 @@ watch(loading, async (newVal) => {
     font-style: italic;
 }
 
-.review-content :deep(ul),
 .review-content :deep(ol) {
-    padding-left: 1.2rem;
+    list-style-type: decimal;
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+}
+
+.review-content :deep(ul) {
+    list-style-type: disc;
+    margin: 1rem 0;
+    padding-left: 1.5rem;
 }
 
 .review-content :deep(code) {
@@ -619,5 +637,71 @@ watch(loading, async (newVal) => {
 
 .review-content-wrapper.expanded::after {
     opacity: 0;
+}
+
+.review-content :deep(li) {
+    display: list-item;
+    margin-bottom: 0.25rem;
+}
+
+.review-content :deep(a) {
+    color: var(--accent);
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+.review-content :deep(a:hover) {
+    opacity: 0.8;
+}
+
+.review-content :deep(ul ul),
+.review-content :deep(ol ol),
+.review-content :deep(ul ol),
+.review-content :deep(ol ul) {
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+}
+
+.review-content :deep(pre) {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1rem 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: block;         
+    width: 0;               
+    min-width: 100%;       
+    box-sizing: border-box;
+    line-height: 1.4;
+}
+
+.review-content :deep(pre code) {
+    background: transparent;
+    padding: 0;
+    font-size: 0.85rem;
+    font-family: 'Fira Code', 'Cascadia Code', monospace;
+    white-space: pre;
+}
+
+.cover-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    flex-shrink: 0;
+}
+
+.action-btn--comment {
+    border: 1px solid color-mix(in srgb, var(--primary) 40%, transparent);
+    color: var(--primary);
+    width: 100%;
+    border-radius: 0.5rem;
+}
+
+.action-btn--comment:hover {
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    border-color: var(--primary);
 }
 </style>

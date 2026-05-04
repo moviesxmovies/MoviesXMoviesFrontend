@@ -176,11 +176,11 @@ export type CreateList = {
 };
 
 export type ReactionResponse = {
-    reactions: Record<string, number>;
-    your_reactions: Record<string, number>;
+  reactions: Record<string, number>;
+  your_reactions: Record<string, number>;
 }
 
-export type SelfUser ={
+export type SelfUser = {
   id: number;
   username: string;
   bio: string;
@@ -188,4 +188,13 @@ export type SelfUser ={
   first_name: string;
   last_name: string;
   email: string;
+}
+
+export type Comment = {
+  id: number;
+  user: string;
+  content: string;
+  created_at: string;
+  reply_comment: string;
+  has_replies: boolean;
 }
