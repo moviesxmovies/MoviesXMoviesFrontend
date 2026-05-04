@@ -18,6 +18,7 @@ import { useRoute } from "vue-router";
 
 const props = defineProps<{
   modelValue: RegisterPayload;
+  fieldErrors?: Record<string, string[]>;
 }>();
 
 const resolver = zodResolver(step1Schema);
@@ -53,136 +54,89 @@ const route = useRoute();
       </p>
     </div>
 
-    <Form
-      :resolver="resolver"
-      @submit="onFormSubmit"
-      class="flex flex-col gap-4 w-full"
-    >
-      <FormField
-        v-slot="$field"
-        name="username"
-        initialValue=""
-        class="flex flex-col gap-1"
-      >
+    <Form :resolver="resolver" @submit="onFormSubmit" class="flex flex-col gap-4 w-full">
+      <div v-if="fieldErrors?.__general__?.length" class="flex flex-col gap-1 rounded-lg p-3"
+        style="background-color: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3)">
+        <div v-for="msg in fieldErrors.__general__" :key="msg" class="flex items-center gap-1.5 text-xs"
+          style="color: #ef4444">
+          <i class="pi pi-exclamation-circle text-xs" />
+          {{ msg }}
+        </div>
+      </div>
+      <FormField v-slot="$field" name="username" initialValue="" class="flex flex-col gap-1">
         <FloatLabel variant="over">
           <IconField>
-            <InputText
-              v-bind="$field"
-              id="username"
-              type="text"
-              fluid
-              :class="{
-                'p-invalid': $field?.invalid,
-                'p-valid': $field?.dirty && !$field?.invalid,
-              }"
-              :aria-label="$t('signup.username')"
-            />
-            <InputIcon
-              v-if="$field?.dirty"
-              :class="
-                $field?.invalid ? 'pi pi-times-circle' : 'pi pi-check-circle'
-              "
-              :style="{ color: $field?.invalid ? '#ef4444' : '#22c55e' }"
-            />
+            <InputText v-bind="$field" id="username" type="text" fluid :class="{
+              'p-invalid': $field?.invalid,
+              'p-valid': $field?.dirty && !$field?.invalid,
+            }" :aria-label="$t('signup.username')" />
+            <InputIcon v-if="$field?.dirty" :class="$field?.invalid ? 'pi pi-times-circle' : 'pi pi-check-circle'
+              " :style="{ color: $field?.invalid ? '#ef4444' : '#22c55e' }" />
           </IconField>
           <label for="username">{{ $t("signup.username") }}</label>
         </FloatLabel>
         <FieldMsg :field="$field" />
+        <div v-for="msg in (fieldErrors?.username ?? [])" :key="msg" class="flex items-center gap-1.5 text-xs"
+          style="color: #ef4444">
+          <i class="pi pi-times-circle text-xs" />
+          {{ msg }}
+        </div>
       </FormField>
 
-      <FormField
-        v-slot="$field"
-        name="email"
-        :initialValue="route.query.email ? String(route.query.email) : ''"
-        class="flex flex-col gap-1"
-      >
+      <FormField v-slot="$field" name="email" :initialValue="route.query.email ? String(route.query.email) : ''"
+        class="flex flex-col gap-1">
         <FloatLabel variant="over">
           <IconField>
-            <InputText
-              v-bind="$field"
-              id="email"
-              type="email"
-              fluid
-              :class="{
-                'p-invalid': $field?.invalid,
-                'p-valid': $field?.dirty && !$field?.invalid,
-              }"
-              :aria-label="$t('signup.email')"
-            />
-            <InputIcon
-              v-if="$field?.dirty"
-              :class="
-                $field?.invalid ? 'pi pi-times-circle' : 'pi pi-check-circle'
-              "
-              :style="{ color: $field?.invalid ? '#ef4444' : '#22c55e' }"
-            />
+            <InputText v-bind="$field" id="email" type="email" fluid :class="{
+              'p-invalid': $field?.invalid,
+              'p-valid': $field?.dirty && !$field?.invalid,
+            }" :aria-label="$t('signup.email')" />
+            <InputIcon v-if="$field?.dirty" :class="$field?.invalid ? 'pi pi-times-circle' : 'pi pi-check-circle'
+              " :style="{ color: $field?.invalid ? '#ef4444' : '#22c55e' }" />
           </IconField>
           <label for="email">{{ $t("signup.email") }}</label>
         </FloatLabel>
         <FieldMsg :field="$field" />
+        <div v-for="msg in (fieldErrors?.email ?? [])" :key="msg" class="flex items-center gap-1.5 text-xs"
+          style="color: #ef4444">
+          <i class="pi pi-times-circle text-xs" />
+          {{ msg }}
+        </div>
       </FormField>
 
-      <FormField
-        v-slot="$field"
-        name="password"
-        initialValue=""
-        class="flex flex-col gap-1"
-      >
+      <FormField v-slot="$field" name="password" initialValue="" class="flex flex-col gap-1">
         <FloatLabel variant="over">
-          <Password
-            v-bind="$field"
-            id="password"
-            :feedback="false"
-            toggleMask
-            fluid
-            :class="{
-              'p-invalid': $field?.invalid,
-              'p-valid': $field?.dirty && !$field?.invalid,
-            }"
-            :aria-label="$t('signup.password')"
-          />
+          <Password v-bind="$field" id="password" :feedback="false" toggleMask fluid :class="{
+            'p-invalid': $field?.invalid,
+            'p-valid': $field?.dirty && !$field?.invalid,
+          }" :aria-label="$t('signup.password')" />
           <label for="password">{{ $t("signup.password") }}</label>
         </FloatLabel>
-        <div
-          v-if="$field?.dirty && $field?.invalid"
-          class="flex flex-col gap-1 mt-1"
-        >
-          <div
-            v-for="(error, i) of $field?.errors"
-            :key="i"
-            class="flex items-center gap-1.5 text-xs"
-            style="color: #ef4444"
-          >
+        <div v-if="$field?.dirty && $field?.invalid" class="flex flex-col gap-1 mt-1">
+          <div v-for="(error, i) of $field?.errors" :key="i" class="flex items-center gap-1.5 text-xs"
+            style="color: #ef4444">
             <i class="pi pi-times-circle text-xs" />
             {{ error.message }}
           </div>
         </div>
       </FormField>
 
-      <FormField
-        v-slot="$field"
-        name="confirm_password"
-        initialValue=""
-        class="flex flex-col gap-1"
-      >
+      <FormField v-slot="$field" name="confirm_password" initialValue="" class="flex flex-col gap-1">
         <FloatLabel variant="over">
-          <Password
-            v-bind="$field"
-            id="confirm_password"
-            :feedback="false"
-            toggleMask
-            fluid
-            :class="{
-              'p-invalid': $field?.invalid,
-              'p-valid': $field?.dirty && !$field?.invalid,
-            }"
-            :aria-label="$t('signup.confirmPassword')"
-          />
+          <Password v-bind="$field" id="confirm_password" :feedback="false" toggleMask fluid :class="{
+            'p-invalid': $field?.invalid,
+            'p-valid': $field?.dirty && !$field?.invalid,
+          }" :aria-label="$t('signup.confirmPassword')" />
           <label for="confirm_password">{{
             $t("signup.confirmPassword")
           }}</label>
         </FloatLabel>
         <FieldMsg :field="$field" />
+        <div v-for="msg in (fieldErrors?.confirm_password ?? [])" :key="msg" class="flex items-center gap-1.5 text-xs"
+          style="color: #ef4444">
+          <i class="pi pi-times-circle text-xs" />
+          {{ msg }}
+        </div>
       </FormField>
 
       <Button type="submit" :label="$t('next')" fluid class="mt-2" />
@@ -208,9 +162,11 @@ const route = useRoute();
   font-size: 0.78rem;
   animation: fadeIn 0.15s ease;
 }
+
 .field-msg.error {
   color: #ef4444;
 }
+
 .field-msg.success {
   color: #22c55e;
 }

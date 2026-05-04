@@ -19,9 +19,10 @@ const fileUploadRef = ref();
 const imagePreview = ref<string | null>(null);
 
 const selectedImage = ref<Blob | null>(null);
-  
+
 const props = defineProps<{
   modelValue: RegisterPayload;
+  fieldErrors?: Record<string, string[]>;
 }>();
 
 const resolver = zodResolver(step2Schema);
@@ -103,6 +104,11 @@ const onFileSelect = (event: FileUploadSelectEvent) => {
             <label for="first_name">{{ $t("signup.firstName") }}</label>
           </FloatLabel>
           <FieldMsg :field="$field" />
+          <div v-for="msg in (fieldErrors?.first_name ?? [])" :key="msg" class="flex items-center gap-1.5 text-xs"
+            style="color: #ef4444">
+            <i class="pi pi-times-circle text-xs" />
+            {{ msg }}
+          </div>
         </FormField>
 
         <FormField v-slot="$field" name="last_name" initialValue="" class="flex flex-col gap-1 flex-1">
@@ -118,6 +124,11 @@ const onFileSelect = (event: FileUploadSelectEvent) => {
             <label for="last_name">{{ $t("signup.lastName") }}</label>
           </FloatLabel>
           <FieldMsg :field="$field" />
+          <div v-for="msg in (fieldErrors?.last_name ?? [])" :key="msg" class="flex items-center gap-1.5 text-xs"
+            style="color: #ef4444">
+            <i class="pi pi-times-circle text-xs" />
+            {{ msg }}
+          </div>
         </FormField>
       </div>
 
