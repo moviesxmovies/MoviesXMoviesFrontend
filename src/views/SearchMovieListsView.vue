@@ -1,12 +1,10 @@
 <script lang="ts" setup>
-import FriendWithFollow from "@/components/friendWithFollow.vue";
+import FriendComponent from "@/components/friendComponent.vue";
 import PaginationComponent from "@/components/paginationComponent.vue";
 import {
-  completeFriendRequest,
   userSearching,
   type userSearchingData,
 } from "@/repositories/userRepository";
-import { useAuthStore } from "@/stores/authStore";
 import type { UserPagination } from "@/types";
 import { useToast } from "primevue";
 import { ref, watch } from "vue";
@@ -18,7 +16,6 @@ const toast = useToast();
 const users = ref<UserPagination>({} as UserPagination);
 const { t } = useI18n();
 const loading = ref<boolean>(false);
-const authStore = useAuthStore();
 
 const searchUsers = async (data: userSearchingData) => {
   try {
@@ -35,16 +32,6 @@ const searchUsers = async (data: userSearchingData) => {
   }
 };
 
-const sendFriendRequest = async (username: string) => {
-    try {
-        await completeFriendRequest(username, true);
-        toast.add({ severity: 'success', summary: t('toast.success'), detail: t('user.friendRequestSent') });
-    } catch (error: any) {
-        toast.add({ severity: 'error', summary: t('toast.error'), detail: error.translatedMessage });
-        throw error;
-    }
-};
-
 watch(
   () => route.query,
   async () => {
@@ -58,25 +45,23 @@ watch(
 <template>
   <div class="users-list">
     <div v-if="loading" class="state-box">
-      <i class="pi pi-spin pi-spinner" style="font-size: 1.25rem" />
+      <i class="pi pi-spin pi-spinner" style="font-size: 1.25rem;" />
       <span>{{ t("loading") }}</span>
     </div>
 
     <div v-else-if="!users.results?.length" class="state-box">
       <div class="empty-icon">
-        <i class="pi pi-search" style="font-size: 1rem" />
+        <i class="pi pi-search" style="font-size: 1rem;" />
       </div>
       <p class="empty-title">{{ t("search.empty") }}</p>
       <span class="empty-sub">{{ t("search.help") }}</span>
     </div>
 
     <template v-else>
-      <FriendWithFollow
+      <FriendComponent
         v-for="user in users.results"
         :key="user.id"
-        :user="user"
-        :is-self-user="authStore.user?.username === user.username"
-        :onAddFriend="sendFriendRequest"
+        :username="user.username"
       />
     </template>
 
@@ -85,7 +70,7 @@ watch(
       data-testid="PaginationComponent"
       :total_pages="users.total_pages"
       :current_page="users.current_page"
-      style="margin-top: 1.5rem"
+      style="margin-top: 1.5rem;"
     />
   </div>
 </template>
