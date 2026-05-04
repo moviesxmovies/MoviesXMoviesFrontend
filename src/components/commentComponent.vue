@@ -180,7 +180,6 @@ watch(() => props.forceOpenRepliesId, (id) => {
 
                 <template v-else>
                     <div class="reply-indent" v-for="reply in repliesResponse?.results" :key="reply.id">
-                        <!-- Propagamos AMBAS props hacia abajo sin modificar -->
                         <CommentComponent
                             :comment="reply"
                             :review-id="reviewId"
