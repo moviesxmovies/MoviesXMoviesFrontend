@@ -59,6 +59,15 @@ export interface MoviePagination {
   current_page: number;
 }
 
+export interface UserPagination {
+  results: User[];
+  total_pages: number;
+  count: number;
+  has_next: boolean;
+  has_previous: boolean;
+  current_page: number;
+}
+
 export interface Platform {
   id: number;
   name: string;
@@ -105,6 +114,7 @@ export interface User {
   friendship: Friendship;
   picture: string;
 }
+
 export interface Review {
   id: number;
   title: string;

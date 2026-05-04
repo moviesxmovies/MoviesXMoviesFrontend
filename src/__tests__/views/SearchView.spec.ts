@@ -1,268 +1,129 @@
-import { mount, flushPromises } from "@vue/test-utils";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { mount } from "@vue/test-utils";
 import SearchView from "@/views/SearchView.vue";
-import type { MoviePagination } from "@/types";
-import { createPinia } from "pinia";
-import { nextTick, reactive } from "vue";
+import { ref } from "vue";
 
-// ── External mocks ────────────────────────────────────────────────────────────
-const mockMovieSearching = vi.fn();
-const mockToastAdd = vi.fn();
-const mockRouterPush = vi.fn();
-const mockRoute = { path: "/search", query: {} as Record<string, any> };
-
-const mockLangStore = reactive({ language: "en" });
-
-vi.mock("@/repositories/movieRepository", () => ({
-  movieSearching: (...a: unknown[]) => mockMovieSearching(...a),
+vi.mock("@/views/SearchMovieView.vue", () => ({
+  default: { template: '<div data-testid="search-movie-view" />' },
 }));
-vi.mock("@/components/movieCardComponent.vue", () => ({
-  default: {
-    template: '<div data-testid="movie-card" />',
-    props: ['movie'] 
-  }
-}));
-vi.mock("@/stores/langStore", () => ({
-  useLangStore: () => mockLangStore,
-}));
-
-vi.mock("vue-router", () => ({
-  useRoute: () => mockRoute,
-  useRouter: () => ({ push: mockRouterPush }),
-}));
-
-vi.mock("vue-i18n", () => ({
-  useI18n: () => ({ t: (k: string) => k }),
-}));
-
-vi.mock("primevue", () => ({
-  useToast: vi.fn(() => ({ add: mockToastAdd })),
-  InputText: {
-    template: `<input data-testid="search-input" v-bind="$attrs" :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" />`,
-    inheritAttrs: false,
-    props: ["modelValue"],
-    emits: ["update:modelValue"],
-  },
-  Drawer: {
-    template: '<div data-testid="mock-drawer"><slot /></div>',
-    props: ["visible", "header", "position"],
-  },
+vi.mock("@/views/SearchUsersView.vue", () => ({
+  default: { template: '<div data-testid="search-users-view" />' },
 }));
 
 vi.mock("@/utils/debounce", () => ({
-  default: (fn: () => void) => fn,
+  default: (fn: Function) => fn,
 }));
 
-// ── Fixtures ──────────────────────────────────────────────────────────────────
-const makeMoviePagination = (
-  count = 2,
-  total_pages = 1,
-  current_page = 1,
-): MoviePagination =>
-  ({
-    results: Array.from({ length: count }, (_, i) => ({
-      id: i + 1,
-      title: `Movie ${i + 1}`,
-    })),
-    total_pages,
-    current_page,
-  }) as unknown as MoviePagination;
+vi.mock("vue-i18n", () => ({
+  useI18n: () => ({ t: (key: string) => key }),
+}));
 
-// ── Mount helper ──────────────────────────────────────────────────────────────
-const mountView = () =>
-  mount(SearchView, {
+const mockPush = vi.fn();
+const mockQuery = ref<Record<string, string>>({});
+
+vi.mock("vue-router", async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useRouter: vi.fn(() => ({ push: mockPush })),
+    useRoute: vi.fn(() => ({ query: mockQuery.value, path: "/search" })),
+  };
+});
+
+const createWrapper = (query: Record<string, string> = {}) => {
+  mockQuery.value = query;
+
+  return mount(SearchView, {
     global: {
-      plugins: [createPinia()],
-      stubs: {
-        MovieCardComponent: {
-          template: '<div data-testid="movie-card" />',
-        },
-        PaginationComponent: {
-          name: "PaginationComponent",
-          template: `<div
-            data-testid="PaginationComponent"
-            :data-total="total_pages"
-            :data-current="current_page"
-          />`,
-          props: ["total_pages", "current_page"],
-          emits: ["change-page"],
-        },
-        FilterComponent: {
-          template: '<div data-testid="mock-filter" />',
-          emits: ["filterGenres", "filterPlatforms", "filterStars", "filterUnseen", "filterReviewed", "close"],
-        },
-      },
+      mocks: { $t: (key: string) => key },
+      stubs: { teleport: true },
     },
   });
-
-// ── Helper ──────────────────
-const typeInSearch = async (wrapper: any, value: string) => {
-  const input = wrapper.find("[data-testid='search-input']");
-  const el = input.element as HTMLInputElement;
-  el.value = value;
-  await input.trigger("input");
-  await nextTick();
 };
 
+beforeEach(() => {
+  mockPush.mockClear();
+  mockQuery.value = {};
+});
+
 describe("SearchView", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockRoute.query = {};
-    mockLangStore.language = "en";
-    mockMovieSearching.mockResolvedValue(makeMoviePagination());
-  });
-
-  // ── Initial load ──────────────────────────────────────────────────────────
-  describe("initial load", () => {
-    it("calls movieSearching on mount with normalized query params", async () => {
-      mountView();
-      await flushPromises();
-      expect(mockMovieSearching).toHaveBeenCalledWith({
-        genres: [],
-        platforms: [],
-        stars: [],
-      });
+  describe("initial render", () => {
+    it("renders the search input", () => {
+      const wrapper = createWrapper();
+      expect(wrapper.find('[data-testid="search-input"]').exists()).toBe(true);
     });
 
-    it("renders a movie card for each result", async () => {
-      const wrapper = mountView();
-      await flushPromises();
-      expect(wrapper.findAll("[data-testid='movie-card']")).toHaveLength(2);
+    it("renders all type options", () => {
+      const wrapper = createWrapper();
+      const buttons = wrapper.findAll(".p-togglebutton");
+      expect(buttons.map((b) => b.text())).toEqual([
+        "search.movies",
+        "search.users",
+        "search.lists",
+        "search.actors",
+        "search.directors",
+      ]);
     });
 
-    it("does NOT show the empty state when results are present", async () => {
-      const wrapper = mountView();
-      await flushPromises();
-      expect(wrapper.find(".empty-state").exists()).toBe(false);
-    });
-  });
-
-  // ── Loading state ─────────────────────────────────────────────────────────
-  describe("loading state", () => {
-    it("shows the loading spinner while the search is in progress", async () => {
-      mockMovieSearching.mockReturnValue(new Promise(() => { }));
-      const wrapper = mountView();
-      await flushPromises();
-      expect(wrapper.find(".loading-state").exists()).toBe(true);
+    it("shows SearchMovieView by default", () => {
+      const wrapper = createWrapper();
+      expect(wrapper.find('[data-testid="search-movie-view"]').exists()).toBe(
+        true,
+      );
+      expect(wrapper.find('[data-testid="search-users-view"]').exists()).toBe(
+        false,
+      );
     });
 
-    it("shows the spinning search icon while loading", async () => {
-      mockMovieSearching.mockReturnValue(new Promise(() => { }));
-      const wrapper = mountView();
-      await flushPromises();
-      expect(wrapper.find(".pi-spinner").exists()).toBe(true);
-    });
-
-    it("hides the loading state after the search resolves", async () => {
-      const wrapper = mountView();
-      await flushPromises();
-      expect(wrapper.find(".loading-state").exists()).toBe(false);
-    });
-
-    it("shows the static search icon when not loading", async () => {
-      const wrapper = mountView();
-      await flushPromises();
-      expect(wrapper.find(".pi-search.search-icon").exists()).toBe(true);
+    it("shows SearchUsersView when type is users", () => {
+      const wrapper = createWrapper({ type: "users" });
+      expect(wrapper.find('[data-testid="search-users-view"]').exists()).toBe(
+        true,
+      );
+      expect(wrapper.find('[data-testid="search-movie-view"]').exists()).toBe(
+        false,
+      );
     });
   });
 
-  // ── Empty state ───────────────────────────────────────────────────────────
-  describe("empty state", () => {
-    it("shows the empty state when results array is empty", async () => {
-      mockMovieSearching.mockResolvedValue({
-        results: [],
-        total_pages: 0,
-        current_page: 1,
-      });
-      const wrapper = mountView();
-      await flushPromises();
-      expect(wrapper.find(".empty-state").exists()).toBe(true);
-    });
-
-    it("displays the noFilms and help i18n keys in the empty state", async () => {
-      mockMovieSearching.mockResolvedValue({
-        results: [],
-        total_pages: 0,
-        current_page: 1,
-      });
-      const wrapper = mountView();
-      await flushPromises();
-      expect(wrapper.find(".empty-state").text()).toContain("search.noFilms");
-      expect(wrapper.find(".empty-state").text()).toContain("search.help");
-    });
-  });
-
-  // ── Search input ──────────────────────────────────────────────────────────
   describe("search input", () => {
-    it("renders the search input", async () => {
-      const wrapper = mountView();
-      await flushPromises();
-      expect(wrapper.find("[data-testid='search-input']").exists()).toBe(true);
+    it("initializes search from name query param", () => {
+      const wrapper = createWrapper({ name: "inception" });
+      const input = wrapper.find('[data-testid="search-input"]');
+      expect((input.element as HTMLInputElement).value).toBe("inception");
     });
 
-    it("does not show the clear button when search is empty", async () => {
-      const wrapper = mountView();
-      await flushPromises();
-      expect(wrapper.find(".clear-btn").exists()).toBe(false);
-    });
-
-    it("shows the clear button when search has a value", async () => {
-      const wrapper = mountView();
-      await flushPromises();
-      await typeInSearch(wrapper, "batman");
+    it("shows clear button when search has value", () => {
+      const wrapper = createWrapper({ name: "inception" });
       expect(wrapper.find(".clear-btn").exists()).toBe(true);
     });
 
-    it("clears the search value when the clear button is clicked", async () => {
-      const wrapper = mountView();
-      await flushPromises();
-      await typeInSearch(wrapper, "batman");
-      await wrapper.find(".clear-btn").trigger("click");
-      await nextTick();
-      expect(
-        (wrapper.find("[data-testid='search-input']").element as HTMLInputElement).value,
-      ).toBe("");
-    });
-
-    it("does not show the clear button while loading even if search has a value", async () => {
-      mockMovieSearching.mockReturnValue(new Promise(() => { }));
-      const wrapper = mountView();
-      const vm = wrapper.vm as unknown as { search: string };
-      vm.search = "batman";
-      await flushPromises();
+    it("hides clear button when search is empty", () => {
+      const wrapper = createWrapper();
       expect(wrapper.find(".clear-btn").exists()).toBe(false);
     });
-  });
 
-  // ── Watch on search ───────────────────────────────────────────────────────
-  describe("watch on search — triggers route update", () => {
-    it("calls router.push with name when search changes", async () => {
-      const wrapper = mountView();
-      await flushPromises();
-      mockRouterPush.mockClear();
+    it("clears search when clear button is clicked", async () => {
+      const wrapper = createWrapper({ name: "inception" });
+      await wrapper.find(".clear-btn").trigger("click");
+      const input = wrapper.find('[data-testid="search-input"]');
+      expect((input.element as HTMLInputElement).value).toBe("");
+    });
 
-      await typeInSearch(wrapper, "inception");
-      await flushPromises();
-
-      expect(mockRouterPush).toHaveBeenCalledWith(
+    it("updates route with name when user types", async () => {
+      const wrapper = createWrapper();
+      await wrapper.find('[data-testid="search-input"]').setValue("batman");
+      expect(mockPush).toHaveBeenCalledWith(
         expect.objectContaining({
-          query: expect.objectContaining({ name: "inception" }),
+          query: expect.objectContaining({ name: "batman", page: 1 }),
         }),
       );
     });
 
     it("sets name to undefined when search is cleared", async () => {
-      const wrapper = mountView();
-      await flushPromises();
-
-      await typeInSearch(wrapper, "batman");
-      await flushPromises();
-      mockRouterPush.mockClear();
-
-      await typeInSearch(wrapper, "");
-      await flushPromises();
-
-      expect(mockRouterPush).toHaveBeenCalledWith(
+      const wrapper = createWrapper({ name: "batman" });
+      await wrapper.find(".clear-btn").trigger("click");
+      expect(mockPush).toHaveBeenCalledWith(
         expect.objectContaining({
           query: expect.objectContaining({ name: undefined }),
         }),
@@ -270,212 +131,39 @@ describe("SearchView", () => {
     });
   });
 
-  // ── updateRoute ───────────────────────────────────────────────────────────
-  describe("updateRoute", () => {
-    it("pushes to the current path", async () => {
-      const wrapper = mountView();
-      await flushPromises();
-      mockRouterPush.mockClear();
-
-      const vm = wrapper.vm as unknown as { changePage: (p: number) => void };
-      vm.changePage(2);
-
-      expect(mockRouterPush).toHaveBeenCalledWith(
-        expect.objectContaining({ path: "/search" }),
-      );
+  describe("type selector", () => {
+    it("defaults type to movies when no query param", () => {
+      const wrapper = createWrapper();
+      expect((wrapper.vm as any).type).toBe("movies");
     });
 
-    it("includes the page number in the query", async () => {
-      const wrapper = mountView();
-      await flushPromises();
-      mockRouterPush.mockClear();
+    it("initializes type from query param", () => {
+      const wrapper = createWrapper({ type: "users" });
+      expect((wrapper.vm as any).type).toBe("users");
+    });
 
-      const vm = wrapper.vm as unknown as { changePage: (p: number) => void };
-      vm.changePage(3);
-
-      expect(mockRouterPush).toHaveBeenCalledWith(
+    it("updates route with new type on change", async () => {
+      const wrapper = createWrapper();
+      await (wrapper.vm as any).updateRoute("users");
+      expect(mockPush).toHaveBeenCalledWith(
         expect.objectContaining({
-          query: expect.objectContaining({ page: 3 }),
+          query: expect.objectContaining({ type: "users", page: 1 }),
         }),
       );
     });
 
-    it("merges existing query params when pushing", async () => {
-      mockRoute.query = { genre: "action" };
-      const wrapper = mountView();
-      await flushPromises();
-      mockRouterPush.mockClear();
-
-      const vm = wrapper.vm as unknown as { changePage: (p: number) => void };
-      vm.changePage(2);
-
-      expect(mockRouterPush).toHaveBeenCalledWith(
+    it("preserves existing query params when changing type", async () => {
+      const wrapper = createWrapper({ name: "batman" });
+      await (wrapper.vm as any).updateRoute("actors");
+      expect(mockPush).toHaveBeenCalledWith(
         expect.objectContaining({
-          query: expect.objectContaining({ genre: "action", page: 2 }),
+          query: expect.objectContaining({
+            name: "batman",
+            type: "actors",
+            page: 1,
+          }),
         }),
       );
-    });
-  });
-
-  // ── changePage ────────────────────────────────────────────────────────────
-  describe("changePage", () => {
-    it("calls router.push when PaginationComponent emits change-page", async () => {
-      mockMovieSearching.mockResolvedValue(makeMoviePagination(2, 3, 1));
-      const wrapper = mountView();
-      await flushPromises();
-      mockRouterPush.mockClear();
-
-      const paginator = wrapper.find("[data-testid='PaginationComponent']");
-      await paginator.trigger("change-page");
-
-      const vm = wrapper.vm as unknown as { changePage: (p: number) => void };
-      vm.changePage(2);
-
-      expect(mockRouterPush).toHaveBeenCalledWith(
-        expect.objectContaining({
-          query: expect.objectContaining({ page: 2 }),
-        }),
-      );
-    });
-  });
-
-  // ── Error handling ────────────────────────────────────────────────────────
-  describe("error handling", () => {
-    it("shows an error toast when movieSearching fails", async () => {
-      mockMovieSearching.mockRejectedValue({
-        response: { data: { message: "Search failed" } },
-      });
-      mountView();
-      await flushPromises();
-      expect(mockToastAdd).toHaveBeenCalledWith(
-        expect.objectContaining({ severity: "error", detail: "Search failed" }),
-      );
-    });
-
-    it("uses the i18n fallback when the error has no server message", async () => {
-      mockMovieSearching.mockRejectedValue(new Error("network"));
-      mountView();
-      await flushPromises();
-      expect(mockToastAdd).toHaveBeenCalledWith(
-        expect.objectContaining({
-          severity: "error",
-          detail: "search.searchMoviesError",
-        }),
-      );
-    });
-
-    it("sets loading to false after a failed search", async () => {
-      mockMovieSearching.mockRejectedValue(new Error("fail"));
-      const wrapper = mountView();
-      await flushPromises();
-      expect(wrapper.find(".loading-state").exists()).toBe(false);
-    });
-  });
-
-  // ── Pagination visibility ─────────────────────────────────────────────────
-  describe("pagination", () => {
-    it("shows PaginationComponent when total_pages > 1 and not loading", async () => {
-      mockMovieSearching.mockResolvedValue(makeMoviePagination(2, 3, 1));
-      const wrapper = mountView();
-      await flushPromises();
-      expect(wrapper.find("[data-testid='PaginationComponent']").exists()).toBe(true);
-    });
-
-    it("hides PaginationComponent when total_pages is 1", async () => {
-      mockMovieSearching.mockResolvedValue(makeMoviePagination(2, 1, 1));
-      const wrapper = mountView();
-      await flushPromises();
-      expect(wrapper.find("[data-testid='PaginationComponent']").exists()).toBe(false);
-    });
-
-    it("hides PaginationComponent while loading", async () => {
-      mockMovieSearching.mockReturnValue(new Promise(() => { }));
-      const wrapper = mountView();
-      await flushPromises();
-      expect(wrapper.find("[data-testid='PaginationComponent']").exists()).toBe(false);
-    });
-
-    it("passes total_pages and current_page to PaginationComponent", async () => {
-      mockMovieSearching.mockResolvedValue(makeMoviePagination(2, 5, 2));
-      const wrapper = mountView();
-      await flushPromises();
-      const paginator = wrapper.find("[data-testid='PaginationComponent']");
-      expect(paginator.attributes("data-total")).toBe("5");
-      expect(paginator.attributes("data-current")).toBe("2");
-    });
-  });
-
-  // ── Query type branching ──────────────────────────────────────────────────
-  describe("route.query.type branching", () => {
-    it("does NOT call movieSearching when query.type is 'user'", async () => {
-      mockRoute.query = { type: "user" };
-      mountView();
-      await flushPromises();
-      expect(mockMovieSearching).not.toHaveBeenCalled();
-    });
-
-    it("does NOT call movieSearching when query.type is 'person'", async () => {
-      mockRoute.query = { type: "person" };
-      mountView();
-      await flushPromises();
-      expect(mockMovieSearching).not.toHaveBeenCalled();
-    });
-
-    it("calls movieSearching when query.type is absent", async () => {
-      mockRoute.query = {};
-      mountView();
-      await flushPromises();
-      expect(mockMovieSearching).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  // ── Language store watch ──────────────────────────────────────────────────
-  describe("language change triggers re-search", () => {
-    it("calls movieSearching again when the language changes", async () => {
-      mountView();
-      await flushPromises();
-      const callsBefore = mockMovieSearching.mock.calls.length;
-
-      mockLangStore.language = "es";
-      await nextTick();
-      await flushPromises();
-
-      expect(mockMovieSearching.mock.calls.length).toBeGreaterThan(callsBefore);
-    });
-  });
-
-  // ── activeFiltersCount ────────────────────────────────────────────────────
-  describe("activeFiltersCount", () => {
-    it("shows the filters badge when filters are active", async () => {
-      mockRoute.query = { genres: ["action", "drama"], stars: ["4"] };
-      const wrapper = mountView();
-      await flushPromises();
-      expect(wrapper.find(".filters-badge").exists()).toBe(true);
-      expect(wrapper.find(".filters-badge").text()).toBe("3");
-    });
-
-    it("hides the filters badge when no filters are active", async () => {
-      mockRoute.query = {};
-      const wrapper = mountView();
-      await flushPromises();
-      expect(wrapper.find(".filters-badge").exists()).toBe(false);
-    });
-  });
-
-  // ── Drawer ────────────────────────────────────────────────────────────────
-  describe("mobile filters drawer", () => {
-    it("renders the filters toggle button", async () => {
-      const wrapper = mountView();
-      await flushPromises();
-      expect(wrapper.find(".filters-toggle").exists()).toBe(true);
-    });
-
-    it("opens the drawer when the filters toggle is clicked", async () => {
-      const wrapper = mountView();
-      await flushPromises();
-      await wrapper.find(".filters-toggle").trigger("click");
-      const vm = wrapper.vm as unknown as { filtersOpen: boolean };
-      expect(vm.filtersOpen).toBe(true);
     });
   });
 });
