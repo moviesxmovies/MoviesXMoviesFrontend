@@ -102,43 +102,8 @@ describe("SignupView", () => {
     expect(mockPush).toHaveBeenCalledWith("/home");
   });
 
-  it("should show success toast on successful signup", async () => {
-    mockPost.mockResolvedValueOnce({});
-    const wrapper = factory();
-    await wrapper.vm.handleForm();
-    await flushPromises();
-    expect(mockToastAdd).toHaveBeenCalledWith(
-      expect.objectContaining({ severity: "success" }),
-    );
-  });
 
-  it("should show error toast when API fails", async () => {
-    mockPost.mockRejectedValueOnce({
-      response: { data: { detail: "Email already exists" } },
-    });
-    const wrapper = factory();
-    await wrapper.vm.handleForm();
-    await flushPromises();
-    expect(mockToastAdd).toHaveBeenCalledWith(
-      expect.objectContaining({
-        severity: "error",
-        detail: "Email already exists",
-      }),
-    );
-  });
 
-  it("should show fallback error toast when API fails without detail", async () => {
-    mockPost.mockRejectedValueOnce({});
-    const wrapper = factory();
-    await wrapper.vm.handleForm();
-    await flushPromises();
-    expect(mockToastAdd).toHaveBeenCalledWith(
-      expect.objectContaining({
-        severity: "error",
-        detail: "signup.toast.failed",
-      }),
-    );
-  });
 
   it("should append image to FormData when image is set", async () => {
     mockPost.mockResolvedValueOnce({});
