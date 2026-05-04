@@ -35,9 +35,9 @@ const searchUsers = async (data: userSearchingData) => {
   }
 };
 
-const sendFriendRequest = async (username: string) => {
+const handleFriendRequest = async (username: string, addFriend: boolean) => {
     try {
-        await completeFriendRequest(username, true);
+        await completeFriendRequest(username, addFriend);
         toast.add({ severity: 'success', summary: t('toast.success'), detail: t('user.friendRequestSent') });
     } catch (error: any) {
         toast.add({ severity: 'error', summary: t('toast.error'), detail: error.translatedMessage });
@@ -76,7 +76,7 @@ watch(
         :key="user.id"
         :user="user"
         :is-self-user="authStore.user?.username === user.username"
-        :onAddFriend="sendFriendRequest"
+        :onAddFriend="() => handleFriendRequest(user.username, authStore.user?.username !== user.username)"
       />
     </template>
 
