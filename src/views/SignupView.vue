@@ -53,6 +53,25 @@ const handleForm = async () => {
   await signup(form);
 };
 
+const handleError = (error: any) => {
+  const data = error.response?.data;
+
+  if (data && typeof data === "object") {
+    if (data.detail) {
+      fieldErrors["__general__"] = [data.detail];
+    } else {
+      Object.assign(fieldErrors, data);
+
+      if (data.error?.length) {
+        fieldErrors["__general__"] = data.error;
+      }
+
+      const hasStep1Error = STEP1_FIELDS.some((f) => data[f]?.length);
+      if (hasStep1Error || data.error?.length) currentStep.value = 1;
+    }
+  }
+};
+
 const signup = async (form: FormData) => {
   Object.keys(fieldErrors).forEach((k) => delete fieldErrors[k]);
 
@@ -60,22 +79,7 @@ const signup = async (form: FormData) => {
     await handleRegister(useLang.language, form as unknown as RegisterPayload);
     router.push("/home");
   } catch (error: any) {
-    const data = error.response?.data;
-
-    if (data && typeof data === "object") {
-      if (data.detail) {
-        fieldErrors["__general__"] = [data.detail];
-      } else {
-        Object.assign(fieldErrors, data);
-
-        if (data.error?.length) {
-          fieldErrors["__general__"] = data.error;
-        }
-
-        const hasStep1Error = STEP1_FIELDS.some((f) => data[f]?.length);
-        if (hasStep1Error || data.error?.length) currentStep.value = 1;
-      }
-    }
+    handleError(error);
   }
 };
 
