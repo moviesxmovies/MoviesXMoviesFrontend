@@ -1,5 +1,5 @@
 import { vi, describe, it, expect, beforeEach } from "vitest";
-import { getReviewReactions, getCommentReactions, postReactionApi, deleteReactionApi } from "@/repositories/reviewRepository";
+import { getReviewReactions, getCommentReactions, postReactionApi, deleteReactionApi, fetchComments, getCommentReplies, postComment, replyComment, getCommentReplies } from "@/repositories/reviewRepository";
 
 
 
@@ -135,6 +135,110 @@ describe("ReviewRepository", () => {
             await deleteReactionApi(reviewId, reactionId, commentId);
 
             expect(mockDelete).toHaveBeenCalledWith(`reviews/${reviewId}/comments/${commentId}/reactions/${reactionId}/`);
+        });
+    });
+
+    // ── fetchComments ─────────────────────────────────────────────────────
+    describe("fetchComments", () => {
+        it("calls API with correct endpoint and returns comments list", async () => {
+            const reviewId = 1;
+            const mockComments = [
+                { id: 1, content: "Great review!", user: "user1" },
+                { id: 2, content: "I disagree.", user: "user2" },
+            ];
+
+            mockGet.mockResolvedValueOnce({ data: mockComments });
+
+            const result = await fetchComments(reviewId);
+
+            expect(mockGet).toHaveBeenCalledWith(`reviews/${reviewId}/comments/`, { params: { last_id: undefined, limit: 10 } });
+            expect(result).toEqual(mockComments);
+        });
+
+        it("throws when fetchComments API fails", async () => {
+            const reviewId = 1;
+            const networkError = new Error("Network error");
+            mockGet.mockRejectedValueOnce(networkError);
+
+            await expect(fetchComments(reviewId)).rejects.toThrow("Network error");
+        });
+    });
+
+    // ── postComment ───────────────────────────────────────────────────────
+    describe("postComment", () => {
+        it("calls API with correct endpoint and payload", async () => {
+            const reviewId = 1;
+            const content = "This is a comment.";
+            const parentId = null;
+
+            mockPost.mockResolvedValueOnce({ data: {} });
+
+            await postComment(reviewId, content);
+
+            expect(mockPost).toHaveBeenCalledWith(`reviews/${reviewId}/comments/`, { content });
+        });
+
+        it("throws when postComment API fails", async () => {
+            const reviewId = 1;
+            const content = "This is a comment.";
+            const parentId = null;
+            const networkError = new Error("Unauthorized");
+            mockPost.mockRejectedValueOnce(networkError);
+
+            await expect(postComment(reviewId, content, parentId)).rejects.toThrow("Unauthorized");
+        });
+    });
+
+    // ── replyComment ───────────────────────────────────────────────────────
+    describe("replyComment", () => {
+        it("calls API with correct endpoint and payload", async () => {
+            const reviewId = 1;
+            const content = "This is a reply.";
+            const parentId = 2;
+
+            mockPost.mockResolvedValueOnce({ data: {} });
+
+            await replyComment(reviewId, parentId, content);
+
+            expect(mockPost).toHaveBeenCalledWith(`reviews/${reviewId}/comments/${parentId}/replies/`, { content });
+        });
+
+        it("throws when replyComment API fails", async () => {
+            const reviewId = 1;
+            const content = "This is a reply.";
+            const parentId = 2;
+            const networkError = new Error("Unauthorized");
+            mockPost.mockRejectedValueOnce(networkError);
+
+            await expect(replyComment(reviewId, content, parentId)).rejects.toThrow("Unauthorized");
+        });
+    });
+
+    // ── getCommentReplies ─────────────────────────────────────────────────────
+    describe("getCommentReplies", () => {
+        it("calls API with correct endpoint and returns replies list", async () => {
+            const reviewId = 1;
+            const commentId = 2;
+            const mockReplies = [
+                { id: 1, content: "I agree!", user: "user3" },
+                { id: 2, content: "Not sure about that.", user: "user4" },
+            ];
+
+            mockGet.mockResolvedValueOnce({ data: mockReplies });
+
+            const result = await getCommentReplies(reviewId, commentId);
+
+            expect(mockGet).toHaveBeenCalledWith(`reviews/${reviewId}/comments/${commentId}/replies/`, { params: { last_id: undefined, limit: 5 } });
+            expect(result).toEqual(mockReplies);
+        });
+
+        it("throws when getCommentReplies API fails", async () => {
+            const reviewId = 1;
+            const commentId = 2;
+            const networkError = new Error("Network error");
+            mockGet.mockRejectedValueOnce(networkError);
+
+            await expect(getCommentReplies(reviewId, commentId)).rejects.toThrow("Network error");
         });
     });
 });

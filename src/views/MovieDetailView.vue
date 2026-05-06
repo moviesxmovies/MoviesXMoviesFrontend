@@ -15,12 +15,14 @@ import ReviewComponent from '@/components/reviewComponent.vue';
 import SectionAccordion from '@/components/sectionAccordion.vue';
 import { api } from '@/composables/useAPI';
 import AddReviewDialog from '@/components/addReviewDialog.vue';
+import { useDate } from '@/composables/useDate';
 
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
 const toast = useToast();
 const langStore = useLangStore();
+const { formatRelativeTime } = useDate();
 
 const movie = ref<Movie>({} as Movie);
 const loadingMovie = ref(false);
@@ -143,7 +145,7 @@ watch(
                         </div>
                         <div class="card-body">
                             <h1 class="movie-title">{{ movie.title }}</h1>
-                            <span class="movie-year">{{ new Date(movie.release_date).toLocaleDateString() }}</span>
+                            <span class="movie-year">{{ formatRelativeTime(movie.release_date) }}</span>
                         </div>
                         <div v-if="movie.platforms?.length" class="card-section">
                             <span class="card-section__label">{{ t('movie.platforms', movie.platforms.length) }}</span>

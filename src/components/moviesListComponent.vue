@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useDate } from '@/composables/useDate';
 import type { MovieList } from '@/types';
 import { goToMovieList } from '@/utils/goTo';
 import { useI18n } from 'vue-i18n';
@@ -6,7 +7,7 @@ const { t } = useI18n();
 const props = defineProps<{
     movieList: MovieList;
 }>();
-
+const {formatRelativeTime} = useDate();
 const privacyConfig: Record<string, { icon: string; class: string }> = {
     P: { icon: 'pi pi-globe', class: 'badge-public' },
     R: { icon: 'pi pi-lock', class: 'badge-private' },
@@ -31,7 +32,7 @@ const privacy = privacyConfig[props.movieList.privacity] ?? privacyConfig['R'];
         </div>
 
         <div class="movie-list-footer">
-            <span class="movie-list-date">{{ new Date(movieList.updated_at).toLocaleDateString() }}</span>
+            <span class="movie-list-date">{{ formatRelativeTime(movieList.updated_at) }}</span>
         </div>
     </div>
 </template>

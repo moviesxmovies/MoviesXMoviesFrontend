@@ -27,7 +27,9 @@ vi.mock("@/components/oauthButtonComponent.vue", () => ({
 vi.mock("@/schemas/signUpSchema", () => ({
   step1Schema: {},
 }));
-
+vi.mock("vue-router", () => ({
+  useRoute: vi.fn(() => ({ query: {} })),
+}));
 const globalConfig = {
   plugins: [PrimeVue],
   components: { Form, FormField },
@@ -166,4 +168,169 @@ describe("SignUpStep1 props", () => {
     });
     expect(wrapper.exists()).toBe(true);
   });
+  describe("SignUpStep1 fieldErrors", () => {
+    it("renders __general__ error block when provided", () => {
+      const wrapper = mount(SignUpStep1, {
+        props: {
+          modelValue: defaultModelValue,
+          fieldErrors: { __general__: ["Esta contraseña es demasiado común."] },
+        },
+        global: globalConfig,
+      });
+
+      expect(wrapper.text()).toContain("Esta contraseña es demasiado común.");
+    });
+
+    it("renders multiple __general__ errors", () => {
+      const wrapper = mount(SignUpStep1, {
+        props: {
+          modelValue: defaultModelValue,
+          fieldErrors: {
+            __general__: ["Error uno.", "Error dos."],
+          },
+        },
+        global: globalConfig,
+      });
+
+      expect(wrapper.text()).toContain("Error uno.");
+      expect(wrapper.text()).toContain("Error dos.");
+    });
+
+    it("does NOT render __general__ block when array is empty", () => {
+      const wrapper = mount(SignUpStep1, {
+        props: {
+          modelValue: defaultModelValue,
+          fieldErrors: { __general__: [] },
+        },
+        global: globalConfig,
+      });
+
+      expect(wrapper.find(".pi-exclamation-circle").exists()).toBe(false);
+    });
+
+    it("renders username field error from backend", () => {
+      const wrapper = mount(SignUpStep1, {
+        props: {
+          modelValue: defaultModelValue,
+          fieldErrors: { username: ["Ya existe un usuario con este nombre."] },
+        },
+        global: globalConfig,
+      });
+
+      expect(wrapper.text()).toContain("Ya existe un usuario con este nombre.");
+    });
+
+    it("renders email field error from backend", () => {
+      const wrapper = mount(SignUpStep1, {
+        props: {
+          modelValue: defaultModelValue,
+          fieldErrors: { email: ["Ya existe Usuario con este Email."] },
+        },
+        global: globalConfig,
+      });
+
+      expect(wrapper.text()).toContain("Ya existe Usuario con este Email.");
+    });
+
+    it("renders confirm_password field error from backend", () => {
+      const wrapper = mount(SignUpStep1, {
+        props: {
+          modelValue: defaultModelValue,
+          fieldErrors: { confirm_password: ["Las contraseñas no coinciden."] },
+        },
+        global: globalConfig,
+      });
+
+      expect(wrapper.text()).toContain("Las contraseñas no coinciden.");
+    });
+
+    it("renders multiple field errors for the same field", () => {
+      const wrapper = mount(SignUpStep1, {
+        props: {
+          modelValue: defaultModelValue,
+          fieldErrors: {
+            username: ["Error A.", "Error B."],
+          },
+        },
+        global: globalConfig,
+      });
+
+      expect(wrapper.text()).toContain("Error A.");
+      expect(wrapper.text()).toContain("Error B.");
+    });
+
+    it("does NOT render field error divs when fieldErrors is undefined", () => {
+      const wrapper = mount(SignUpStep1, {
+        props: {
+          modelValue: defaultModelValue,
+          fieldErrors: undefined,
+        },
+        global: globalConfig,
+      });
+
+      expect(wrapper.find(".pi-times-circle").exists()).toBe(false);
+    });
+
+    it("does NOT render field error divs when fieldErrors is empty object", () => {
+      const wrapper = mount(SignUpStep1, {
+        props: {
+          modelValue: defaultModelValue,
+          fieldErrors: {},
+        },
+        global: globalConfig,
+      });
+
+      expect(wrapper.findAll(".pi-times-circle")).toHaveLength(0);
+    });
+
+    it("renders both __general__ and field-specific errors simultaneously", () => {
+      const wrapper = mount(SignUpStep1, {
+        props: {
+          modelValue: defaultModelValue,
+          fieldErrors: {
+            __general__: ["Esta contraseña es demasiado común."],
+            username: ["Ya existe un usuario con este nombre."],
+          },
+        },
+        global: globalConfig,
+      });
+
+      expect(wrapper.text()).toContain("Esta contraseña es demasiado común.");
+      expect(wrapper.text()).toContain("Ya existe un usuario con este nombre.");
+    });
+  });
+
+  describe("SignUpStep1 route query", () => {
+    it("prefills email field from route.query.email", async () => {
+      const { useRoute } = await import("vue-router");
+      vi.mocked(useRoute).mockReturnValueOnce({
+        query: { email: "prefilled@example.com" },
+      } as any);
+
+      const wrapper = mount(SignUpStep1, {
+        props: { modelValue: defaultModelValue },
+        global: globalConfig,
+      });
+
+      const emailInput = wrapper.find("input#email");
+      expect(emailInput.exists()).toBe(true);
+      const emailField = wrapper
+        .findAllComponents(FormField)
+        .find((f) => f.props("name") === "email");
+      expect(emailField?.props("initialValue")).toBe("prefilled@example.com");
+    });
+
+    it("uses empty string as initialValue when route.query.email is absent", () => {
+      const wrapper = mount(SignUpStep1, {
+        props: { modelValue: defaultModelValue },
+        global: globalConfig,
+      });
+
+      const emailField = wrapper
+        .findAllComponents(FormField)
+        .find((f) => f.props("name") === "email");
+      expect(emailField?.props("initialValue")).toBe("");
+    });
+  });
+
 });
