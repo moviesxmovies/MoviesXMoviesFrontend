@@ -8,7 +8,7 @@ import {
 } from "@/repositories/userRepository";
 import { useAuthStore } from "@/stores/authStore";
 import type { Pagination, User } from "@/types";
-import { useToast } from "primevue";
+import { Skeleton, useToast } from "primevue";
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
@@ -47,13 +47,21 @@ const updateRoute = (page: number) => {
 };
 
 const handleFriendRequest = async (username: string, addFriend: boolean) => {
-    try {
-        await completeFriendRequest(username, addFriend);
-        toast.add({ severity: 'success', summary: t('toast.success'), detail: t('user.friendRequestSent') });
-    } catch (error: any) {
-        toast.add({ severity: 'error', summary: t('toast.error'), detail: error.translatedMessage });
-        throw error;
-    }
+  try {
+    await completeFriendRequest(username, addFriend);
+    toast.add({
+      severity: "success",
+      summary: t("toast.success"),
+      detail: t("user.friendRequestSent"),
+    });
+  } catch (error: any) {
+    toast.add({
+      severity: "error",
+      summary: t("toast.error"),
+      detail: error.translatedMessage,
+    });
+    throw error;
+  }
 };
 
 watch(
@@ -67,9 +75,10 @@ watch(
 
 <template>
   <div class="users-list">
-    <div v-if="loading" class="state-box">
-      <i class="pi pi-spin pi-spinner" style="font-size: 1.25rem" />
-      <span>{{ t("loading") }}</span>
+    <div v-if="loading">
+      <div v-for="n in 10" :key="n" class="skeleton-card">
+        <Skeleton height="100%" border-radius="1rem" />
+      </div>
     </div>
 
     <div v-else-if="!users.results?.length" class="state-box">
@@ -86,7 +95,13 @@ watch(
         :key="user.id"
         :user="user"
         :is-self-user="authStore.user?.username === user.username"
-        :onAddFriend="() => handleFriendRequest(user.username, authStore.user?.username !== user.username)"
+        :onAddFriend="
+          () =>
+            handleFriendRequest(
+              user.username,
+              authStore.user?.username !== user.username,
+            )
+        "
       />
     </template>
 
@@ -145,5 +160,11 @@ watch(
 .empty-sub {
   font-size: 0.85rem;
   color: var(--text-color-secondary);
+}
+
+.skeleton-card {
+  width: 100%;
+  height: 80px;
+  padding: 0.5rem 1rem;
 }
 </style>

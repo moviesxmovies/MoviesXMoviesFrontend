@@ -1,14 +1,23 @@
 <script lang="ts" setup>
 import type { Movie } from "@/types";
 import { goToMovie } from "@/utils/goTo";
+import { Skeleton } from "primevue";
 
 const props = defineProps<{
+  loading: boolean;
   movie: Movie;
 }>();
 </script>
 
 <template>
-  <div class="movie-card" @click="goToMovie(movie.slug)">
+  <div v-if="loading" class="movie-card skeleton">
+    <Skeleton height="auto" class="poster-skeleton" border-radius="0" />
+    <div class="movie-info">
+      <Skeleton width="80%" height="0.7rem" border-radius="4px" class="mb-2" />
+      <Skeleton width="40%" height="0.65rem" border-radius="4px" />
+    </div>
+  </div>
+  <div class="movie-card" @click="goToMovie(movie.slug)" v-else>
     <div class="movie-poster-wrap">
       <img :src="movie.cover" :alt="movie.title" class="movie-poster" />
     </div>
@@ -72,5 +81,15 @@ const props = defineProps<{
   color: var(--gray);
   font-weight: 500;
   margin: 0;
+}
+
+.movie-card.skeleton {
+  cursor: default;
+  pointer-events: none;
+}
+
+.poster-skeleton {
+  width: 100%;
+  aspect-ratio: 2 / 3;
 }
 </style>

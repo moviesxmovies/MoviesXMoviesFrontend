@@ -3,7 +3,7 @@ import MoviesListComponent from "@/components/moviesListComponent.vue";
 import PaginationComponent from "@/components/paginationComponent.vue";
 import { listSearching } from "@/repositories/listRepository";
 import type { MovieList, Pagination } from "@/types";
-import { useToast } from "primevue";
+import { Skeleton, useToast } from "primevue";
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
@@ -43,7 +43,10 @@ const updateRoute = (page: number) => {
 watch(
   () => route.query,
   async () => {
-    await searchMovieLists(route.query.name?.toString() || "", Number(route.query.page));
+    await searchMovieLists(
+      route.query.name?.toString() || "",
+      Number(route.query.page),
+    );
   },
   { immediate: true },
 );
@@ -51,9 +54,10 @@ watch(
 
 <template>
   <div class="movie-list">
-    <div v-if="loading" class="state-box">
-      <i class="pi pi-spin pi-spinner" style="font-size: 1.25rem" />
-      <span>{{ t("loading") }}</span>
+    <div v-if="loading" class="movielist-grid">
+      <div v-for="n in 10" :key="n" class="skeleton-card">
+        <Skeleton height="100%" border-radius="1rem" />
+      </div>
     </div>
 
     <div v-else-if="!movieLists.results?.length" class="state-box">
@@ -160,5 +164,11 @@ watch(
 .empty-sub {
   font-size: 0.85rem;
   color: var(--text-color-secondary);
+}
+
+.skeleton-card {
+  aspect-ratio: 1 / 1;
+  border-radius: 1rem;
+  overflow: hidden;
 }
 </style>
