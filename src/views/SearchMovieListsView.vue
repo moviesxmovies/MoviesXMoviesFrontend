@@ -1,26 +1,24 @@
 <script lang="ts" setup>
-import FriendComponent from "@/components/friendComponent.vue";
+import MoviesListComponent from "@/components/moviesListComponent.vue";
 import PaginationComponent from "@/components/paginationComponent.vue";
-import {
-  userSearching,
-  type userSearchingData,
-} from "@/repositories/userRepository";
-import type { Pagination, User } from "@/types";
+import { listSearching } from "@/repositories/listRepository";
+import type { MovieList, Pagination } from "@/types";
 import { useToast } from "primevue";
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
+const router = useRouter();
 const toast = useToast();
-const users = ref<Pagination<User>>({} as Pagination<User>);
+const movieLists = ref<Pagination<MovieList>>({} as Pagination<MovieList>);
 const { t } = useI18n();
 const loading = ref<boolean>(false);
 
-const searchUsers = async (data: userSearchingData) => {
+const searchMovieLists = async (query: string, page?: number) => {
   try {
     loading.value = true;
-    users.value = await userSearching(data);
+    movieLists.value = await listSearching(query, page);
   } catch (error: any) {
     toast.add({
       severity: "error",
@@ -32,58 +30,101 @@ const searchUsers = async (data: userSearchingData) => {
   }
 };
 
+const updateRoute = (page: number) => {
+  router.push({
+    path: route.path,
+    query: {
+      ...route.query,
+      page,
+    },
+  });
+};
+
 watch(
   () => route.query,
   async () => {
-    console.log(route.query);
-    await searchUsers(route.query);
+    await searchMovieLists(route.query.name?.toString() || "", Number(route.query.page));
   },
   { immediate: true },
 );
 </script>
 
 <template>
-  <div class="users-list">
+  <div class="movie-list">
     <div v-if="loading" class="state-box">
-      <i class="pi pi-spin pi-spinner" style="font-size: 1.25rem;" />
+      <i class="pi pi-spin pi-spinner" style="font-size: 1.25rem" />
       <span>{{ t("loading") }}</span>
     </div>
 
-    <div v-else-if="!users.results?.length" class="state-box">
+    <div v-else-if="!movieLists.results?.length" class="state-box">
       <div class="empty-icon">
-        <i class="pi pi-search" style="font-size: 1rem;" />
+        <i class="pi pi-search" style="font-size: 1rem" />
       </div>
       <p class="empty-title">{{ t("search.empty") }}</p>
       <span class="empty-sub">{{ t("search.help") }}</span>
     </div>
 
-    <template v-else>
-      <FriendComponent
-        v-for="user in users.results"
-        :key="user.id"
-        :username="user.username"
+    <div v-else class="movielist-grid">
+      <MoviesListComponent
+        v-for="movieList in movieLists.results"
+        :key="movieList.id"
+        :movieList="movieList"
       />
-    </template>
+    </div>
 
-    <PaginationComponent
-      v-if="!loading && users.total_pages > 1"
-      data-testid="PaginationComponent"
-      :total_pages="users.total_pages"
-      :current_page="users.current_page"
-      style="margin-top: 1.5rem;"
-    />
+    <div v-if="!loading && movieLists.total_pages > 1">
+      <PaginationComponent
+        data-testid="PaginationComponent"
+        :data-total="movieLists.total_pages"
+        :data-current="movieLists.current_page"
+        :total_pages="movieLists.total_pages"
+        :current_page="movieLists.current_page"
+        @change-page="updateRoute"
+      />
+    </div>
   </div>
 </template>
 
 <style scoped>
-.users-list {
+.movie-list {
   width: 100%;
-  max-width: 600px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 0 1rem;
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.movielist-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  min-height: 200px;
+}
+
+@media (min-width: 768px) {
+  .movie-list {
+    padding: 0 1.5rem;
+  }
+  .movielist-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .movielist-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .movie-list {
+    padding: 0 3rem;
+  }
+  .movielist-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
 }
 
 .state-box {

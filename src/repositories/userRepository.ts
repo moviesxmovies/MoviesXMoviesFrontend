@@ -177,13 +177,13 @@ export type userSearchingData = {
 
 export const userSearching = async (
   data: userSearchingData,
-  limit: number = 15,
+  limit?: number,
 ) => {
   try {
     const response = await api.get(`/users/searching/`, {
       params: {
         ...data,
-        limit: limit,
+        limit,
         search_query: data.name || undefined,
       },
     });

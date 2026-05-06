@@ -100,7 +100,7 @@ export const createList = async (list: CreateList) => {
   }
 };
 
-export const searchLists = async (
+export const listSearching = async (
   query: string,
   page?: number,
   limit?: number,

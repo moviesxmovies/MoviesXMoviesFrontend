@@ -7,7 +7,7 @@ import {
   type searchData,
 } from "@/repositories/movieRepository";
 import { useLangStore } from "@/stores/langStore";
-import type { Pagination } from "@/types";
+import type { Movie, Pagination } from "@/types";
 import { Drawer, useToast } from "primevue";
 import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
@@ -16,7 +16,7 @@ import { useRoute, useRouter, type LocationQueryValue } from "vue-router";
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
-const movies = ref<Pagination>({} as Pagination);
+const movies = ref<Pagination<Movie>>({} as Pagination<Movie>);
 const { t } = useI18n();
 const loading = ref<boolean>(false);
 const langStore = useLangStore();

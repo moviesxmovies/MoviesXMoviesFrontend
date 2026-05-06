@@ -11,9 +11,10 @@ import type { Pagination, User } from "@/types";
 import { useToast } from "primevue";
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
+const router = useRouter();
 const toast = useToast();
 const users = ref<Pagination<User>>({} as Pagination<User>);
 const { t } = useI18n();
@@ -35,6 +36,16 @@ const searchUsers = async (data: userSearchingData) => {
   }
 };
 
+const updateRoute = (page: number) => {
+  router.push({
+    path: route.path,
+    query: {
+      ...route.query,
+      page,
+    },
+  });
+};
+
 const handleFriendRequest = async (username: string, addFriend: boolean) => {
     try {
         await completeFriendRequest(username, addFriend);
@@ -48,7 +59,6 @@ const handleFriendRequest = async (username: string, addFriend: boolean) => {
 watch(
   () => route.query,
   async () => {
-    console.log(route.query);
     await searchUsers(route.query);
   },
   { immediate: true },
@@ -85,6 +95,7 @@ watch(
       data-testid="PaginationComponent"
       :total_pages="users.total_pages"
       :current_page="users.current_page"
+      @change-page="updateRoute"
       style="margin-top: 1.5rem"
     />
   </div>
