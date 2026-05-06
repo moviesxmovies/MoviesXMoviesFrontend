@@ -50,17 +50,8 @@ export interface DynamicPagination<T> {
   count: number;
 }
 
-export interface MoviePagination {
-  results: Movie[];
-  total_pages: number;
-  count: number;
-  has_next: boolean;
-  has_previous: boolean;
-  current_page: number;
-}
-
-export interface UserPagination {
-  results: User[];
+export interface Pagination<T> {
+  results: T[];
   total_pages: number;
   count: number;
   has_next: boolean;
@@ -141,15 +132,6 @@ export interface Rating {
   user: string;
   movie: string;
   created_at: string;
-}
-
-export interface MovieListPagination {
-  results: MovieList[];
-  total_pages: number;
-  count: number;
-  has_next: boolean;
-  has_previous: boolean;
-  current_page: number;
 }
 
 export interface MovieList {

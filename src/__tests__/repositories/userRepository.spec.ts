@@ -424,7 +424,6 @@ describe("UserRepository", () => {
       expect(mockGet).toHaveBeenCalledWith("/users/searching/", {
         params: {
           page: 1,
-          limit: 15,
           search_query: "testUser",
           name: "testUser",
         },

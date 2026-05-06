@@ -1,6 +1,6 @@
 import { api } from "@/composables/useAPI";
 import TranslatedError from "@/exceptions/TranslatedError";
-import type { Movie, MoviePagination } from "@/types";
+import type { Movie, Pagination } from "@/types";
 
 export type searchData = {
   name?: string;
@@ -44,7 +44,7 @@ export const movieSearching = async (
   limit: number = 15,
 ) => {
   try {
-    const { data }: { data: MoviePagination } = await api.get(
+    const { data }: { data: Pagination<Movie> } = await api.get(
       "movies/searching/",
       {
         params: { ...params, limit },

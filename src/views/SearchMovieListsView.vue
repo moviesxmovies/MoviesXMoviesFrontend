@@ -1,13 +1,8 @@
 <script lang="ts" setup>
-import FriendWithFollow from "@/components/friendWithFollow.vue";
+import MoviesListComponent from "@/components/moviesListComponent.vue";
 import PaginationComponent from "@/components/paginationComponent.vue";
-import {
-  completeFriendRequest,
-  userSearching,
-  type userSearchingData,
-} from "@/repositories/userRepository";
-import { useAuthStore } from "@/stores/authStore";
-import type { Pagination, User } from "@/types";
+import { listSearching } from "@/repositories/listRepository";
+import type { MovieList, Pagination } from "@/types";
 import { Skeleton, useToast } from "primevue";
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
@@ -16,15 +11,14 @@ import { useRoute, useRouter } from "vue-router";
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
-const users = ref<Pagination<User>>({} as Pagination<User>);
+const movieLists = ref<Pagination<MovieList>>({} as Pagination<MovieList>);
 const { t } = useI18n();
 const loading = ref<boolean>(false);
-const authStore = useAuthStore();
 
-const searchUsers = async (data: userSearchingData) => {
+const searchMovieLists = async (query: string, page?: number) => {
   try {
     loading.value = true;
-    users.value = await userSearching(data);
+    movieLists.value = await listSearching(query, page);
   } catch (error: any) {
     toast.add({
       severity: "error",
@@ -46,42 +40,27 @@ const updateRoute = (page: number) => {
   });
 };
 
-const handleFriendRequest = async (username: string, addFriend: boolean) => {
-  try {
-    await completeFriendRequest(username, addFriend);
-    toast.add({
-      severity: "success",
-      summary: t("toast.success"),
-      detail: t("user.friendRequestSent"),
-    });
-  } catch (error: any) {
-    toast.add({
-      severity: "error",
-      summary: t("toast.error"),
-      detail: error.translatedMessage,
-    });
-    throw error;
-  }
-};
-
 watch(
   () => route.query,
   async () => {
-    await searchUsers(route.query);
+    await searchMovieLists(
+      route.query.name?.toString() || "",
+      Number(route.query.page),
+    );
   },
   { immediate: true },
 );
 </script>
 
 <template>
-  <div class="users-list">
-    <div v-if="loading">
+  <div class="movie-list">
+    <div v-if="loading" class="movielist-grid">
       <div v-for="n in 10" :key="n" class="skeleton-card">
         <Skeleton height="100%" border-radius="1rem" />
       </div>
     </div>
 
-    <div v-else-if="!users.results?.length" class="state-box">
+    <div v-else-if="!movieLists.results?.length" class="state-box">
       <div class="empty-icon">
         <i class="pi pi-search" style="font-size: 1rem" />
       </div>
@@ -89,42 +68,67 @@ watch(
       <span class="empty-sub">{{ t("search.help") }}</span>
     </div>
 
-    <template v-else>
-      <FriendWithFollow
-        v-for="user in users.results"
-        :key="user.id"
-        :user="user"
-        :is-self-user="authStore.user?.username === user.username"
-        :onAddFriend="
-          () =>
-            handleFriendRequest(
-              user.username,
-              authStore.user?.username !== user.username,
-            )
-        "
+    <div v-else class="movielist-grid">
+      <MoviesListComponent
+        v-for="movieList in movieLists.results"
+        :key="movieList.id"
+        :movieList="movieList"
       />
-    </template>
+    </div>
 
-    <PaginationComponent
-      v-if="!loading && users.total_pages > 1"
-      data-testid="PaginationComponent"
-      :total_pages="users.total_pages"
-      :current_page="users.current_page"
-      @change-page="updateRoute"
-      style="margin-top: 1.5rem"
-    />
+    <div v-if="!loading && movieLists.total_pages > 1">
+      <PaginationComponent
+        data-testid="PaginationComponent"
+        :data-total="movieLists.total_pages"
+        :data-current="movieLists.current_page"
+        :total_pages="movieLists.total_pages"
+        :current_page="movieLists.current_page"
+        @change-page="updateRoute"
+      />
+    </div>
   </div>
 </template>
 
 <style scoped>
-.users-list {
+.movie-list {
   width: 100%;
-  max-width: 600px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 0 1rem;
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.movielist-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  min-height: 200px;
+}
+
+@media (min-width: 768px) {
+  .movie-list {
+    padding: 0 1.5rem;
+  }
+  .movielist-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .movielist-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .movie-list {
+    padding: 0 3rem;
+  }
+  .movielist-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
 }
 
 .state-box {
@@ -163,8 +167,8 @@ watch(
 }
 
 .skeleton-card {
-  width: 100%;
-  height: 80px;
-  padding: 0.5rem 1rem;
+  aspect-ratio: 1 / 1;
+  border-radius: 1rem;
+  overflow: hidden;
 }
 </style>

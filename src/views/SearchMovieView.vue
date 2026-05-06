@@ -7,7 +7,7 @@ import {
   type searchData,
 } from "@/repositories/movieRepository";
 import { useLangStore } from "@/stores/langStore";
-import type { MoviePagination } from "@/types";
+import type { Movie, Pagination } from "@/types";
 import { Drawer, useToast } from "primevue";
 import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
@@ -16,7 +16,7 @@ import { useRoute, useRouter, type LocationQueryValue } from "vue-router";
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
-const movies = ref<MoviePagination>({} as MoviePagination);
+const movies = ref<Pagination<Movie>>({} as Pagination<Movie>);
 const { t } = useI18n();
 const loading = ref<boolean>(false);
 const langStore = useLangStore();
@@ -150,26 +150,21 @@ watch(
     </aside>
 
     <div class="main-content">
-      <div class="movies-grid">
-        <div v-if="loading" class="loading-state">
-          <i class="pi pi-spin pi-spinner loading-spinner"></i>
-          <span>{{ t("loading") }}</span>
+      <div v-if="!movies.results?.length" class="empty-state">
+        <div class="empty-icon">
+          <i class="pi pi-search"></i>
         </div>
-        <div v-else-if="!movies.results?.length" class="empty-state">
-          <div class="empty-icon">
-            <i class="pi pi-search"></i>
-          </div>
-          <p>{{ t("search.empty") }}</p>
-          <span>{{ t("search.help") }}</span>
-        </div>
-        <template v-else>
-          <MovieCardComponent
-            v-for="movie in movies.results"
-            :key="movie.id"
-            :movie="movie"
-            data-testid="movie-card"
-          />
-        </template>
+        <p>{{ t("search.empty") }}</p>
+        <span>{{ t("search.help") }}</span>
+      </div>
+      <div v-else class="movies-grid">
+        <MovieCardComponent
+          v-for="movie in movies.results"
+          :key="movie.id"
+          :movie="movie"
+          :loading="loading"
+          data-testid="movie-card"
+        />
       </div>
 
       <div v-if="!loading && movies.total_pages > 1">
@@ -192,21 +187,6 @@ watch(
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
   min-height: 200px;
-}
-
-.loading-state {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 4rem 0;
-  gap: 12px;
-  color: var(--text-color-secondary);
-}
-
-.loading-spinner {
-  font-size: 2rem;
 }
 
 .empty-state {
@@ -352,5 +332,11 @@ watch(
   border: 1px solid var(--secondary);
   border-radius: 1.25rem;
   padding: 1.25rem;
+}
+
+.skeleton-card {
+  aspect-ratio: 2 / 3;
+  border-radius: 1rem;
+  overflow: hidden;
 }
 </style>

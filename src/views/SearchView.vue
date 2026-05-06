@@ -6,6 +6,7 @@ import { ref, watch } from "vue";
 import debounce from "@/utils/debounce";
 import { InputText, SelectButton } from "primevue";
 import { useI18n } from "vue-i18n";
+import SearchMovieListsView from "./SearchMovieListsView.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -92,6 +93,7 @@ watch(
     </div>
 
     <SearchUsersView v-if="route.query.type === 'users'" key="users" />
+    <SearchMovieListsView v-else-if="route.query.type === 'lists'" key="lists" />
     <SearchMovieView v-else />
   </div>
 </template>
