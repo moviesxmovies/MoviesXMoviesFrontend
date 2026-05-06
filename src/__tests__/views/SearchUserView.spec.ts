@@ -79,8 +79,7 @@ describe("SearchUsersView", () => {
     it("shows loading state while fetching", async () => {
       vi.mocked(userSearching).mockReturnValue(new Promise(() => {}));
       const wrapper = createWrapper();
-      expect(wrapper.find(".state-box").exists()).toBe(true);
-      expect(wrapper.find(".pi-spinner").exists()).toBe(true);
+      expect(wrapper.find(".skeleton-card").exists()).toBe(true);
     });
 
     it("shows empty state when no results", async () => {

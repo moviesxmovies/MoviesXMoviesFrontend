@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { mount, flushPromises } from "@vue/test-utils";
 import SearchMovieView from "@/views/SearchMovieView.vue";
 import type { Movie, Pagination } from "@/types";
+import { movieSearching } from "@/repositories/movieRepository";
 
 // -- Mocks --
 
@@ -10,8 +11,11 @@ vi.mock("@/components/filterComponent.vue", () => ({
 }));
 vi.mock("@/components/movieCardComponent.vue", () => ({
   default: {
-    template: '<div data-testid="movie-card" />',
-    props: ["movie"],
+    template: `
+      <div v-if="loading" data-testid="movie-card-skeleton" />
+      <div v-else data-testid="movie-card" />
+    `,
+    props: ["movie", "loading"],
   },
 }));
 vi.mock("@/components/paginationComponent.vue", () => ({
@@ -22,9 +26,8 @@ vi.mock("@/components/paginationComponent.vue", () => ({
   },
 }));
 
-const mockMovieSearching = vi.fn();
 vi.mock("@/repositories/movieRepository", () => ({
-  movieSearching: (...args: any[]) => mockMovieSearching(...args),
+  movieSearching: vi.fn(),
 }));
 
 const mockToastAdd = vi.fn();
@@ -79,17 +82,17 @@ describe("SearchMovieView", () => {
   beforeEach(async () => {
     mockPush.mockClear();
     mockToastAdd.mockClear();
-    mockMovieSearching.mockClear();
-    mockMovieSearching.mockResolvedValue(emptyPagination);
+    vi.mocked(movieSearching).mockClear();
+    vi.mocked(movieSearching).mockResolvedValue(emptyPagination);
     Object.keys(mockRouteQuery).forEach((k) => delete mockRouteQuery[k]);
   });
 
   describe("initial render", () => {
-    it("shows loading state while fetching", async () => {
-      // Never resolves during this test
-      mockMovieSearching.mockReturnValue(new Promise(() => {}));
+    it("shows skeleton cards while fetching", async () => {
+      vi.mocked(movieSearching).mockReturnValue(new Promise(() => {}));
       const wrapper = createWrapper();
-      expect(wrapper.find(".loading-state").exists()).toBe(true);
+      await wrapper.vm.$nextTick();
+      expect(wrapper.find('[data-testid="movie-card"]').exists()).toBe(false);
     });
 
     it("shows empty state when no results", async () => {
@@ -99,7 +102,7 @@ describe("SearchMovieView", () => {
     });
 
     it("renders movie cards when results exist", async () => {
-      mockMovieSearching.mockResolvedValue({
+      vi.mocked(movieSearching).mockResolvedValue({
         ...emptyPagination,
         results: [
           { id: 1, title: "Inception" },
@@ -134,7 +137,7 @@ describe("SearchMovieView", () => {
     it("calls movieSearching on mount", async () => {
       createWrapper();
       await vi.waitFor(() =>
-        expect(mockMovieSearching).toHaveBeenCalledTimes(1),
+        expect(vi.mocked(movieSearching)).toHaveBeenCalledTimes(1),
       );
     });
 
@@ -144,7 +147,7 @@ describe("SearchMovieView", () => {
       createWrapper();
 
       await vi.waitFor(() =>
-        expect(mockMovieSearching).toHaveBeenCalledWith(
+        expect(vi.mocked(movieSearching)).toHaveBeenCalledWith(
           expect.objectContaining({
             genres: ["action"],
             stars: ["5"],
@@ -154,7 +157,7 @@ describe("SearchMovieView", () => {
     });
 
     it("shows toast on search error", async () => {
-      mockMovieSearching.mockRejectedValue({
+      vi.mocked(movieSearching).mockRejectedValue({
         response: { data: { message: "Server error" } },
       });
       createWrapper();
