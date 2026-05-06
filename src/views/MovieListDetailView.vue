@@ -1,0 +1,345 @@
+<script lang="ts" setup>
+import { api } from "@/composables/useAPI";
+import { useDate } from "@/composables/useDate";
+import { getMovieList } from "@/repositories/listRepository";
+import {
+  type Pagination,
+  type Movie,
+  type MovieList,
+  type User,
+} from "@/types";
+import { Skeleton, useToast } from "primevue";
+import { ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
+import { useRoute, useRouter } from "vue-router";
+
+const router = useRouter();
+const route = useRoute();
+const toast = useToast();
+const { t } = useI18n();
+const movieList = ref<MovieList>({} as MovieList);
+const user = ref<User>({} as User);
+const movies = ref<Pagination<Movie>>({} as Pagination<Movie>);
+const loading = ref(false);
+
+const { formatRelativeTime } = useDate();
+const privacyConfig: Record<string, { icon: string; class: string }> = {
+  P: { icon: "pi pi-globe", class: "badge-public" },
+  R: { icon: "pi pi-lock", class: "badge-private" },
+  F: { icon: "pi pi-users", class: "badge-friends" },
+};
+
+const privacy = ref<{ icon: string; class: string } | undefined>(
+  privacyConfig["R"],
+);
+
+const fetchMovieList = async () => {
+  loading.value = true;
+  try {
+    movieList.value = await getMovieList(
+      route.params.user as string,
+      route.params.slug as string,
+    );
+    privacy.value = privacyConfig[movieList.value.privacity];
+  } catch (error: any) {
+    toast.add({
+      severity: "error",
+      summary: t("toast.error"),
+      detail: error.response?.data?.message || t("list.getListError"),
+    });
+  } finally {
+    loading.value = false;
+  }
+};
+
+const fetchUser = async () => {
+  try {
+    const { data } = await api.get(movieList.value.user);
+    user.value = data;
+  } catch (error: any) {
+    toast.add({
+      severity: "error",
+      summary: t("toast.error"),
+      detail: error.response?.data?.message || t("user.no_user"),
+    });
+  }
+};
+
+const updateRoute = (page: number) => {
+  router.push({
+    path: route.path,
+    query: {
+      ...route.query,
+      page,
+    },
+  });
+};
+
+watch(
+  () => [route.params.user, route.params.slug],
+  async () => {
+    await fetchMovieList();
+    await fetchUser();
+  },
+  { immediate: true },
+);
+
+watch(
+  () => route.query.page,
+  (newPage) => {
+    if (newPage) {
+      updateRoute(Number(newPage));
+    }
+  },
+);
+</script>
+
+<template>
+  <div class="page">
+    <template v-if="loading">
+      <div class="header-skeleton">
+        <Skeleton shape="circle" size="10rem" class="mr-4" />
+        <div class="flex-1">
+          <Skeleton width="40%" height="2.5rem" class="mb-2" />
+          <Skeleton width="60%" height="1.5rem" />
+        </div>
+      </div>
+    </template>
+
+    <template v-else>
+      <div class="movie-list-info">
+        <div class="info-card">
+          <!-- User -->
+          <div class="author-section">
+            <div class="avatar-wrapper">
+              <img
+                :src="user.picture"
+                :alt="user.username"
+                class="author-img"
+              />
+            </div>
+            <div class="author-meta">
+              <span class="label">{{ t("list.createdBy") }}</span>
+              <p class="username">@{{ user.username }}</p>
+            </div>
+          </div>
+
+          <!-- Only in desktop -->
+          <div class="divider"></div>
+
+          <!-- List info -->
+          <div class="list-content">
+            <div class="list-header">
+              <h1 class="list-name">{{ movieList.name }}</h1>
+              <span
+                v-if="privacy"
+                class="privacy-badge"
+                :class="privacy.class"
+                v-tooltip="movieList.privacity"
+              >
+                <i :class="privacy.icon" />
+              </span>
+            </div>
+
+            <p class="list-description">
+              {{ movieList.description || t("list.noDescription") }}
+            </p>
+
+            <div class="list-footer-stats">
+              <div class="stat">
+                <i class="pi pi-video" />
+                <span>
+                  {{ t("list.moviesCount", movieList.movies.length) }}</span
+                >
+              </div>
+              <div class="stat">
+                <i class="pi pi-calendar" />
+                <span>{{
+                  t("list.updated", [formatRelativeTime(movieList.updated_at)])
+                }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="movies-grid">
+        <MovieCardComponent
+          v-for="movie in movies.results"
+          :key="movie.id"
+          :movie="movie"
+          :loading="loading"
+          data-testid="movie-card"
+        />
+      </div>
+
+      <div v-if="!loading && movies.total_pages > 1">
+        <PaginationComponent
+          data-testid="PaginationComponent"
+          :data-total="movies.total_pages"
+          :data-current="movies.current_page"
+          :total_pages="movies.total_pages"
+          :current_page="movies.current_page"
+          @change-page="updateRoute"
+        />
+      </div>
+    </template>
+  </div>
+</template>
+
+<style scoped>
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 4rem 1rem;
+}
+
+.movie-list-info {
+  margin-bottom: 3rem;
+}
+
+.info-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--secondary);
+  border-radius: 1.25rem;
+  padding: 2rem;
+  gap: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+}
+
+@media (min-width: 768px) {
+  .info-card {
+    flex-direction: row;
+    align-items: stretch;
+  }
+}
+
+.author-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 200px;
+  text-align: center;
+}
+
+.avatar-wrapper {
+  position: relative;
+  padding: 5px;
+  background: linear-gradient(45deg, var(--primary), transparent);
+  border-radius: 50%;
+  margin-bottom: 1rem;
+}
+
+.author-img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--secondary);
+}
+
+.author-meta .label {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.6;
+  margin-bottom: 0.25rem;
+}
+
+.username {
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+}
+
+.divider {
+  width: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0 1rem;
+}
+
+.list-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.list-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.list-name {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin: 0;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.list-description {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  opacity: 0.8;
+  margin-bottom: 1.5rem;
+  max-width: 800px;
+}
+
+.list-footer-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+.stat i {
+  color: var(--primary);
+}
+
+.privacy-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+}
+
+.badge-public {
+  background: rgba(34, 197, 94, 0.1);
+  color: #4ade80;
+}
+.badge-private {
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+}
+.badge-friends {
+  background: rgba(99, 102, 241, 0.1);
+  color: #818cf8;
+}
+
+.header-skeleton {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+  background: var(--secondary);
+  border-radius: 1.25rem;
+}
+</style>

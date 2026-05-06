@@ -100,6 +100,15 @@ export const createList = async (list: CreateList) => {
   }
 };
 
+export const getMovieList = async (user: string, slug: string) => {
+  try {
+    const { data }: { data: MovieList } = await api.get(`/movies-lists/${user}/${slug}/`);
+    return data;
+  } catch (error: any) {
+    throw new TranslatedError(error, error.response?.data?.status);
+  }
+};
+
 export const listSearching = async (
   query: string,
   page?: number,

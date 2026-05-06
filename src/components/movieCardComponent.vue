@@ -4,7 +4,7 @@ import { goToMovie } from "@/utils/goTo";
 import { Skeleton } from "primevue";
 
 const props = defineProps<{
-  loading: boolean;
+  loading?: boolean;
   movie: Movie;
 }>();
 </script>

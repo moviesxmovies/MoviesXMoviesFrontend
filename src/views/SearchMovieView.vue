@@ -150,7 +150,7 @@ watch(
     </aside>
 
     <div class="main-content">
-      <div v-if="!movies.results?.length" class="empty-state">
+      <div v-if="!loading && !movies.results?.length" class="empty-state">
         <div class="empty-icon">
           <i class="pi pi-search"></i>
         </div>

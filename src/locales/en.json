@@ -263,6 +263,8 @@
     "empty": "No results found",
     "help": "Try with other values",
     "searchMoviesError": "Error fetching movies",
+    "searchUsersError": "Error fetching users",
+    "searchMovieListsError": "Error fetching movie lists",
     "filters": "Filters",
     "movies": "Movies",
     "users": "Users",
@@ -278,6 +280,7 @@
     "biography": "Biography",
     "no_biography": "No biography available.",
     "reviews": "Reviews",
+    "no_user": "No user found",
     "no_reviews": "No reviews available.",
     "no_reviews_description": "This user has not written any reviews yet.",
     "no_friends_requests": "No requests available",
@@ -378,5 +381,12 @@
     "confirm": "Confirm",
     "seeMore": "See more",
     "seeLess": "See less"
+  },
+  "list": {
+    "noDescription": "This list doesn't have a description.",
+    "getListError": "Error fetching list details. Please try again later.",
+    "createdBy": "Created by",
+    "moviesCount": "{count} movie | {count} movies",
+    "updated": "Last updated {0}"
   }
 }
