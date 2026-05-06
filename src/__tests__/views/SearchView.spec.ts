@@ -6,6 +6,9 @@ import { ref } from "vue";
 vi.mock("@/views/SearchMovieView.vue", () => ({
   default: { template: '<div data-testid="search-movie-view" />' },
 }));
+vi.mock("@/views/SearchMovieListsView.vue", () => ({
+  default: { template: '<div data-testid="search-movie-lists-view" />' },
+}));
 vi.mock("@/views/SearchUsersView.vue", () => ({
   default: { template: '<div data-testid="search-users-view" />' },
 }));
@@ -80,6 +83,16 @@ describe("SearchView", () => {
       expect(wrapper.find('[data-testid="search-users-view"]').exists()).toBe(
         true,
       );
+      expect(wrapper.find('[data-testid="search-movie-view"]').exists()).toBe(
+        false,
+      );
+    });
+
+    it("shows SearchMovieListsView when type is lists", () => {
+      const wrapper = createWrapper({ type: "lists" });
+      expect(
+        wrapper.find('[data-testid="search-movie-lists-view"]').exists(),
+      ).toBe(true);
       expect(wrapper.find('[data-testid="search-movie-view"]').exists()).toBe(
         false,
       );
@@ -162,6 +175,34 @@ describe("SearchView", () => {
             type: "actors",
             page: 1,
           }),
+        }),
+      );
+    });
+
+    it("updates type and route when an option is clicked", async () => {
+      const wrapper = createWrapper();
+      const buttons = wrapper.findAll(".p-togglebutton");
+      await buttons[1].trigger("click");
+
+      expect((wrapper.vm as any).type).toBe("users");
+      expect(mockPush).toHaveBeenCalledWith(
+        expect.objectContaining({
+          query: expect.objectContaining({ type: "users", page: 1 }),
+        }),
+      );
+    });
+
+    it("syncs v-model and triggers updateRoute on SelectButton change", async () => {
+      const wrapper = createWrapper();
+      const selectButton = wrapper.findComponent({ name: "SelectButton" });
+
+      await selectButton.vm.$emit("update:modelValue", "actors");
+      await selectButton.vm.$emit("change", { value: "actors" });
+
+      expect((wrapper.vm as any).type).toBe("actors");
+      expect(mockPush).toHaveBeenCalledWith(
+        expect.objectContaining({
+          query: expect.objectContaining({ type: "actors" }),
         }),
       );
     });
