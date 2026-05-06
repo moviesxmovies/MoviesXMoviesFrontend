@@ -5,7 +5,7 @@ import {
   userSearching,
   type userSearchingData,
 } from "@/repositories/userRepository";
-import type { UserPagination } from "@/types";
+import type { Pagination, User } from "@/types";
 import { useToast } from "primevue";
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
@@ -13,7 +13,7 @@ import { useRoute } from "vue-router";
 
 const route = useRoute();
 const toast = useToast();
-const users = ref<UserPagination>({} as UserPagination);
+const users = ref<Pagination<User>>({} as Pagination<User>);
 const { t } = useI18n();
 const loading = ref<boolean>(false);
 

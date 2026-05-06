@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { mount, flushPromises } from "@vue/test-utils";
 import SearchMovieView from "@/views/SearchMovieView.vue";
-import type { MoviePagination } from "@/types";
+import type { Movie, Pagination } from "@/types";
 
 // -- Mocks --
 
@@ -60,7 +60,7 @@ vi.mock("vue-i18n", () => ({
 
 // -- Helpers --
 
-const emptyPagination: MoviePagination = {
+const emptyPagination: Pagination<Movie> = {
   results: [],
   total_pages: 1,
   current_page: 1,

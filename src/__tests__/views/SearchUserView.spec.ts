@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { mount, flushPromises } from "@vue/test-utils";
 import { userSearching } from "@/repositories/userRepository";
 import SearchUsersView from "@/views/SearchUsersView.vue";
-import type { UserPagination } from "@/types";
+import type { Pagination, User } from "@/types";
 
 // -- Mocks --
 
@@ -51,7 +51,7 @@ vi.mock("vue-router", async (importOriginal) => {
 
 const mockToastAdd = vi.fn();
 
-const emptyPagination: UserPagination = {
+const emptyPagination: Pagination<User> = {
   results: [],
   total_pages: 1,
   current_page: 1,

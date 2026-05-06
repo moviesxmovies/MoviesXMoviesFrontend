@@ -1,7 +1,7 @@
 import { mount, flushPromises } from "@vue/test-utils";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import CelebrityView from "@/views/CelebrityView.vue"; // adjust path as needed
-import type { MoviePagination, Person } from "@/types";
+import type { Movie, Pagination, Person } from "@/types";
 import { useLangStore } from "@/stores/langStore";
 
 // ── Repository mocks ─────────────────────────────────────────────────────────
@@ -88,14 +88,14 @@ const makePerson = (overrides: Partial<Person> = {}): Person =>
     ...overrides,
   }) as unknown as Person;
 
-const makeMoviePagination = (count = 2): MoviePagination =>
+const makeMoviePagination = (count = 2): Pagination<Movie> =>
   ({
     results: Array.from({ length: count }, (_, i) => ({
       id: i + 1,
       title: `Movie ${i + 1}`,
     })),
     next_last_id: null,
-  }) as unknown as MoviePagination;
+  }) as unknown as Pagination<Movie>;
 
 // ── Mount helper ─────────────────────────────────────────────────────────────
 const mountView = () =>
@@ -340,7 +340,7 @@ describe("CelebrityView", () => {
           type: "acted" | "directed",
           lastId?: number,
         ) => Promise<void>;
-        acted_movies: MoviePagination;
+        acted_movies: Pagination<Movie>;
       };
 
       await vm.fetchFilmography("acted", 1);
