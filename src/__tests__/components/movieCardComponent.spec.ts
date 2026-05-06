@@ -3,9 +3,9 @@ import MovieCardComponent from "@/components/movieCardComponent.vue";
 import type { Movie } from "@/types/movie";
 import { describe, expect, it } from "vitest";
 
-function mountComponent(movie: Movie) {
+function mountComponent(movie: Movie, loading: boolean) {
   return mount(MovieCardComponent, {
-    props: { movie },
+    props: { movie, loading },
   });
 }
 
@@ -26,7 +26,18 @@ const sampleMovie: Movie = {
 
 describe("MovieCardComponent rendering", () => {
   it("component accepts props", () => {
-    const wrapper = mountComponent(sampleMovie);
+    const wrapper = mountComponent(sampleMovie, false);
     expect(wrapper.props().movie).toEqual(sampleMovie);
+    expect(wrapper.props().loading).toEqual(false);
+  });
+
+  it("shows skeleton when loading is true", () => {
+    const wrapper = mountComponent(sampleMovie, true);
+    expect(wrapper.find(".skeleton").exists()).toBe(true);
+  });
+
+  it("shows movie title when loading is false", () => {
+    const wrapper = mountComponent(sampleMovie, false);
+    expect(wrapper.find(".movie-title").text()).toBe(sampleMovie.title);
   });
 });
