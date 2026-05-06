@@ -6,7 +6,7 @@ import type { Pagination, User } from "@/types";
 
 // -- Mocks --
 
-vi.mock("@/components/friendComponent.vue", () => ({
+vi.mock("@/components/friendWithFollow.vue", () => ({
   default: {
     template: '<div data-testid="friend-component" />',
     props: ["username"],
