@@ -5,6 +5,7 @@ import {
   addMovieToList,
   removeMovieFromList,
   createList,
+  listSearching,
 } from "@/repositories/listRepository";
 
 // ── Mocks ────────────────────────────────────────────────────────────────────
@@ -40,11 +41,13 @@ describe("ListRepository", () => {
     it("calls API with correct user slug and returns data", async () => {
       const userSlug = "user-123";
       const mockLists = [{ id: 1, name: "Favorites" }];
-      mockGet.mockResolvedValueOnce({ data: mockLists});
+      mockGet.mockResolvedValueOnce({ data: mockLists });
 
       const result = await fetchUserLists(userSlug);
 
-      expect(mockGet).toHaveBeenCalledWith(`/movies-lists/${userSlug}/`, { params: { last_id: undefined, limit: 6 } });
+      expect(mockGet).toHaveBeenCalledWith(`/movies-lists/${userSlug}/`, {
+        params: { last_id: undefined, limit: 6 },
+      });
       expect(result).toEqual(mockLists);
     });
 
@@ -151,6 +154,26 @@ describe("ListRepository", () => {
       const networkError = new Error("Network error");
       mockPost.mockRejectedValueOnce(networkError);
       await expect(createList({} as any)).rejects.toThrow("Network error");
+    });
+  });
+
+  // ── listSearching ────────────────────────────────────────────────────────────
+  describe("listSearching", () => {
+    it("calls GET with constructed path", async () => {
+      const mockLists = [{ id: 1, name: "action-movies" }];
+      mockGet.mockResolvedValueOnce({ data: mockLists });
+      const result = await listSearching("action");
+
+      expect(mockGet).toHaveBeenCalledWith("/movies-lists/searching/", {
+        params: { query: "action", page: undefined, limit: undefined },
+      });
+      expect(result).toEqual(mockLists);
+    });
+
+    it("throws error when listSearching fails", async () => {
+      const networkError = new Error("Network error");
+      mockGet.mockRejectedValueOnce(networkError);
+      await expect(listSearching("action")).rejects.toThrow("Network error");
     });
   });
 });
