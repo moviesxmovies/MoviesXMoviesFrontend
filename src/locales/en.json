@@ -174,7 +174,8 @@
     "step2": "Rate movies clicking on the stars",
     "step3": "Add new movies to your lists",
     "step4": "Mark movies as  unseen",
-    "step5": "You want speed? Swipe left or right to rate movies and up or down to add them to your lists or mark them as unseen",
+    "step5": "Click on the info button to see more details about the movie",
+    "step6": "You want speed? Swipe left or right to rate movies and up or down to add them to your lists or mark them as unseen",
     "finish": "Get Started",
     "continue": "Continue",
     "skip": "Skip",
@@ -182,7 +183,8 @@
     "step2Label": "Rate",
     "step3Label": "Add",
     "step4Label": "Unseen",
-    "step5Label": "Swipe",
+    "step5Label": "Info",
+    "step6Label": "Swipe",
     "hint": "You can skip this at any time"
   },
   "verify": {

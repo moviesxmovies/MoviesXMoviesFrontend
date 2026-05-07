@@ -7,9 +7,7 @@ const props = defineProps<{
 
 <template>
   <div class="flex justify-center">
-    <div
-      class="action-bar inline-flex w-full max-w-sm overflow-hidden rounded-b-2xl"
-    >
+    <div class="action-bar inline-flex w-full max-w-sm overflow-hidden rounded-2xl">
       <button
         id="more-info"
         :disabled="loading"
@@ -21,21 +19,16 @@ const props = defineProps<{
       >
         <i class="pi pi-info-circle" />
       </button>
-
       <button
         id="unseen-button"
         :disabled="loading"
-        :class="[
-          'action-btn neutral-btn bg-gray-600',
-          { 'opacity-40 pointer-events-none': loading },
-        ]"
+        :class="['action-btn neutral-btn', { 'opacity-40 pointer-events-none': loading }]"
         @mousedown.stop
         @touchstart.stop
         @click.stop="emit('markAsNotSeen')"
       >
         <i class="pi pi-eye-slash" />
       </button>
-
       <button
         id="add-to-list-button"
         :disabled="loading"
@@ -53,21 +46,26 @@ const props = defineProps<{
 <style scoped>
 .action-bar {
   border: 1px solid var(--secondary);
+  border-radius: 0 0 1.5rem 1.5rem;
+  background: var(--background);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
 .action-btn {
   flex: 1;
-  height: 3.25rem;
+  height: 3rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
-  transition:
-    filter 0.15s ease,
-    transform 0.1s ease;
-  font-size: 1.2rem;
-  color: white;
+  border: none;
+  border-right: 1px solid var(--secondary);
+  background: transparent;
+  color: var(--text);
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: background 0.2s, color 0.2s, transform 0.1s;
 }
 
 .action-btn:last-child {
@@ -75,7 +73,7 @@ const props = defineProps<{
 }
 
 .action-btn:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
 }
 
 .action-btn:disabled {
@@ -84,23 +82,33 @@ const props = defineProps<{
 }
 
 .accent-btn {
-  background: var(--accent);
-}
-.accent-btn:hover {
-  filter: brightness(1.15);
+  color: var(--accent);
 }
 
-.neutral-btn:hover {
-  filter: brightness(1.1);
+.accent-btn:hover,#more-info.animate-boarding {
+  background: var(--accent);
+  color: var(--background);
+}
+
+.neutral-btn {
+  color: var(--text);
+}
+
+.neutral-btn:hover,#unseen-button.animate-boarding {
+  background: var(--secondary);
+  color: var(--text);
 }
 
 .primary-btn {
-  background: var(--primary);
-}
-.primary-btn:hover {
-  filter: brightness(1.15);
+  color: var(--primary);
 }
 
+.primary-btn:hover,#add-to-list-button.animate-boarding {
+  background: var(--primary);
+  color: var(--background);
+}
+
+/* Boarding animation */
 #more-info.animate-boarding,
 #unseen-button.animate-boarding,
 #add-to-list-button.animate-boarding {
@@ -109,6 +117,7 @@ const props = defineProps<{
   animation: button-cinematic-pop 1.5s infinite;
   border-color: white !important;
 }
+
 
 @keyframes button-cinematic-pop {
   0% {
