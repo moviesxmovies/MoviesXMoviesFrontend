@@ -5,6 +5,8 @@
     "markAsNotSeen": "Mark as not seen",
     "rateNStars": "Rate {n} stars"
   },
+  "cancel": "Cancel",
+  "remove": "Remove",
   "next": "Next",
   "back": "Back",
   "loading": "Loading...",
@@ -387,6 +389,8 @@
     "getListError": "Error fetching list details. Please try again later.",
     "createdBy": "Created by",
     "moviesCount": "{count} movie | {count} movies",
-    "updated": "Last updated {0}"
+    "updated": "Last updated {0}",
+    "confirmation": "Remove movie from list",
+    "confirmRemoveMovie": "Are you sure you want to remove \"{0}\" from the list?"
   }
 }

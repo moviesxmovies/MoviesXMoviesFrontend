@@ -103,12 +103,12 @@ const removeMovieModal = async (slug: string) => {
     header: t("list.confirmation"),
     icon: "pi pi-exclamation-triangle",
     rejectProps: {
-      label: t("actions.cancel"),
+      label: t("cancel"),
       severity: "secondary",
       outlined: true,
     },
     acceptProps: {
-      label: t("actions.remove"),
+      label: t("remove"),
     },
     accept: () => {
       removeMovie(slug);
@@ -439,7 +439,19 @@ watch(
   border-radius: 1.25rem;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(12px);
-  max-width: 450px;
+  max-width: 300px;
+}
+
+@media (min-width: 640px) {
+  :deep(.p-confirmdialog) {
+    max-width: 450px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :deep(.p-confirmdialog) {
+    max-width: 600px;
+  }
 }
 
 /* Dialog Header */
