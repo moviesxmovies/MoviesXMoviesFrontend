@@ -7,7 +7,7 @@ import "primeflex/themes/primeone-light.css";
 import "primeicons/primeicons.css";
 import i18n from "./i18n";
 import App from "./App.vue";
-import { ToastService } from "primevue";
+import { ConfirmationService, ToastService } from "primevue";
 import MyPreset from "./primeVueStyles";
 import { useLangStore } from "./stores/langStore";
 import { useThemeStore } from "./stores/themeStore";
@@ -28,6 +28,7 @@ const pinia = createPinia();
 app.use(pinia);
 app.use(router);
 app.use(ToastService);
+app.use(ConfirmationService);
 
 const langStore = useLangStore(pinia);
 const themeStore = useThemeStore(pinia);

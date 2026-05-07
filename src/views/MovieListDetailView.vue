@@ -6,6 +6,7 @@ import { useDate } from "@/composables/useDate";
 import {
   getMovieList,
   movieSearchingInList,
+  removeMovieFromList,
 } from "@/repositories/listRepository";
 import {
   type Pagination,
@@ -13,7 +14,7 @@ import {
   type MovieList,
   type User,
 } from "@/types";
-import { Skeleton, useToast } from "primevue";
+import { ConfirmDialog, Skeleton, useConfirm, useToast } from "primevue";
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
@@ -21,6 +22,7 @@ import { useRoute, useRouter } from "vue-router";
 const router = useRouter();
 const route = useRoute();
 const toast = useToast();
+const confirm = useConfirm();
 const { t } = useI18n();
 const search = ref("");
 const movieList = ref<MovieList>({} as MovieList);
@@ -93,6 +95,47 @@ const updateRoute = (page: number) => {
       page,
     },
   });
+};
+
+const removeMovieModal = async (slug: string) => {
+  confirm.require({
+    message: t("list.confirmRemoveMovie", [slug]),
+    header: t("list.confirmation"),
+    icon: "pi pi-exclamation-triangle",
+    rejectProps: {
+      label: t("actions.cancel"),
+      severity: "secondary",
+      outlined: true,
+    },
+    acceptProps: {
+      label: t("actions.remove"),
+    },
+    accept: () => {
+      removeMovie(slug);
+    },
+  });
+};
+
+const removeMovie = async (slug: string) => {
+  try {
+    await removeMovieFromList(
+      route.params.user as string,
+      route.params.slug as string,
+      slug,
+    );
+    toast.add({
+      severity: "success",
+      summary: t("toast.success"),
+      detail: t("list.movieRemoved"),
+    });
+    fetchMovies(movies.value.current_page);
+  } catch (error: any) {
+    toast.add({
+      severity: "error",
+      summary: t("toast.error"),
+      detail: error.response?.data?.message || t("list.removeMovieError"),
+    });
+  }
 };
 
 watch(
@@ -189,12 +232,15 @@ watch(
       </div>
 
       <div class="movies-grid">
+        <ConfirmDialog />
         <MovieCardComponent
           v-for="movie in movies.results"
           :key="movie.id"
           :movie="movie"
           :loading="loading"
+          :delete="true"
           data-testid="movie-card"
+          @remove-movie="removeMovieModal"
         />
       </div>
 

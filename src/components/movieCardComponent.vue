@@ -2,6 +2,9 @@
 import type { Movie } from "@/types";
 import { goToMovie } from "@/utils/goTo";
 import { Skeleton } from "primevue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   loading?: boolean;
@@ -10,7 +13,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "delete"): void;
+  (e: "removeMovie", slug: string): void;
 }>();
 </script>
 
@@ -28,7 +31,7 @@ const emit = defineEmits<{
       <button
         v-if="delete"
         class="delete-btn"
-        @click.stop="emit('delete')"
+        @click.stop="emit('removeMovie', movie.slug)"
         :aria-label="$t('actions.delete')"
       >
         <i class="pi pi-trash" />
