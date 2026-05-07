@@ -217,7 +217,7 @@ watch(
               <div class="stat">
                 <i class="pi pi-video" />
                 <span>
-                  {{ t("list.moviesCount", movieList.movies.length) }}</span
+                  {{ t("list.moviesCount", movieList.movies?.length || 1) }}</span
                 >
               </div>
               <div class="stat">
