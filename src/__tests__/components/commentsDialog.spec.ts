@@ -25,6 +25,7 @@ vi.mock('primevue', () => ({
             </div>`,
     }),
     Skeleton: defineComponent({ template: '<div class="skeleton" />' }),
+    ProgressSpinner: defineComponent({ template: '<div class="progress-spinner" />' }),
     useToast: vi.fn(() => ({ add: vi.fn() })),
 }));
 
@@ -42,7 +43,7 @@ vi.mock('@/components/commentComponent.vue', () => ({
 
 import { fetchComments, postComment, replyComment } from '@/repositories/reviewRepository';
 import { useToast } from 'primevue';
-import CommentsDialog from '@/components/commentsDialog.vue'; 
+import CommentsDialog from '@/components/commentsDialog.vue';
 import CommentComponent from '@/components/commentComponent.vue';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

@@ -177,6 +177,14 @@ watch(loading, async (newVal) => {
                     <button class="action-btn action-btn--comment" @click="commentModalVisible = true">
                         <i class="pi pi-comment" />
                     </button>
+                    <div v-if="isSelf" class="review-actions">
+                        <button class="action-btn action-btn--edit" @click="editModalVisible = true">
+                            <i class="pi pi-pencil" />
+                        </button>
+                        <button class="action-btn action-btn--delete" @click="confirmDelete">
+                            <i class="pi pi-trash" />
+                        </button>
+                    </div>
                 </div>
                 <div class="review-body">
                     <div class="review-header">
@@ -184,14 +192,7 @@ watch(loading, async (newVal) => {
                             <span class="movie-name" @click="goToMovie(movie?.slug)">{{ movie?.title }}</span>
                             <span class="review-date">{{ formatRelativeTime(review.created_at) }}</span>
                         </div>
-                        <div class="review-header-right">
-                            <RouterLink v-if="user" :to="`/users/${user.username}`" class="user-avatar-link">
-                                <img class="user-avatar" :src="user.picture" :alt="user.username" />
-                            </RouterLink>
-                            <span class="badge" :class="review.is_positive ? 'badge-positive' : 'badge-negative'">
-                                <i :class="review.is_positive ? 'pi pi-thumbs-up' : 'pi pi-thumbs-down'" />
-                            </span>
-                        </div>
+
                     </div>
                     <h3 class="review-title">{{ review.title }}</h3>
                     <div :class="{ expanded: isExpanded, 'review-content-wrapper': isLongContent }">
@@ -201,14 +202,13 @@ watch(loading, async (newVal) => {
                         {{ isExpanded ? t('common.seeLess') : t('common.seeMore') }}
                     </button>
                 </div>
-
-                <div v-if="isSelf" class="review-actions">
-                    <button class="action-btn action-btn--edit" @click="editModalVisible = true">
-                        <i class="pi pi-pencil" />
-                    </button>
-                    <button class="action-btn action-btn--delete" @click="confirmDelete">
-                        <i class="pi pi-trash" />
-                    </button>
+                <div class="review-header-right">
+                    <RouterLink v-if="user" :to="`/users/${user.username}`" class="user-avatar-link">
+                        <img class="user-avatar" :src="user.picture" :alt="user.username" />
+                    </RouterLink>
+                    <span class="badge" :class="review.is_positive ? 'badge-positive' : 'badge-negative'">
+                        <i :class="review.is_positive ? 'pi pi-thumbs-up' : 'pi pi-thumbs-down'" />
+                    </span>
                 </div>
             </div>
 
@@ -303,18 +303,16 @@ watch(loading, async (newVal) => {
 /* RIGHT COLUMN */
 .review-header-right {
     display: flex;
-    flex-direction: row;
-    align-items: center;
+    flex-direction: column;
     gap: 0.5rem;
+    align-self: flex-start;
     flex-shrink: 0;
 }
 
+
 .review-actions {
     display: flex;
-    flex-direction: column;
     gap: 0.3rem;
-    align-self: flex-start;
-    flex-shrink: 0;
 }
 
 
@@ -670,9 +668,9 @@ watch(loading, async (newVal) => {
     overflow-x: auto;
     margin: 1rem 0;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    display: block;         
-    width: 0;               
-    min-width: 100%;       
+    display: block;
+    width: 0;
+    min-width: 100%;
     box-sizing: border-box;
     line-height: 1.4;
 }

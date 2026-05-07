@@ -2,7 +2,7 @@
 import { useInfinitePagination } from '@/composables/useInfinitePagination';
 import { fetchComments, postComment, replyComment } from '@/repositories/reviewRepository';
 import type { Comment, DynamicPagination } from '@/types';
-import { Dialog, Skeleton, useToast } from 'primevue';
+import { Dialog, useToast, ProgressSpinner } from 'primevue';
 import { ref, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import CommentComponent from './commentComponent.vue';
@@ -11,7 +11,8 @@ const props = defineProps<{ visible: boolean; reviewId: number }>();
 const emit = defineEmits<{ 'update:visible': [value: boolean] }>();
 
 const commentsResponse = ref<DynamicPagination<Comment>>({} as DynamicPagination<Comment>);
-const loading = ref(false);
+const initialLoading = ref(false);
+const progressiveLoading = ref(false);
 const sending = ref(false);
 const newComment = ref('');
 const replyingTo = ref<{ comment: Comment; username: string } | null>(null);
@@ -24,7 +25,10 @@ const { t } = useI18n();
 const toast = useToast();
 
 const getComments = async (lastId?: number) => {
-    loading.value = true;
+    console.log('Fetching comments', { lastId });
+    if (lastId) progressiveLoading.value = true;
+    else
+        initialLoading.value = true;
     try {
         const response = await fetchComments(props.reviewId, lastId);
         if (lastId) {
@@ -41,11 +45,12 @@ const getComments = async (lastId?: number) => {
             life: 3000,
         });
     } finally {
-        loading.value = false;
+        initialLoading.value = false;
+        progressiveLoading.value = false;
     }
 };
 
-const { sentinelRef } = useInfinitePagination(commentsResponse, loading, getComments);
+const { sentinelRef } = useInfinitePagination(commentsResponse, progressiveLoading, getComments);
 
 const scrollToReplyingTo = async () => {
     if (!replyingTo.value) return;
@@ -142,36 +147,23 @@ watch(() => props.visible, (val) => {
 
         <!-- SCROLL AREA -->
         <div class="scroll-area" ref="scrollAreaRef">
-            <div v-if="!loading && !commentsResponse.results?.length" class="empty-state">
+            <div v-if="!initialLoading && !commentsResponse.results?.length" class="empty-state">
                 <i class="pi pi-comment empty-icon" />
                 <p>{{ $t('commentsDialog.empty') }}</p>
             </div>
 
             <template v-else>
-                <CommentComponent
-                    v-for="comment in commentsResponse.results"
-                    :key="comment.id"
-                    :comment="comment"
-                    :review-id="props.reviewId"
-                    :highlight-target="highlightTarget"
+                <CommentComponent v-for="comment in commentsResponse.results" :key="comment.id" :comment="comment"
+                    :review-id="props.reviewId" :highlight-target="highlightTarget"
                     :force-open-replies-id="forceOpenRepliesId"
-                    @reply="(c, username) => replyingTo = { comment: c, username }"
-                />
+                    @reply="(c, username) => replyingTo = { comment: c, username }" />
             </template>
 
-            <div v-if="loading" v-for="i in 3" :key="i" class="comment">
-                <div class="comment-avatar-col">
-                    <Skeleton shape="circle" width="2rem" height="2rem" />
-                    <div class="comment-thread-line" />
-                </div>
-                <div class="comment-body">
-                    <div class="comment-header">
-                        <Skeleton width="80px" height="10px" border-radius="4px" />
-                        <Skeleton width="50px" height="10px" border-radius="4px" />
-                    </div>
-                    <Skeleton width="100%" height="36px" border-radius="0.75rem" style="margin-top: 0.15rem" />
-                    <Skeleton width="60px" height="10px" border-radius="4px" style="margin-top: 0.1rem" />
-                </div>
+            <div v-if="initialLoading" class="loading-container">
+                <ProgressSpinner class="app-spinner" style="width: 40px; height: 40px" strokeWidth="4" animationDuration=".8s" />
+            </div>
+            <div v-if="progressiveLoading" class="loading-progressive-container">
+                <ProgressSpinner class="app-spinner" style="width: 40px; height: 40px" strokeWidth="4" animationDuration=".8s" />
             </div>
 
             <div ref="sentinelRef" class="sentinel" />
@@ -315,13 +307,19 @@ watch(() => props.visible, (val) => {
     scrollbar-color: color-mix(in srgb, var(--secondary) 40%, transparent) transparent;
 }
 
-.scroll-area::-webkit-scrollbar { width: 4px; }
+.scroll-area::-webkit-scrollbar {
+    width: 4px;
+}
+
 .scroll-area::-webkit-scrollbar-thumb {
     background: color-mix(in srgb, var(--secondary) 40%, transparent);
     border-radius: 999px;
 }
 
-.sentinel { height: 1px; flex-shrink: 0; }
+.sentinel {
+    height: 1px;
+    flex-shrink: 0;
+}
 
 .empty-state {
     display: flex;
@@ -335,8 +333,14 @@ watch(() => props.visible, (val) => {
     opacity: 0.6;
 }
 
-.empty-icon { font-size: 2rem; }
-.empty-state p { font-size: 0.85rem; margin: 0; }
+.empty-icon {
+    font-size: 2rem;
+}
+
+.empty-state p {
+    font-size: 0.85rem;
+    margin: 0;
+}
 
 .input-area {
     border-top: 1px solid color-mix(in srgb, var(--secondary) 40%, transparent);
@@ -424,8 +428,13 @@ watch(() => props.visible, (val) => {
     transition: border-color 0.2s;
 }
 
-.comment-input:focus { border-color: var(--primary); }
-.comment-input:disabled { opacity: 0.5; }
+.comment-input:focus {
+    border-color: var(--primary);
+}
+
+.comment-input:disabled {
+    opacity: 0.5;
+}
 
 .send-btn {
     display: flex;
@@ -443,13 +452,26 @@ watch(() => props.visible, (val) => {
     transition: opacity 0.2s, transform 0.15s;
 }
 
-.send-btn:hover:not(:disabled) { opacity: 0.85; transform: scale(1.05); }
-.send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.send-btn:hover:not(:disabled) {
+    opacity: 0.85;
+    transform: scale(1.05);
+}
+
+.send-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
 
 .slide-down-enter-active,
-.slide-down-leave-active { transition: all 0.2s ease; }
+.slide-down-leave-active {
+    transition: all 0.2s ease;
+}
+
 .slide-down-enter-from,
-.slide-down-leave-to { opacity: 0; transform: translateY(-6px); }
+.slide-down-leave-to {
+    opacity: 0;
+    transform: translateY(-6px);
+}
 </style>
 <style>
 .comments-root {
@@ -459,11 +481,45 @@ watch(() => props.visible, (val) => {
     background: var(--background) !important;
     overflow: hidden !important;
 }
+
 .comments-header {
     background: var(--background) !important;
     border-bottom: 1px solid color-mix(in srgb, var(--secondary) 50%, transparent) !important;
 }
-.comments-content { background: var(--background) !important; padding: 0 !important; }
-.comments-close-btn { border-radius: 50% !important; }
-.comments-close-btn:hover { background: color-mix(in srgb, var(--secondary) 20%, transparent) !important; }
+
+.comments-content {
+    background: var(--background) !important;
+    padding: 0 !important;
+}
+
+.comments-close-btn {
+    border-radius: 50% !important;
+}
+
+.comments-close-btn:hover {
+    background: color-mix(in srgb, var(--secondary) 20%, transparent) !important;
+}
+
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    padding: 2rem 0;
+}
+
+.loading-progressive-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 1rem 0;
+}
+.app-spinner :deep(.p-progressspinner-circle) {
+    stroke: var(--primary);
+    stroke-linecap: round;
+}
+
+.app-spinner {
+    opacity: 0.9;
+}
 </style>

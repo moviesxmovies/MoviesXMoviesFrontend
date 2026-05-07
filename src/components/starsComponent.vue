@@ -59,7 +59,7 @@ const rateMovie = async (rating: number) => {
       v-for="i in 5"
       :key="i"
       :class="[
-        'text-5xl mx-2 transition-all duration-200 star-icon',
+        'text-5xl mx-2 transition-all duration-200 star-icon z-1000',
         !loading ? 'cursor-pointer' : 'cursor-default',
         i <= focusedRating
           ? 'pi pi-star-fill text-[var(--yellow)] focused-rating'
@@ -68,6 +68,7 @@ const rateMovie = async (rating: number) => {
       @mouseenter="!loading && handleMouseEnter(i)"
       @touchstart="!loading && handleMouseEnter(i)"
       @click="!loading && rateMovie(i)"
+      :aria-label="$t('actions.rateNStars', { n: i })"
     />
   </div>
 </template>

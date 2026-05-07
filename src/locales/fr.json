@@ -1,28 +1,30 @@
 {
   "shortcuts": {
-    "alternateInfo": "Afficher/Masquer infos",
-    "addToList": "Ajouter à la liste",
+    "alternateInfo": "Afficher/masquer les infos",
+    "addToList": "Ajouter à une liste",
     "markAsNotSeen": "Marquer comme non vu",
     "rateNStars": "Noter {n} étoiles"
   },
+  "cancel": "Annuler",
+  "remove": "Supprimer",
   "next": "Suivant",
   "back": "Retour",
   "loading": "Chargement...",
   "toast": {
     "success": "Opération réussie",
-    "error": "Une erreur est survenue"
+    "error": "Une erreur s'est produite"
   },
   "components": {
-    "selectLanguage": "Choisir une langue",
+    "selectLanguage": "Sélectionner une langue",
     "oauthButton": "Se connecter avec {0}",
     "changeTheme": "Changer le thème",
     "form": {
-      "requiredUsername": "Nom d'utilisateur requis",
-      "requiredPassword": "Mot de passe requis",
-      "submit": "Connexion"
+      "requiredUsername": "Le nom d'utilisateur est requis",
+      "requiredPassword": "Le mot de passe est requis",
+      "submit": "Se connecter"
     },
     "movieInfoDrawer": {
-      "fetchActorsError": "Erreur lors de la récupération des acteurs",
+      "fetchActorsError": "Erreur lors du chargement des acteurs",
       "synopsis": "Synopsis",
       "platforms": "Plateforme | Plateformes",
       "genres": "Genre | Genres",
@@ -31,30 +33,30 @@
     },
     "filmography": {
       "no_movies": "Aucun film trouvé",
-      "no_movies_description": "La filmographie de cette célébrité est vide ou en cours de mise à jour."
+      "no_movies_description": "La filmographie de cette personnalité est vide ou en attente de mise à jour."
     },
     "navbar": {
-      "logout": "Déconnexion",
-      "profile": "Mon Profil"
+      "logout": "Se déconnecter",
+      "profile": "Mon profil"
     },
     "movieList": {
       "moviesCount": "{count} film | {count} films"
     },
     "lists": {
-      "public": "Public",
-      "private": "Privé",
+      "public": "Publique",
+      "private": "Privée",
       "friends": "Amis",
       "noLists": "Vous n'avez pas encore de listes. Commencez à ajouter des films pour les voir ici.",
-      "noListDesc": "Vos listes apparaîtront ici une fois créées. Vous pouvez les organiser pour vos favoris, les partager ou les garder privées."
+      "noListDesc": "Vos listes apparaîtront ici une fois créées. Vous pouvez les organiser, les partager avec des amis ou les garder privées."
     },
     "addToList": {
       "success": "'{0}' ajouté à {1} avec succès",
       "error": "Erreur lors de l'ajout de '{0}' à '{1}'",
       "removeFromListSuccess": "'{0}' retiré de '{1}' avec succès",
-      "removeFromListError": "Erreur lors du retrait de '{0}' de '{1}'",
-      "fetchListsError": "Erreur lors de la récupération des listes",
-      "checkMovieInListsError": "Erreur lors de la recherche dans les listes",
-      "title": "Ajouter à la liste",
+      "removeFromListError": "Erreur lors de la suppression de '{0}' de '{1}'",
+      "fetchListsError": "Erreur lors du chargement des listes",
+      "checkMovieInListsError": "Erreur lors de la recherche des relations de listes",
+      "title": "Ajouter à une liste",
       "description": "Ajouter '{0}' à une liste",
       "createList": "Créer une nouvelle liste"
     },
@@ -62,32 +64,38 @@
       "error": "Erreur lors de la création de la liste",
       "description": "Créer une nouvelle liste",
       "formName": "Nom",
-      "formDescription": "Description"
+      "formDescription": "Description",
+      "header": "Créer une liste",
+      "submit": "Créer",
+      "cancel": "Annuler"
     },
     "searchGenres": {
       "genres": "Genres",
-      "getGenresError": "Erreur lors de l'obtention des genres"
+      "getGenresError": "Erreur lors du chargement des genres"
     },
     "searchPlatforms": {
       "platforms": "Plateformes",
-      "getPlatformsError": "Erreur lors de l'obtention des plateformes"
+      "getPlatformsError": "Erreur lors du chargement des plateformes"
     },
     "filter": {
       "genres": "Filtrer par genre",
       "platforms": "Filtrer par plateforme",
-      "stars": "Filtrer par étoiles"
+      "stars": "Filtrer par étoiles",
+      "preferences": "Préférences",
+      "unseen": "Afficher uniquement les films non vus",
+      "reviewed": "Afficher uniquement les films notés"
     }
   },
   "signup": {
     "toast": {
       "success": "Votre compte a été créé",
-      "failed": "Échec de l'inscription"
+      "failed": "L'inscription a échoué"
     },
     "step1": {
       "subtitle": "Créez votre compte pour commencer à partager vos films préférés."
     },
     "step2": {
-      "title": "Créez votre profil",
+      "title": "Créer votre profil",
       "subtitle": "Configurez votre profil.",
       "image": "Photo de profil"
     },
@@ -99,24 +107,24 @@
     "or": "ou continuer avec",
     "password": "Mot de passe",
     "confirmPassword": "Confirmer le mot de passe",
-    "login": "Déjà un compte ? Connectez-vous ici"
+    "login": "Vous avez déjà un compte ? Connectez-vous ici"
   },
   "login": {
     "toast": {
       "success": "Session démarrée"
     },
-    "title": "Connexion",
+    "title": "Se connecter",
     "subtitle": "Entrez vos identifiants pour vous connecter.",
     "username": "Nom d'utilisateur",
     "password": "Mot de passe",
-    "noAccount": "Pas de compte ?",
+    "noAccount": "Vous n'avez pas de compte ?",
     "signup": "Inscrivez-vous ici",
     "forgotPassword": "Mot de passe oublié ?"
   },
   "notFound": {
-    "title": "404 - Introuvable",
+    "title": "404 - Non trouvé",
     "description": "La page que vous recherchez n'existe pas.",
-    "linkText": "Retour à l'accueil"
+    "linkText": "Retourner à l'accueil"
   },
   "oauth": {
     "toast": {
@@ -128,45 +136,46 @@
   },
   "forgotPassword": {
     "toast": {
-      "error": "Échec de l'envoi de l'e-mail de réinitialisation."
+      "error": "Impossible d'envoyer l'e-mail de réinitialisation. Veuillez réessayer."
     },
     "title": "Mot de passe oublié",
-    "description": "Entrez votre e-mail et nous vous enverrons un lien de réinitialisation.",
+    "description": "Entrez votre adresse e-mail et nous vous enverrons un lien pour réinitialiser votre mot de passe.",
     "resetPassword": "Réinitialiser le mot de passe",
-    "rememberPassword": "Mot de passe retrouvé ? Connexion",
+    "rememberPassword": "Vous vous souvenez de votre mot de passe ? Connectez-vous ici",
     "backToLogin": "Retour à la connexion"
   },
   "resetPassword": {
     "toast": {
-      "error": "Échec de la réinitialisation du mot de passe."
+      "error": "Impossible de réinitialiser le mot de passe. Veuillez réessayer."
     },
     "title": "Réinitialiser le mot de passe",
     "description": "Entrez votre nouveau mot de passe ci-dessous.",
     "newPassword": "Nouveau mot de passe",
     "confirmNewPassword": "Confirmer le nouveau mot de passe",
-    "submit": "Réinitialiser"
+    "submit": "Réinitialiser le mot de passe"
   },
   "home": {
     "welcome": "Bienvenue sur MoviesXMovies !",
-    "login": "Connexion",
+    "login": "Se connecter",
     "emailPlaceholder": "Entrez votre e-mail",
     "signupBtn": "S'inscrire",
     "orContinue": "ou continuer avec",
     "badge": "En ligne",
     "feature1": "Partagez vos films préférés",
-    "feature2": "Obtenez des recommandations",
+    "feature2": "Obtenez des recommandations de films",
     "feature3": "Créez vos propres listes de films.",
-    "fetchMoviesError": "Échec du chargement des films. Veuillez réessayer plus tard.",
-    "profile": "Mon Profil",
+    "fetchMoviesError": "Impossible de charger les films. Veuillez réessayer plus tard.",
+    "profile": "Mon profil",
     "shortcuts": "Raccourcis",
     "search": "Rechercher"
   },
   "onboarding": {
-    "step1": "Commençons par un tour rapide",
+    "step1": "Laissez-nous vous faire une visite rapide",
     "step2": "Notez les films en cliquant sur les étoiles",
-    "step3": "Ajoutez des films à vos listes",
+    "step3": "Ajoutez de nouveaux films à vos listes",
     "step4": "Marquez les films comme non vus",
-    "step5": "Besoin de rapidité ? Balayez pour noter, ajouter ou marquer comme non vu",
+    "step5": "Cliquez sur le bouton info pour voir plus de détails",
+    "step6": "Vous voulez aller vite ? Glissez gauche/droite pour noter et haut/bas pour ajouter ou marquer",
     "finish": "Commencer",
     "continue": "Continuer",
     "skip": "Passer",
@@ -174,46 +183,47 @@
     "step2Label": "Noter",
     "step3Label": "Ajouter",
     "step4Label": "Non vu",
-    "step5Label": "Balayer",
+    "step5Label": "Info",
+    "step6Label": "Glisser",
     "hint": "Vous pouvez passer ceci à tout moment"
   },
   "verify": {
     "toast": {
       "success": "E-mail vérifié avec succès",
-      "inocrrectLength": "Veuillez entrer le code à 6 chiffres.",
+      "inocrrectLength": "Veuillez entrer le code complet à 6 chiffres.",
       "invalidCode": "Code de vérification invalide",
-      "resendSuccess": "Code renvoyé sur votre e-mail",
-      "resendError": "Échec du renvoi du code."
+      "resendSuccess": "Code de vérification renvoyé à votre e-mail",
+      "resendError": "Impossible de renvoyer le code. Veuillez réessayer."
     },
     "title": "Vérifiez votre e-mail",
-    "description": "Nous avons envoyé un code à 6 chiffres à votre adresse e-mail.",
+    "description": "Nous vous avons envoyé un code à 6 chiffres à votre adresse e-mail.",
     "button": "VÉRIFIER LE CODE",
     "resend": "Renvoyer le code",
     "didntReceive": "Vous n'avez pas reçu le code ?"
   },
   "schema": {
     "username": {
-      "required": "Nom d'utilisateur requis",
+      "required": "Le nom d'utilisateur est requis",
       "maxLength": "Le nom d'utilisateur ne peut pas dépasser 15 caractères"
     },
     "firstName": {
-      "required": "Prénom requis"
+      "required": "Le prénom est requis"
     },
     "lastName": {
-      "required": "Nom requis"
+      "required": "Le nom est requis"
     },
     "email": {
-      "required": "E-mail requis",
+      "required": "L'e-mail est requis",
       "invalid": "Adresse e-mail invalide"
     },
     "password": {
-      "required": "Mot de passe requis",
+      "required": "Le mot de passe est requis",
       "minLength": "Au moins 10 caractères",
-      "upperCase": "Doit inclure une majuscule",
-      "number": "Doit inclure un chiffre"
+      "upperCase": "Le mot de passe doit contenir une majuscule",
+      "number": "Le mot de passe doit contenir un chiffre"
     },
     "confirmPassword": {
-      "required": "Veuillez confirmer le mot de passe",
+      "required": "Veuillez confirmer votre mot de passe",
       "mismatch": "Les mots de passe ne correspondent pas"
     },
     "checks": {
@@ -221,7 +231,7 @@
       "first_name": "prénom",
       "last_name": "nom",
       "email": "e-mail",
-      "samePasswordAs": "Le mot de passe ne peut pas être identique à votre {0}"
+      "samePasswordAs": "Le mot de passe ne peut pas être le même que votre {0}"
     },
     "forgotPasswordCode": {
       "required": "Le code de réinitialisation est requis"
@@ -234,14 +244,14 @@
     }
   },
   "checkEmail": {
-    "title": "Vérifiez vos e-mails",
-    "description": "Nous avons envoyé un code de réinitialisation. Entrez-le ci-dessous.",
+    "title": "Vérifiez votre e-mail",
+    "description": "Nous vous avons envoyé un code de réinitialisation. Entrez-le ci-dessous.",
     "button": "Aller à la connexion"
   },
   "celebrity": {
     "error": {
-      "fetchingProfile": "Erreur lors de la récupération des données.",
-      "fetchingMovies": "Erreur lors de la récupération des films."
+      "fetchingProfile": "Impossible de charger les données de cette personnalité.",
+      "fetchingMovies": "Impossible de charger les films de cette personnalité."
     },
     "birthday": "Date de naissance",
     "deathday": "Date de décès",
@@ -254,48 +264,135 @@
   },
   "search": {
     "searchPlaceholder": "Rechercher",
-    "loading": "Recherche de films...",
-    "noFilms": "Aucun film trouvé",
-    "help": "Essayez avec d'autres valeurs",
-    "searchMoviesError": "Erreur lors de la recherche",
-    "filters": "filtres"
+    "empty": "Aucun résultat trouvé",
+    "help": "Essayez d'autres termes",
+    "searchMoviesError": "Erreur lors de la recherche de films",
+    "searchUsersError": "Erreur lors de la recherche d'utilisateurs",
+    "searchMovieListsError": "Erreur lors de la recherche de listes",
+    "filters": "Filtres",
+    "movies": "Films",
+    "users": "Utilisateurs",
+    "lists": "Listes",
+    "actors": "Acteurs",
+    "directors": "Réalisateurs"
   },
   "user": {
     "editProfile": "Modifier",
     "editProfileTitle": "Modifier le profil",
-    "friendsRequests": "Demandes d'ami",
+    "friendsRequests": "Demandes d'amis",
     "friends": "Amis",
     "biography": "Biographie",
     "no_biography": "Aucune biographie disponible.",
-    "reviews": "Critiques",
-    "no_reviews": "Aucune critique disponible.",
-    "no_reviews_description": "Cet utilisateur n'a pas encore écrit de critique.",
+    "reviews": "Avis",
+    "no_user": "Aucun utilisateur trouvé",
+    "no_reviews": "Aucun avis disponible.",
+    "no_reviews_description": "Cet utilisateur n'a pas encore écrit d'avis.",
     "no_friends_requests": "Aucune demande",
-    "no_friends_requests_description": "Vous n'avez pas de demandes d'ami en attente",
+    "no_friends_requests_description": "Vous n'avez aucune demande d'ami en attente",
     "no_friends": "Aucun ami",
     "no_friends_description": "Cet utilisateur n'a pas encore d'amis.",
     "suggested_friends": "Amis suggérés",
     "no_suggested_friends": "Aucune suggestion",
-    "no_suggested_friends_description": "Nous n'avons pas trouvé de suggestions pour le moment",
+    "no_suggested_friends_description": "Nous n'avons pas trouvé de suggestions d'amis pour le moment",
     "movies_lists": "Listes de films",
-    "no_movies_lists": "Aucune liste",
-    "no_movies_lists_description": "Cet utilisateur n'a pas encore créé de liste.",
-    "logout": "Déconnexion",
-    "clickToChangePicture": "Cliquez pour changer la photo",
+    "no_movies_lists": "Aucune liste de films",
+    "no_movies_lists_description": "Cet utilisateur n'a pas encore créé de listes.",
+    "logout": "Se déconnecter",
+    "clickToChangePicture": "Cliquer pour changer la photo",
     "firstName": "Prénom",
     "lastName": "Nom",
     "username": "Nom d'utilisateur",
     "email": "E-mail",
     "bio": "Biographie",
     "newPassword": "Nouveau mot de passe",
-    "confirmPassword": "Confirmer le mot de passe",
-    "leaveBlankToKeep": "Laisser vide pour garder l'actuel",
+    "confirmPassword": "Confirmer le nouveau mot de passe",
+    "leaveBlankToKeep": "Laisser vide pour conserver le mot de passe actuel",
     "yourProfile": "Votre photo de profil",
-    "profileUpdated": "Profil mis à jour avec succès"
+    "profileUpdated": "Profil mis à jour avec succès",
+    "chooseMoviesListType": "Choisir le type de liste",
+    "createNormalList": "Liste normale",
+    "createIntelligentList": "Liste intelligente"
+  },
+  "movie": {
+    "synopsis": "Synopsis",
+    "platforms": "Plateforme | Plateformes",
+    "genres": "Genre | Genres",
+    "actors": "Acteur | Acteurs",
+    "directors": "Réalisateur | Réalisateurs",
+    "reviews": "Avis",
+    "no_reviews": "Aucun avis disponible",
+    "no_directors": "Aucun réalisateur disponible",
+    "no_actors": "Aucun acteur disponible",
+    "no_genres": "Aucun genre disponible",
+    "no_platforms": "Aucune plateforme disponible",
+    "no_synopsis": "Aucun synopsis disponible.",
+    "no_reviews_description": "Ce film n'a pas encore reçu d'avis.",
+    "no_directors_description": "Aucun réalisateur disponible pour ce film.",
+    "no_actors_description": "Aucun acteur disponible pour ce film.",
+    "no_genres_description": "Aucun genre disponible pour ce film.",
+    "no_platforms_description": "Aucune plateforme disponible pour ce film.",
+    "no_synopsis_description": "Aucun synopsis disponible pour ce film."
+  },
+  "review": {
+    "addReview": "Ajouter un avis",
+    "editReview": "Modifier l'avis",
+    "positive": "Positif",
+    "negative": "Négatif",
+    "title": "Titre",
+    "content": "Contenu",
+    "titlePlaceholder": "Un titre bref pour votre avis",
+    "contentPlaceholder": "Partagez votre opinion sur le film",
+    "sentiment": "Sentiment",
+    "deleteConfirmTitle": "Supprimer l'avis",
+    "deleteConfirmBody": "Êtes-vous sûr de vouloir supprimer cet avis ?",
+    "error": {
+      "titleRequired": "Le titre est requis",
+      "contentRequired": "Le contenu est requis"
+    },
+    "updated": "Avis mis à jour avec succès",
+    "submitted": "Avis créé avec succès",
+    "deleted": "Avis supprimé avec succès"
+  },
+  "commentsDialog": {
+    "title": "Commentaires",
+    "noComments": "Aucun commentaire disponible",
+    "noCommentsDescription": "Soyez le premier à commenter cet avis.",
+    "addComment": "Ajouter un commentaire",
+    "placeholder": "Écrivez votre commentaire ici...",
+    "submit": "Envoyer",
+    "error": {
+      "contentRequired": "Le contenu du commentaire est requis"
+    },
+    "commentAdded": "Commentaire ajouté avec succès",
+    "empty": "Aucun commentaire pour l'instant"
+  },
+  "comment": {
+    "reply": "Répondre",
+    "replyingTo": "En réponse à {0}",
+    "placeholder": "Écrivez votre commentaire ici...",
+    "hideReplies": "Masquer les réponses",
+    "showReplies": "Afficher les réponses",
+    "loadMoreReplies": "Charger plus de réponses"
   },
   "common": {
     "save": "Enregistrer",
     "cancel": "Annuler",
-    "reset": "Réinitialiser"
+    "reset": "Réinitialiser",
+    "submit": "Envoyer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "close": "Fermer",
+    "confirm": "Confirmer",
+    "seeMore": "Voir plus",
+    "seeLess": "Voir moins"
+  },
+  "list": {
+    "noDescription": "Cette liste n'a pas de description.",
+    "getListError": "Erreur lors du chargement des détails de la liste.",
+    "createdBy": "Créée par",
+    "moviesCount": "{count} film | {count} films",
+    "updated": "Dernière mise à jour {0}",
+    "confirmation": "Retirer le film de la liste",
+    "confirmRemoveMovie": "Êtes-vous sûr de vouloir retirer \"{0}\" de la liste ?"
   }
 }
