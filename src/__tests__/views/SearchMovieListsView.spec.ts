@@ -155,7 +155,7 @@ describe("SearchMovieListsView", () => {
 
       expect(mockToastAdd).toHaveBeenCalledWith(
         expect.objectContaining({
-          detail: "search.searchUsersError", // Fallback defined in your code
+          detail: "search.searchMovieListsError",
         })
       );
     });

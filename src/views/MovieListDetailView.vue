@@ -1,7 +1,12 @@
 <script lang="ts" setup>
+import MovieCardComponent from "@/components/movieCardComponent.vue";
+import PaginationComponent from "@/components/paginationComponent.vue";
 import { api } from "@/composables/useAPI";
 import { useDate } from "@/composables/useDate";
-import { getMovieList } from "@/repositories/listRepository";
+import {
+  getMovieList,
+  movieSearchingInList,
+} from "@/repositories/listRepository";
 import {
   type Pagination,
   type Movie,
@@ -17,6 +22,7 @@ const router = useRouter();
 const route = useRoute();
 const toast = useToast();
 const { t } = useI18n();
+const search = ref("");
 const movieList = ref<MovieList>({} as MovieList);
 const user = ref<User>({} as User);
 const movies = ref<Pagination<Movie>>({} as Pagination<Movie>);
@@ -34,7 +40,6 @@ const privacy = ref<{ icon: string; class: string } | undefined>(
 );
 
 const fetchMovieList = async () => {
-  loading.value = true;
   try {
     movieList.value = await getMovieList(
       route.params.user as string,
@@ -47,8 +52,6 @@ const fetchMovieList = async () => {
       summary: t("toast.error"),
       detail: error.response?.data?.message || t("list.getListError"),
     });
-  } finally {
-    loading.value = false;
   }
 };
 
@@ -61,6 +64,23 @@ const fetchUser = async () => {
       severity: "error",
       summary: t("toast.error"),
       detail: error.response?.data?.message || t("user.no_user"),
+    });
+  }
+};
+
+const fetchMovies = async (page?: number) => {
+  try {
+    movies.value = await movieSearchingInList(
+      route.params.user as string,
+      route.params.slug as string,
+      search.value,
+      page,
+    );
+  } catch (error: any) {
+    toast.add({
+      severity: "error",
+      summary: t("toast.error"),
+      detail: error.response?.data?.message || t("list.getMoviesError"),
     });
   }
 };
@@ -78,8 +98,13 @@ const updateRoute = (page: number) => {
 watch(
   () => [route.params.user, route.params.slug],
   async () => {
-    await fetchMovieList();
-    await fetchUser();
+    loading.value = true;
+    await Promise.all([
+      await fetchMovieList(),
+      fetchUser(),
+      fetchMovies(Number(route.query.page)),
+    ]);
+    loading.value = false;
   },
   { immediate: true },
 );
@@ -228,7 +253,7 @@ watch(
 .avatar-wrapper {
   position: relative;
   padding: 5px;
-  background: linear-gradient(45deg, var(--primary), transparent);
+  background: var(--primary);
   border-radius: 50%;
   margin-bottom: 1rem;
 }
@@ -258,7 +283,7 @@ watch(
 
 .divider {
   width: 1px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.4);
   margin: 0 1rem;
 }
 
@@ -280,7 +305,7 @@ watch(
   font-size: 2.25rem;
   font-weight: 800;
   margin: 0;
-  color: #ffffff;
+  color: var(--text);
   line-height: 1.2;
 }
 
@@ -297,7 +322,7 @@ watch(
   flex-wrap: wrap;
   gap: 1.5rem;
   padding-top: 1.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .stat {
@@ -322,16 +347,16 @@ watch(
 }
 
 .badge-public {
-  background: rgba(34, 197, 94, 0.1);
-  color: #4ade80;
+  background: rgba(34, 197, 94, 0.2);
+  color: #309153;
 }
 .badge-private {
-  background: rgba(239, 68, 68, 0.1);
-  color: #f87171;
+  background: rgba(239, 68, 68, 0.2);
+  color: #b73b3b;
 }
 .badge-friends {
-  background: rgba(99, 102, 241, 0.1);
-  color: #818cf8;
+  background: rgba(99, 102, 241, 0.2);
+  color: #4d57bd;
 }
 
 .header-skeleton {
@@ -341,5 +366,24 @@ watch(
   padding: 2rem;
   background: var(--secondary);
   border-radius: 1.25rem;
+}
+
+.movies-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  min-height: 200px;
+}
+
+@media (min-width: 768px) {
+  .movies-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .movies-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
 }
 </style>
