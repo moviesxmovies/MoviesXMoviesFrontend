@@ -11,3 +11,7 @@ export const goToUser = (username: string | undefined) => {
 export const goToMovieList = (user: string | undefined, slug: string | undefined) => {
     router.push({ name: 'movie-list', params: { user, slug } });
 }
+
+export const goToPerson = (slug: string | undefined) => {
+    router.push({ name: 'celebrity', params: { slug } });
+};

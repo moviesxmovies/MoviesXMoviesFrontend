@@ -7,6 +7,7 @@ import debounce from "@/utils/debounce";
 import { InputText, SelectButton } from "primevue";
 import { useI18n } from "vue-i18n";
 import SearchMovieListsView from "./SearchMovieListsView.vue";
+import SearchCelebritiesView from "./SearchCelebritiesView.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -19,8 +20,7 @@ const options = ref([
   { label: t("search.movies"), value: "movies" },
   { label: t("search.users"), value: "users" },
   { label: t("search.lists"), value: "lists" },
-  { label: t("search.actors"), value: "actors" },
-  { label: t("search.directors"), value: "directors" },
+  { label: t("search.celebrities"), value: "celebrities" },
 ]);
 
 const updateRoute = (type: string) => {
@@ -57,8 +57,7 @@ watch(
       { label: t("search.movies"), value: "movies" },
       { label: t("search.users"), value: "users" },
       { label: t("search.lists"), value: "lists" },
-      { label: t("search.actors"), value: "actors" },
-      { label: t("search.directors"), value: "directors" },
+      { label: t("search.celebrities"), value: "celebrities" },
     ];
   },
 );
@@ -94,6 +93,7 @@ watch(
 
     <SearchUsersView v-if="route.query.type === 'users'" key="users" />
     <SearchMovieListsView v-else-if="route.query.type === 'lists'" key="lists" />
+    <SearchCelebritiesView v-else-if="route.query.type === 'celebrities'" key="celebrities" />
     <SearchMovieView v-else />
   </div>
 </template>

@@ -274,7 +274,8 @@
     "users": "Users",
     "lists": "Lists",
     "actors": "Actors",
-    "directors": "Directors"
+    "directors": "Directors",
+    "celebrities": "Celebrities"
   },
   "user": {
     "editProfile": "Edit",
