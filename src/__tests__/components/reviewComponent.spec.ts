@@ -86,7 +86,7 @@ vi.mock('@/components/editReviewDialog.vue', () => ({
 
 vi.mock("@/stores/langStore", () => ({
   useLangStore: () => ({
-    language: "es"
+    language: "en"
   }),
 }));
 
