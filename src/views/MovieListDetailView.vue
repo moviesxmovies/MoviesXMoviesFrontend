@@ -232,7 +232,7 @@ watch(
       </div>
 
       <div class="movies-grid">
-        <ConfirmDialog />
+        <ConfirmDialog appendTo="self" />
         <MovieCardComponent
           v-for="movie in movies.results"
           :key="movie.id"
@@ -431,5 +431,80 @@ watch(
   .movies-grid {
     grid-template-columns: repeat(5, 1fr);
   }
+}
+
+:deep(.p-confirmdialog) {
+  background: color-mix(in srgb, var(--secondary) 80%, transparent);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.25rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+  max-width: 450px;
+}
+
+/* Dialog Header */
+:deep(.p-dialog-header) {
+  background: transparent;
+  padding: 1.5rem 1.5rem 0.5rem;
+  color: var(--text);
+}
+
+:deep(.p-dialog-title) {
+  font-weight: 800;
+  font-size: 1.25rem;
+}
+
+/* Dialog message and icon */
+:deep(.p-dialog-content) {
+  background: transparent;
+  padding: 0.5rem 1.5rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+:deep(.p-confirmdialog-icon) {
+  font-size: 2rem;
+  color: #b73b3b; 
+}
+
+:deep(.p-confirmdialog-message) {
+  color: var(--text);
+  line-height: 1.5;
+  font-size: 1rem;
+}
+
+:deep(.p-dialog-footer) {
+  background: color-mix(in srgb, var(--primary) 15%, transparent);
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+:deep(.p-dialog-footer button) {
+  border-radius: 0.75rem;
+  padding: 0.6rem 1.25rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+/* Cancel button */
+:deep(.p-button-secondary.p-button-outlined) {
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  color: var(--text) !important;
+}
+
+:deep(.p-button-secondary.p-button-outlined:hover) {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Close button (x) */
+:deep(.p-dialog-header-icons .p-dialog-header-close) {
+  color: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  transition: all 0.2s;
 }
 </style>
