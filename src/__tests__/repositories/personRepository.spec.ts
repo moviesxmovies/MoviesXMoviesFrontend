@@ -1,5 +1,5 @@
 import { vi, describe, it, expect, beforeEach } from "vitest";
-import { fetchPersons } from "@/repositories/personRepository";
+import { fetchPersons,celebritySearching } from "@/repositories/personRepository";
 
 const { mockGet } = vi.hoisted(() => ({
   mockGet: vi.fn(),
@@ -33,5 +33,29 @@ describe("PersonRepository", () => {
     mockGet.mockRejectedValueOnce(error);
 
     await expect(fetchPersons(type)).rejects.toThrow("API error");
+  });
+
+  it("should search for celebrities with given query and pagination", async () => {
+    const search_query = "john";
+    const page = 2;
+    const limit = 10;
+    const mockResponse = { results: [{ id: 1, name: "John Doe" }] };
+    mockGet.mockResolvedValue({ data: mockResponse });
+
+    const result = await celebritySearching(search_query, page, limit);
+
+    expect(mockGet).toHaveBeenCalledWith("/persons/searching/", {
+      params: { search_query, page, limit },
+    });
+    expect(result).toEqual(mockResponse);
+  });
+
+  it("should throw a TranslatedError if API call fails during celebrity search", async () => {
+    const search_query = "john";
+    const error = new Error("API error");
+    error.response = { data: { status: "error" } };
+    mockGet.mockRejectedValueOnce(error);
+
+    await expect(celebritySearching(search_query)).rejects.toThrow("API error");
   });
 });

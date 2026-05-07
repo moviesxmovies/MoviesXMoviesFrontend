@@ -63,8 +63,7 @@ describe("SearchView", () => {
         "search.movies",
         "search.users",
         "search.lists",
-        "search.actors",
-        "search.directors",
+        "search.celebrities",
       ]);
     });
 
