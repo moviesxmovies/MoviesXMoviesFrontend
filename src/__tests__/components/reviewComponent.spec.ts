@@ -84,6 +84,12 @@ vi.mock('@/components/editReviewDialog.vue', () => ({
   }),
 }))
 
+vi.mock("@/stores/langStore", () => ({
+  useLangStore: () => ({
+    language: "en"
+  }),
+}));
+
 // ─── Imports after mocks ──────────────────────────────────────────────────────
 
 import ReviewComponent from '@/components/reviewComponent.vue'

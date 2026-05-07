@@ -23,7 +23,7 @@ const searchMovieLists = async (query: string, page?: number) => {
     toast.add({
       severity: "error",
       summary: t("toast.error"),
-      detail: error.response?.data?.message || t("search.searchUsersError"),
+      detail: error.response?.data?.message || t("search.searchMovieListsError"),
     });
   } finally {
     loading.value = false;

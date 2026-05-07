@@ -4,6 +4,7 @@ import i18n from "@/i18n";
 import type {
   CreateList,
   DynamicPagination,
+  Movie,
   MovieList,
   Pagination,
 } from "@/types";
@@ -100,6 +101,17 @@ export const createList = async (list: CreateList) => {
   }
 };
 
+export const getMovieList = async (user: string, slug: string) => {
+  try {
+    const { data }: { data: MovieList } = await api.get(
+      `/movies-lists/${user}/${slug}/`,
+    );
+    return data;
+  } catch (error: any) {
+    throw new TranslatedError(error, error.response?.data?.status);
+  }
+};
+
 export const listSearching = async (
   query: string,
   page?: number,
@@ -114,6 +126,26 @@ export const listSearching = async (
           page,
           limit,
         },
+      },
+    );
+    return data;
+  } catch (error: any) {
+    throw new TranslatedError(error, error.response?.data?.status);
+  }
+};
+
+export const movieSearchingInList = async (
+  user: string,
+  slug: string,
+  query: string,
+  page?: number,
+  limit?: number,
+) => {
+  try {
+    const { data }: { data: Pagination<Movie> } = await api.get(
+      `/movies-lists/${user}/${slug}/movies/searching/`,
+      {
+        params: { query, limit, page },
       },
     );
     return data;

@@ -9,6 +9,7 @@ const authRequiredRoutes = [
   { path: "/users/:slug", name: "user-profile", view: "UserProfileView" },
   { path: "/users", name: "self-profile", view: "UserProfileView" },
   { path: "/movies/:slug", name: "movie-detail", view: "MovieDetailView" },
+  { path: "/movie-list/:user/:slug", name: "movie-list", view: "MovieListDetailView" },
   { path: "/search", name: "search", view: "SearchView" },
 ];
 
