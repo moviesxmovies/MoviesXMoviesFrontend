@@ -54,7 +54,7 @@ describe("Onboarding Component", () => {
 
   it("renders the first step by default", () => {
     expect(wrapper.text()).toContain("onboarding.step1");
-    expect(wrapper.find("#step-span").text()).toContain("1 / 5");
+    expect(wrapper.find("#step-span").text()).toContain("1 / 6");
   });
 
   it("advances to the next step when clicking continue", async () => {
@@ -63,19 +63,19 @@ describe("Onboarding Component", () => {
     await flushPromises();
 
     expect(wrapper.text()).toContain("onboarding.step2");
-    expect(wrapper.find("#step-span").text()).toContain("2 / 5");
+    expect(wrapper.find("#step-span").text()).toContain("2 / 6");
   });
 
   it("completes onboarding after the last step", async () => {
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 5; i++) {
       const btn = wrapper.findComponent('#continue-button');
-      expect(wrapper.find("#step-span").text()).toContain(i + 1 + " / 5");
+      expect(wrapper.find("#step-span").text()).toContain(i + 1 + " / 6");
       await btn.trigger("click");
       await flushPromises();
 
     }
 
-    expect(wrapper.find("#step-span").text()).toContain("5 / 5");
+    expect(wrapper.find("#step-span").text()).toContain("6 / 6");
 
     await wrapper.findComponent('#continue-button').trigger("click");
     await flushPromises();
