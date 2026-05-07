@@ -84,7 +84,7 @@ vi.mock('@/composables/useInfinitePagination', () => ({
 }))
 
 vi.mock('@/stores/langStore', () => ({
-  useLangStore: () => ({ language: 'en' }),
+  useLangStore: () => ({ language: 'es' }),
 }))
 
 // ─── Imports after mocks ──────────────────────────────────────────────────────
