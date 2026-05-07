@@ -16,6 +16,7 @@ const props = defineProps<{
         @touchstart.stop
         @click.stop="emit('showMoreInfo')"
         :aria-label="$t('actions.showMoreInfo')"
+        :title="$t('actions.showMoreInfo')"
       >
         <i class="pi pi-info-circle" />
       </button>
@@ -26,6 +27,8 @@ const props = defineProps<{
         @mousedown.stop
         @touchstart.stop
         @click.stop="emit('markAsNotSeen')"
+        :aria-label="$t('actions.markAsNotSeen')"
+        :title="$t('actions.markAsNotSeen')"
       >
         <i class="pi pi-eye-slash" />
       </button>
@@ -36,6 +39,8 @@ const props = defineProps<{
         @mousedown.stop
         @touchstart.stop
         @click.stop="emit('addToList')"
+        :aria-label="$t('actions.addToList')"
+        :title="$t('actions.addToList')"
       >
         <i class="pi pi-plus-circle" />
       </button>

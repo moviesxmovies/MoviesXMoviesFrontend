@@ -394,5 +394,10 @@
     "updated": "Zuletzt aktualisiert {0}",
     "confirmation": "Film aus Liste entfernen",
     "confirmRemoveMovie": "Bist du sicher, dass du \"{0}\" aus der Liste entfernen möchtest?"
-  }
+  },
+  "actions": {
+    "addToList": "Zur Liste hinzufügen",
+    "markAsNotSeen": "Als nicht gesehen markieren",
+    "rateNStars": "{n} Sterne geben"
+  } 
 }

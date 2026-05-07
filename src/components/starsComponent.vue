@@ -68,6 +68,7 @@ const rateMovie = async (rating: number) => {
       @mouseenter="!loading && handleMouseEnter(i)"
       @touchstart="!loading && handleMouseEnter(i)"
       @click="!loading && rateMovie(i)"
+      :aria-label="$t('actions.rateNStars', { n: i })"
     />
   </div>
 </template>
