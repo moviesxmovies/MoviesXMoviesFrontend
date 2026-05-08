@@ -1,14 +1,15 @@
 <script lang="ts" setup>
-import { MultiSelect } from 'primevue';
+import { MultiSelect } from "primevue";
 
 const props = defineProps<{
   modelValue: any[];
   isLoading: boolean;
   items: any[];
   message: string;
+  optionLabel?: string;
 }>();
 
-const emit = defineEmits(["update:modelValue", "change"]);
+const emit = defineEmits(["update:modelValue", "change", "filter"]);
 
 const handleSelectionChange = (value: any[]) => {
   emit("update:modelValue", value);
@@ -20,12 +21,13 @@ const handleSelectionChange = (value: any[]) => {
   <MultiSelect
     :model-value="modelValue"
     @update:model-value="handleSelectionChange"
+    @filter="emit('filter', $event)"
     :loading="isLoading"
     :disabled="isLoading"
     display="chip"
     :appendTo="'self'"
     :options="items"
-    optionLabel="name"
+    :optionLabel="optionLabel || 'name'"
     filter
     :placeholder="message"
     :maxSelectedLabels="99"
