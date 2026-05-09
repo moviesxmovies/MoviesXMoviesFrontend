@@ -319,7 +319,7 @@ watch(
                     :emptyDescription="t('user.no_friends_description')" :loading="loadingFriends"
                     v-model:sentinelRef="friendsSentinelRef">
                     <FriendWithFollow v-for="friend in friends.results" :key="friend.id" :user="friend"
-                        :isSelfUser="isSelfProfile" :onAddFriend="sendFriendRequest" />
+                        :onAddFriend="sendFriendRequest" />
                 </SectionAccordion>
 
                 <!-- SUGGESTED FRIENDS -->

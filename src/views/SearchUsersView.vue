@@ -3,12 +3,13 @@ import FriendWithFollow from "@/components/friendWithFollow.vue";
 import PaginationComponent from "@/components/paginationComponent.vue";
 import {
   completeFriendRequest,
+  removeFriend,
   userSearching,
   type userSearchingData,
 } from "@/repositories/userRepository";
 import { useAuthStore } from "@/stores/authStore";
-import type { Pagination, User } from "@/types";
-import { Skeleton, useToast } from "primevue";
+import type { Friendship, Pagination, User } from "@/types";
+import { ConfirmDialog, Skeleton, useConfirm, useToast } from "primevue";
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
@@ -20,6 +21,7 @@ const users = ref<Pagination<User>>({} as Pagination<User>);
 const { t } = useI18n();
 const loading = ref<boolean>(false);
 const authStore = useAuthStore();
+const confirm = useConfirm();
 
 const searchUsers = async (data: userSearchingData) => {
   try {
@@ -46,13 +48,33 @@ const updateRoute = (page: number) => {
   });
 };
 
-const handleFriendRequest = async (username: string, addFriend: boolean) => {
+const updateUserFriendship = (
+  username: string,
+  patch: Partial<User["friendship"]> | null,
+) => {
+  const user = users.value.results.find((u) => u.username === username);
+  if (!user) return;
+  if (patch === null) {
+    user.friendship = {} as Friendship;
+  } else {
+    user.friendship = { ...user.friendship, ...patch };
+  }
+};
+
+const handleFriendRequest = async (username: string, accept: boolean) => {
   try {
-    await completeFriendRequest(username, addFriend);
+    await completeFriendRequest(username, accept);
+    if (accept) {
+      updateUserFriendship(username, { status: "P" });
+    } else {
+      updateUserFriendship(username, { is_friend: false });
+    }
     toast.add({
       severity: "success",
       summary: t("toast.success"),
-      detail: t("user.friendRequestSent"),
+      detail: accept
+        ? t("user.friendRequestSent")
+        : t("user.friendRequestDeclined"),
     });
   } catch (error: any) {
     toast.add({
@@ -60,8 +82,46 @@ const handleFriendRequest = async (username: string, addFriend: boolean) => {
       summary: t("toast.error"),
       detail: error.translatedMessage,
     });
-    throw error;
   }
+};
+
+const removeFriendRequest = async (slug: string) => {
+  try {
+    await removeFriend(slug);
+    updateUserFriendship(slug, { is_friend: false });
+    toast.add({
+      severity: "success",
+      summary: t("toast.success"),
+      detail: t("user.friendRemoved"),
+    });
+  } catch (error: any) {
+    toast.add({
+      severity: "error",
+      summary: t("toast.error"),
+      detail: error.translatedMessage,
+    });
+  }
+};
+
+const removeFrienshipModal = async (slug: string, already_friends: boolean) => {
+  confirm.require({
+    message: t("search.confirmRemoveFriend"),
+    header: t("search.confirmation"),
+    icon: "pi pi-exclamation-triangle",
+    rejectProps: {
+      label: t("cancel"),
+      severity: "secondary",
+      outlined: true,
+    },
+    acceptProps: {
+      label: t("remove"),
+    },
+    accept: () => {
+      already_friends
+        ? removeFriendRequest(slug)
+        : handleFriendRequest(slug, false);
+    },
+  });
 };
 
 watch(
@@ -90,18 +150,15 @@ watch(
     </div>
 
     <template v-else>
+      <ConfirmDialog appendTo="self" />
       <FriendWithFollow
         v-for="user in users.results"
         :key="user.id"
         :user="user"
         :is-self-user="authStore.user?.username === user.username"
-        :onAddFriend="
-          () =>
-            handleFriendRequest(
-              user.username,
-              authStore.user?.username !== user.username,
-            )
-        "
+        :onAddFriend="() => handleFriendRequest(user.username, true)"
+        :onRemoveFriend="() => removeFrienshipModal(user.username, true)"
+        :onRemovePending="() => removeFrienshipModal(user.username, false)"
       />
     </template>
 
@@ -166,5 +223,92 @@ watch(
   width: 100%;
   height: 80px;
   padding: 0.5rem 1rem;
+}
+
+:deep(.p-confirmdialog) {
+  background: color-mix(in srgb, var(--secondary) 80%, transparent);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.25rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+  max-width: 300px;
+}
+
+@media (min-width: 640px) {
+  :deep(.p-confirmdialog) {
+    max-width: 450px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :deep(.p-confirmdialog) {
+    max-width: 600px;
+  }
+}
+
+/* Dialog Header */
+:deep(.p-dialog-header) {
+  background: transparent;
+  padding: 1.5rem 1.5rem 0.5rem;
+  color: var(--text);
+}
+
+:deep(.p-dialog-title) {
+  font-weight: 800;
+  font-size: 1.25rem;
+}
+
+/* Dialog message and icon */
+:deep(.p-dialog-content) {
+  background: transparent;
+  padding: 0.5rem 1.5rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+:deep(.p-confirmdialog-icon) {
+  font-size: 2rem;
+  color: #b73b3b;
+}
+
+:deep(.p-confirmdialog-message) {
+  color: var(--text);
+  line-height: 1.5;
+  font-size: 1rem;
+}
+
+:deep(.p-dialog-footer) {
+  background: color-mix(in srgb, var(--primary) 15%, transparent);
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+:deep(.p-dialog-footer button) {
+  border-radius: 0.75rem;
+  padding: 0.6rem 1.25rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+/* Cancel button */
+:deep(.p-button-secondary.p-button-outlined) {
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  color: var(--text) !important;
+}
+
+:deep(.p-button-secondary.p-button-outlined:hover) {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Close button (x) */
+:deep(.p-dialog-header-icons .p-dialog-header-close) {
+  color: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  transition: all 0.2s;
 }
 </style>
