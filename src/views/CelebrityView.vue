@@ -35,6 +35,7 @@ const genderMap: Record<string, { color: string; icon: string }> = {
   "0": { color: "var(--secondary)", icon: "pi pi-minus" },
   "1": { color: "var(--accent)", icon: "pi pi-venus" },
   "2": { color: "var(--primary)", icon: "pi pi-mars" },
+  "3": { color: "var(--secondary)", icon: "pi pi-question" },
 };
 
 const genderIcon = computed(
