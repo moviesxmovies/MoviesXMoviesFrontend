@@ -164,7 +164,7 @@ watch(
           <div class="card-body">
             <h1 class="celebrity-name">{{ user.name }}</h1>
             <div class="dates">
-              <div class="date-row">
+              <div v-if="user.birthday" class="date-row">
                 <i class="pi pi-calendar accent-icon" />
                 <span><b>{{ t("celebrity.birthday") }}:</b>
                   {{ user.birthday }}</span>
