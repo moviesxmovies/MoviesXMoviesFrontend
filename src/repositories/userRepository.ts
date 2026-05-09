@@ -192,3 +192,12 @@ export const userSearching = async (
     throw new TranslatedError(error, error.response?.data?.status);
   }
 };
+
+export const getUserTranslations = async (slug: string) => {
+  try {
+    const { data } = await api.get(`/users/${slug}/translations/`);
+    return data;
+  } catch (error: any) {
+    throw new TranslatedError(error, error.response?.data?.status);
+  }
+}
