@@ -12,6 +12,7 @@ import {
   getSuggestedFriends,
   getUserMoviesLists,
   userSearching,
+  getUserTranslations,
 } from "@/repositories/userRepository";
 
 // ── Mocks ────────────────────────────────────────────────────────────────────
@@ -439,6 +440,29 @@ describe("UserRepository", () => {
       mockGet.mockRejectedValueOnce(new Error("Server error"));
 
       await expect(userSearching(apiParams)).rejects.toThrow("Server error");
+    });
+  });
+  // ── getUserTranslations ───────────────────────────────────────────────────────────────
+  describe("getUserTranslations", () => {
+    it("calls API with correct endpoint and returns translations", async () => {
+      const mockTranslations = [
+        { id: 1, language: "en", content: "Hello" },
+        { id: 2, language: "es", content: "Hola" },
+      ];
+
+      mockGet.mockResolvedValueOnce({ data: mockTranslations });
+      const result = await getUserTranslations("testuser");
+
+      expect(mockGet).toHaveBeenCalledWith("/users/testuser/translations/");
+      expect(result).toEqual(mockTranslations);
+    });
+
+    it("throws when API fails", async () => {
+      mockGet.mockRejectedValueOnce(new Error("Server error"));
+
+      await expect(getUserTranslations("testuser")).rejects.toThrow(
+        "Server error",
+      );
     });
   });
 });

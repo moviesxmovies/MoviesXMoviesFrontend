@@ -402,5 +402,9 @@
     "markAsNotSeen": "Mark as not seen",
     "rateNStars": "Rate {n} stars",
     "showMoreInfo": "Show more info"
+  },
+  "translation":{
+    "translate": "Translate",
+    "showOriginal": "Show Original"
   }
 }

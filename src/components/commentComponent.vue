@@ -2,10 +2,12 @@
 import { api } from '@/composables/useAPI';
 import { type User, type Comment, type DynamicPagination } from '@/types';
 import { Skeleton } from 'primevue';
-import { ref, watch, nextTick } from 'vue';
+import { ref, watch, nextTick, computed } from 'vue';
 import ReactionsComponent from './reactionsComponent.vue';
-import { getCommentReplies } from '@/repositories/reviewRepository';
+import { getCommentReplies, getCommentTranslation } from '@/repositories/reviewRepository';
 import { useDate } from '@/composables/useDate';
+import { useTranslation } from '@/composables/useTranslation';
+import TranslateButton from './translateButton.vue';
 
 const props = defineProps<{
     comment: Comment;
@@ -22,11 +24,20 @@ const user = ref<User>();
 const commentEl = ref<HTMLElement | null>(null);
 const isHighlighted = ref(false);
 const { formatRelativeTime } = useDate();
-
+const { isTranslated, translatedData, translate, isLoading, error } = useTranslation(
+    () => getCommentTranslation(props.reviewId, props.comment.id)
+);
 // ── Replies ──────────────────────────────────────────────────
 const repliesResponse = ref<DynamicPagination<Comment> | null>(null);
 const repliesVisible = ref(false);
 const repliesLoading = ref(false);
+
+const renderedContent = computed(() => {
+    if (isTranslated.value && translatedData.value && 'content' in translatedData.value) {
+        return translatedData.value.content
+    }
+    return props.comment.content
+});
 
 const loadReplies = async () => {
     repliesLoading.value = true;
@@ -141,13 +152,15 @@ watch(() => props.forceOpenRepliesId, (id) => {
                 <span class="comment-username">{{ user.username }}</span>
                 <span class="comment-date">{{ formatRelativeTime(comment.created_at) }}</span>
             </div>
-            <p class="comment-content">{{ comment.content }}</p>
+            <p class="comment-content">{{ renderedContent }}</p>
 
             <div class="actions">
                 <button class="reply-btn" @click="emit('reply', comment, user.username)">
                     <i class="pi pi-reply" />
                     <span>{{ $t('comment.reply') }}</span>
                 </button>
+                <TranslateButton :is-translated="isTranslated" :is-loading="isLoading" :error="error"
+                    @translate="translate" />
                 <ReactionsComponent :comment-id="comment.id" :review-id="reviewId" :picker-up="false" />
             </div>
 
@@ -180,13 +193,9 @@ watch(() => props.forceOpenRepliesId, (id) => {
 
                 <template v-else>
                     <div class="reply-indent" v-for="reply in repliesResponse?.results" :key="reply.id">
-                        <CommentComponent
-                            :comment="reply"
-                            :review-id="reviewId"
-                            :highlight-target="highlightTarget"
+                        <CommentComponent :comment="reply" :review-id="reviewId" :highlight-target="highlightTarget"
                             :force-open-replies-id="forceOpenRepliesId"
-                            @reply="(c, username) => emit('reply', c, username)"
-                        />
+                            @reply="(c, username) => emit('reply', c, username)" />
                     </div>
 
                     <!-- LOAD MORE SKELETON -->
@@ -232,9 +241,17 @@ watch(() => props.forceOpenRepliesId, (id) => {
 }
 
 @keyframes comment-flash {
-    0%   { background: color-mix(in srgb, var(--primary) 20%, transparent); }
-    50%  { background: color-mix(in srgb, var(--primary) 12%, transparent); }
-    100% { background: transparent; }
+    0% {
+        background: color-mix(in srgb, var(--primary) 20%, transparent);
+    }
+
+    50% {
+        background: color-mix(in srgb, var(--primary) 12%, transparent);
+    }
+
+    100% {
+        background: transparent;
+    }
 }
 
 .comment--highlight {

@@ -80,3 +80,23 @@ export const getCommentReplies = async (reviewId: number, commentId: number, las
         throw error;
     }
 }
+
+export const getReviewTranslation = async (reviewId: number) => {
+    try {
+        const { data } = await api.get(`reviews/${reviewId}/translations/`);
+        return data;
+    }
+    catch (error: any) {
+        throw error;
+    }
+}
+
+export const getCommentTranslation = async (reviewId: number, commentId: number) => {
+    try {
+        const { data } = await api.get(`reviews/${reviewId}/comments/${commentId}/translations/`);
+        return data;
+    }
+    catch (error: any) {
+        throw error;
+    }
+}

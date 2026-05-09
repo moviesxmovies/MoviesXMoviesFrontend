@@ -54,6 +54,7 @@ vi.mock('vue-router', () => ({
   RouterLink: defineComponent({ props: ['to'], template: '<a :href="to"><slot /></a>' }),
 }))
 
+
 vi.mock('primevue', () => ({
   Dialog: defineComponent({
     props: ['visible', 'modal', 'draggable', 'dismissableMask', 'style', 'pt'],
