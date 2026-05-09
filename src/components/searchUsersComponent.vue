@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Pagination, User } from "@/types";
 import { useToast } from "primevue";
-import { nextTick, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { userSearching } from "@/repositories/userRepository";
 import debounce from "@/utils/debounce";
@@ -15,43 +15,14 @@ const users = ref<Pagination<User>>({} as Pagination<User>);
 const props = defineProps<{ modelValue?: string[] }>();
 const emit = defineEmits(["update:modelValue", "filterUsers"]);
 
-const loadMore = async () => {
-  if (!users.value.has_next || isLoading.value) return;
-  await fetchUsers(
-    props.modelValue?.join(" ") || "",
-    users.value.current_page + 1,
-  );
-};
-
-const loadPrevious = async () => {
-  if (!users.value.has_previous || isLoading.value) return;
-
-  // Guardar altura antes de añadir elementos arriba
-  const panel = document.querySelector(
-    ".p-multiselect-list-container",
-  ) as HTMLElement;
-  const prevHeight = panel?.scrollHeight ?? 0;
-
-  await fetchUsers(
-    props.modelValue?.join(" ") || "",
-    users.value.current_page - 1,
-  );
-
-  // Restaurar posición para que no salte
-  await nextTick();
-  if (panel) {
-    panel.scrollTop = panel.scrollHeight - prevHeight;
-  }
-};
-
 const withoutSelected = (list: User[]) =>
   list.filter((u) => !selectedUsers.value.some((s) => s.id === u.id));
 
-const fetchUsers = async (search = "", page?: number) => {
+const fetchUsers = async (search = "") => {
   if (isLoading.value) return;
   isLoading.value = true;
   try {
-    const data = await userSearching({ name: search, page });
+    const data = await userSearching({ name: search });
     users.value = {
       ...data,
       results: [...selectedUsers.value, ...withoutSelected(data.results)],
@@ -89,8 +60,5 @@ const onSelectionChange = (selected: User[]) => {
     v-model="selectedUsers as User[]"
     @filter="debouncedFetch($event.value)"
     @change="onSelectionChange(selectedUsers)"
-    :optionLabel="'username'"
-    @loadmore="loadMore"
-    @loadprevious="loadPrevious"
   />
 </template>

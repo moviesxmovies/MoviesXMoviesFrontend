@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { MultiSelect } from "primevue";
-import { ref } from "vue";
 
 const props = defineProps<{
   modelValue: any[];
@@ -10,45 +9,17 @@ const props = defineProps<{
   optionLabel?: string;
 }>();
 
-const multiSelectRef = ref<any>(null);
-const scrollListener = ref(false);
-const emit = defineEmits(["update:modelValue", "change", "search", "loadmore", "loadprevious"]);
+const emit = defineEmits(["update:modelValue", "change", "search"]);
 
 const handleSelectionChange = (value: any[]) => {
   emit("update:modelValue", value);
   emit("change");
-};
-
-const onShow = () => {
-  if (scrollListener.value) return;
-  const panel = multiSelectRef.value?.$el?.querySelector(
-    ".p-multiselect-list-container",
-  ) as HTMLElement | null;
-  if (!panel) return;
-
-  panel.addEventListener("scroll", () => {
-    if (props.isLoading) return;
-    const { scrollTop, scrollHeight, clientHeight } = panel;
-    if (scrollHeight - scrollTop - clientHeight < 80) {
-      emit("loadmore");
-    }
-    if (scrollTop < 80) {
-      emit("loadprevious");
-    }
-  });
-  scrollListener.value = true;
-};
-
-const onHide = () => {
-  scrollListener.value = false;
 };
 </script>
 
 <template>
   <MultiSelect
     ref="multiSelectRef"
-    @show="onShow"
-    @hide="onHide"
     :model-value="modelValue"
     @update:model-value="handleSelectionChange"
     @filter="emit('search', $event)"
@@ -57,12 +28,11 @@ const onHide = () => {
     display="chip"
     :appendTo="'self'"
     :options="items"
-    :optionLabel="optionLabel || 'name'"
+    optionLabel="username"
     filter
     :placeholder="message"
     :maxSelectedLabels="99"
     class="w-full multiselect-expandable"
-    scroll-height="300px"
   >
     <!-- Loading state -->
     <template #empty>
@@ -81,7 +51,7 @@ const onHide = () => {
       </div>
     </template>
 
-    <!-- Option con foto -->
+    <!-- Option -->
     <template #option="{ option }">
       <div class="flex items-center gap-3 py-1">
         <img
@@ -105,7 +75,7 @@ const onHide = () => {
       </div>
     </template>
 
-    <!-- Chip con foto -->
+    <!-- Chip -->
     <template #chip="{ value }">
       <div
         class="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold"

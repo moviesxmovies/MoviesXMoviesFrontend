@@ -6,7 +6,6 @@ const props = defineProps<{
   isLoading: boolean;
   items: any[];
   message: string;
-  optionLabel?: string;
 }>();
 
 const emit = defineEmits(["update:modelValue", "change", "filter"]);
@@ -27,7 +26,7 @@ const handleSelectionChange = (value: any[]) => {
     display="chip"
     :appendTo="'self'"
     :options="items"
-    :optionLabel="optionLabel || 'name'"
+    optionLabel="name"
     filter
     :placeholder="message"
     :maxSelectedLabels="99"
