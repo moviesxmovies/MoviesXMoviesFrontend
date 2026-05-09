@@ -40,7 +40,7 @@ const fetchUsers = async (search = "") => {
   }
 };
 
-const debouncedFetch = debounce(fetchUsers, 500);
+const debouncedFetch = debounce(fetchUsers, 300);
 
 onMounted(() => fetchUsers());
 

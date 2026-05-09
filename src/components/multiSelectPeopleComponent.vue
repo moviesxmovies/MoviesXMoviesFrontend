@@ -1,5 +1,7 @@
 <script lang="ts" setup>
+import debounce from "@/utils/debounce";
 import { MultiSelect } from "primevue";
+import { computed, ref, watch } from "vue";
 
 const props = defineProps<{
   modelValue: any[];
@@ -9,26 +11,43 @@ const props = defineProps<{
   optionLabel?: string;
 }>();
 
+const isSearching = ref(false);
+const showLoading = computed(() => props.isLoading || isSearching.value);
+
 const emit = defineEmits(["update:modelValue", "change", "search"]);
+
+const handleFilter = (event: any) => {
+  isSearching.value = true;
+
+  debounce(() => {
+    emit("search", event);
+  }, 500);
+};
 
 const handleSelectionChange = (value: any[]) => {
   emit("update:modelValue", value);
   emit("change");
 };
+
+watch(
+  () => props.isLoading,
+  (loading) => {
+    if (!loading) isSearching.value = false;
+  },
+);
 </script>
 
 <template>
   <MultiSelect
-    ref="multiSelectRef"
     :model-value="modelValue"
     @update:model-value="handleSelectionChange"
-    @filter="emit('search', $event)"
-    :loading="isLoading"
-    :disabled="isLoading"
+    @filter="handleFilter"
+    :loading="showLoading"
     display="chip"
     :appendTo="'self'"
     :options="items"
     optionLabel="username"
+    :autoFilter="false"
     filter
     :placeholder="message"
     :maxSelectedLabels="99"
@@ -40,7 +59,20 @@ const handleSelectionChange = (value: any[]) => {
         class="flex items-center justify-center gap-2 py-3"
         style="color: var(--text); opacity: 0.6"
       >
-        <template v-if="isLoading">
+        <template v-if="showLoading">
+          <i class="pi pi-spin pi-spinner" style="color: var(--primary)" />
+          <span class="text-sm">{{ $t("common.loading") }}</span>
+        </template>
+        <template v-else>
+          <i class="pi pi-search opacity-40" />
+          <span class="text-sm">{{ $t("common.noResults") }}</span>
+        </template>
+      </div>
+    </template>
+
+    <template #emptyfilter>
+      <div class="flex items-center justify-center gap-2 py-3">
+        <template v-if="showLoading">
           <i class="pi pi-spin pi-spinner" style="color: var(--primary)" />
           <span class="text-sm">{{ $t("common.loading") }}</span>
         </template>
