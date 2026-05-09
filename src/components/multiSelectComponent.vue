@@ -8,7 +8,7 @@ const props = defineProps<{
   message: string;
 }>();
 
-const emit = defineEmits(["update:modelValue", "change", "filter"]);
+const emit = defineEmits(["update:modelValue", "change"]);
 
 const handleSelectionChange = (value: any[]) => {
   emit("update:modelValue", value);
@@ -20,7 +20,6 @@ const handleSelectionChange = (value: any[]) => {
   <MultiSelect
     :model-value="modelValue"
     @update:model-value="handleSelectionChange"
-    @filter="emit('filter', $event)"
     :loading="isLoading"
     :disabled="isLoading"
     display="chip"
