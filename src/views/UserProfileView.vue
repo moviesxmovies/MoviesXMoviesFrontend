@@ -8,6 +8,7 @@ import {
     getUserFriends,
     getSuggestedFriends,
     getUserMoviesLists,
+    getUserTranslations,
 } from '@/repositories/userRepository';
 import type { FriendRequest, MovieList, Review, User } from '@/types';
 import { Accordion, AccordionContent, AccordionHeader, AccordionPanel, Skeleton, useToast } from 'primevue';
@@ -29,6 +30,8 @@ import EditProfileModal from '@/components/editProfileModal.vue';
 import { refreshToken } from '@/repositories/auth/authRepository';
 import { useProfileStore } from '@/stores/profileStore';
 import ChoiceMovieListTypeModal from '@/components/choiceMovieListTypeModal.vue';
+import { useTranslation } from '@/composables/useTranslation';
+import TranslateButton from '@/components/translateButton.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -56,7 +59,9 @@ const { data: friendRequests, loading: loadingRequests, fetch: fetchRequests, re
 const { data: friends, loading: loadingFriends, fetch: fetchFriends, reset: resetFriends } = usePaginatedFetch<User>();
 const { data: suggestedFriends, loading: loadingSuggestedFriends, fetch: fetchSuggestedData, reset: resetSuggestedFriends } = usePaginatedFetch<User>();
 const { data: moviesLists, loading: loadingMoviesLists, fetch: fetchMoviesListsData, reset: resetMoviesLists } = usePaginatedFetch<MovieList>();
-
+const { isTranslated, translatedData, translate, isLoading, error, reset: resetTranslation } = useTranslation(
+    () => getUserTranslations(user.value.username)
+);
 const fetchUserProfile = async () => {
     const { slug } = route.params;
     loadingProfile.value = true;
@@ -202,6 +207,7 @@ watch(
             fetchUserFriends(),
             fetchUserSuggestedFriends(),
             fetchMoviesLists(),
+            resetTranslation(),
         ]);
     },
     { immediate: true }
@@ -254,7 +260,13 @@ watch(
                             <h2 class="section-title">{{ t('user.biography') }}</h2>
                         </AccordionHeader>
                         <AccordionContent class="section-body">
-                            <p v-if="user.bio" class="biography">{{ user.bio }}</p>
+                            <div v-if="user.bio" class="biography-container">
+                                <p class="biography">{{ isTranslated && translatedData?.bio ?
+                                    translatedData.bio :
+                                    user.bio }}</p>
+                                <TranslateButton v-if="!isSelfProfile" :is-translated="isTranslated"
+                                    :is-loading="isLoading" :error="error" @translate="translate" />
+                            </div>
                             <p v-else class="empty-text">{{ t('user.no_biography') }}</p>
                         </AccordionContent>
                     </AccordionPanel>
