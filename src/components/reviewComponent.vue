@@ -204,7 +204,7 @@ watch(loading, async (newVal) => {
                         review.title }}</h3>
                     <div :class="{ expanded: isExpanded, 'review-content-wrapper': isLongContent }">
                         <p class="review-content" ref="contentRef"
-                            v-html="isTranslated && translatedData?.content ? translatedData.content : review.content">
+                            v-html="isTranslated && translatedData?.content ? translatedData.content : renderedContent">
                         </p>
                     </div>
                     <button v-if="isLongContent" class="expand-btn" @click="isExpanded = !isExpanded">
