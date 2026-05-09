@@ -59,7 +59,6 @@ watch(
     @filter="handleFilter"
     :loading="showLoading"
     display="chip"
-    :appendTo="'self'"
     :options="items"
     :optionLabel="type === 'person' ? 'name' : 'username'"
     :autoFilter="false"
@@ -76,11 +75,11 @@ watch(
       >
         <template v-if="showLoading">
           <i class="pi pi-spin pi-spinner" style="color: var(--primary)" />
-          <span class="text-sm">{{ $t("common.loading") }}</span>
+          <span class="text-sm">{{ $t("loading") }}</span>
         </template>
         <template v-else>
           <i class="pi pi-search opacity-40" />
-          <span class="text-sm">{{ $t("common.noResults") }}</span>
+          <span class="text-sm">{{ $t("search.empty") }}</span>
         </template>
       </div>
     </template>
@@ -89,11 +88,11 @@ watch(
       <div class="flex items-center justify-center gap-2 py-3">
         <template v-if="showLoading">
           <i class="pi pi-spin pi-spinner" style="color: var(--primary)" />
-          <span class="text-sm">{{ $t("common.loading") }}</span>
+          <span class="text-sm">{{ $t("loading") }}</span>
         </template>
         <template v-else>
           <i class="pi pi-search opacity-40" />
-          <span class="text-sm">{{ $t("common.noResults") }}</span>
+          <span class="text-sm">{{ $t("search.empty") }}</span>
         </template>
       </div>
     </template>

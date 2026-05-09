@@ -26,7 +26,7 @@ const fetchPersons = async (search = "") => {
       summary: t("toast.error"),
       detail:
         error.response?.data?.message ||
-        t("components.searchPersons.getPersonsError"),
+        t("search.searchCelebritiesError"),
     });
   } finally {
     isLoading.value = false;
@@ -47,7 +47,7 @@ const onSelectionChange = (selected: Person[]) => {
 
 <template>
   <MultiSelectPeopleComponent
-    :message="t('components.searchPersons.persons')"
+    :message="t('search.celebrities')"
     :isLoading="isLoading"
     :items="persons.results as Person[]"
     v-model="selectedPersons as Person[]"

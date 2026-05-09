@@ -5,6 +5,7 @@ import PrimeVue from "primevue/config";
 import "primeflex/primeflex.css";
 import "primeflex/themes/primeone-light.css";
 import "primeicons/primeicons.css";
+import "./assets/multi-select.css";
 import i18n from "./i18n";
 import App from "./App.vue";
 import { ConfirmationService, ToastService } from "primevue";

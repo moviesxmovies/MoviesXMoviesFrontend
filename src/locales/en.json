@@ -268,6 +268,7 @@
     "help": "Try with other values",
     "searchMoviesError": "Error fetching movies",
     "searchUsersError": "Error fetching users",
+    "searchCelebritiesError": "Error fetching celebrities",
     "searchMovieListsError": "Error fetching movie lists",
     "filters": "Filters",
     "movies": "Movies",

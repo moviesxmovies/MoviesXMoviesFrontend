@@ -303,12 +303,12 @@ describe("MultiSelectPeopleComponent", () => {
 
         it("shows i18n loading text when loading", () => {
             const wrapper = mountPerson({ isLoading: true });
-            expect(wrapper.text()).toContain("common.loading");
+            expect(wrapper.text()).toContain("loading");
         });
 
         it("shows i18n noResults text when not loading", () => {
             const wrapper = mountPerson({ isLoading: false });
-            expect(wrapper.text()).toContain("common.noResults");
+            expect(wrapper.text()).toContain("search.empty");
         });
     });
 });

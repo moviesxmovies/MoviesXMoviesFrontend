@@ -26,7 +26,7 @@ const fetchUsers = async (search = "") => {
       summary: t("toast.error"),
       detail:
         error.response?.data?.message ||
-        t("components.searchUsers.getUsersError"),
+        t("search.searchUsersError"),
     });
   } finally {
     isLoading.value = false;
@@ -47,7 +47,7 @@ const onSelectionChange = (selected: User[]) => {
 
 <template>
   <MultiSelectPeopleComponent
-    :message="t('components.searchUsers.users')"
+    :message="t('search.users')"
     :isLoading="isLoading"
     :items="users.results as User[]"
     v-model="selectedUsers as User[]"

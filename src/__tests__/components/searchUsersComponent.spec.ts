@@ -95,7 +95,7 @@ describe("SearchUsersComponent", () => {
             const wrapper = mountComponent();
             await flushPromises();
             expect(wrapper.find("[data-testid='MultiSelectPeopleComponent']").attributes("data-message")).toBe(
-                "components.searchUsers.users"
+                "search.users"
             );
         });
     });
@@ -123,7 +123,7 @@ describe("SearchUsersComponent", () => {
             expect(mockToastAdd).toHaveBeenCalledWith({
                 severity: "error",
                 summary: "toast.error",
-                detail: "components.searchUsers.getUsersError",
+                detail: "search.searchUsersError",
             });
         });
 
