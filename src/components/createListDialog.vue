@@ -21,7 +21,11 @@ import {
   RadioButton,
   useToast,
 } from "primevue";
+import { ref } from "vue";
 import { useI18n } from "vue-i18n";
+import SearchGenresComponent from "./searchGenresComponent.vue";
+import SearchPersonComponent from "./searchPersonComponent.vue";
+import SearchUsersComponent from "./searchUsersComponent.vue";
 const visible = defineModel<boolean>("visible", { default: false });
 
 const authStore = useAuthStore();
@@ -31,9 +35,14 @@ const resolver = zodResolver(defaultListSchema);
 const form = useForm({ resolver: zodResolver(defaultListSchema) });
 const props = defineProps<{
   movie?: Movie;
+  intelligent?: boolean;
 }>();
 
 const emit = defineEmits(["reloadLists"]);
+
+const selectedCelebrities = ref<string[]>([]);
+const selectedFriends = ref<string[]>([]);
+const selectedGenres = ref<string[]>([]);
 
 const handleSubmit = async ({
   valid,
@@ -41,7 +50,11 @@ const handleSubmit = async ({
 }: FormSubmitEvent<Record<string, any>>) => {
   if (!valid) return;
   try {
-    const data = await createList(values as CreateList);
+    const data = await createList(values as CreateList, props.intelligent, {
+      celebrities: selectedCelebrities.value || undefined,
+      friends: selectedFriends.value || undefined,
+      genres: selectedGenres.value || undefined,
+    });
     if (props.movie) {
       await addToList(data.data.slug, props.movie);
     }
@@ -86,10 +99,17 @@ const addToList = async (listSlug: string, movie: Movie) => {
 </script>
 
 <template>
-  <Dialog v-model:visible="visible" modal :draggable="false" :dismissableMask="true"
-    :header="t('components.createList.header')" :style="{ width: '90vw', maxWidth: '400px' }" :pt="{
+  <Dialog
+    v-model:visible="visible"
+    modal
+    :draggable="false"
+    :dismissableMask="true"
+    :header="t('components.createList.header')"
+    :style="{ width: '90vw', maxWidth: '400px' }"
+    :pt="{
       root: {
-        class: 'rounded-[2rem] border-none shadow-2xl bg-[var(--background)] overflow-hidden',
+        class:
+          'rounded-[2rem] border-none shadow-2xl bg-[var(--background)] overflow-hidden',
       },
       header: { class: 'bg-[var(--background)]' },
       title: { class: 'text-2xl font-display font-bold text-[var(--primary)]' },
@@ -97,54 +117,128 @@ const addToList = async (listSlug: string, movie: Movie) => {
       closeButton: {
         class: 'hover:bg-[var(--secondary)]/20 transition-colors',
       },
-    }">
+    }"
+  >
     <div class="p-2">
       <div class="text-center mb-8">
-        <div class="w-16 h-16 rounded-full flex items-center justify-center m-auto mb-4"
-          style="background: color-mix(in srgb, var(--primary) 12%, transparent)">
+        <div
+          class="w-16 h-16 rounded-full flex items-center justify-center m-auto mb-4"
+          style="
+            background: color-mix(in srgb, var(--primary) 12%, transparent);
+          "
+        >
           <i class="pi pi-list text-2xl" style="color: var(--primary)"></i>
         </div>
-        <p class="text-[10px] font-black uppercase tracking-[0.2em] opacity-60 mt-2 px-2" style="color: var(--text)">
+        <p
+          class="text-[10px] font-black uppercase tracking-[0.2em] opacity-60 mt-2 px-2"
+          style="color: var(--text)"
+        >
           {{ t("components.createList.description") }}
         </p>
       </div>
 
-      <Form :resolver="resolver" @submit="handleSubmit" class="flex flex-col gap-5 w-full">
-        <FormField v-slot="$field" name="name" initialValue="" class="flex flex-col gap-1">
+      <Form
+        :resolver="resolver"
+        @submit="handleSubmit"
+        class="flex flex-col gap-5 w-full"
+      >
+        <FormField
+          v-slot="$field"
+          name="name"
+          initialValue=""
+          class="flex flex-col gap-1"
+        >
           <FloatLabel variant="over">
             <IconField>
-              <InputText v-bind="$field" id="name" fluid :class="{
-                'p-invalid': $field?.invalid,
-                'p-valid': $field?.dirty && !$field?.invalid,
-              }" />
-              <InputIcon v-if="$field?.dirty" :class="$field?.invalid ? 'pi pi-times-circle' : 'pi pi-pencil'" :style="{
-                color: $field?.invalid ? '#ef4444' : 'var(--primary)',
-              }" />
+              <InputText
+                v-bind="$field"
+                id="name"
+                fluid
+                :class="{
+                  'p-invalid': $field?.invalid,
+                  'p-valid': $field?.dirty && !$field?.invalid,
+                }"
+              />
+              <InputIcon
+                v-if="$field?.dirty"
+                :class="$field?.invalid ? 'pi pi-times-circle' : 'pi pi-pencil'"
+                :style="{
+                  color: $field?.invalid ? '#ef4444' : 'var(--primary)',
+                }"
+              />
             </IconField>
             <label for="name">{{ $t("components.createList.formName") }}</label>
           </FloatLabel>
           <FieldMsg :field="$field" />
         </FormField>
 
-        <FormField v-slot="$field" name="description" initialValue="" class="flex flex-col gap-1">
+        <FormField
+          v-slot="$field"
+          name="description"
+          initialValue=""
+          class="flex flex-col gap-1"
+        >
           <FloatLabel variant="over">
             <IconField>
               <InputText id="description" v-bind="$field" fluid />
-              <InputIcon class="pi pi-pencil" style="color: var(--primary); opacity: 0.5" />
+              <InputIcon
+                class="pi pi-pencil"
+                style="color: var(--primary); opacity: 0.5"
+              />
             </IconField>
             <label for="description">{{
               t("components.createList.formDescription")
-              }}</label>
+            }}</label>
           </FloatLabel>
         </FormField>
 
-        <FormField v-slot="$field" name="privacity" initialValue="P" class="flex flex-col gap-1">
-          <div class="flex justify-evenly gap-4 p-4 rounded-2xl"
-            style="background: color-mix(in srgb, var(--secondary) 10%, transparent); border: 1.5px solid color-mix(in srgb, var(--secondary) 40%, transparent)">
-            <div v-for="(option, key) in privacityConfig" :key="key" class="flex items-center gap-2">
-              <RadioButton :inputId="`privacity-${key}`" name="privacity" :value="option.value"
-                v-model="form.fields.privacy" />
-              <label :for="`privacity-${key}`" class="text-sm font-medium cursor-pointer" style="color: var(--text)">
+        <template v-if="intelligent">
+          <div
+            class="flex flex-col gap-4 p-4 rounded-2xl"
+            style="
+              background: color-mix(in srgb, var(--secondary) 10%, transparent);
+              border: 1.5px solid
+                color-mix(in srgb, var(--secondary) 40%, transparent);
+            "
+          >
+            <SearchGenresComponent
+              @filterGenres="(genres: string[]) => (selectedGenres = genres)"
+            />
+            <SearchPersonComponent v-model="selectedCelebrities" />
+            <SearchUsersComponent v-model="selectedFriends" />
+          </div>
+        </template>
+
+        <FormField
+          v-slot="$field"
+          name="privacity"
+          initialValue="P"
+          class="flex flex-col gap-1"
+        >
+          <div
+            class="flex justify-evenly gap-4 p-4 rounded-2xl"
+            style="
+              background: color-mix(in srgb, var(--secondary) 10%, transparent);
+              border: 1.5px solid
+                color-mix(in srgb, var(--secondary) 40%, transparent);
+            "
+          >
+            <div
+              v-for="(option, key) in privacityConfig"
+              :key="key"
+              class="flex items-center gap-2"
+            >
+              <RadioButton
+                :inputId="`privacity-${key}`"
+                name="privacity"
+                :value="option.value"
+                v-model="form.fields.privacy"
+              />
+              <label
+                :for="`privacity-${key}`"
+                class="text-sm font-medium cursor-pointer"
+                style="color: var(--text)"
+              >
                 <i :class="option.icon" class="text-xs opacity-70"></i>
                 {{ option.text }}
               </label>
@@ -153,9 +247,13 @@ const addToList = async (listSlug: string, movie: Movie) => {
         </FormField>
 
         <div class="flex flex-col gap-3 pt-2">
-          <Button type="submit" :label="t('components.createList.submit')" fluid />
+          <Button
+            type="submit"
+            :label="t('components.createList.submit')"
+            fluid
+          />
           <button type="button" class="cancel-btn" @click="visible = false">
-            {{ t('components.createList.cancel') }}
+            {{ t("components.createList.cancel") }}
           </button>
         </div>
       </Form>

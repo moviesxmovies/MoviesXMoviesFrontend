@@ -92,9 +92,24 @@ export const removeMovieFromList = async (
   }
 };
 
-export const createList = async (list: CreateList) => {
+type IntelligentListParams = {
+  celebrities?: any[];
+  friends?: any[];
+  genres?: any[];
+};
+
+export const createList = async (
+  list: CreateList,
+  intelligent?: boolean,
+  params?: IntelligentListParams,
+) => {
   try {
-    const data = await api.post("/movies-lists/", list);
+    const data = await api.post("/movies-lists/", list, {
+      params: {
+        intelligent,
+        ...params,
+      },
+    });
     return data;
   } catch (error: any) {
     throw new TranslatedError(error, error.response?.data?.status);

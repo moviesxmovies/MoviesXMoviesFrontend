@@ -24,6 +24,7 @@ const closeAllModals = () => {
 
 <template>
     <CreateListDialog v-model:visible="normalListModalVisible" @reload-lists="closeAllModals"/>
+    <CreateListDialog v-model:visible="intelligentListModalVisible" :intelligent="true" @reload-lists="closeAllModals"/>
     <Dialog v-model:visible="visible" :header="$t('user.chooseMoviesListType')" :modal="true" :closable="true"
         :dismissableMask="true" :draggable="false" :style="{ width: '90vw', maxWidth: '600px' }" :pt="{
             root: {

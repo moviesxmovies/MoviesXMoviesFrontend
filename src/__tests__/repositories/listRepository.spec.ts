@@ -148,7 +148,11 @@ describe("ListRepository", () => {
 
       const result = await createList(newList as any);
 
-      expect(mockPost).toHaveBeenCalledWith("/movies-lists/", newList);
+      expect(mockPost).toHaveBeenCalledWith("/movies-lists/", newList, {
+        params: {
+          intelligent: undefined,
+        },
+      });
       expect(result).toEqual(mockResponse);
     });
 
@@ -173,7 +177,9 @@ describe("ListRepository", () => {
     it("throws error when getMovieList fails", async () => {
       const networkError = new Error("Network error");
       mockGet.mockRejectedValueOnce(networkError);
-      await expect(getMovieList("john", "action-movies")).rejects.toThrow("Network error");
+      await expect(getMovieList("john", "action-movies")).rejects.toThrow(
+        "Network error",
+      );
     });
   });
 
@@ -202,19 +208,27 @@ describe("ListRepository", () => {
     it("calls GET with constructed path", async () => {
       const mockMovies = [{ id: 1, title: "Action Movie 1" }];
       mockGet.mockResolvedValueOnce({ data: mockMovies });
-      const result = await movieSearchingInList("john", "action-movies", "action");
+      const result = await movieSearchingInList(
+        "john",
+        "action-movies",
+        "action",
+      );
 
-      expect(mockGet).toHaveBeenCalledWith("/movies-lists/john/action-movies/movies/searching/", {
-        params: { query: "action", page: undefined, limit: undefined },
-      });
+      expect(mockGet).toHaveBeenCalledWith(
+        "/movies-lists/john/action-movies/movies/searching/",
+        {
+          params: { query: "action", page: undefined, limit: undefined },
+        },
+      );
       expect(result).toEqual(mockMovies);
     });
 
     it("throws error when movieSearchingInList fails", async () => {
       const networkError = new Error("Network error");
       mockGet.mockRejectedValueOnce(networkError);
-      await expect(movieSearchingInList("john", "action-movies", "action")).rejects.toThrow("Network error");
+      await expect(
+        movieSearchingInList("john", "action-movies", "action"),
+      ).rejects.toThrow("Network error");
     });
   });
-
 });
