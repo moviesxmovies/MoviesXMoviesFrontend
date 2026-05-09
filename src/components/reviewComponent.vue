@@ -14,6 +14,9 @@ import DOMPurify from 'dompurify'
 import { marked } from 'marked'
 import CommentsDialog from './commentsDialog.vue';
 import { useDate } from '@/composables/useDate';
+import { useTranslation } from '@/composables/useTranslation';
+import { getReviewTranslation } from '@/repositories/reviewRepository';
+import TranslateButton from './translateButton.vue';
 const props = defineProps<{
     review: Review;
 }>();
@@ -32,6 +35,9 @@ const { formatRelativeTime } = useDate();
 const editModalVisible = ref(false);
 const confirmDeleteVisible = ref(false);
 
+const { isTranslated, translatedData, translate, isLoading, error } = useTranslation(
+    () => getReviewTranslation(props.review.id,)
+);
 
 const isSelf = computed(() => {
     return authStore.isAuthenticated && Number(user.value?.id) === Number(authStore.user?.user_id);
@@ -194,13 +200,18 @@ watch(loading, async (newVal) => {
                         </div>
 
                     </div>
-                    <h3 class="review-title">{{ review.title }}</h3>
+                    <h3 class="review-title">{{ isTranslated && translatedData?.title ? translatedData.title :
+                        review.title }}</h3>
                     <div :class="{ expanded: isExpanded, 'review-content-wrapper': isLongContent }">
-                        <p class="review-content" ref="contentRef" v-html="renderedContent"></p>
+                        <p class="review-content" ref="contentRef"
+                            v-html="isTranslated && translatedData?.content ? translatedData.content : renderedContent">
+                        </p>
                     </div>
                     <button v-if="isLongContent" class="expand-btn" @click="isExpanded = !isExpanded">
                         {{ isExpanded ? t('common.seeLess') : t('common.seeMore') }}
                     </button>
+                    <TranslateButton :is-translated="isTranslated" :is-loading="isLoading" :error="error"
+                        @translate="translate" />
                 </div>
                 <div class="review-header-right">
                     <RouterLink v-if="user" :to="`/users/${user.username}`" class="user-avatar-link">
@@ -211,6 +222,7 @@ watch(loading, async (newVal) => {
                     </span>
                 </div>
             </div>
+
 
             <ReactionsComponent :reviewId="review.id" type="review" />
         </template>
