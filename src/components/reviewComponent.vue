@@ -48,7 +48,10 @@ const isLongContent = ref(false)
 const commentModalVisible = ref(false)
 const LINE_HEIGHT_THRESHOLD = 76
 const renderedContent = computed(() => {
-    const html = marked.parse(props.review.content) as string
+    const translation = isTranslated.value && translatedData.value && 'content' in translatedData.value
+        ? translatedData.value.content
+        : props.review.content
+    const html = marked.parse(translation) as string
     return DOMPurify.sanitize(html)
 })
 
@@ -203,8 +206,7 @@ watch(loading, async (newVal) => {
                     <h3 class="review-title">{{ isTranslated && translatedData?.title ? translatedData.title :
                         review.title }}</h3>
                     <div :class="{ expanded: isExpanded, 'review-content-wrapper': isLongContent }">
-                        <p class="review-content" ref="contentRef"
-                            v-html="isTranslated && translatedData?.content ? translatedData.content : renderedContent">
+                        <p class="review-content" ref="contentRef" v-html="renderedContent">
                         </p>
                     </div>
                     <button v-if="isLongContent" class="expand-btn" @click="isExpanded = !isExpanded">

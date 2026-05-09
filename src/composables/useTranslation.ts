@@ -1,11 +1,11 @@
 import { ref } from 'vue';
 
-type TranslateFn = () => Promise<{ content: string } | { title: string; body: string } >;
+type TranslateFn = () => Promise<{ content: string } | { title: string; body: string }>;
 
 export function useTranslation(fetchFn: TranslateFn) {
     const isTranslated = ref(false);
     const isLoading = ref(false);
-    const translatedData = ref<Record<string, any> | null>(null);
+    const translatedData = ref<{ content: string } | { title: string; body: string } | null>(null);
     const error = ref<string | null>(null);
 
     const translate = async () => {
