@@ -15,18 +15,11 @@ const users = ref<Pagination<User>>({} as Pagination<User>);
 const props = defineProps<{ modelValue?: string[] }>();
 const emit = defineEmits(["update:modelValue", "filterUsers"]);
 
-const withoutSelected = (list: User[]) =>
-  list.filter((u) => !selectedUsers.value.some((s) => s.id === u.id));
-
 const fetchUsers = async (search = "") => {
   if (isLoading.value) return;
   isLoading.value = true;
   try {
-    const data = await userSearching({ name: search });
-    users.value = {
-      ...data,
-      results: [...selectedUsers.value, ...withoutSelected(data.results)],
-    };
+    users.value = await userSearching({ name: search });
   } catch (error: any) {
     toast.add({
       severity: "error",

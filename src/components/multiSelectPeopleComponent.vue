@@ -24,6 +24,13 @@ const handleFilter = (event: any) => {
   }, 500);
 };
 
+const removeItem = (itemToRemove: any) => {
+  const newValue = props.modelValue.filter(
+    (item) => item.username !== itemToRemove.username
+  );
+  handleSelectionChange(newValue);
+};
+
 const handleSelectionChange = (value: any[]) => {
   emit("update:modelValue", value);
   emit("change");
@@ -124,6 +131,11 @@ watch(
         />
         <i v-else class="pi pi-user" style="font-size: 0.6rem" />
         {{ value.username }}
+        <i
+          class="pi pi-times cursor-pointer ml-1"
+          style="font-size: 0.6rem; opacity: 0.7"
+          @click.stop="removeItem(value)"
+        />
       </div>
     </template>
   </MultiSelect>
