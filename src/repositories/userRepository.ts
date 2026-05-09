@@ -183,7 +183,7 @@ export const userSearching = async (
     const response = await api.get(`/users/searching/`, {
       params: {
         ...data,
-        limit: 5,
+        limit,
         search_query: data.name || undefined,
       },
     });
