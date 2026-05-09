@@ -1,5 +1,5 @@
 import { vi, describe, it, expect, beforeEach } from "vitest";
-import { getReviewReactions, getCommentReactions, postReactionApi, deleteReactionApi, fetchComments, getCommentReplies, postComment, replyComment, getCommentReplies } from "@/repositories/reviewRepository";
+import { getReviewReactions, getCommentReactions, postReactionApi, deleteReactionApi, fetchComments, getCommentReplies, postComment, replyComment, getReviewTranslation, getCommentTranslation } from "@/repositories/reviewRepository";
 
 
 
@@ -239,6 +239,58 @@ describe("ReviewRepository", () => {
             mockGet.mockRejectedValueOnce(networkError);
 
             await expect(getCommentReplies(reviewId, commentId)).rejects.toThrow("Network error");
+        });
+    });
+
+    //  ── getReviewTranslation ─────────────────────────────────────────────────────
+    describe("getReviewTranslation", () => {
+        it("calls API with correct endpoint and returns translation", async () => {
+            const reviewId = 1;
+            const targetLanguage = "es";
+            const mockTranslation = { content: "Esta es una reseña traducida." };
+
+            mockGet.mockResolvedValueOnce({ data: mockTranslation });
+
+            const result = await getReviewTranslation(reviewId, targetLanguage);
+
+            expect(mockGet).toHaveBeenCalledWith(`reviews/${reviewId}/translations/`);
+            expect(result).toEqual(mockTranslation);
+        });
+
+        it("throws when getReviewTranslation API fails", async () => {
+            const reviewId = 1;
+            const targetLanguage = "es";
+            const networkError = new Error("Network error");
+            mockGet.mockRejectedValueOnce(networkError);
+
+            await expect(getReviewTranslation(reviewId, targetLanguage)).rejects.toThrow("Network error");
+        });
+    });
+
+    //  ── getCommentTranslation ─────────────────────────────────────────────────────
+    describe("getCommentTranslation", () => {
+        it("calls API with correct endpoint and returns translation", async () => {
+            const reviewId = 1;
+            const commentId = 2;
+            const targetLanguage = "es";
+            const mockTranslation = { content: "Este es un comentario traducido." };
+
+            mockGet.mockResolvedValueOnce({ data: mockTranslation });
+
+            const result = await getCommentTranslation(reviewId, commentId, targetLanguage);
+
+            expect(mockGet).toHaveBeenCalledWith(`reviews/${reviewId}/comments/${commentId}/translations/`);
+            expect(result).toEqual(mockTranslation);
+        });
+
+        it("throws when getCommentTranslation API fails", async () => {
+            const reviewId = 1;
+            const commentId = 2;
+            const targetLanguage = "es";
+            const networkError = new Error("Network error");
+            mockGet.mockRejectedValueOnce(networkError);
+
+            await expect(getCommentTranslation(reviewId, commentId, targetLanguage)).rejects.toThrow("Network error");
         });
     });
 });
