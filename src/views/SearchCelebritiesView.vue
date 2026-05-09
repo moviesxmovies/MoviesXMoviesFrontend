@@ -82,10 +82,11 @@ watch(
                 :celebrity="celebrity" />
         </div>
 
-        <PaginationComponent v-if="!loading && celebrities.total_pages > 1" data-testid="PaginationComponent"
-            :total_pages="celebrities.total_pages" :current_page="celebrities.current_page" @change-page="updateRoute"
-            style="margin-top: 1.5rem" />
+
     </div>
+    <PaginationComponent v-if="!loading && celebrities.total_pages > 1" data-testid="PaginationComponent"
+        :total_pages="celebrities.total_pages" :current_page="celebrities.current_page" @change-page="updateRoute"
+        style="margin-top: 1.5rem" />
 </template>
 <style scoped>
 .users-list {
