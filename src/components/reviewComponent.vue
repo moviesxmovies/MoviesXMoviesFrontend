@@ -54,7 +54,12 @@ const renderedContent = computed(() => {
     const html = marked.parse(translation) as string
     return DOMPurify.sanitize(html)
 })
-
+const renderedTitle = computed(() => {
+    if (isTranslated.value && translatedData.value && 'title' in translatedData.value) {
+        return translatedData.value.title
+    }
+    return props.review.title
+})
 const fetchMovieData = async () => {
     try {
         const response = await api.get(props.review.movie);
@@ -203,8 +208,7 @@ watch(loading, async (newVal) => {
                         </div>
 
                     </div>
-                    <h3 class="review-title">{{ isTranslated && translatedData?.title ? translatedData.title :
-                        review.title }}</h3>
+                    <h3 class="review-title">{{ renderedTitle }}</h3>
                     <div :class="{ expanded: isExpanded, 'review-content-wrapper': isLongContent }">
                         <p class="review-content" ref="contentRef" v-html="renderedContent">
                         </p>

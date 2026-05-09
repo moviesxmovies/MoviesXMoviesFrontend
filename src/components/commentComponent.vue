@@ -2,7 +2,7 @@
 import { api } from '@/composables/useAPI';
 import { type User, type Comment, type DynamicPagination } from '@/types';
 import { Skeleton } from 'primevue';
-import { ref, watch, nextTick } from 'vue';
+import { ref, watch, nextTick, computed } from 'vue';
 import ReactionsComponent from './reactionsComponent.vue';
 import { getCommentReplies, getCommentTranslation } from '@/repositories/reviewRepository';
 import { useDate } from '@/composables/useDate';
@@ -31,6 +31,13 @@ const { isTranslated, translatedData, translate, isLoading, error } = useTransla
 const repliesResponse = ref<DynamicPagination<Comment> | null>(null);
 const repliesVisible = ref(false);
 const repliesLoading = ref(false);
+
+const renderedContent = computed(() => {
+    if (isTranslated.value && translatedData.value && 'content' in translatedData.value) {
+        return translatedData.value.content
+    }
+    return props.comment.content
+});
 
 const loadReplies = async () => {
     repliesLoading.value = true;
@@ -145,8 +152,7 @@ watch(() => props.forceOpenRepliesId, (id) => {
                 <span class="comment-username">{{ user.username }}</span>
                 <span class="comment-date">{{ formatRelativeTime(comment.created_at) }}</span>
             </div>
-            <p class="comment-content">{{ isTranslated && translatedData?.content ? translatedData.content :
-                comment.content }}</p>
+            <p class="comment-content">{{ renderedContent }}</p>
 
             <div class="actions">
                 <button class="reply-btn" @click="emit('reply', comment, user.username)">

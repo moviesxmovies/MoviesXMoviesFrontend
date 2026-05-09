@@ -12,7 +12,7 @@ import {
 } from '@/repositories/userRepository';
 import type { FriendRequest, MovieList, Review, User } from '@/types';
 import { Accordion, AccordionContent, AccordionHeader, AccordionPanel, Skeleton, useToast } from 'primevue';
-import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useLangStore } from '@/stores/langStore';
@@ -52,6 +52,12 @@ const isMobile = ref(window.innerWidth < 640);
 const handleResize = () => {
     isMobile.value = window.innerWidth < 640;
 };
+const renderedBiography = computed(() => {
+    if (isTranslated.value && translatedData.value && 'bio' in translatedData.value) {
+        return translatedData.value.bio
+    }
+    return user.value.bio
+});
 
 
 const { data: reviews, loading: loadingReviews, fetch: fetchReviews, reset: resetReviews } = usePaginatedFetch<Review>();
@@ -261,9 +267,7 @@ watch(
                         </AccordionHeader>
                         <AccordionContent class="section-body">
                             <div v-if="user.bio" class="biography-container">
-                                <p class="biography">{{ isTranslated && translatedData?.bio ?
-                                    translatedData.bio :
-                                    user.bio }}</p>
+                                <p class="biography">{{ renderedBiography }}</p>
                                 <TranslateButton v-if="!isSelfProfile" :is-translated="isTranslated"
                                     :is-loading="isLoading" :error="error" @translate="translate" />
                             </div>
