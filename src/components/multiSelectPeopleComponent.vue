@@ -9,6 +9,7 @@ const props = defineProps<{
   items: any[];
   message: string;
   optionLabel?: string;
+  type: "person" | "user";
 }>();
 
 const isSearching = ref(false);
@@ -25,10 +26,17 @@ const handleFilter = (event: any) => {
 };
 
 const removeItem = (itemToRemove: any) => {
-  const newValue = props.modelValue.filter(
-    (item) => item.username !== itemToRemove.username
-  );
-  handleSelectionChange(newValue);
+  if (props.type === "person") {
+    const newValue = props.modelValue.filter(
+      (item) => item.slug !== itemToRemove.slug,
+    );
+    handleSelectionChange(newValue);
+  } else {
+    const newValue = props.modelValue.filter(
+      (item) => item.username !== itemToRemove.username,
+    );
+    handleSelectionChange(newValue);
+  }
 };
 
 const handleSelectionChange = (value: any[]) => {
@@ -53,7 +61,7 @@ watch(
     display="chip"
     :appendTo="'self'"
     :options="items"
-    optionLabel="username"
+    :optionLabel="type === 'person' ? 'name' : 'username'"
     :autoFilter="false"
     filter
     :placeholder="message"
@@ -94,22 +102,13 @@ watch(
     <template #option="{ option }">
       <div class="flex items-center gap-3 py-1">
         <img
-          v-if="option.picture"
-          :src="option.picture"
-          :alt="option.username"
+          v-if="type === 'person' ? option.image : option.picture"
+          :src="type === 'person' ? option.image : option.picture"
+          :alt="type === 'person' ? option.name : option.username"
           class="w-8 h-8 rounded-full object-cover"
         />
-        <div
-          v-else
-          class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-          style="
-            background: color-mix(in srgb, var(--primary) 15%, transparent);
-          "
-        >
-          <i class="pi pi-user text-xs" style="color: var(--primary)" />
-        </div>
         <span class="text-sm font-medium" style="color: var(--text)">{{
-          option.username
+          type === "person" ? option.name : option.username
         }}</span>
       </div>
     </template>
@@ -124,13 +123,11 @@ watch(
         "
       >
         <img
-          v-if="value.picture"
-          :src="value.picture"
-          :alt="value.username"
+          :src="type === 'person' ? value.image : value.picture"
+          :alt="type === 'person' ? value.name : value.username"
           class="w-4 h-4 rounded-full object-cover"
         />
-        <i v-else class="pi pi-user" style="font-size: 0.6rem" />
-        {{ value.username }}
+        {{ type === "person" ? value.name : value.username }}
         <i
           class="pi pi-times cursor-pointer ml-1"
           style="font-size: 0.6rem; opacity: 0.7"

@@ -93,9 +93,9 @@ export const removeMovieFromList = async (
 };
 
 type IntelligentListParams = {
-  celebrities?: string[];
-  friends?: string[];
-  genres?: string[];
+  celebrities?: any[];
+  friends?: any[];
+  genres?: any[];
 };
 
 export const createList = async (

@@ -7,7 +7,7 @@ import {
 } from "@/repositories/listRepository";
 import { defaultListSchema } from "@/schemas/listSchema";
 import { useAuthStore } from "@/stores/authStore";
-import type { CreateList, Movie, User } from "@/types";
+import type { CreateList, Movie } from "@/types";
 import { Form, FormField, type FormSubmitEvent } from "@primevue/forms";
 import { zodResolver } from "@primevue/forms/resolvers/zod";
 import { useForm } from "@primevue/forms/useform";
@@ -24,7 +24,8 @@ import {
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import SearchGenresComponent from "./searchGenresComponent.vue";
-import SearchPeopleComponent from "./searchUsersComponent.vue";
+import SearchPersonComponent from "./searchPersonComponent.vue";
+import SearchUsersComponent from "./searchUsersComponent.vue";
 const visible = defineModel<boolean>("visible", { default: false });
 
 const authStore = useAuthStore();
@@ -200,8 +201,11 @@ const addToList = async (listSlug: string, movie: Movie) => {
                 color-mix(in srgb, var(--secondary) 40%, transparent);
             "
           >
-            <SearchGenresComponent v-model="selectedGenres" />
-            <SearchPeopleComponent v-model="selectedCelebrities" />
+            <SearchGenresComponent
+              @filterGenres="(genres: string[]) => (selectedGenres = genres)"
+            />
+            <SearchPersonComponent v-model="selectedCelebrities" />
+            <SearchUsersComponent v-model="selectedFriends" />
           </div>
         </template>
 

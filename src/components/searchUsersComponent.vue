@@ -53,5 +53,6 @@ const onSelectionChange = (selected: User[]) => {
     v-model="selectedUsers as User[]"
     @filter="debouncedFetch($event.value)"
     @change="onSelectionChange(selectedUsers)"
+    :type="'user'"
   />
 </template>
