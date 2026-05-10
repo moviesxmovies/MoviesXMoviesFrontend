@@ -69,7 +69,7 @@ A Vue 3 SPA frontend for the MoviesXMovies platform — a social movie tracking 
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/your-org/MoviesXMoviesFrontend.git
+   git clone https://github.com/moviesxmovies/MoviesXMoviesFrontend.git
    cd MoviesXMoviesFrontend
    ```
 
@@ -212,6 +212,3 @@ GitHub Actions workflows handle the full pipeline:
 ## Internationalization
 
 The UI is fully translated into **English**, **Spanish (es)**, **French (fr)**, and **German (de)**. Locale files live in `src/locales/` and are loaded dynamically via **vue-i18n**. The active language is persisted through the `langStore` and can be changed at any time from the navbar.
-
-## License
-[License](LICENSE)
