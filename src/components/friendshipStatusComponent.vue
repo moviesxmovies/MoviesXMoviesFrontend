@@ -72,6 +72,7 @@ const removeFriendRequest = async () => {
     if (props.onRemoveFriend) {
       await props.onRemoveFriend(props.user.username);
     }
+    sentFriendRequest.value = false;
   } catch (error) {
     hasFailed.value = true;
     console.error("Error sending friend request:", error);
@@ -83,6 +84,7 @@ const removePendingState = async () => {
     if (props.onRemovePending) {
       await props.onRemovePending(props.user.username);
     }
+    sentFriendRequest.value = false;
   } catch (error) {
     hasFailed.value = true;
     console.error("Error sending friend request:", error);
@@ -143,7 +145,7 @@ const handleFriends = () => {
 
 .btn-action:hover {
   background: var(--accent);
-  color: var(--text);
+  color: #e0e0e0;
 }
 
 .btn-action:active {
@@ -160,13 +162,13 @@ const handleFriends = () => {
 }
 
 .status-friend {
-  border: 1px solid var(--secondary);
+  border: 1px solid var(--primary);
   color: var(--primary);
 }
 
 .status-friend:hover {
   background: var(--primary);
-  color: var(--text);
+  color: #e0e0e0;
 }
 
 .status-pending {

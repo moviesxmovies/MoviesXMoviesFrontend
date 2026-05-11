@@ -50,24 +50,21 @@ const updateRoute = (page: number) => {
 
 const updateUserFriendship = (
   username: string,
-  patch: Partial<User["friendship"]> | null,
+  patch: User["friendship"],
 ) => {
   const user = users.value.results.find((u) => u.username === username);
   if (!user) return;
-  if (patch === null) {
-    user.friendship = {} as Friendship;
-  } else {
-    user.friendship = { ...user.friendship, ...patch };
-  }
+  user.friendship = { ...patch };
+  console.log(user.friendship);
 };
 
 const handleFriendRequest = async (username: string, accept: boolean) => {
   try {
     await completeFriendRequest(username, accept);
     if (accept) {
-      updateUserFriendship(username, { status: "P" });
+      updateUserFriendship(username, { is_friend: false, status: "P" });
     } else {
-      updateUserFriendship(username, { is_friend: false });
+      updateUserFriendship(username, { is_friend: false, status: null });
     }
     toast.add({
       severity: "success",
@@ -88,7 +85,7 @@ const handleFriendRequest = async (username: string, accept: boolean) => {
 const removeFriendRequest = async (slug: string) => {
   try {
     await removeFriend(slug);
-    updateUserFriendship(slug, { is_friend: false });
+    updateUserFriendship(slug, { is_friend: false, status: null });
     toast.add({
       severity: "success",
       summary: t("toast.success"),
