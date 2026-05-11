@@ -4,10 +4,12 @@ import PaginationComponent from "@/components/paginationComponent.vue";
 import { api } from "@/composables/useAPI";
 import { useDate } from "@/composables/useDate";
 import {
+  deleteList,
   getMovieList,
   movieSearchingInList,
   removeMovieFromList,
 } from "@/repositories/listRepository";
+import { useAuthStore } from "@/stores/authStore";
 import {
   type Pagination,
   type Movie,
@@ -21,6 +23,7 @@ import { useRoute, useRouter } from "vue-router";
 
 const router = useRouter();
 const route = useRoute();
+const authStore = useAuthStore();
 const { t } = useI18n();
 const search = ref("");
 const movieList = ref<MovieList>({} as MovieList);
@@ -28,7 +31,8 @@ const user = ref<User>({} as User);
 const movies = ref<Pagination<Movie>>({} as Pagination<Movie>);
 const loading = ref(false);
 
-const confirmDeleteVisible = ref(false);
+const confirmDeleteListVisible = ref(false);
+const confirmDeleteMovieVisible = ref(false);
 const movieToDelete = ref<string | null>(null);
 
 const { formatRelativeTime } = useDate();
@@ -88,12 +92,16 @@ const updateRoute = (page: number) => {
 
 const removeMovieModal = (slug: string) => {
   movieToDelete.value = slug;
-  confirmDeleteVisible.value = true;
+  confirmDeleteMovieVisible.value = true;
+};
+
+const removeListModal = () => {
+  confirmDeleteListVisible.value = true;
 };
 
 const removeMovieConfirm = async () => {
   if (!movieToDelete.value) return;
-  confirmDeleteVisible.value = false;
+  confirmDeleteMovieVisible.value = false;
   try {
     await removeMovieFromList(
       route.params.user as string,
@@ -105,6 +113,17 @@ const removeMovieConfirm = async () => {
     console.error(error);
   } finally {
     movieToDelete.value = null;
+  }
+};
+
+const removeListConfirm = async () => {
+  if (!movieList.value.slug) return;
+  confirmDeleteListVisible.value = false;
+  try {
+    await deleteList(user.value.username, movieList.value.slug);
+    router.back();
+  } catch (error: any) {
+    console.error(error);
   }
 };
 
@@ -133,37 +152,103 @@ watch(
 </script>
 
 <template>
-  <!-- CONFIRM DELETE DIALOG -->
-  <Dialog v-model:visible="confirmDeleteVisible" modal :draggable="false" :dismissableMask="true"
-    :style="{ width: '90vw', maxWidth: '380px' }" :pt="{
-      root: { class: 'rounded-[2rem] border-none shadow-2xl bg-[var(--background)] overflow-hidden' },
+  <!-- CONFIRM DELETE MOVIE DIALOG -->
+  <Dialog
+    v-model:visible="confirmDeleteMovieVisible"
+    modal
+    :draggable="false"
+    :dismissableMask="true"
+    :style="{ width: '90vw', maxWidth: '380px' }"
+    :pt="{
+      root: {
+        class:
+          'rounded-[2rem] border-none shadow-2xl bg-[var(--background)] overflow-hidden',
+      },
       header: { class: 'bg-[var(--background)] pb-0' },
       title: { class: 'text-xl font-bold text-[var(--primary)]' },
       content: { class: 'bg-[var(--background)]' },
-      footer: { class: 'bg-[var(--background)] border-t border-[var(--secondary)]' },
-      closeButton: { class: 'hover:bg-[var(--secondary)]/20 transition-colors' },
-    }">
+      footer: {
+        class: 'bg-[var(--background)] border-t border-[var(--secondary)]',
+      },
+      closeButton: {
+        class: 'hover:bg-[var(--secondary)]/20 transition-colors',
+      },
+    }"
+  >
     <template #header>
       <div class="confirm-header">
         <div class="confirm-icon">
           <i class="pi pi-trash" />
         </div>
         <div>
-          <p class="confirm-title">{{ t('list.confirmation') }}</p>
+          <p class="confirm-title">{{ t("list.confirmation") }}</p>
         </div>
       </div>
     </template>
 
-    <p class="confirm-body">{{ t('list.confirmRemoveMovie', [movieToDelete]) }}</p>
+    <p class="confirm-body">
+      {{ t("list.confirmRemoveMovie", [movieToDelete]) }}
+    </p>
 
     <template #footer>
       <div class="footer-actions">
-        <button class="btn-cancel" @click="confirmDeleteVisible = false">
-          {{ t('common.cancel') }}
+        <button class="btn-cancel" @click="confirmDeleteMovieVisible = false">
+          {{ t("common.cancel") }}
         </button>
         <button class="btn-delete" @click="removeMovieConfirm">
           <i class="pi pi-trash" />
-          <span>{{ t('remove') }}</span>
+          <span>{{ t("remove") }}</span>
+        </button>
+      </div>
+    </template>
+  </Dialog>
+
+  <!-- CONFIRM DELETE LIST DIALOG -->
+  <Dialog
+    v-model:visible="confirmDeleteListVisible"
+    modal
+    :draggable="false"
+    :dismissableMask="true"
+    :style="{ width: '90vw', maxWidth: '380px' }"
+    :pt="{
+      root: {
+        class:
+          'rounded-[2rem] border-none shadow-2xl bg-[var(--background)] overflow-hidden',
+      },
+      header: { class: 'bg-[var(--background)] pb-0' },
+      title: { class: 'text-xl font-bold text-[var(--primary)]' },
+      content: { class: 'bg-[var(--background)]' },
+      footer: {
+        class: 'bg-[var(--background)] border-t border-[var(--secondary)]',
+      },
+      closeButton: {
+        class: 'hover:bg-[var(--secondary)]/20 transition-colors',
+      },
+    }"
+  >
+    <template #header>
+      <div class="confirm-header">
+        <div class="confirm-icon">
+          <i class="pi pi-trash" />
+        </div>
+        <div>
+          <p class="confirm-title">{{ t("list.confirmation") }}</p>
+        </div>
+      </div>
+    </template>
+
+    <p class="confirm-body">
+      {{ t("list.confirmRemoveList", [movieList.slug]) }}
+    </p>
+
+    <template #footer>
+      <div class="footer-actions">
+        <button class="btn-cancel" @click="confirmDeleteListVisible = false">
+          {{ t("common.cancel") }}
+        </button>
+        <button class="btn-delete" @click="removeListConfirm">
+          <i class="pi pi-trash" />
+          <span>{{ t("remove") }}</span>
         </button>
       </div>
     </template>
@@ -186,7 +271,11 @@ watch(
           <!-- User -->
           <div class="author-section">
             <div class="avatar-wrapper">
-              <img :src="user.picture" :alt="user.username" class="author-img" />
+              <img
+                :src="user.picture"
+                :alt="user.username"
+                class="author-img"
+              />
             </div>
             <div class="author-meta">
               <span class="label">{{ t("list.createdBy") }}</span>
@@ -201,7 +290,12 @@ watch(
           <div class="list-content">
             <div class="list-header">
               <h1 class="list-name">{{ movieList.name }}</h1>
-              <span v-if="privacy" class="privacy-badge" :class="privacy.class" v-tooltip="movieList.privacity">
+              <span
+                v-if="privacy"
+                class="privacy-badge"
+                :class="privacy.class"
+                v-tooltip="movieList.privacity"
+              >
                 <i :class="privacy.icon" />
               </span>
             </div>
@@ -214,13 +308,21 @@ watch(
               <div class="stat">
                 <i class="pi pi-video" />
                 <span>
-                  {{ t("list.moviesCount", movieList.movies?.length || 0) }}</span>
+                  {{
+                    t("list.moviesCount", movieList.movies?.length || 0)
+                  }}</span
+                >
               </div>
               <div class="stat">
                 <i class="pi pi-calendar" />
                 <span>{{
                   t("list.updated", [formatRelativeTime(movieList.updated_at)])
-                  }}</span>
+                }}</span>
+              </div>
+              <div v-if="user.username === authStore.user?.username">
+                <button @click="removeListModal" class="btn-delete-list">
+                  Delete list
+                </button>
               </div>
             </div>
           </div>
@@ -228,14 +330,26 @@ watch(
       </div>
 
       <div class="movies-grid">
-        <MovieCardComponent v-for="movie in movies.results" :key="movie.id" :movie="movie" :loading="loading"
-          :delete="true" data-testid="movie-card" @remove-movie="removeMovieModal" />
+        <MovieCardComponent
+          v-for="movie in movies.results"
+          :key="movie.id"
+          :movie="movie"
+          :loading="loading"
+          :delete="true"
+          data-testid="movie-card"
+          @remove-movie="removeMovieModal"
+        />
       </div>
 
       <div v-if="!loading && movies.total_pages > 1">
-        <PaginationComponent data-testid="PaginationComponent" :data-total="movies.total_pages"
-          :data-current="movies.current_page" :total_pages="movies.total_pages" :current_page="movies.current_page"
-          @change-page="updateRoute" />
+        <PaginationComponent
+          data-testid="PaginationComponent"
+          :data-total="movies.total_pages"
+          :data-current="movies.current_page"
+          :total_pages="movies.total_pages"
+          :current_page="movies.current_page"
+          @change-page="updateRoute"
+        />
       </div>
     </template>
   </div>
@@ -388,6 +502,35 @@ watch(
 .badge-friends {
   background: rgba(99, 102, 241, 0.2);
   color: #4d57bd;
+}
+
+.btn-delete-list {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid var(--red);
+  background: transparent;
+  color: var(--red);
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    transform 0.1s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn-delete-list:hover {
+  background: var(--red);
+  color: var(--background);
+}
+
+.btn-delete-list:active {
+  transform: scale(0.97);
 }
 
 .header-skeleton {

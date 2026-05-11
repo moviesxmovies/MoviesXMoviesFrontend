@@ -217,7 +217,7 @@ const logoutConfirm = () => {
   router.push({ name: "welcome" });
 };
 
-const openRemoveFriendDialog = (username: string) => {
+const openRemoveFriendDialog = async (username: string) => {
   pendingRemoveFriendUsername.value = username;
   confirmRemoveFriendVisible.value = true;
 };
@@ -277,9 +277,9 @@ const onUpdated = async (userUpdated: User) => {
   profileStore.refresh();
 };
 
-const createNormalList = () => { };
+const createNormalList = () => {};
 
-const createIntelligentList = () => { };
+const createIntelligentList = () => {};
 
 const movieListDialogConfig = {
   icon: "pi pi-plus",
@@ -326,73 +326,109 @@ watch(
 </script>
 
 <template>
-  <ChoiceMovieListTypeModal v-model:visible="choiceMovieListTypeModalVisible" @create-normal-list="createNormalList"
-    @create-intelligent-list="createIntelligentList" @reload-lists="reloadLists" />
-  <EditProfileModal v-model:visible="editProfileModalVisible" @updated="onUpdated" @emailChanged="emailChanged" />
+  <ChoiceMovieListTypeModal
+    v-model:visible="choiceMovieListTypeModalVisible"
+    @create-normal-list="createNormalList"
+    @create-intelligent-list="createIntelligentList"
+    @reload-lists="reloadLists"
+  />
+  <EditProfileModal
+    v-model:visible="editProfileModalVisible"
+    @updated="onUpdated"
+    @emailChanged="emailChanged"
+  />
 
   <!-- CONFIRM LOGOUT DIALOG -->
-  <Dialog v-model:visible="confirmLogoutVisible" modal :draggable="false" :dismissableMask="true"
-    :style="{ width: '90vw', maxWidth: '380px' }" :pt="{
-      root: { class: 'rounded-[2rem] border-none shadow-2xl bg-[var(--background)] overflow-hidden' },
+  <Dialog
+    v-model:visible="confirmLogoutVisible"
+    modal
+    :draggable="false"
+    :dismissableMask="true"
+    :style="{ width: '90vw', maxWidth: '380px' }"
+    :pt="{
+      root: {
+        class:
+          'rounded-[2rem] border-none shadow-2xl bg-[var(--background)] overflow-hidden',
+      },
       header: { class: 'bg-[var(--background)] pb-0' },
       title: { class: 'text-xl font-bold text-[var(--primary)]' },
       content: { class: 'bg-[var(--background)]' },
-      footer: { class: 'bg-[var(--background)] border-t border-[var(--secondary)]' },
-      closeButton: { class: 'hover:bg-[var(--secondary)]/20 transition-colors' },
-    }">
+      footer: {
+        class: 'bg-[var(--background)] border-t border-[var(--secondary)]',
+      },
+      closeButton: {
+        class: 'hover:bg-[var(--secondary)]/20 transition-colors',
+      },
+    }"
+  >
     <template #header>
       <div class="confirm-header">
         <div class="confirm-icon">
           <i class="pi pi-sign-out" />
         </div>
         <div>
-          <p class="confirm-title">{{ t('user.logoutConfirmTitle') }}</p>
+          <p class="confirm-title">{{ t("user.logoutConfirmTitle") }}</p>
         </div>
       </div>
     </template>
-    <p class="confirm-body">{{ t('user.logoutConfirmBody') }}</p>
+    <p class="confirm-body">{{ t("user.logoutConfirmBody") }}</p>
     <template #footer>
       <div class="footer-actions">
         <button class="btn-cancel" @click="confirmLogoutVisible = false">
-          {{ t('common.cancel') }}
+          {{ t("common.cancel") }}
         </button>
         <button class="btn-danger" @click="logoutConfirm">
           <i class="pi pi-sign-out" />
-          <span>{{ t('user.logout') }}</span>
+          <span>{{ t("user.logout") }}</span>
         </button>
       </div>
     </template>
   </Dialog>
 
   <!-- CONFIRM REMOVE FRIEND DIALOG -->
-  <Dialog v-model:visible="confirmRemoveFriendVisible" modal :draggable="false" :dismissableMask="true"
-    :style="{ width: '90vw', maxWidth: '380px' }" :pt="{
-      root: { class: 'rounded-[2rem] border-none shadow-2xl bg-[var(--background)] overflow-hidden' },
+  <Dialog
+    v-model:visible="confirmRemoveFriendVisible"
+    modal
+    :draggable="false"
+    :dismissableMask="true"
+    :style="{ width: '90vw', maxWidth: '380px' }"
+    :pt="{
+      root: {
+        class:
+          'rounded-[2rem] border-none shadow-2xl bg-[var(--background)] overflow-hidden',
+      },
       header: { class: 'bg-[var(--background)] pb-0' },
       title: { class: 'text-xl font-bold text-[var(--primary)]' },
       content: { class: 'bg-[var(--background)]' },
-      footer: { class: 'bg-[var(--background)] border-t border-[var(--secondary)]' },
-      closeButton: { class: 'hover:bg-[var(--secondary)]/20 transition-colors' },
-    }">
+      footer: {
+        class: 'bg-[var(--background)] border-t border-[var(--secondary)]',
+      },
+      closeButton: {
+        class: 'hover:bg-[var(--secondary)]/20 transition-colors',
+      },
+    }"
+  >
     <template #header>
       <div class="confirm-header">
         <div class="confirm-icon">
           <i class="pi pi-user-minus" />
         </div>
         <div>
-          <p class="confirm-title">{{ t('user.removeFriendConfirmTitle') }}</p>
+          <p class="confirm-title">{{ t("user.removeFriendConfirmTitle") }}</p>
         </div>
       </div>
     </template>
-    <p class="confirm-body">{{ t('user.removeFriendConfirmBody', [pendingRemoveFriendUsername]) }}</p>
+    <p class="confirm-body">
+      {{ t("user.removeFriendConfirmBody", [pendingRemoveFriendUsername]) }}
+    </p>
     <template #footer>
       <div class="footer-actions">
         <button class="btn-cancel" @click="confirmRemoveFriendVisible = false">
-          {{ t('common.cancel') }}
+          {{ t("common.cancel") }}
         </button>
         <button class="btn-danger" @click="removeFriendConfirm">
           <i class="pi pi-user-minus" />
-          <span>{{ t('common.remove') }}</span>
+          <span>{{ t("common.remove") }}</span>
         </button>
       </div>
     </template>
@@ -416,19 +452,39 @@ watch(
               <img :src="user.picture" :alt="user.username" class="card-img" />
             </div>
             <div class="card-body">
-              <h1 class="user-name" :style="isSelfProfile ? 'text-align: start' : 'text-align: center'">
+              <h1
+                class="user-name"
+                :style="
+                  isSelfProfile ? 'text-align: start' : 'text-align: center'
+                "
+              >
                 {{ user.username }}
               </h1>
-              <button v-if="isSelfProfile && isMobile" class="btn-logout" @click="logout">
+              <button
+                v-if="isSelfProfile && isMobile"
+                class="btn-logout"
+                @click="logout"
+              >
                 {{ $t("user.logout") }}
               </button>
-              <button v-if="isSelfProfile" @click="editProfileModalVisible = true" class="btn-edit">
+              <button
+                v-if="isSelfProfile"
+                @click="editProfileModalVisible = true"
+                class="btn-edit"
+              >
                 {{ $t("user.editProfile") }}
               </button>
-              <FriendshipStatusComponent v-else :user="user"
-                @add-friend="(username) => completeFriendRequest(username, true)"
+              <FriendshipStatusComponent
+                v-else
+                :user="user"
+                @add-friend="
+                  (username) => completeFriendRequest(username, true)
+                "
                 @remove-friend="(username) => openRemoveFriendDialog(username)"
-                @remove-pending="(username) => completeFriendRequest(username, false)" />
+                @remove-pending="
+                  (username) => completeFriendRequest(username, false)
+                "
+              />
             </div>
           </template>
         </div>
@@ -445,8 +501,13 @@ watch(
             <AccordionContent class="section-body">
               <div v-if="user.bio" class="biography-container">
                 <p class="biography">{{ renderedBiography }}</p>
-                <TranslateButton v-if="!isSelfProfile" :is-translated="isTranslated" :is-loading="isLoading"
-                  :error="error" @translate="translate" />
+                <TranslateButton
+                  v-if="!isSelfProfile"
+                  :is-translated="isTranslated"
+                  :is-loading="isLoading"
+                  :error="error"
+                  @translate="translate"
+                />
               </div>
               <p v-else class="empty-text">{{ t("user.no_biography") }}</p>
             </AccordionContent>
@@ -454,61 +515,115 @@ watch(
         </Accordion>
 
         <!-- REVIEWS -->
-        <SectionAccordion icon="pi pi-file-word accent-icon" :title="t('user.reviews')"
-          :isEmpty="!reviews.results?.length" :emptyIcon="'pi pi-file-word'" :emptyTitle="t('user.no_reviews')"
-          :emptyDescription="t('user.no_reviews_description')" :loading="loadingReviews"
-          v-model:sentinelRef="reviewsSentinelRef" defaultOpen>
-          <ReviewComponent v-for="review in reviews.results" :key="review.id" :review="review" @deleted="
-            () => {
-              resetReviews();
-              fetchUserReviews();
-            }
-          " @reload="
-            () => {
-              resetReviews();
-              fetchUserReviews();
-            }
-          " />
+        <SectionAccordion
+          icon="pi pi-file-word accent-icon"
+          :title="t('user.reviews')"
+          :isEmpty="!reviews.results?.length"
+          :emptyIcon="'pi pi-file-word'"
+          :emptyTitle="t('user.no_reviews')"
+          :emptyDescription="t('user.no_reviews_description')"
+          :loading="loadingReviews"
+          v-model:sentinelRef="reviewsSentinelRef"
+          defaultOpen
+        >
+          <ReviewComponent
+            v-for="review in reviews.results"
+            :key="review.id"
+            :review="review"
+            @deleted="
+              () => {
+                resetReviews();
+                fetchUserReviews();
+              }
+            "
+            @reload="
+              () => {
+                resetReviews();
+                fetchUserReviews();
+              }
+            "
+          />
         </SectionAccordion>
 
         <!-- MOVIES LISTS -->
-        <SectionAccordion icon="pi pi-folder accent-icon" :title="t('user.movies_lists')"
-          :isEmpty="!moviesLists.results?.length" :emptyIcon="'pi pi-folder'" :emptyTitle="t('user.no_movies_lists')"
-          :emptyDescription="t('user.no_movies_lists_description')" :loading="loadingMoviesLists"
+        <SectionAccordion
+          icon="pi pi-folder accent-icon"
+          :title="t('user.movies_lists')"
+          :isEmpty="!moviesLists.results?.length"
+          :emptyIcon="'pi pi-folder'"
+          :emptyTitle="t('user.no_movies_lists')"
+          :emptyDescription="t('user.no_movies_lists_description')"
+          :loading="loadingMoviesLists"
           v-model:sentinelRef="moviesListsSentinelRef"
-          :dialogOptions="isSelfProfile ? movieListDialogConfig : undefined">
+          :dialogOptions="isSelfProfile ? movieListDialogConfig : undefined"
+        >
           <div class="movies-lists-grid">
-            <MoviesListComponent v-for="movieList in moviesLists.results" :key="movieList.id" :movieList="movieList" />
+            <MoviesListComponent
+              v-for="movieList in moviesLists.results"
+              :key="movieList.id"
+              :movieList="movieList"
+            />
           </div>
         </SectionAccordion>
       </div>
 
       <!-- FRIENDS SECTION -->
       <div class="content friends-section">
-
         <!-- FRIEND REQUESTS -->
-        <SectionAccordion v-if="isSelfProfile" icon="pi pi-bell" :title="t('user.friendsRequests')"
-          :isEmpty="!friendRequests.results?.length" :emptyIcon="'pi pi-users'"
-          :emptyTitle="t('user.no_friends_requests')" :emptyDescription="t('user.no_friends_requests_description')"
-          :loading="loadingRequests" :panelHeight="'200px'" :defaultOpen="!!friendRequests.results?.length">
-          <FriendRequestComponent v-for="request in friendRequests.results" :key="request.id" :request="request"
-            @accept="acceptFriendRequest" @decline="rejectFriendRequest" />
-          <div :ref="(el) => { friendRequestsSentinelRef = el as HTMLElement; }" class="sentinel" />
+        <SectionAccordion
+          v-if="isSelfProfile"
+          icon="pi pi-bell"
+          :title="t('user.friendsRequests')"
+          :isEmpty="!friendRequests.results?.length"
+          :emptyIcon="'pi pi-users'"
+          :emptyTitle="t('user.no_friends_requests')"
+          :emptyDescription="t('user.no_friends_requests_description')"
+          :loading="loadingRequests"
+          :panelHeight="'200px'"
+          :defaultOpen="!!friendRequests.results?.length"
+        >
+          <FriendRequestComponent
+            v-for="request in friendRequests.results"
+            :key="request.id"
+            :request="request"
+            @accept="acceptFriendRequest"
+            @decline="rejectFriendRequest"
+          />
+          <div
+            :ref="
+              (el) => {
+                friendRequestsSentinelRef = el as HTMLElement;
+              }
+            "
+            class="sentinel"
+          />
         </SectionAccordion>
 
         <!-- FRIENDS -->
-        <SectionAccordion icon="pi pi-users" :title="t('user.friends')" :isEmpty="!friends.results?.length"
-          :emptyIcon="'pi pi-users'" :emptyTitle="t('user.no_friends')"
-          :emptyDescription="t('user.no_friends_description')" :loading="loadingFriends"
-          v-model:sentinelRef="friendsSentinelRef">
+        <SectionAccordion
+          icon="pi pi-users"
+          :title="t('user.friends')"
+          :isEmpty="!friends.results?.length"
+          :emptyIcon="'pi pi-users'"
+          :emptyTitle="t('user.no_friends')"
+          :emptyDescription="t('user.no_friends_description')"
+          :loading="loadingFriends"
+          v-model:sentinelRef="friendsSentinelRef"
+        >
           <HandleFriendshipComponent :users="friends.results" />
         </SectionAccordion>
 
         <!-- SUGGESTED FRIENDS -->
-        <SectionAccordion icon="pi pi-lightbulb" :title="t('user.suggested_friends')"
-          :isEmpty="!suggestedFriends.results?.length" :emptyIcon="'pi pi-users'"
-          :emptyTitle="t('user.no_suggested_friends')" :emptyDescription="t('user.no_suggested_friends_description')"
-          :loading="loadingSuggestedFriends" v-model:sentinelRef="suggestedFriendsSentinelRef">
+        <SectionAccordion
+          icon="pi pi-lightbulb"
+          :title="t('user.suggested_friends')"
+          :isEmpty="!suggestedFriends.results?.length"
+          :emptyIcon="'pi pi-users'"
+          :emptyTitle="t('user.no_suggested_friends')"
+          :emptyDescription="t('user.no_suggested_friends_description')"
+          :loading="loadingSuggestedFriends"
+          v-model:sentinelRef="suggestedFriendsSentinelRef"
+        >
           <HandleFriendshipComponent :users="suggestedFriends.results" />
         </SectionAccordion>
       </div>

@@ -168,3 +168,11 @@ export const movieSearchingInList = async (
     throw new TranslatedError(error, error.response?.data?.status);
   }
 };
+
+export const deleteList = async (user: string, slug: string) => {
+  try {
+    await api.delete(`/movies-lists/${user}/${slug}/`);
+  } catch (error: any) {
+    throw new TranslatedError(error, error.response?.data?.status);
+  }
+};
