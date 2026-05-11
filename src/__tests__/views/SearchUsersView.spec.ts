@@ -190,7 +190,7 @@ describe("SearchUsersView", () => {
       const wrapper = createWrapper();
       await flushPromises();
 
-      const pagination = wrapper.getComponent('[data-testid="pagination-component"]');
+      const pagination = wrapper.getComponent('[data-testid="PaginationComponent"]');
       await pagination.vm.$emit("change-page", 2);
 
       expect(mockPush).toHaveBeenCalledWith(
