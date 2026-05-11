@@ -18,7 +18,6 @@ const {
     mockLogout,
     mockRefreshToken,
     mockProfileStoreRefresh,
-
 } = vi.hoisted(() => ({
     mockGetSelfUserProfile: vi.fn(),
     mockGetUserProfile: vi.fn(),
@@ -29,6 +28,7 @@ const {
     mockGetSuggestedFriends: vi.fn(),
     mockGetUserMoviesLists: vi.fn(),
     mockToast: { add: vi.fn() },
+    mockConfirm: vi.fn(),
     mockLogout: vi.fn(),
     mockRefreshToken: vi.fn(),
     mockProfileStoreRefresh: vi.fn(),
@@ -94,8 +94,7 @@ vi.mock("primevue", async (importOriginal) => {
 // Stub child components to keep tests focused
 vi.mock('@/components/friendRequestComponent.vue', () => ({ default: { template: '<div class="friend-request-stub" />' } }));
 vi.mock('@/components/reviewComponent.vue', () => ({ default: { template: '<div class="review-stub" />' } }));
-vi.mock('@/components/friendWithFollow.vue', () => ({ default: { template: '<div class="friend-with-follow-stub" />' } }));
-vi.mock('@/components/friendshipStatusComponent.vue', () => ({ default: { template: '<div class="friendship-status-stub" />' } }));
+vi.mock('@/components/handleFriendshipComponent.vue', () => ({ default: { template: '<div class="handle-friendship-stub" />', props: ['users'] } }));vi.mock('@/components/friendshipStatusComponent.vue', () => ({ default: { template: '<div class="friendship-status-stub" />' } }));
 vi.mock('@/components/moviesListComponent.vue', () => ({ default: { template: '<div class="movies-list-stub" />' } }));
 vi.mock('@/components/sectionAccordion.vue', () => ({ default: { template: '<div class="section-accordion-stub"><slot /></div>', props: ['icon', 'title', 'isEmpty', 'emptyIcon', 'emptyTitle', 'emptyDescription', 'loading', 'defaultOpen', 'panelHeight', 'sentinelRef'] } }));
 
@@ -260,24 +259,6 @@ describe('UserProfileView', () => {
         expect(mockCompleteFriendRequest).toHaveBeenCalledWith('testuser', false);
     });
 
-    // ── sendFriendRequest ─────────────────────────────────────────────────────
-    it('calls completeFriendRequest with true on send', async () => {
-        mockCompleteFriendRequest.mockResolvedValue({});
-        const wrapper = factory('');
-        await flushPromises();
-        const vm = wrapper.vm as any;
-        await vm.sendFriendRequest('otheruser');
-        expect(mockCompleteFriendRequest).toHaveBeenCalledWith('otheruser', true);
-    });
-
-    it('throws when sendFriendRequest fails', async () => {
-        mockCompleteFriendRequest.mockRejectedValue({ translatedMessage: 'Error' });
-        const wrapper = factory('');
-        await flushPromises();
-        const vm = wrapper.vm as any;
-        await expect(vm.sendFriendRequest('otheruser')).rejects.toBeTruthy();
-    });
-
     // ── Reviews rendering ─────────────────────────────────────────────────────
     it('renders review components when reviews exist', async () => {
         mockGetUserReviews.mockResolvedValue({
@@ -299,7 +280,7 @@ describe('UserProfileView', () => {
         });
         const wrapper = factory('');
         await flushPromises();
-        expect(wrapper.find('.friend-with-follow-stub').exists()).toBe(true);
+        expect(wrapper.find('.handle-friendship-stub').exists()).toBe(true);
     });
 
     // ── Movies lists rendering ────────────────────────────────────────────────
@@ -629,19 +610,6 @@ describe('UserProfileView', () => {
             const vm = wrapper.vm as any;
 
             await vm.rejectFriendRequest('testuser');
-
-            expect(mockToast.add).toHaveBeenCalledWith(
-                expect.objectContaining({ severity: 'success' })
-            );
-        });
-
-        it('shows success toast when sendFriendRequest succeeds', async () => {
-            mockCompleteFriendRequest.mockResolvedValue({});
-            const wrapper = factory('');
-            await flushPromises();
-            const vm = wrapper.vm as any;
-
-            await vm.sendFriendRequest('otheruser');
 
             expect(mockToast.add).toHaveBeenCalledWith(
                 expect.objectContaining({ severity: 'success' })

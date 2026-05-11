@@ -5,179 +5,120 @@ import FriendshipStatusComponent from '@/components/friendshipStatusComponent.vu
 import type { User } from '@/types';
 
 const i18n = createI18n({
-    legacy: false,
-    locale: 'en',
-    messages: {
-        en: {
-            components: {
-                friendWithFollow: {
-                    status: {
-                        self: 'You',
-                        friend: 'Friends',
-                        pending: 'Pending',
-                        failed: 'Failed',
-                        add: 'Add Friend',
-                    },
-                },
-            },
+  legacy: false,
+  locale: 'en',
+  messages: {
+    en: {
+      components: {
+        friendWithFollow: {
+          status: {
+            self: 'You',
+            friend: 'Friends',
+            pending: 'Pending',
+            failed: 'Failed',
+            add: 'Add Friend',
+          },
         },
+      },
     },
+  },
 });
 
-const mountComponent = (user: Partial<User>, onAddFriend?: (username: string) => Promise<void>) => {
-    return mount(FriendshipStatusComponent, {
-        props: { user: user as User, onAddFriend },
-        global: { plugins: [i18n] },
-    });
-};
-
 const baseUser: User = {
-    id: 1,
-    username: 'testuser',
-    picture: 'https://example.com/pic.jpg',
-    bio: 'bio',
-    friendship: { is_friend: false, status: 'N' },
+  id: 1,
+  username: 'testuser',
+  picture: 'https://example.com/pic.jpg',
+  bio: 'bio',
+  friendship: { is_friend: false, status: 'N' },
 };
 
-describe('FriendshipStatusComponent', () => {
-    beforeEach(() => vi.clearAllMocks());
+describe('FriendshipStatusComponent (Props Version)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
-    // ── statusConfig: no friendship ───────────────────────────────────────────
-    describe('when friendship is null', () => {
-        it('shows status-self div', () => {
-            const wrapper = mountComponent({ ...baseUser, friendship: null as any });
-            expect(wrapper.find('.status-info.status-self').exists()).toBe(true);
-        });
+  const mountComponent = (propsOverride = {}) => {
+    return mount(FriendshipStatusComponent, {
+      props: {
+        user: baseUser,
+        ...propsOverride,
+      },
+      global: {
+        plugins: [i18n],
+      },
+    });
+  };
 
-        it('does not show action button', () => {
-            const wrapper = mountComponent({ ...baseUser, friendship: null as any });
-            expect(wrapper.find('button').exists()).toBe(false);
-        });
-
-        it('has correct aria-label', () => {
-            const wrapper = mountComponent({ ...baseUser, friendship: null as any });
-            expect(wrapper.find('.status-info').attributes('aria-label')).toBe('You');
-        });
+  describe('States rendering', () => {
+    it('shows status-self div when friendship is null', () => {
+      const wrapper = mountComponent({ 
+        user: { ...baseUser, friendship: null as any } 
+      });
+      expect(wrapper.find('.status-self').exists()).toBe(true);
+      expect(wrapper.find('button').exists()).toBe(false); // No hay acción para uno mismo
     });
 
-    // ── statusConfig: is_friend ───────────────────────────────────────────────
-    describe('when is_friend is true', () => {
-        it('shows status-friend div', () => {
-            const wrapper = mountComponent({ ...baseUser, friendship: { is_friend: true, status: 'A' } });
-            expect(wrapper.find('.status-info.status-friend').exists()).toBe(true);
-        });
-
-        it('does not show action button', () => {
-            const wrapper = mountComponent({ ...baseUser, friendship: { is_friend: true, status: 'A' } });
-            expect(wrapper.find('button').exists()).toBe(false);
-        });
-
-        it('has correct aria-label', () => {
-            const wrapper = mountComponent({ ...baseUser, friendship: { is_friend: true, status: 'A' } });
-            expect(wrapper.find('.status-info').attributes('aria-label')).toBe('Friends');
-        });
+    it('shows the "Friends" button when they are already friends', () => {
+      const wrapper = mountComponent({ 
+        user: { ...baseUser, friendship: { is_friend: true, status: 'A' } } 
+      });
+      expect(wrapper.find('button.status-friend').exists()).toBe(true);
     });
 
-    // ── statusConfig: pending ─────────────────────────────────────────────────
-    describe('when status is P', () => {
-        it('shows status-pending div', () => {
-            const wrapper = mountComponent({ ...baseUser, friendship: { is_friend: false, status: 'P' } });
-            expect(wrapper.find('.status-info.status-pending').exists()).toBe(true);
-        });
+    it('shows the "Pending" button when the status is "P"', () => {
+      const wrapper = mountComponent({ 
+        user: { ...baseUser, friendship: { is_friend: false, status: 'P' } } 
+      });
+      expect(wrapper.find('button.status-pending').exists()).toBe(true);
+    });
+  });
 
-        it('does not show action button', () => {
-            const wrapper = mountComponent({ ...baseUser, friendship: { is_friend: false, status: 'P' } });
-            expect(wrapper.find('button').exists()).toBe(false);
-        });
-
-        it('has correct aria-label', () => {
-            const wrapper = mountComponent({ ...baseUser, friendship: { is_friend: false, status: 'P' } });
-            expect(wrapper.find('.status-info').attributes('aria-label')).toBe('Pending');
-        });
+  describe('Actions (Callbacks)', () => {
+    it('calls onAddFriend when the state is initial', async () => {
+      const onAddFriend = vi.fn().mockResolvedValue(undefined);
+      const wrapper = mountComponent({ onAddFriend });
+      
+      await wrapper.find('button').trigger('click');
+      
+      expect(onAddFriend).toHaveBeenCalledWith('testuser');
+      await flushPromises();
+      expect(wrapper.find('.status-pending').exists()).toBe(true);
     });
 
-    // ── statusConfig: add ─────────────────────────────────────────────────────
-    describe('when can add friend', () => {
-        it('shows action button', () => {
-            const wrapper = mountComponent(baseUser);
-            expect(wrapper.find('button.btn-action').exists()).toBe(true);
-        });
-
-        it('has status-add class', () => {
-            const wrapper = mountComponent(baseUser);
-            expect(wrapper.find('button').classes()).toContain('status-add');
-        });
-
-        it('has correct aria-label', () => {
-            const wrapper = mountComponent(baseUser);
-            expect(wrapper.find('button').attributes('aria-label')).toBe('Add Friend');
-        });
+    it('calls onRemoveFriend when they are already friends', async () => {
+      const onRemoveFriend = vi.fn().mockResolvedValue(undefined);
+      const user = { ...baseUser, friendship: { is_friend: true, status: 'A' } };
+      const wrapper = mountComponent({ user, onRemoveFriend });
+      
+      await wrapper.find('button').trigger('click');
+      
+      expect(onRemoveFriend).toHaveBeenCalledWith('testuser');
     });
 
-    // ── sendFriendRequest: success ────────────────────────────────────────────
-    describe('sendFriendRequest success', () => {
-        it('calls onAddFriend with username', async () => {
-            const onAddFriend = vi.fn().mockResolvedValue(undefined);
-            const wrapper = mountComponent(baseUser, onAddFriend);
-            await wrapper.find('button').trigger('click');
-            await flushPromises();
-            expect(onAddFriend).toHaveBeenCalledWith('testuser');
-        });
-
-        it('shows pending status after sending', async () => {
-            const onAddFriend = vi.fn().mockResolvedValue(undefined);
-            const wrapper = mountComponent(baseUser, onAddFriend);
-            await wrapper.find('button').trigger('click');
-            await flushPromises();
-            expect(wrapper.find('.status-info.status-pending').exists()).toBe(true);
-        });
-
-        it('does not show button after sending', async () => {
-            const onAddFriend = vi.fn().mockResolvedValue(undefined);
-            const wrapper = mountComponent(baseUser, onAddFriend);
-            await wrapper.find('button').trigger('click');
-            await flushPromises();
-            expect(wrapper.find('button').exists()).toBe(false);
-        });
+    it('calls onRemovePending when the request is pending', async () => {
+      const onRemovePending = vi.fn().mockResolvedValue(undefined);
+      const user = { ...baseUser, friendship: { is_friend: false, status: 'P' } };
+      const wrapper = mountComponent({ user, onRemovePending });
+      
+      await wrapper.find('button').trigger('click');
+      
+      expect(onRemovePending).toHaveBeenCalledWith('testuser');
     });
+  });
 
-    // ── sendFriendRequest: failure ────────────────────────────────────────────
-    describe('sendFriendRequest failure', () => {
-        it('shows failed status when onAddFriend throws', async () => {
-            const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-            const onAddFriend = vi.fn().mockRejectedValue(new Error('Network error'));
-            const wrapper = mountComponent(baseUser, onAddFriend);
-            await wrapper.find('button').trigger('click');
-            await flushPromises();
-            expect(wrapper.find('button.status-failed').exists()).toBe(true);
-            consoleSpy.mockRestore();
-        });
-
-        it('still shows button after failure so user can retry', async () => {
-            const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-            const onAddFriend = vi.fn().mockRejectedValue(new Error('Network error'));
-            const wrapper = mountComponent(baseUser, onAddFriend);
-            await wrapper.find('button').trigger('click');
-            await flushPromises();
-            expect(wrapper.find('button').exists()).toBe(true);
-            consoleSpy.mockRestore();
-        });
-
-        it('logs error on failure', async () => {
-            const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-            const onAddFriend = vi.fn().mockRejectedValue(new Error('Network error'));
-            const wrapper = mountComponent(baseUser, onAddFriend);
-            await wrapper.find('button').trigger('click');
-            await flushPromises();
-            expect(consoleSpy).toHaveBeenCalledWith('Error sending friend request:', expect.any(Error));
-            consoleSpy.mockRestore();
-        });
+  describe('Error Handling', () => {
+    it('changes to failed state if the promise rejects', async () => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const onAddFriend = vi.fn().mockRejectedValue(new Error('API Error'));
+      const wrapper = mountComponent({ onAddFriend });
+      
+      await wrapper.find('button').trigger('click');
+      await flushPromises();
+      
+      expect(wrapper.find('.status-failed').exists()).toBe(true);
+      expect(wrapper.find('button').exists()).toBe(false);
+      
+      consoleSpy.mockRestore();
     });
-
-    // ── no onAddFriend ────────────────────────────────────────────────────────
-    it('does not throw when onAddFriend is not provided', async () => {
-        const wrapper = mountComponent(baseUser);
-        await expect(wrapper.find('button').trigger('click')).resolves.not.toThrow();
-        await flushPromises();
-    });
+  });
 });

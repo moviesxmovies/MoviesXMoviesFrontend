@@ -123,7 +123,7 @@ export interface FriendRequest {
 }
 export interface Friendship {
   is_friend: boolean;
-  status: string;
+  status: string | null;
 }
 
 export interface Rating {
