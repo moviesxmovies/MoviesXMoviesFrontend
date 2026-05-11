@@ -8,7 +8,7 @@ import {
   type userSearchingData,
 } from "@/repositories/userRepository";
 import { useAuthStore } from "@/stores/authStore";
-import type { Friendship, Pagination, User } from "@/types";
+import type { Pagination, User } from "@/types";
 import { ConfirmDialog, Skeleton, useConfirm, useToast } from "primevue";
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
@@ -48,23 +48,13 @@ const updateRoute = (page: number) => {
   });
 };
 
-const updateUserFriendship = (
-  username: string,
-  patch: User["friendship"],
-) => {
-  const user = users.value.results.find((u) => u.username === username);
-  if (!user) return;
-  user.friendship = { ...patch };
-  console.log(user.friendship);
-};
-
-const handleFriendRequest = async (username: string, accept: boolean) => {
+const handleFriendRequest = async (user: User, accept: boolean) => {
   try {
-    await completeFriendRequest(username, accept);
+    await completeFriendRequest(user.username, accept);
     if (accept) {
-      updateUserFriendship(username, { is_friend: false, status: "P" });
+      user.friendship = { is_friend: false, status: "P" };
     } else {
-      updateUserFriendship(username, { is_friend: false, status: null });
+      user.friendship = { is_friend: false, status: null };
     }
     toast.add({
       severity: "success",
@@ -82,10 +72,10 @@ const handleFriendRequest = async (username: string, accept: boolean) => {
   }
 };
 
-const removeFriendRequest = async (slug: string) => {
+const removeFriendRequest = async (user: User) => {
   try {
-    await removeFriend(slug);
-    updateUserFriendship(slug, { is_friend: false, status: null });
+    await removeFriend(user.username);
+    user.friendship = { is_friend: false, status: null };
     toast.add({
       severity: "success",
       summary: t("toast.success"),
@@ -100,7 +90,7 @@ const removeFriendRequest = async (slug: string) => {
   }
 };
 
-const removeFrienshipModal = async (slug: string, already_friends: boolean) => {
+const removeFrienshipModal = async (user: User, already_friends: boolean) => {
   confirm.require({
     message: t("search.confirmRemoveFriend"),
     header: t("search.confirmation"),
@@ -115,8 +105,8 @@ const removeFrienshipModal = async (slug: string, already_friends: boolean) => {
     },
     accept: () => {
       already_friends
-        ? removeFriendRequest(slug)
-        : handleFriendRequest(slug, false);
+        ? removeFriendRequest(user)
+        : handleFriendRequest(user, false);
     },
   });
 };
@@ -153,9 +143,9 @@ watch(
         :key="user.id"
         :user="user"
         :is-self-user="authStore.user?.username === user.username"
-        :onAddFriend="() => handleFriendRequest(user.username, true)"
-        :onRemoveFriend="() => removeFrienshipModal(user.username, true)"
-        :onRemovePending="() => removeFrienshipModal(user.username, false)"
+        :onAddFriend="() => handleFriendRequest(user, true)"
+        :onRemoveFriend="() => removeFrienshipModal(user, true)"
+        :onRemovePending="() => removeFrienshipModal(user, false)"
       />
     </template>
 
