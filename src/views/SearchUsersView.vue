@@ -1,15 +1,12 @@
 <script lang="ts" setup>
-import FriendWithFollow from "@/components/friendWithFollow.vue";
+import HandleFrienshipComponent from "@/components/handleFrienshipComponent.vue";
 import PaginationComponent from "@/components/paginationComponent.vue";
 import {
-  completeFriendRequest,
-  removeFriend,
   userSearching,
   type userSearchingData,
 } from "@/repositories/userRepository";
-import { useAuthStore } from "@/stores/authStore";
 import type { Pagination, User } from "@/types";
-import { ConfirmDialog, Skeleton, useConfirm, useToast } from "primevue";
+import { Skeleton, useToast } from "primevue";
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
@@ -20,8 +17,6 @@ const toast = useToast();
 const users = ref<Pagination<User>>({} as Pagination<User>);
 const { t } = useI18n();
 const loading = ref<boolean>(false);
-const authStore = useAuthStore();
-const confirm = useConfirm();
 
 const searchUsers = async (data: userSearchingData) => {
   try {
@@ -44,69 +39,6 @@ const updateRoute = (page: number) => {
     query: {
       ...route.query,
       page,
-    },
-  });
-};
-
-const handleFriendRequest = async (user: User, accept: boolean) => {
-  try {
-    await completeFriendRequest(user.username, accept);
-    if (accept) {
-      user.friendship = { is_friend: false, status: "P" };
-    } else {
-      user.friendship = { is_friend: false, status: null };
-    }
-    toast.add({
-      severity: "success",
-      summary: t("toast.success"),
-      detail: accept
-        ? t("user.friendRequestSent")
-        : t("user.friendRequestDeclined"),
-    });
-  } catch (error: any) {
-    toast.add({
-      severity: "error",
-      summary: t("toast.error"),
-      detail: error.translatedMessage,
-    });
-  }
-};
-
-const removeFriendRequest = async (user: User) => {
-  try {
-    await removeFriend(user.username);
-    user.friendship = { is_friend: false, status: null };
-    toast.add({
-      severity: "success",
-      summary: t("toast.success"),
-      detail: t("user.friendRemoved"),
-    });
-  } catch (error: any) {
-    toast.add({
-      severity: "error",
-      summary: t("toast.error"),
-      detail: error.translatedMessage,
-    });
-  }
-};
-
-const removeFrienshipModal = async (user: User, already_friends: boolean) => {
-  confirm.require({
-    message: t("search.confirmRemoveFriend"),
-    header: t("search.confirmation"),
-    icon: "pi pi-exclamation-triangle",
-    rejectProps: {
-      label: t("cancel"),
-      severity: "secondary",
-      outlined: true,
-    },
-    acceptProps: {
-      label: t("remove"),
-    },
-    accept: () => {
-      already_friends
-        ? removeFriendRequest(user)
-        : handleFriendRequest(user, false);
     },
   });
 };
@@ -136,18 +68,7 @@ watch(
       <span class="empty-sub">{{ t("search.help") }}</span>
     </div>
 
-    <template v-else>
-      <ConfirmDialog appendTo="self" />
-      <FriendWithFollow
-        v-for="user in users.results"
-        :key="user.id"
-        :user="user"
-        :is-self-user="authStore.user?.username === user.username"
-        :onAddFriend="() => handleFriendRequest(user, true)"
-        :onRemoveFriend="() => removeFrienshipModal(user, true)"
-        :onRemovePending="() => removeFrienshipModal(user, false)"
-      />
-    </template>
+    <HandleFrienshipComponent v-else :users="users.results" />
 
     <PaginationComponent
       v-if="!loading && users.total_pages > 1"

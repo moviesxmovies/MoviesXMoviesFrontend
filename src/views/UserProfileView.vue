@@ -42,6 +42,7 @@ import { useProfileStore } from "@/stores/profileStore";
 import ChoiceMovieListTypeModal from "@/components/choiceMovieListTypeModal.vue";
 import { useTranslation } from "@/composables/useTranslation";
 import TranslateButton from "@/components/translateButton.vue";
+import HandleFrienshipComponent from "@/components/handleFrienshipComponent.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -51,7 +52,6 @@ const langStore = useLangStore();
 const authStore = useAuthStore();
 const notificationsStore = useNotificationsStore();
 const profileStore = useProfileStore();
-const confirm = useConfirm();
 
 const user = ref<User>({} as User);
 const loadingProfile = ref(false);
@@ -202,69 +202,6 @@ const rejectFriendRequest = async (username: string) => {
         error.response?.data?.message || t("user.error.rejectingFriendRequest"),
     });
   }
-};
-
-const handleFriendRequest = async (user: User, accept: boolean) => {
-  try {
-    await completeFriendRequest(user.username, accept);
-    if (accept) {
-      user.friendship = { is_friend: false, status: "P" };
-    } else {
-      user.friendship = { is_friend: false, status: null };
-    }
-    toast.add({
-      severity: "success",
-      summary: t("toast.success"),
-      detail: accept
-        ? t("user.friendRequestSent")
-        : t("user.friendRequestDeclined"),
-    });
-  } catch (error: any) {
-    toast.add({
-      severity: "error",
-      summary: t("toast.error"),
-      detail: error.translatedMessage,
-    });
-  }
-};
-
-const removeFriendRequest = async (user: User) => {
-  try {
-    await removeFriend(user.username);
-    user.friendship = { is_friend: false, status: null };
-    toast.add({
-      severity: "success",
-      summary: t("toast.success"),
-      detail: t("user.friendRemoved"),
-    });
-  } catch (error: any) {
-    toast.add({
-      severity: "error",
-      summary: t("toast.error"),
-      detail: error.translatedMessage,
-    });
-  }
-};
-
-const removeFrienshipModal = async (user: User, already_friends: boolean) => {
-  confirm.require({
-    message: t("search.confirmRemoveFriend"),
-    header: t("search.confirmation"),
-    icon: "pi pi-exclamation-triangle",
-    rejectProps: {
-      label: t("cancel"),
-      severity: "secondary",
-      outlined: true,
-    },
-    acceptProps: {
-      label: t("remove"),
-    },
-    accept: () => {
-      already_friends
-        ? removeFriendRequest(user)
-        : handleFriendRequest(user, false);
-    },
-  });
 };
 
 const logout = () => {
@@ -536,14 +473,7 @@ watch(
           :loading="loadingFriends"
           v-model:sentinelRef="friendsSentinelRef"
         >
-          <FriendWithFollow
-            v-for="friend in friends.results"
-            :key="friend.id"
-            :user="friend"
-            :onAddFriend="() => handleFriendRequest(user, true)"
-            :onRemoveFriend="() => removeFrienshipModal(user, true)"
-            :onRemovePending="() => removeFrienshipModal(user, false)"
-          />
+          <HandleFrienshipComponent :users="friends.results" />
         </SectionAccordion>
 
         <!-- SUGGESTED FRIENDS -->
@@ -557,14 +487,7 @@ watch(
           :loading="loadingSuggestedFriends"
           v-model:sentinelRef="suggestedFriendsSentinelRef"
         >
-          <FriendWithFollow
-            v-for="friend in suggestedFriends.results"
-            :key="friend.id"
-            :user="friend"
-            :onAddFriend="() => handleFriendRequest(user, true)"
-            :onRemoveFriend="() => removeFrienshipModal(user, true)"
-            :onRemovePending="() => removeFrienshipModal(user, false)"
-          />
+          <HandleFrienshipComponent :users="suggestedFriends.results" />
         </SectionAccordion>
       </div>
     </div>
