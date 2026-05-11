@@ -14,21 +14,22 @@ import {
   type MovieList,
   type User,
 } from "@/types";
-import { ConfirmDialog, Skeleton, useConfirm, useToast } from "primevue";
+import { Dialog, Skeleton } from "primevue";
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 
 const router = useRouter();
 const route = useRoute();
-const toast = useToast();
-const confirm = useConfirm();
 const { t } = useI18n();
 const search = ref("");
 const movieList = ref<MovieList>({} as MovieList);
 const user = ref<User>({} as User);
 const movies = ref<Pagination<Movie>>({} as Pagination<Movie>);
 const loading = ref(false);
+
+const confirmDeleteVisible = ref(false);
+const movieToDelete = ref<string | null>(null);
 
 const { formatRelativeTime } = useDate();
 const privacyConfig: Record<string, { icon: string; class: string }> = {
@@ -49,11 +50,7 @@ const fetchMovieList = async () => {
     );
     privacy.value = privacyConfig[movieList.value.privacity];
   } catch (error: any) {
-    toast.add({
-      severity: "error",
-      summary: t("toast.error"),
-      detail: error.response?.data?.message || t("list.getListError"),
-    });
+    console.error(error);
   }
 };
 
@@ -62,11 +59,7 @@ const fetchUser = async () => {
     const { data } = await api.get(movieList.value.user);
     user.value = data;
   } catch (error: any) {
-    toast.add({
-      severity: "error",
-      summary: t("toast.error"),
-      detail: error.response?.data?.message || t("user.no_user"),
-    });
+    console.error(error);
   }
 };
 
@@ -79,11 +72,7 @@ const fetchMovies = async (page?: number) => {
       page,
     );
   } catch (error: any) {
-    toast.add({
-      severity: "error",
-      summary: t("toast.error"),
-      detail: error.response?.data?.message || t("list.getMoviesError"),
-    });
+    console.error(error);
   }
 };
 
@@ -97,44 +86,25 @@ const updateRoute = (page: number) => {
   });
 };
 
-const removeMovieModal = async (slug: string) => {
-  confirm.require({
-    message: t("list.confirmRemoveMovie", [slug]),
-    header: t("list.confirmation"),
-    icon: "pi pi-exclamation-triangle",
-    rejectProps: {
-      label: t("cancel"),
-      severity: "secondary",
-      outlined: true,
-    },
-    acceptProps: {
-      label: t("remove"),
-    },
-    accept: () => {
-      removeMovie(slug);
-    },
-  });
+const removeMovieModal = (slug: string) => {
+  movieToDelete.value = slug;
+  confirmDeleteVisible.value = true;
 };
 
-const removeMovie = async (slug: string) => {
+const removeMovieConfirm = async () => {
+  if (!movieToDelete.value) return;
+  confirmDeleteVisible.value = false;
   try {
     await removeMovieFromList(
       route.params.user as string,
       route.params.slug as string,
-      slug,
+      movieToDelete.value,
     );
-    toast.add({
-      severity: "success",
-      summary: t("toast.success"),
-      detail: t("list.movieRemoved"),
-    });
     fetchMovies(movies.value.current_page);
   } catch (error: any) {
-    toast.add({
-      severity: "error",
-      summary: t("toast.error"),
-      detail: error.response?.data?.message || t("list.removeMovieError"),
-    });
+    console.error(error);
+  } finally {
+    movieToDelete.value = null;
   }
 };
 
@@ -163,6 +133,42 @@ watch(
 </script>
 
 <template>
+  <!-- CONFIRM DELETE DIALOG -->
+  <Dialog v-model:visible="confirmDeleteVisible" modal :draggable="false" :dismissableMask="true"
+    :style="{ width: '90vw', maxWidth: '380px' }" :pt="{
+      root: { class: 'rounded-[2rem] border-none shadow-2xl bg-[var(--background)] overflow-hidden' },
+      header: { class: 'bg-[var(--background)] pb-0' },
+      title: { class: 'text-xl font-bold text-[var(--primary)]' },
+      content: { class: 'bg-[var(--background)]' },
+      footer: { class: 'bg-[var(--background)] border-t border-[var(--secondary)]' },
+      closeButton: { class: 'hover:bg-[var(--secondary)]/20 transition-colors' },
+    }">
+    <template #header>
+      <div class="confirm-header">
+        <div class="confirm-icon">
+          <i class="pi pi-trash" />
+        </div>
+        <div>
+          <p class="confirm-title">{{ t('list.confirmation') }}</p>
+        </div>
+      </div>
+    </template>
+
+    <p class="confirm-body">{{ t('list.confirmRemoveMovie', [movieToDelete]) }}</p>
+
+    <template #footer>
+      <div class="footer-actions">
+        <button class="btn-cancel" @click="confirmDeleteVisible = false">
+          {{ t('common.cancel') }}
+        </button>
+        <button class="btn-delete" @click="removeMovieConfirm">
+          <i class="pi pi-trash" />
+          <span>{{ t('remove') }}</span>
+        </button>
+      </div>
+    </template>
+  </Dialog>
+
   <div class="page">
     <template v-if="loading">
       <div class="header-skeleton">
@@ -180,11 +186,7 @@ watch(
           <!-- User -->
           <div class="author-section">
             <div class="avatar-wrapper">
-              <img
-                :src="user.picture"
-                :alt="user.username"
-                class="author-img"
-              />
+              <img :src="user.picture" :alt="user.username" class="author-img" />
             </div>
             <div class="author-meta">
               <span class="label">{{ t("list.createdBy") }}</span>
@@ -199,12 +201,7 @@ watch(
           <div class="list-content">
             <div class="list-header">
               <h1 class="list-name">{{ movieList.name }}</h1>
-              <span
-                v-if="privacy"
-                class="privacy-badge"
-                :class="privacy.class"
-                v-tooltip="movieList.privacity"
-              >
+              <span v-if="privacy" class="privacy-badge" :class="privacy.class" v-tooltip="movieList.privacity">
                 <i :class="privacy.icon" />
               </span>
             </div>
@@ -217,14 +214,13 @@ watch(
               <div class="stat">
                 <i class="pi pi-video" />
                 <span>
-                  {{ t("list.moviesCount", movieList.movies?.length || 1) }}</span
-                >
+                  {{ t("list.moviesCount", movieList.movies?.length || 0) }}</span>
               </div>
               <div class="stat">
                 <i class="pi pi-calendar" />
                 <span>{{
                   t("list.updated", [formatRelativeTime(movieList.updated_at)])
-                }}</span>
+                  }}</span>
               </div>
             </div>
           </div>
@@ -232,27 +228,14 @@ watch(
       </div>
 
       <div class="movies-grid">
-        <ConfirmDialog appendTo="self" />
-        <MovieCardComponent
-          v-for="movie in movies.results"
-          :key="movie.id"
-          :movie="movie"
-          :loading="loading"
-          :delete="true"
-          data-testid="movie-card"
-          @remove-movie="removeMovieModal"
-        />
+        <MovieCardComponent v-for="movie in movies.results" :key="movie.id" :movie="movie" :loading="loading"
+          :delete="true" data-testid="movie-card" @remove-movie="removeMovieModal" />
       </div>
 
       <div v-if="!loading && movies.total_pages > 1">
-        <PaginationComponent
-          data-testid="PaginationComponent"
-          :data-total="movies.total_pages"
-          :data-current="movies.current_page"
-          :total_pages="movies.total_pages"
-          :current_page="movies.current_page"
-          @change-page="updateRoute"
-        />
+        <PaginationComponent data-testid="PaginationComponent" :data-total="movies.total_pages"
+          :data-current="movies.current_page" :total_pages="movies.total_pages" :current_page="movies.current_page"
+          @change-page="updateRoute" />
       </div>
     </template>
   </div>
@@ -396,10 +379,12 @@ watch(
   background: rgba(34, 197, 94, 0.2);
   color: #309153;
 }
+
 .badge-private {
   background: rgba(239, 68, 68, 0.2);
   color: #b73b3b;
 }
+
 .badge-friends {
   background: rgba(99, 102, 241, 0.2);
   color: #4d57bd;
@@ -433,90 +418,84 @@ watch(
   }
 }
 
-:deep(.p-confirmdialog) {
-  background: color-mix(in srgb, var(--secondary) 80%, transparent);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 1.25rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(12px);
-  max-width: 300px;
-}
-
-@media (min-width: 640px) {
-  :deep(.p-confirmdialog) {
-    max-width: 450px;
-  }
-}
-
-@media (min-width: 1024px) {
-  :deep(.p-confirmdialog) {
-    max-width: 600px;
-  }
-}
-
-/* Dialog Header */
-:deep(.p-dialog-header) {
-  background: transparent;
-  padding: 1.5rem 1.5rem 0.5rem;
-  color: var(--text);
-}
-
-:deep(.p-dialog-title) {
-  font-weight: 800;
-  font-size: 1.25rem;
-}
-
-/* Dialog message and icon */
-:deep(.p-dialog-content) {
-  background: transparent;
-  padding: 0.5rem 1.5rem 1.5rem;
+/* CONFIRM DIALOG */
+.confirm-header {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
-:deep(.p-confirmdialog-icon) {
-  font-size: 2rem;
-  color: #b73b3b; 
-}
-
-:deep(.p-confirmdialog-message) {
-  color: var(--text);
-  line-height: 1.5;
+.confirm-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--red) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--red) 30%, transparent);
+  color: var(--red);
   font-size: 1rem;
+  flex-shrink: 0;
 }
 
-:deep(.p-dialog-footer) {
-  background: color-mix(in srgb, var(--primary) 15%, transparent);
-  padding: 1rem 1.5rem;
+.confirm-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.confirm-body {
+  font-size: 0.875rem;
+  color: var(--gray);
+  line-height: 1.6;
+  margin: 0;
+  padding: 0.25rem 0;
+}
+
+.footer-actions {
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 0.5rem;
+  width: 100%;
 }
 
-:deep(.p-dialog-footer button) {
-  border-radius: 0.75rem;
-  padding: 0.6rem 1.25rem;
+.btn-cancel {
+  padding: 0.5rem 1.2rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--secondary) 60%, transparent);
+  background: transparent;
+  color: var(--text);
+  font-size: 0.85rem;
   font-weight: 600;
-  transition: all 0.2s ease;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: inherit;
 }
 
-/* Cancel button */
-:deep(.p-button-secondary.p-button-outlined) {
-  border-color: rgba(255, 255, 255, 0.5) !important;
-  color: var(--text) !important;
+.btn-cancel:hover {
+  background: color-mix(in srgb, var(--secondary) 15%, transparent);
 }
 
-:deep(.p-button-secondary.p-button-outlined:hover) {
-  background: rgba(255, 255, 255, 0.05) !important;
-  border-color: rgba(255, 255, 255, 0.4) !important;
+.btn-delete {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.4rem;
+  border-radius: 999px;
+  border: none;
+  background: var(--red);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  font-family: inherit;
 }
 
-/* Close button (x) */
-:deep(.p-dialog-header-icons .p-dialog-header-close) {
-  color: rgba(255, 255, 255, 0.5);
-  border-radius: 50%;
-  transition: all 0.2s;
+.btn-delete:hover {
+  opacity: 0.85;
 }
 </style>

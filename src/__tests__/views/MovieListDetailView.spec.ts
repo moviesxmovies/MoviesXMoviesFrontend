@@ -37,8 +37,11 @@ vi.mock("vue-i18n", () => ({
 
 vi.mock("primevue", () => ({
   useToast: vi.fn(() => ({ add: vi.fn() })),
-  useConfirm: vi.fn(() => ({ require: vi.fn() })),
-  ConfirmDialog: defineComponent({ template: "<div />" }),
+  Dialog: defineComponent({
+    props: ["visible"],
+    emits: ["update:visible"],
+    template: `<div v-if="visible"><slot name="header" /><slot /><slot name="footer" /></div>`,
+  }),
   Skeleton: defineComponent({ template: "<div class='skeleton' />" }),
 }));
 
@@ -138,7 +141,6 @@ describe("MovieListView", () => {
     it("shows skeleton while loading", () => {
       (useRoute as ReturnType<typeof vi.fn>).mockReturnValue(mockRoute);
       (useRouter as ReturnType<typeof vi.fn>).mockReturnValue(mockRouter);
-      // Delay resolution so loading stays true during the first render
       (getMovieList as ReturnType<typeof vi.fn>).mockReturnValue(
         new Promise(() => {}),
       );
@@ -274,36 +276,28 @@ describe("MovieListView", () => {
   // ── Remove movie ───────────────────────────────────────────────────────────
 
   describe("Remove movie", () => {
-    it("calls confirm.require when remove-movie is emitted", async () => {
-      const { useConfirm } = await import("primevue");
-      const mockRequire = vi.fn();
-      (useConfirm as ReturnType<typeof vi.fn>).mockReturnValue({
-        require: mockRequire,
-      });
-
+    it("opens the confirm dialog when remove-movie is emitted", async () => {
       const wrapper = await mountComponent();
+
+      // Dialog should be hidden before clicking
+      expect(wrapper.find(".confirm-title").exists()).toBe(false);
+
       await wrapper.find('[data-testid="movie-card"]').trigger("click");
 
-      expect(mockRequire).toHaveBeenCalledWith(
-        expect.objectContaining({
-          icon: "pi pi-exclamation-triangle",
-        }),
-      );
+      // Dialog should now be visible
+      expect(wrapper.find(".confirm-title").exists()).toBe(true);
     });
 
-    it("calls removeMovieFromList with correct args on confirm accept", async () => {
-      let acceptCallback: () => void = () => {};
-      const { useConfirm } = await import("primevue");
-      (useConfirm as ReturnType<typeof vi.fn>).mockReturnValue({
-        require: vi.fn(({ accept }: { accept: () => void }) => {
-          acceptCallback = accept;
-        }),
-      });
+    it("calls removeMovieFromList with correct args when confirm button is clicked", async () => {
       (removeMovieFromList as ReturnType<typeof vi.fn>).mockResolvedValue({});
 
       const wrapper = await mountComponent();
+
+      // Open the dialog
       await wrapper.find('[data-testid="movie-card"]').trigger("click");
-      acceptCallback();
+
+      // Click the confirm (delete) button
+      await wrapper.find(".btn-delete").trigger("click");
       await flushPromises();
 
       expect(removeMovieFromList).toHaveBeenCalledWith(
@@ -314,26 +308,40 @@ describe("MovieListView", () => {
     });
 
     it("refreshes movie list after successful removal", async () => {
-      let acceptCallback: () => void = () => {};
-      const { useConfirm } = await import("primevue");
-      (useConfirm as ReturnType<typeof vi.fn>).mockReturnValue({
-        require: vi.fn(({ accept }: { accept: () => void }) => {
-          acceptCallback = accept;
-        }),
-      });
       (removeMovieFromList as ReturnType<typeof vi.fn>).mockResolvedValue({});
 
       const callsBefore = (movieSearchingInList as ReturnType<typeof vi.fn>)
         .mock.calls.length;
 
       const wrapper = await mountComponent();
+
       await wrapper.find('[data-testid="movie-card"]').trigger("click");
-      acceptCallback();
+      await wrapper.find(".btn-delete").trigger("click");
       await flushPromises();
 
       expect(
         (movieSearchingInList as ReturnType<typeof vi.fn>).mock.calls.length,
       ).toBeGreaterThan(callsBefore);
+    });
+
+    it("closes the dialog when cancel is clicked", async () => {
+      const wrapper = await mountComponent();
+
+      await wrapper.find('[data-testid="movie-card"]').trigger("click");
+      expect(wrapper.find(".confirm-title").exists()).toBe(true);
+
+      await wrapper.find(".btn-cancel").trigger("click");
+      expect(wrapper.find(".confirm-title").exists()).toBe(false);
+    });
+
+    it("does not call removeMovieFromList when cancel is clicked", async () => {
+      const wrapper = await mountComponent();
+
+      await wrapper.find('[data-testid="movie-card"]').trigger("click");
+      await wrapper.find(".btn-cancel").trigger("click");
+      await flushPromises();
+
+      expect(removeMovieFromList).not.toHaveBeenCalled();
     });
   });
 
@@ -361,89 +369,6 @@ describe("MovieListView", () => {
     });
   });
 
-  // ── Error handling ─────────────────────────────────────────────────────────
-
-  describe("Error handling", () => {
-    it("shows toast error when getMovieList fails", async () => {
-      const { useToast } = await import("primevue");
-      const mockAdd = vi.fn();
-      (useToast as ReturnType<typeof vi.fn>).mockReturnValue({ add: mockAdd });
-      (getMovieList as ReturnType<typeof vi.fn>).mockRejectedValue({
-        response: { data: { message: "List not found" } },
-      });
-
-      await mountComponent();
-
-      expect(mockAdd).toHaveBeenCalledWith(
-        expect.objectContaining({
-          severity: "error",
-          detail: "List not found",
-        }),
-      );
-    });
-
-    it("shows toast error when movieSearchingInList fails", async () => {
-      const { useToast } = await import("primevue");
-      const mockAdd = vi.fn();
-      (useToast as ReturnType<typeof vi.fn>).mockReturnValue({ add: mockAdd });
-      (movieSearchingInList as ReturnType<typeof vi.fn>).mockRejectedValue({
-        response: { data: { message: "Could not fetch movies" } },
-      });
-
-      await mountComponent();
-
-      expect(mockAdd).toHaveBeenCalledWith(
-        expect.objectContaining({
-          severity: "error",
-          detail: "Could not fetch movies",
-        }),
-      );
-    });
-
-    it("shows toast error when removeMovieFromList fails", async () => {
-      const { useToast, useConfirm } = await import("primevue");
-      const mockAdd = vi.fn();
-      (useToast as ReturnType<typeof vi.fn>).mockReturnValue({ add: mockAdd });
-
-      let acceptCallback: () => void = () => {};
-      (useConfirm as ReturnType<typeof vi.fn>).mockReturnValue({
-        require: vi.fn(({ accept }: { accept: () => void }) => {
-          acceptCallback = accept;
-        }),
-      });
-      (removeMovieFromList as ReturnType<typeof vi.fn>).mockRejectedValue({
-        response: { data: { message: "Remove failed" } },
-      });
-
-      const wrapper = await mountComponent();
-      await wrapper.find('[data-testid="movie-card"]').trigger("click");
-      acceptCallback();
-      await flushPromises();
-
-      expect(mockAdd).toHaveBeenCalledWith(
-        expect.objectContaining({
-          severity: "error",
-          detail: "Remove failed",
-        }),
-      );
-    });
-
-    it("uses fallback error key when API error message is missing", async () => {
-      const { useToast } = await import("primevue");
-      const mockAdd = vi.fn();
-      (useToast as ReturnType<typeof vi.fn>).mockReturnValue({ add: mockAdd });
-      (getMovieList as ReturnType<typeof vi.fn>).mockRejectedValue({});
-
-      await mountComponent();
-
-      expect(mockAdd).toHaveBeenCalledWith(
-        expect.objectContaining({
-          severity: "error",
-          detail: "list.getListError",
-        }),
-      );
-    });
-  });
 
   // ── Stats display ──────────────────────────────────────────────────────────
 

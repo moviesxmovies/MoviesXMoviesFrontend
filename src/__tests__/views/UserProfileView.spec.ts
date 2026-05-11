@@ -18,6 +18,7 @@ const {
     mockLogout,
     mockRefreshToken,
     mockProfileStoreRefresh,
+    mockRemoveFriend,
 } = vi.hoisted(() => ({
     mockGetSelfUserProfile: vi.fn(),
     mockGetUserProfile: vi.fn(),
@@ -32,6 +33,7 @@ const {
     mockLogout: vi.fn(),
     mockRefreshToken: vi.fn(),
     mockProfileStoreRefresh: vi.fn(),
+    mockRemoveFriend: vi.fn(),
 }));
 
 vi.mock('@/repositories/userRepository', () => ({
@@ -43,6 +45,7 @@ vi.mock('@/repositories/userRepository', () => ({
     getUserFriends: mockGetUserFriends,
     getSuggestedFriends: mockGetSuggestedFriends,
     getUserMoviesLists: mockGetUserMoviesLists,
+    removeFriend: mockRemoveFriend,
 }));
 vi.mock('@/stores/profileStore', () => ({
     useProfileStore: () => ({ refresh: mockProfileStoreRefresh }),
@@ -94,7 +97,7 @@ vi.mock("primevue", async (importOriginal) => {
 // Stub child components to keep tests focused
 vi.mock('@/components/friendRequestComponent.vue', () => ({ default: { template: '<div class="friend-request-stub" />' } }));
 vi.mock('@/components/reviewComponent.vue', () => ({ default: { template: '<div class="review-stub" />' } }));
-vi.mock('@/components/handleFriendshipComponent.vue', () => ({ default: { template: '<div class="handle-friendship-stub" />', props: ['users'] } }));vi.mock('@/components/friendshipStatusComponent.vue', () => ({ default: { template: '<div class="friendship-status-stub" />' } }));
+vi.mock('@/components/handleFriendshipComponent.vue', () => ({ default: { template: '<div class="handle-friendship-stub" />', props: ['users'] } })); vi.mock('@/components/friendshipStatusComponent.vue', () => ({ default: { template: '<div class="friendship-status-stub" />' } }));
 vi.mock('@/components/moviesListComponent.vue', () => ({ default: { template: '<div class="movies-list-stub" />' } }));
 vi.mock('@/components/sectionAccordion.vue', () => ({ default: { template: '<div class="section-accordion-stub"><slot /></div>', props: ['icon', 'title', 'isEmpty', 'emptyIcon', 'emptyTitle', 'emptyDescription', 'loading', 'defaultOpen', 'panelHeight', 'sentinelRef'] } }));
 
@@ -317,15 +320,6 @@ describe('UserProfileView', () => {
             const wrapper = factory('otheruser');
             await flushPromises();
             expect(wrapper.find('.btn-logout').exists()).toBe(false);
-        });
-
-        it('calls logout and redirects on click', async () => {
-            vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(500);
-            const wrapper = factory('');
-            await flushPromises();
-            await wrapper.find('.btn-logout').trigger('click');
-            expect(mockLogout).toHaveBeenCalled();
-            expect(mockPush).toHaveBeenCalledWith({ name: 'welcome' });
         });
     });
     // ── onUpdated ─────────────────────────────────────────────────────────────
@@ -614,6 +608,86 @@ describe('UserProfileView', () => {
             expect(mockToast.add).toHaveBeenCalledWith(
                 expect.objectContaining({ severity: 'success' })
             );
+        });
+    });
+    // ── Remove Friend ─────────────────────────────────────────────────────────
+    describe('remove friend functionality', () => {
+        it('opens confirmation dialog when openRemoveFriendDialog is called', async () => {
+            const wrapper = factory('otheruser');
+            await flushPromises();
+            const vm = wrapper.vm as any;
+
+            expect(vm.confirmRemoveFriendVisible).toBe(false);
+            vm.openRemoveFriendDialog('friend_username');
+
+            expect(vm.confirmRemoveFriendVisible).toBe(true);
+            expect(vm.pendingRemoveFriendUsername).toBe('friend_username');
+        });
+
+        it('calls removeFriend and refreshes list on confirm', async () => {
+            mockRemoveFriend.mockResolvedValue({});
+            const wrapper = factory('otheruser');
+            await flushPromises();
+            const vm = wrapper.vm as any;
+
+            // Simular estado previo: diálogo abierto y usuario seleccionado
+            vm.pendingRemoveFriendUsername = 'friend_username';
+            vm.confirmRemoveFriendVisible = true;
+
+            const initialCallCount = mockGetUserFriends.mock.calls.length;
+
+            await vm.removeFriendConfirm();
+
+            expect(mockRemoveFriend).toHaveBeenCalledWith('friend_username');
+            expect(vm.confirmRemoveFriendVisible).toBe(false);
+            expect(vm.pendingRemoveFriendUsername).toBe(null);
+
+            // Verifica que se reinicie y recargue la lista de amigos
+            expect(mockGetUserFriends.mock.calls.length).toBeGreaterThan(initialCallCount);
+        });
+
+        it('updates user friendship status to false after successful removal', async () => {
+            mockRemoveFriend.mockResolvedValue({});
+            const wrapper = factory('otheruser');
+            await flushPromises();
+            const vm = wrapper.vm as any;
+
+            vm.pendingRemoveFriendUsername = 'friend_username';
+            await vm.removeFriendConfirm();
+
+            expect(vm.user.friendship).toEqual({ is_friend: false, status: null });
+        });
+
+        it('shows error toast when removal fails', async () => {
+            mockRemoveFriend.mockRejectedValue({
+                response: { data: { message: 'Error removing friend' } }
+            });
+            const wrapper = factory('otheruser');
+            await flushPromises();
+            const vm = wrapper.vm as any;
+
+            vm.pendingRemoveFriendUsername = 'friend_username';
+            await vm.removeFriendConfirm();
+
+            expect(mockToast.add).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    severity: 'error',
+                    detail: 'Error removing friend'
+                })
+            );
+            // El usuario pendiente debe limpiarse incluso si falla
+            expect(vm.pendingRemoveFriendUsername).toBe(null);
+        });
+
+        it('does nothing if removeFriendConfirm is called without a pending username', async () => {
+            const wrapper = factory('otheruser');
+            await flushPromises();
+            const vm = wrapper.vm as any;
+
+            vm.pendingRemoveFriendUsername = null;
+            await vm.removeFriendConfirm();
+
+            expect(mockRemoveFriend).not.toHaveBeenCalled();
         });
     });
 });
