@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import HandleFrienshipComponent from "@/components/handleFrienshipComponent.vue";
+import HandleFriendshipComponent from "@/components/handleFriendshipComponent.vue";
 import PaginationComponent from "@/components/paginationComponent.vue";
 import {
   userSearching,
@@ -68,7 +68,7 @@ watch(
       <span class="empty-sub">{{ t("search.help") }}</span>
     </div>
 
-    <HandleFrienshipComponent v-else :users="users.results" />
+    <HandleFriendshipComponent v-else :users="users.results" />
 
     <PaginationComponent
       v-if="!loading && users.total_pages > 1"

@@ -39,7 +39,7 @@ import { useProfileStore } from "@/stores/profileStore";
 import ChoiceMovieListTypeModal from "@/components/choiceMovieListTypeModal.vue";
 import { useTranslation } from "@/composables/useTranslation";
 import TranslateButton from "@/components/translateButton.vue";
-import HandleFrienshipComponent from "@/components/handleFrienshipComponent.vue";
+import HandleFriendshipComponent from "@/components/handleFriendshipComponent.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -484,7 +484,7 @@ watch(
           :loading="loadingSuggestedFriends"
           v-model:sentinelRef="suggestedFriendsSentinelRef"
         >
-          <HandleFrienshipComponent :users="suggestedFriends.results" />
+          <HandleFriendshipComponent :users="suggestedFriends.results" />
         </SectionAccordion>
       </div>
     </div>
