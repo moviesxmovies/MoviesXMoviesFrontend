@@ -59,7 +59,14 @@ describe("HandleFriendshipComponent", () => {
       props,
       global: {
         plugins: [ConfirmationService, ToastService],
-        stubs: { ConfirmDialog: true },
+        stubs: {
+          // Use a functional stub to keep content in the DOM and capture props
+          Dialog: {
+            name: 'Dialog',
+            props: ['visible'],
+            template: '<div v-if="visible" class="p-dialog-stub"><slot name="header"></slot><slot></slot><slot name="footer"></slot></div>'
+          }
+        },
       },
     });
   };
@@ -85,35 +92,26 @@ describe("HandleFriendshipComponent", () => {
 
   describe("removeFrienshipModal", () => {
     it("triggers confirmation modal when removing a friend", async () => {
-      const user = {
-        id: 2,
-        username: "user2",
-        friendship: { is_friend: true, status: null },
-      };
+      const user = { id: 2, username: "user2", friendship: { is_friend: true, status: null } };
       const wrapper = factory({ users: [user] });
 
-      // Corregido: Usamos .at(0) para obtener el primer botón encontrado
-      await wrapper.findAll(".remove-btn").at(0)?.trigger("click");
+      await wrapper.find(".remove-btn").trigger("click");
 
-      expect(mockConfirm.require).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: "search.confirmRemoveFriend",
-        }),
-      );
+      // Check the manual Dialog visibility instead of the mockConfirm
+      const dialog = wrapper.findComponent({ name: 'Dialog' });
+      expect(dialog.props('visible')).toBe(true);
     });
 
     it("calls removeFriend API when confirmation is accepted", async () => {
       vi.mocked(removeFriend).mockResolvedValue({});
-      mockConfirm.require.mockImplementation((options) => options.accept());
-
-      const user = {
-        id: 2,
-        username: "user2",
-        friendship: { is_friend: true, status: null },
-      };
+      const user = { id: 2, username: "user2", friendship: { is_friend: true, status: null } };
       const wrapper = factory({ users: [user] });
 
-      await wrapper.findAll(".remove-btn").at(0)?.trigger("click");
+      // 1. Open Modal
+      await wrapper.find(".remove-btn").trigger("click");
+
+      // 2. Click the actual "Remove" button inside the Dialog footer
+      await wrapper.find(".btn-remove").trigger("click");
       await flushPromises();
 
       expect(removeFriend).toHaveBeenCalledWith("user2");
@@ -122,16 +120,14 @@ describe("HandleFriendshipComponent", () => {
 
     it("calls handleFriendRequest(false) when declining a pending request", async () => {
       vi.mocked(completeFriendRequest).mockResolvedValue({});
-      mockConfirm.require.mockImplementation((options) => options.accept());
-
-      const user = {
-        id: 1,
-        username: "user1",
-        friendship: { is_friend: false, status: "P" },
-      };
+      const user = { id: 1, username: "user1", friendship: { is_friend: false, status: "P" } };
       const wrapper = factory({ users: [user] });
 
-      await wrapper.findAll(".pending-btn").at(0)?.trigger("click");
+      // 1. Open Modal via pending button
+      await wrapper.find(".pending-btn").trigger("click");
+
+      // 2. Confirm action
+      await wrapper.find(".btn-remove").trigger("click");
       await flushPromises();
 
       expect(completeFriendRequest).toHaveBeenCalledWith("user1", false);
