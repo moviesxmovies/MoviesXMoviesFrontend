@@ -44,3 +44,59 @@ export const deleteReactionApi = async (reviewId: number, id: number, commentId?
         throw error;
     }
 };
+
+export const fetchComments = async (reviewId: number, lastId?: number, limit = 10) => {
+    try {
+        const { data } = await api.get(`reviews/${reviewId}/comments/`, { params: { last_id: lastId, limit } });
+        return data;
+    } catch (error: any) {
+        throw error;
+    }
+}
+
+export const postComment = async (reviewId: number, content: string) => {
+    try {
+        const { data } = await api.post(`reviews/${reviewId}/comments/`, { content });
+        return data;
+    } catch (error: any) {
+        throw error;
+    }
+}
+
+export const replyComment = async (reviewId: number, commentId: number, content: string) => {
+    try {
+        const { data } = await api.post(`reviews/${reviewId}/comments/${commentId}/replies/`, { content });
+        return data;
+    } catch (error: any) {
+        throw error;
+    }
+}
+
+export const getCommentReplies = async (reviewId: number, commentId: number, lastId?: number, limit = 5) => {
+    try {
+        const { data } = await api.get(`reviews/${reviewId}/comments/${commentId}/replies/`, { params: { last_id: lastId, limit } });
+        return data;
+    } catch (error: any) {
+        throw error;
+    }
+}
+
+export const getReviewTranslation = async (reviewId: number) => {
+    try {
+        const { data } = await api.get(`reviews/${reviewId}/translations/`);
+        return data;
+    }
+    catch (error: any) {
+        throw error;
+    }
+}
+
+export const getCommentTranslation = async (reviewId: number, commentId: number) => {
+    try {
+        const { data } = await api.get(`reviews/${reviewId}/comments/${commentId}/translations/`);
+        return data;
+    }
+    catch (error: any) {
+        throw error;
+    }
+}

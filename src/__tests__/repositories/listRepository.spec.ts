@@ -5,6 +5,9 @@ import {
   addMovieToList,
   removeMovieFromList,
   createList,
+  getMovieList,
+  listSearching,
+  movieSearchingInList,
 } from "@/repositories/listRepository";
 
 // ── Mocks ────────────────────────────────────────────────────────────────────
@@ -40,11 +43,13 @@ describe("ListRepository", () => {
     it("calls API with correct user slug and returns data", async () => {
       const userSlug = "user-123";
       const mockLists = [{ id: 1, name: "Favorites" }];
-      mockGet.mockResolvedValueOnce({ data: mockLists});
+      mockGet.mockResolvedValueOnce({ data: mockLists });
 
       const result = await fetchUserLists(userSlug);
 
-      expect(mockGet).toHaveBeenCalledWith(`/movies-lists/${userSlug}/`, { params: { last_id: undefined, limit: 6 } });
+      expect(mockGet).toHaveBeenCalledWith(`/movies-lists/${userSlug}/`, {
+        params: { last_id: undefined, limit: 6 },
+      });
       expect(result).toEqual(mockLists);
     });
 
@@ -143,7 +148,11 @@ describe("ListRepository", () => {
 
       const result = await createList(newList as any);
 
-      expect(mockPost).toHaveBeenCalledWith("/movies-lists/", newList);
+      expect(mockPost).toHaveBeenCalledWith("/movies-lists/", newList, {
+        params: {
+          intelligent: undefined,
+        },
+      });
       expect(result).toEqual(mockResponse);
     });
 
@@ -151,6 +160,75 @@ describe("ListRepository", () => {
       const networkError = new Error("Network error");
       mockPost.mockRejectedValueOnce(networkError);
       await expect(createList({} as any)).rejects.toThrow("Network error");
+    });
+  });
+
+  // ── getMovieList ────────────────────────────────────────────────────────────
+  describe("getMovieList", () => {
+    it("calls GET with constructed path", async () => {
+      const mockList = { id: 1, name: "action-movies" };
+      mockGet.mockResolvedValueOnce({ data: mockList });
+      const result = await getMovieList("john", "action-movies");
+
+      expect(mockGet).toHaveBeenCalledWith("/movies-lists/john/action-movies/");
+      expect(result).toEqual(mockList);
+    });
+
+    it("throws error when getMovieList fails", async () => {
+      const networkError = new Error("Network error");
+      mockGet.mockRejectedValueOnce(networkError);
+      await expect(getMovieList("john", "action-movies")).rejects.toThrow(
+        "Network error",
+      );
+    });
+  });
+
+  // ── listSearching ────────────────────────────────────────────────────────────
+  describe("listSearching", () => {
+    it("calls GET with constructed path", async () => {
+      const mockLists = [{ id: 1, name: "action-movies" }];
+      mockGet.mockResolvedValueOnce({ data: mockLists });
+      const result = await listSearching("action");
+
+      expect(mockGet).toHaveBeenCalledWith("/movies-lists/searching/", {
+        params: { query: "action", page: undefined, limit: undefined },
+      });
+      expect(result).toEqual(mockLists);
+    });
+
+    it("throws error when listSearching fails", async () => {
+      const networkError = new Error("Network error");
+      mockGet.mockRejectedValueOnce(networkError);
+      await expect(listSearching("action")).rejects.toThrow("Network error");
+    });
+  });
+
+  // ── movieSearchingInList ────────────────────────────────────────────────────
+  describe("movieSearchingInList", () => {
+    it("calls GET with constructed path", async () => {
+      const mockMovies = [{ id: 1, title: "Action Movie 1" }];
+      mockGet.mockResolvedValueOnce({ data: mockMovies });
+      const result = await movieSearchingInList(
+        "john",
+        "action-movies",
+        "action",
+      );
+
+      expect(mockGet).toHaveBeenCalledWith(
+        "/movies-lists/john/action-movies/movies/searching/",
+        {
+          params: { query: "action", page: undefined, limit: undefined },
+        },
+      );
+      expect(result).toEqual(mockMovies);
+    });
+
+    it("throws error when movieSearchingInList fails", async () => {
+      const networkError = new Error("Network error");
+      mockGet.mockRejectedValueOnce(networkError);
+      await expect(
+        movieSearchingInList("john", "action-movies", "action"),
+      ).rejects.toThrow("Network error");
     });
   });
 });

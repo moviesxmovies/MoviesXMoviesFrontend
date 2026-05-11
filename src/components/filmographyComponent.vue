@@ -34,7 +34,7 @@ const emit = defineEmits<{
       </h2>
     </AccordionHeader>
     <AccordionContent v-if="props.list" class="section-body">
-      <ScrollPanel style="width: 100%; height: 500px">
+      <ScrollPanel style="width: 100%; height: 680px">
         <div class="movies-grid">
           <MovieCardComponent v-for="movie in props.list" :key="movie.id" :movie="movie" />
           <div :ref="(el) => emit('update:sentinelRef', el as HTMLElement)" class="sentinel" />

@@ -35,6 +35,7 @@ const genderMap: Record<string, { color: string; icon: string }> = {
   "0": { color: "var(--secondary)", icon: "pi pi-minus" },
   "1": { color: "var(--accent)", icon: "pi pi-venus" },
   "2": { color: "var(--primary)", icon: "pi pi-mars" },
+  "3": { color: "var(--secondary)", icon: "pi pi-question" },
 };
 
 const genderIcon = computed(
@@ -164,7 +165,7 @@ watch(
           <div class="card-body">
             <h1 class="celebrity-name">{{ user.name }}</h1>
             <div class="dates">
-              <div class="date-row">
+              <div v-if="user.birthday" class="date-row">
                 <i class="pi pi-calendar accent-icon" />
                 <span><b>{{ t("celebrity.birthday") }}:</b>
                   {{ user.birthday }}</span>

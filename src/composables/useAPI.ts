@@ -28,6 +28,9 @@ function logout(authStore: any) {
 api.interceptors.request.use(async (config) => {
   const authStore = useAuthStore();
 
+  // Add a delay for debuging skeletons
+  //await new Promise((resolve) => setTimeout(resolve, 1000));
+
   if (!authStore.token) return config;
 
   if (authStore.isTokenExpired()) {

@@ -21,6 +21,11 @@ const props = defineProps<{
     defaultOpen?: boolean;
     iconClass?: string;
     panelHeight?: string;
+    dialogOptions?: {
+        icon: string;
+        label: string;
+        onClick: () => void;
+    };
 }>();
 
 
@@ -36,6 +41,8 @@ const handleSentinelRef = (el: HTMLElement | null) => {
             <AccordionHeader class="section-header">
                 <i :class="[icon, iconClass]" />
                 <h2 class="section-title">{{ title }}</h2>
+                <Button v-if="dialogOptions" class="dialog-button" :class="dialogOptions.icon"
+                    label="{{ dialogOptions.label }}" @click.stop="dialogOptions.onClick" />
             </AccordionHeader>
             <AccordionContent class="section-body">
                 <ScrollPanel :style="`width: 100%; height: ${props.panelHeight || '350px'}`">
@@ -54,6 +61,8 @@ const handleSentinelRef = (el: HTMLElement | null) => {
             <AccordionHeader class="section-header">
                 <i :class="[icon, iconClass]" />
                 <h2 class="section-title">{{ title }}</h2>
+                <Button v-if="dialogOptions" class="dialog-button" :class="dialogOptions.icon"
+                    label="{{ dialogOptions.label }}" @click.stop="dialogOptions.onClick" />
             </AccordionHeader>
             <AccordionContent
                 class="bg-secondary/5 rounded-[2rem] p-10 md:p-20 border-2 border-dashed border-secondary/40">
@@ -87,6 +96,7 @@ const handleSentinelRef = (el: HTMLElement | null) => {
 }
 
 .section-header {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -106,6 +116,24 @@ const handleSentinelRef = (el: HTMLElement | null) => {
 
 .section-body {
     padding: 1.5rem;
+}
+
+.dialog-button {
+    position: absolute;
+    right: 3rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.75rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    white-space: nowrap;
 }
 
 .accent-icon {
@@ -168,5 +196,24 @@ const handleSentinelRef = (el: HTMLElement | null) => {
 
 :deep(.p-scrollpanel-bar:hover) {
     background: var(--primary);
+}
+
+:deep(.p-accordionheader[aria-expanded="true"]) .dialog-button i,
+:deep(.p-accordionheader[aria-expanded="true"]) .dialog-button::before,
+:deep(.p-accordionheader:hover) .dialog-button i,
+:deep(.p-accordionheader:hover) .dialog-button::before {
+    color: #000;
+}
+
+
+
+.dialog-button:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.dialog-button:hover i,
+.dialog-button:hover::before {
+    color: white !important;
 }
 </style>

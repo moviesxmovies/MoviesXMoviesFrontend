@@ -1,6 +1,8 @@
 import { onUnmounted, ref, watch } from "vue";
 
-export const useInfiniteScroll = (callback: () => void) => {
+export const useInfiniteScroll = (
+  callback: () => void,
+) => {
   const sentinelRef = ref<HTMLElement | null>(null);
   let observer: IntersectionObserver | null = null;
 
@@ -8,9 +10,7 @@ export const useInfiniteScroll = (callback: () => void) => {
     stop();
     observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry?.isIntersecting) {
-          callback();
-        }
+        if (entry?.isIntersecting) callback();
       },
       {
         root: null,
@@ -28,18 +28,11 @@ export const useInfiniteScroll = (callback: () => void) => {
   };
 
   watch(sentinelRef, (newEl) => {
-    if (newEl) {
-      start(newEl);
-    } else {
-      stop();
-    }
+    if (newEl) start(newEl);
+    else stop();
   });
 
-  onUnmounted(() => {
-    stop();
-  });
+  onUnmounted(() => stop());
 
-  return {
-    sentinelRef,
-  };
+  return { sentinelRef };
 };

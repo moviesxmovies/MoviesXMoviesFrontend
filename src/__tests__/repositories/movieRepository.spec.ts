@@ -7,7 +7,7 @@ import {
   movieSearching,
   type searchData,
 } from "@/repositories/movieRepository";
-import type { MoviePagination } from "@/types";
+import type { Movie, Pagination } from "@/types";
 import TranslatedError from "@/exceptions/TranslatedError";
 
 // ── Mocks ────────────────────────────────────────────────────────────────────
@@ -95,7 +95,7 @@ describe("MovieRepository", () => {
 
   // ── movieSearching ───────────────────────────────────────────────────────────
   describe("movieSearching", () => {
-    const mockPaginationResponse: MoviePagination = {
+    const mockPaginationResponse: Pagination<Movie> = {
       count: 2,
       next: null,
       previous: null,

@@ -1,38 +1,37 @@
 import { createRouter, createWebHistory } from "vue-router";
 import type { RouteRecordRaw } from "vue-router";
 import { useAuthStore } from "../stores/authStore";
+const authRequiredRoutes = [
+  { path: "/onboarding", name: "onboarding", view: "OnBoardingView" },
+  { path: "/verify-email", name: "verify-email", view: "VerifyEmailView" },
+  { path: "/home", name: "home", view: "HomeView" },
+  { path: "/profiles/:slug", name: "celebrity", view: "CelebrityView" },
+  { path: "/users/:slug", name: "user-profile", view: "UserProfileView" },
+  { path: "/users", name: "self-profile", view: "UserProfileView" },
+  { path: "/movies/:slug", name: "movie-detail", view: "MovieDetailView" },
+  { path: "/movie-list/:user/:slug", name: "movie-list", view: "MovieListDetailView" },
+  { path: "/search", name: "search", view: "SearchView" },
+];
 
+const guestOnlyRoutes = [
+  { path: "/", name: "welcome", view: "WelcomeView" },
+  { path: "/login", name: "login", view: "LoginView" },
+  { path: "/signup", name: "signup", view: "SignupView" },
+  { path: "/accounts/google/login/callback/", name: "oauth-callback", view: "OauthCallbackView" },
+];
 const routes: Array<RouteRecordRaw> = [
-  {
-    path: "/accounts/google/login/callback/",
-    component: () => import("../views/OauthCallbackView.vue"),
-    name: "oauth-callback",
-    meta: { forbiddenWhenAuthenticated: true },
-  },
-  {
-    path: "/onboarding",
-    component: () => import("../views/OnBoardingView.vue"),
-    name: "onboarding",
-    meta: { requiresAuth: true },
-  },
-  {
-    path: "/verify-email",
-    component: () => import("../views/VerifyEmailView.vue"),
-    name: "verify-email",
-    meta: { requiresAuth: true },
-  },
-  {
-    path: "/login",
-    component: () => import("../views/LoginView.vue"),
-    name: "login",
-    meta: { forbiddenWhenAuthenticated: true },
-  },
-  {
-    path: "/signup",
-    component: () => import("../views/SignupView.vue"),
-    name: "signup",
-    meta: { forbiddenWhenAuthenticated: true },
-  },
+  ...authRequiredRoutes.map(r => ({
+    path: r.path,
+    name: r.name,
+    component: () => import(`../views/${r.view}.vue`),
+    meta: { requiresAuth: true }
+  })),
+  ...guestOnlyRoutes.map(r => ({
+    path: r.path,
+    name: r.name,
+    component: () => import(`../views/${r.view}.vue`),
+    meta: { forbiddenWhenAuthenticated: true }
+  })),
   {
     path: "/forgot-password",
     name: "forgot-password",
@@ -47,42 +46,6 @@ const routes: Array<RouteRecordRaw> = [
     path: "/check-email",
     component: () => import("../views/CheckEmailView.vue"),
     name: "check-email",
-  },
-  {
-    path: "/home",
-    component: () => import("../views/HomeView.vue"),
-    name: "home",
-    meta: { requiresAuth: true },
-  },
-  {
-    path: "/",
-    component: () => import("../views/WelcomeView.vue"),
-    name: "welcome",
-    meta: { forbiddenWhenAuthenticated: true },
-  },
-  {
-    path: "/profiles/:slug",
-    component: () => import("../views/CelebrityView.vue"),
-    name: "celebrity",
-    meta: { requiresAuth: true },
-  },
-  {
-    path: "/users/:slug",
-    component: () => import("../views/UserProfileView.vue"),
-    name: "user-profile",
-    meta: { requiresAuth: true },
-  },
-  {
-    path: "/users",
-    component: () => import("../views/UserProfileView.vue"),
-    name: "self-profile",
-    meta: { requiresAuth: true },
-  },
-  {
-    path: "/search",
-    component: () => import("../views/SearchView.vue"),
-    name: "search",
-    meta: { requiresAuth: true },
   },
   {
     path: "/:pathMatch(.*)*",

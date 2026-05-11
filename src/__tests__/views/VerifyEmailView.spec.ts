@@ -62,7 +62,7 @@ describe("VerifyEmailView logic", () => {
 
     const errorMessage = wrapper.find(".p-message");
     expect(errorMessage.exists()).toBe(true);
-    expect(errorMessage.text()).toContain("verify.toast.incorrectLength");
+    expect(errorMessage.text()).toContain("Please enter the full 6-digit code");
   });
 
   it("Should not verify user if verification code is wrong", async () => {

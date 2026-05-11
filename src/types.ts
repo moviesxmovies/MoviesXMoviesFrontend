@@ -50,8 +50,8 @@ export interface DynamicPagination<T> {
   count: number;
 }
 
-export interface MoviePagination {
-  results: Movie[];
+export interface Pagination<T> {
+  results: T[];
   total_pages: number;
   count: number;
   has_next: boolean;
@@ -105,6 +105,7 @@ export interface User {
   friendship: Friendship;
   picture: string;
 }
+
 export interface Review {
   id: number;
   title: string;
@@ -133,15 +134,6 @@ export interface Rating {
   created_at: string;
 }
 
-export interface MovieListPagination {
-  results: MovieList[];
-  total_pages: number;
-  count: number;
-  has_next: boolean;
-  has_previous: boolean;
-  current_page: number;
-}
-
 export interface MovieList {
   id: number;
   name: string;
@@ -166,11 +158,11 @@ export type CreateList = {
 };
 
 export type ReactionResponse = {
-    reactions: Record<string, number>;
-    your_reactions: Record<string, number>;
+  reactions: Record<string, number>;
+  your_reactions: Record<string, number>;
 }
 
-export type SelfUser ={
+export type SelfUser = {
   id: number;
   username: string;
   bio: string;
@@ -178,4 +170,13 @@ export type SelfUser ={
   first_name: string;
   last_name: string;
   email: string;
+}
+
+export type Comment = {
+  id: number;
+  user: string;
+  content: string;
+  created_at: string;
+  reply_comment: string;
+  has_replies: boolean;
 }

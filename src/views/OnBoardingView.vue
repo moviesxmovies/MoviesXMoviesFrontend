@@ -52,7 +52,8 @@ const steps = [
     { id: 'step2', targetId: 'stars' },
     { id: 'step3', targetId: 'add-to-list-button' },
     { id: 'step4', targetId: 'unseen-button' },
-    { id: 'step5', targetId: 'mainSwipe' },
+    { id: 'step5', targetId: 'more-info' },
+    { id: 'step6', targetId: 'mainSwipe' },
 ];
 </script>
 
@@ -72,12 +73,13 @@ const steps = [
                             <span class="badge-dot" />
                             <Transition name="fade" mode="out-in">
                                 <span :key="currentStep">{{ $t(`onboarding.step${currentStep + 1}Label`) || "Onboarding"
-                                    }}</span>
+                                }}</span>
                             </Transition>
                         </div>
                         <span class="card-eyebrow">
                             <Transition name="fade" mode="out-in">
-                                <span id="step-span" :key="currentStep">{{ currentStep + 1 }} / {{ steps.length }}</span>
+                                <span id="step-span" :key="currentStep">{{ currentStep + 1 }} / {{ steps.length
+                                    }}</span>
                             </Transition>
                         </span>
                     </div>

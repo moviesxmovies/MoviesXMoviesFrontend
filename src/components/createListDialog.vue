@@ -21,7 +21,11 @@ import {
   RadioButton,
   useToast,
 } from "primevue";
+import { ref } from "vue";
 import { useI18n } from "vue-i18n";
+import SearchGenresComponent from "./searchGenresComponent.vue";
+import SearchPersonComponent from "./searchPersonComponent.vue";
+import SearchUsersComponent from "./searchUsersComponent.vue";
 const visible = defineModel<boolean>("visible", { default: false });
 
 const authStore = useAuthStore();
@@ -30,10 +34,15 @@ const { t } = useI18n();
 const resolver = zodResolver(defaultListSchema);
 const form = useForm({ resolver: zodResolver(defaultListSchema) });
 const props = defineProps<{
-  movie: Movie;
+  movie?: Movie;
+  intelligent?: boolean;
 }>();
 
 const emit = defineEmits(["reloadLists"]);
+
+const selectedCelebrities = ref<string[]>([]);
+const selectedFriends = ref<string[]>([]);
+const selectedGenres = ref<string[]>([]);
 
 const handleSubmit = async ({
   valid,
@@ -41,12 +50,18 @@ const handleSubmit = async ({
 }: FormSubmitEvent<Record<string, any>>) => {
   if (!valid) return;
   try {
-    const data = await createList(values as CreateList);
-    await addToList(data.data.slug);
+    const data = await createList(values as CreateList, props.intelligent, {
+      celebrities: selectedCelebrities.value || undefined,
+      friends: selectedFriends.value || undefined,
+      genres: selectedGenres.value || undefined,
+    });
+    if (props.movie) {
+      await addToList(data.data.slug, props.movie);
+    }
     toast.add({
       severity: "success",
       summary: t("toast.success"),
-      detail: data.status,
+      detail: t("components.createList.success"),
       life: 3000,
     });
     emit("reloadLists");
@@ -61,13 +76,13 @@ const handleSubmit = async ({
   }
 };
 
-const addToList = async (listSlug: string) => {
+const addToList = async (listSlug: string, movie: Movie) => {
   try {
-    await addMovieToList(authStore.user?.username || "", listSlug, props.movie.slug);
+    await addMovieToList(authStore.user?.username || "", listSlug, movie.slug);
     toast.add({
       severity: "success",
       summary: t("toast.success"),
-      detail: t("components.addToList.success", [props.movie.title, listSlug]),
+      detail: t("components.addToList.success", [movie.title, listSlug]),
       life: 3000,
     });
   } catch (error: any) {
@@ -76,7 +91,7 @@ const addToList = async (listSlug: string) => {
       summary: t("toast.error"),
       detail:
         error.response?.data?.message ||
-        t("components.addToList.addToListError", [props.movie.title, listSlug]),
+        t("components.addToList.addToListError", [movie.title, listSlug]),
       life: 3000,
     });
   }
@@ -89,20 +104,34 @@ const addToList = async (listSlug: string) => {
     modal
     :draggable="false"
     :dismissableMask="true"
-    class="rounded-2xl border shadow-sm overflow-hidden w-full max-w-md"
-    style="background-color: var(--background); border-color: var(--secondary)"
     :header="t('components.createList.header')"
+    :style="{ width: '90vw', maxWidth: '400px' }"
+    :pt="{
+      root: {
+        class:
+          'rounded-[2rem] border-none shadow-2xl bg-[var(--background)] overflow-hidden',
+      },
+      header: { class: 'bg-[var(--background)]' },
+      title: { class: 'text-2xl font-display font-bold text-[var(--primary)]' },
+      content: { class: 'bg-[var(--background)]' },
+      closeButton: {
+        class: 'hover:bg-[var(--secondary)]/20 transition-colors',
+      },
+    }"
   >
-    <div class="p-4">
+    <div class="p-2">
       <div class="text-center mb-8">
         <div
-          class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center m-auto mb-4"
+          class="w-16 h-16 rounded-full flex items-center justify-center m-auto mb-4"
+          style="
+            background: color-mix(in srgb, var(--primary) 12%, transparent);
+          "
         >
           <i class="pi pi-list text-2xl" style="color: var(--primary)"></i>
         </div>
         <p
-          class="text-xs sm:text-sm mt-2 px-2"
-          style="color: var(--text); opacity: 0.6"
+          class="text-[10px] font-black uppercase tracking-[0.2em] opacity-60 mt-2 px-2"
+          style="color: var(--text)"
         >
           {{ t("components.createList.description") }}
         </p>
@@ -163,6 +192,23 @@ const addToList = async (listSlug: string) => {
           </FloatLabel>
         </FormField>
 
+        <template v-if="intelligent">
+          <div
+            class="flex flex-col gap-4 p-4 rounded-2xl"
+            style="
+              background: color-mix(in srgb, var(--secondary) 10%, transparent);
+              border: 1.5px solid
+                color-mix(in srgb, var(--secondary) 40%, transparent);
+            "
+          >
+            <SearchGenresComponent
+              @filterGenres="(genres: string[]) => (selectedGenres = genres)"
+            />
+            <SearchPersonComponent v-model="selectedCelebrities" />
+            <SearchUsersComponent v-model="selectedFriends" />
+          </div>
+        </template>
+
         <FormField
           v-slot="$field"
           name="privacity"
@@ -170,7 +216,12 @@ const addToList = async (listSlug: string) => {
           class="flex flex-col gap-1"
         >
           <div
-            class="flex justify-evenly gap-4 p-4 bg-white/5 rounded-2xl border border-secondary/20"
+            class="flex justify-evenly gap-4 p-4 rounded-2xl"
+            style="
+              background: color-mix(in srgb, var(--secondary) 10%, transparent);
+              border: 1.5px solid
+                color-mix(in srgb, var(--secondary) 40%, transparent);
+            "
           >
             <div
               v-for="(option, key) in privacityConfig"
@@ -185,7 +236,8 @@ const addToList = async (listSlug: string) => {
               />
               <label
                 :for="`privacity-${key}`"
-                class="text-sm font-medium cursor-pointer text-text"
+                class="text-sm font-medium cursor-pointer"
+                style="color: var(--text)"
               >
                 <i :class="option.icon" class="text-xs opacity-70"></i>
                 {{ option.text }}
@@ -195,15 +247,14 @@ const addToList = async (listSlug: string) => {
         </FormField>
 
         <div class="flex flex-col gap-3 pt-2">
-          <Button type="submit" label="Create List" fluid class="py-3.5" />
           <Button
-            type="button"
-            label="Cancel"
-            variant="text"
+            type="submit"
+            :label="t('components.createList.submit')"
             fluid
-            class="p-button-secondary"
-            @click="visible = false"
           />
+          <button type="button" class="cancel-btn" @click="visible = false">
+            {{ t("components.createList.cancel") }}
+          </button>
         </div>
       </Form>
     </div>
@@ -211,24 +262,13 @@ const addToList = async (listSlug: string) => {
 </template>
 
 <style scoped>
-:deep(.p-button.p-button-secondary) {
-  background-color: transparent !important;
-  border-color: transparent !important;
-  color: var(--primary) !important;
-  opacity: 0.8;
-}
-
-:deep(.p-button.p-button-secondary:hover) {
-  opacity: 1;
-  text-decoration: underline;
-}
-
 :deep(.p-inputtext) {
   background-color: var(--background) !important;
   color: var(--text) !important;
   border-color: var(--secondary) !important;
   font-size: 16px !important;
   padding: 0.75rem !important;
+  border-radius: 0.75rem !important;
 }
 
 :deep(.p-inputtext:focus) {
@@ -241,29 +281,46 @@ const addToList = async (listSlug: string) => {
   opacity: 0.6;
 }
 
+:deep(.p-invalid .p-inputtext) {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 1px #ef4444 !important;
+}
+
 :deep(.p-button) {
   background-color: var(--primary) !important;
   border-color: var(--primary) !important;
   color: #fff !important;
   padding: 0.85rem !important;
   font-weight: 700;
+  border-radius: 0.75rem !important;
 }
 
-:deep(.p-invalid .p-inputtext) {
-  border-color: #ef4444 !important;
-  box-shadow: 0 0 0 1px #ef4444 !important;
+:deep(.p-radiobutton .p-radiobutton-box) {
+  border-color: var(--secondary) !important;
 }
 
-.field-msg {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.75rem;
-  animation: fadeIn 0.15s ease;
+:deep(.p-radiobutton-checked .p-radiobutton-box) {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
 }
 
-.field-msg.error {
-  color: #ef4444;
+.cancel-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: transparent;
+  border: none;
+  color: var(--primary);
+  font-size: 0.875rem;
+  font-weight: 700;
+  opacity: 0.8;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  text-align: center;
+}
+
+.cancel-btn:hover {
+  opacity: 1;
+  text-decoration: underline;
 }
 
 @keyframes fadeIn {

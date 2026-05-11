@@ -5,12 +5,20 @@
     "markAsNotSeen": "Mark as not seen",
     "rateNStars": "Rate {n} stars"
   },
+  "cancel": "Cancel",
+  "remove": "Remove",
   "next": "Next",
   "back": "Back",
   "loading": "Loading...",
+  "verifying": "Verifying...",
+  "error": "Error",
+  "errors": {
+    "generic": "Something went wrong. Please try again."
+  },
   "toast": {
     "success": "Operation successful",
-    "error": "An error occurred"
+    "error": "An error occurred",
+    "close": "Close notification"
   },
   "components": {
     "selectLanguage": "Select a Language",
@@ -38,14 +46,16 @@
       "profile": "My Profile"
     },
     "movieList": {
-      "moviesCount": "{count} film | {count} films"
+      "moviesCount": "{count} film | {count} films",
+      "errorDetail": "Could not load movies. Please try again later."
     },
     "lists": {
       "public": "Public",
       "private": "Private",
       "friends": "Friends",
       "noLists": "You don't have any lists yet. Start adding movies to your lists to see them here.",
-      "noListDesc": "Your lists will appear here once you create them. You can create lists to organize your favorite movies, share them with friends, or keep them private for your own reference."
+      "noListDesc": "Your lists will appear here once you create them. You can create lists to organize your favorite movies, share them with friends, or keep them private for your own reference.",
+      "noListsDesc": "You haven't created any lists yet."
     },
     "addToList": {
       "success": "'{0}' added to {1} correctly",
@@ -54,15 +64,29 @@
       "removeFromListError": "Error removing '{0}' from '{1}'",
       "fetchListsError": "Error getting user's lists",
       "checkMovieInListsError": "Error searching movie lists relations",
+      "addToListError": "Error adding movie to the list",
       "title": "Add to list",
       "description": "Add '{0}' to a list",
       "createList": "Create new list"
     },
     "createList": {
       "error": "Error creating list",
+      "success": "List created successfully",
       "description": "Create a new list",
       "formName": "Name",
-      "formDescription": "description"
+      "formDescription": "Description",
+      "header": "Create List",
+      "submit": "Create",
+      "cancel": "Cancel"
+    },
+    "friendWithFollow": {
+      "status": {
+        "add": "Add Friend",
+        "pending": "Request Pending",
+        "friend": "Friends",
+        "self": "This is you",
+        "failed": "Request Failed"
+      }
     },
     "searchGenres": {
       "genres": "Genres",
@@ -102,7 +126,8 @@
     "or": "or continue with",
     "password": "Password",
     "confirmPassword": "Confirm Password",
-    "login": "Already have an account? Login here"
+    "login": "Already have an account? Login here",
+    "progress": "Sign up progress"
   },
   "login": {
     "toast": {
@@ -169,7 +194,8 @@
     "step2": "Rate movies clicking on the stars",
     "step3": "Add new movies to your lists",
     "step4": "Mark movies as  unseen",
-    "step5": "You want speed? Swipe left or right to rate movies and up or down to add them to your lists or mark them as unseen",
+    "step5": "Click on the info button to see more details about the movie",
+    "step6": "You want speed? Swipe left or right to rate movies and up or down to add them to your lists or mark them as unseen",
     "finish": "Get Started",
     "continue": "Continue",
     "skip": "Skip",
@@ -177,13 +203,15 @@
     "step2Label": "Rate",
     "step3Label": "Add",
     "step4Label": "Unseen",
-    "step5Label": "Swipe",
+    "step5Label": "Info",
+    "step6Label": "Swipe",
     "hint": "You can skip this at any time"
   },
   "verify": {
     "toast": {
       "success": "Email verified successfully",
       "inocrrectLength": "Please enter the full 6-digit code.",
+      "incorrectLength": "Please enter the full 6-digit code.",
       "invalidCode": "Invalid verification code",
       "resendSuccess": "Verification code resent to your email",
       "resendError": "Failed to resend verification code. Please try again."
@@ -192,7 +220,8 @@
     "description": "We've sent a 6 digit code to your mail direction.",
     "button": "VERIFY CODE",
     "resend": "Resend code",
-    "didntReceive": "Didn't receive the code?"
+    "didntReceive": "Didn't receive the code?",
+    "ariaLabel": "Verification code digit {index}"
   },
   "schema": {
     "username": {
@@ -224,7 +253,8 @@
       "first_name": "first name",
       "last_name": "last name",
       "email": "email",
-      "samePasswordAs": "Password cannot be the same as your {0}"
+      "samePasswordAs": "Password cannot be the same as your {0}",
+      "passwordSameAsEmail": "Password cannot be the same as your email"
     },
     "forgotPasswordCode": {
       "required": "Password reset code is required"
@@ -257,11 +287,19 @@
   },
   "search": {
     "searchPlaceholder": "Search",
-    "loading": "Searching for films...",
-    "noFilms": "No films found",
+    "empty": "No results found",
     "help": "Try with other values",
     "searchMoviesError": "Error fetching movies",
-    "filters": "Filters"
+    "searchUsersError": "Error fetching users",
+    "searchCelebritiesError": "Error fetching celebrities",
+    "searchMovieListsError": "Error fetching movie lists",
+    "filters": "Filters",
+    "movies": "Movies",
+    "users": "Users",
+    "lists": "Lists",
+    "actors": "Actors",
+    "directors": "Directors",
+    "celebrities": "Celebrities"
   },
   "user": {
     "editProfile": "Edit",
@@ -271,6 +309,7 @@
     "biography": "Biography",
     "no_biography": "No biography available.",
     "reviews": "Reviews",
+    "no_user": "No user found",
     "no_reviews": "No reviews available.",
     "no_reviews_description": "This user has not written any reviews yet.",
     "no_friends_requests": "No requests available",
@@ -294,11 +333,127 @@
     "confirmPassword": "Confirm New Password",
     "leaveBlankToKeep": "Leave blank to keep current password",
     "yourProfile": "Your Profile Picture",
-    "profileUpdated": "Profile updated successfully"
+    "profileUpdated": "Profile updated successfully",
+    "chooseMoviesListType": "Choose the type of list",
+    "createNormalList": "Normal List",
+    "createIntelligentList": "Intelligent List",
+    "addMoviesList": "Create new list",
+    "friendRequestSent": "Friend request sent",
+    "friendRequestAccepted": "Friend request accepted",
+    "friendRequestRejected": "Friend request rejected",
+    "error": {
+      "fetchingProfile": "Failed to load user profile. Please try again later.",
+      "updatingProfile": "Failed to update profile. Please try again.",
+      "acceptingFriendRequest": "Failed to accept friend request. Please try again.",
+      "rejectingFriendRequest": "Failed to reject friend request. Please try again."
+    }
+  },
+  "movie": {
+    "synopsis": "Synopsis",
+    "platforms": "Platform | Platforms",
+    "genres": "Genre | Genres",
+    "actors": "Actor | Actors",
+    "directors": "Director | Directors",
+    "reviews": "Reviews",
+    "no_reviews": "No reviews available",
+    "no_directors": "No directors available",
+    "no_actors": "No actors available",
+    "no_genres": "No genres available",
+    "no_platforms": "No platforms available",
+    "no_synopsis": "No synopsis available.",
+    "no_reviews_description": "This movie hasn't received any reviews yet.",
+    "no_directors_description": "No directors available for this movie.",
+    "no_actors_description": "No actors available for this movie.",
+    "no_genres_description": "No genres available for this movie.",
+    "no_platforms_description": "No platforms available for this movie.",
+    "no_synopsis_description": "No synopsis available for this movie.",
+    "add_review": "Write a Review",
+    "error": {
+      "fetchingMovie": "Failed to load movie details. Please try again later.",
+      "fetchingPerson": "Failed to load person details. Please try again later."
+    }
+  },
+  "review": {
+    "addReview": "Add Review",
+    "editReview": "Edit Review",
+    "positive": "Positive",
+    "negative": "Negative",
+    "title": "Title",
+    "content": "Content",
+    "titlePlaceholder": "A brief title for your review",
+    "contentPlaceholder": "Share your thoughts about the movie",
+    "sentiment": "Sentiment",
+    "deleteConfirmTitle": "Delete Review",
+    "deleteConfirmBody": "Are you sure you want to delete this review?",
+    "error": {
+      "titleRequired": "Title is required",
+      "contentRequired": "Content is required",
+      "fetching": "Failed to load review. Please try again later."
+    },
+    "updated": "Review updated successfully",
+    "submitted": "Review created successfully",
+    "deleted": "Review deleted successfully"
+  },
+  "commentsDialog": {
+    "title": "Comments",
+    "noComments": "No comments available",
+    "noCommentsDescription": "Be the first to comment on this review.",
+    "addComment": "Add Comment",
+    "placeholder": "Write your comment here...",
+    "submit": "Submit",
+    "error": {
+      "contentRequired": "Comment content is required"
+    },
+    "commentAdded": "Comment added successfully",
+    "empty": "No comments yet"
+  },
+  "comment": {
+    "reply": "Reply",
+    "replyingTo": "Replying to {0}",
+    "placeholder": "Write your comment here...",
+    "hideReplies": "Hide Replies",
+    "showReplies": "Show Replies",
+    "loadMoreReplies": "Load more replies",
+    "postError": "Failed to post comment. Please try again."
   },
   "common": {
     "save": "Save",
     "cancel": "Cancel",
-    "reset": "Reset"
+    "reset": "Reset",
+    "submit": "Submit",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "confirm": "Confirm",
+    "seeMore": "See more",
+    "seeLess": "See less"
+  },
+  "list": {
+    "noDescription": "This list doesn't have a description.",
+    "getListError": "Error fetching list details. Please try again later.",
+    "createdBy": "Created by",
+    "moviesCount": "{count} movie | {count} movies",
+    "updated": "Last updated {0}",
+    "confirmation": "Remove movie from list",
+    "confirmRemoveMovie": "Are you sure you want to remove \"{0}\" from the list?",
+    "getMoviesError": "Failed to load movies in this list. Please try again later.",
+    "movieRemoved": "Movie removed from list successfully",
+    "removeMovieError": "Failed to remove movie from list. Please try again."
+  },
+  "actions": {
+    "addToList": "Add to list",
+    "markAsNotSeen": "Mark as not seen",
+    "rateNStars": "Rate {n} stars",
+    "showMoreInfo": "Show more info",
+    "delete": "Delete"
+  },
+  "navbar": {
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "translation": {
+    "translate": "Translate",
+    "showOriginal": "Show Original",
+    "loading": "Translating..."
   }
 }
