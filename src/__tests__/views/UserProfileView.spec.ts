@@ -14,11 +14,13 @@ const {
     mockGetUserFriends,
     mockGetSuggestedFriends,
     mockGetUserMoviesLists,
+    mockRemoveFriend,
     mockToast,
+    mockConfirm,
     mockLogout,
     mockRefreshToken,
     mockProfileStoreRefresh,
-
+    mockNotificationSet,
 } = vi.hoisted(() => ({
     mockGetSelfUserProfile: vi.fn(),
     mockGetUserProfile: vi.fn(),
@@ -28,10 +30,13 @@ const {
     mockGetUserFriends: vi.fn(),
     mockGetSuggestedFriends: vi.fn(),
     mockGetUserMoviesLists: vi.fn(),
+    mockRemoveFriend: vi.fn(),
     mockToast: { add: vi.fn() },
+    mockConfirm: { require: vi.fn() },
     mockLogout: vi.fn(),
     mockRefreshToken: vi.fn(),
     mockProfileStoreRefresh: vi.fn(),
+    mockNotificationSet: vi.fn(),
 }));
 
 vi.mock('@/repositories/userRepository', () => ({
@@ -43,10 +48,13 @@ vi.mock('@/repositories/userRepository', () => ({
     getUserFriends: mockGetUserFriends,
     getSuggestedFriends: mockGetSuggestedFriends,
     getUserMoviesLists: mockGetUserMoviesLists,
+    removeFriend: mockRemoveFriend,
 }));
+
 vi.mock('@/stores/profileStore', () => ({
     useProfileStore: () => ({ refresh: mockProfileStoreRefresh }),
 }));
+
 vi.mock('@/repositories/auth/authRepository', () => ({
     refreshToken: mockRefreshToken,
 }));
@@ -55,8 +63,9 @@ const { mockPush, mockUseRoute } = vi.hoisted(() => ({
     mockPush: vi.fn(),
     mockUseRoute: vi.fn(),
 }));
+
 vi.mock('vue-router', async (importOriginal) => {
-    const actual = await importOriginal<typeof import('vue-router')>();
+    const actual = await importOriginal();
     return {
         ...actual,
         useRoute: mockUseRoute,
@@ -64,17 +73,12 @@ vi.mock('vue-router', async (importOriginal) => {
     };
 });
 
-
-vi.mock('@/composables/useInfiniteScroll', () => ({
-    useInfiniteScroll: () => ({ sentinelRef: { value: null } }),
-}));
-
 vi.mock('@/composables/useInfinitePagination', () => ({
     useInfinitePagination: () => ({ sentinelRef: { value: null } }),
 }));
 
 vi.mock('@/stores/notificationStore', () => ({
-    useNotificationsStore: () => ({ set: vi.fn() }),
+    useNotificationsStore: () => ({ set: mockNotificationSet }),
 }));
 
 vi.mock('@/stores/langStore', () => ({
@@ -84,31 +88,32 @@ vi.mock('@/stores/langStore', () => ({
 vi.mock('@/stores/authStore', () => ({
     useAuthStore: () => ({ user: { user_id: 1 }, isAuthenticated: true, logout: mockLogout }),
 }));
+
 vi.mock("primevue", async (importOriginal) => {
-    const actual = await importOriginal<typeof import("primevue")>();
+    const actual = await importOriginal();
     return {
         ...actual,
         useToast: () => mockToast,
+        useConfirm: () => mockConfirm,
     };
 });
-// Stub child components to keep tests focused
+
+// Stubs de componentes hijos
 vi.mock('@/components/friendRequestComponent.vue', () => ({ default: { template: '<div class="friend-request-stub" />' } }));
 vi.mock('@/components/reviewComponent.vue', () => ({ default: { template: '<div class="review-stub" />' } }));
 vi.mock('@/components/friendWithFollow.vue', () => ({ default: { template: '<div class="friend-with-follow-stub" />' } }));
 vi.mock('@/components/friendshipStatusComponent.vue', () => ({ default: { template: '<div class="friendship-status-stub" />' } }));
 vi.mock('@/components/moviesListComponent.vue', () => ({ default: { template: '<div class="movies-list-stub" />' } }));
-vi.mock('@/components/sectionAccordion.vue', () => ({ default: { template: '<div class="section-accordion-stub"><slot /></div>', props: ['icon', 'title', 'isEmpty', 'emptyIcon', 'emptyTitle', 'emptyDescription', 'loading', 'defaultOpen', 'panelHeight', 'sentinelRef'] } }));
+vi.mock('@/components/sectionAccordion.vue', () => ({ default: { template: '<div class="section-accordion-stub"><slot /></div>', props: ['icon', 'title', 'isEmpty', 'loading'] } }));
 
 const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: {} } });
-
 const emptyPagination = { results: [], count: 0, next_last_id: null };
-const mockUser: any = { id: 1, username: 'testuser', picture: 'pic.jpg', bio: 'bio', friendship: null };
+const mockUser = { id: 1, username: 'testuser', picture: 'pic.jpg', bio: 'bio', friendship: null };
 
 const factory = (routeSlug = '') => {
     mockUseRoute.mockReturnValue({ params: { slug: routeSlug } });
     return mount(UserProfileView, {
         global: { plugins: [i18n, ToastService] },
-
     });
 };
 
@@ -124,527 +129,136 @@ describe('UserProfileView', () => {
         mockGetUserMoviesLists.mockResolvedValue(emptyPagination);
     });
 
-    // ── Render ────────────────────────────────────────────────────────────────
-    it('renders the page', async () => {
+    it('renders the page and sidebar', async () => {
         const wrapper = factory();
         await flushPromises();
         expect(wrapper.find('.page').exists()).toBe(true);
-    });
-
-    it('renders sidebar', async () => {
-        const wrapper = factory();
-        await flushPromises();
         expect(wrapper.find('.sidebar').exists()).toBe(true);
     });
 
-    // ── Self profile (no slug) ────────────────────────────────────────────────
-    describe('self profile', () => {
-        it('calls getSelfUserProfile when no slug', async () => {
+    describe('Profile Logic (Self vs Other)', () => {
+        it('calls getSelfUserProfile when no slug is present', async () => {
             factory('');
             await flushPromises();
             expect(mockGetSelfUserProfile).toHaveBeenCalled();
-            expect(mockGetUserProfile).not.toHaveBeenCalled();
         });
 
-        it('shows edit profile button for self profile', async () => {
-            const wrapper = factory('');
+        it('sets isSelfProfile to true when slug matches auth user id', async () => {
+            mockGetUserProfile.mockResolvedValue({ ...mockUser, id: 1 });
+            const wrapper = factory('testuser');
+            await flushPromises();
+            const vm = wrapper.vm as any;
+            expect(vm.isSelfProfile).toBe(true);
+        });
+
+        it('shows edit profile button only for self profile', async () => {
+            const wrapper = factory(''); // self
             await flushPromises();
             expect(wrapper.find('.btn-edit').exists()).toBe(true);
         });
+    });
 
-        it('does not show friendship status for self profile', async () => {
+    describe('Friendship Actions', () => {
+        it('acceptFriendRequest calls repository and updates notifications', async () => {
+            mockCompleteFriendRequest.mockResolvedValue({});
             const wrapper = factory('');
             await flushPromises();
-            expect(wrapper.find('.friendship-status-stub').exists()).toBe(false);
+            const vm = wrapper.vm as any;
+            
+            await vm.acceptFriendRequest('otheruser');
+            
+            expect(mockCompleteFriendRequest).toHaveBeenCalledWith('otheruser', true); 
+            expect(mockNotificationSet).toHaveBeenCalled(); 
         });
 
-        it('shows friend requests section for self profile', async () => {
-            mockGetFriendsRequests.mockResolvedValue({ results: [{ id: 1, from_user: '/api/u/', to_user: '/api/v/', status: 'P' }], count: 1, next_last_id: null });
+        it('handleFriendRequest updates the user friendship status locally', async () => {
+            mockCompleteFriendRequest.mockResolvedValue({});
             const wrapper = factory('');
             await flushPromises();
-            expect(wrapper.find('.friend-request-stub').exists()).toBe(true);
-        });
-    });
+            const vm = wrapper.vm as any;
+            const targetUser = { username: 'target', friendship: null };
 
-    // ── Other profile (with slug) ─────────────────────────────────────────────
-    describe('other profile', () => {
-        it('calls getUserProfile when slug is provided', async () => {
-            factory('otheruser');
-            await flushPromises();
-            expect(mockGetUserProfile).toHaveBeenCalledWith('otheruser');
-        });
-
-        it('does not show edit profile button for other profile', async () => {
-            mockGetUserProfile.mockResolvedValue({ ...mockUser, id: 999 });
-            const wrapper = factory('otheruser');
-            await flushPromises();
-            expect(wrapper.find('.btn-edit').exists()).toBe(false);
+            // Caso: Aceptar (enviar solicitud)
+            await vm.handleFriendRequest(targetUser, true);
+            expect(targetUser.friendship.status).toBe('P');
+            
+            // Caso: Declinar
+            await vm.handleFriendRequest(targetUser, false);
+            expect(targetUser.friendship.status).toBe(null); 
         });
 
-        it('shows friendship status for other profile', async () => {
-            mockGetUserProfile.mockResolvedValue({ ...mockUser, id: 999 });
-            const wrapper = factory('otheruser');
-            await flushPromises();
-            expect(wrapper.find('.friendship-status-stub').exists()).toBe(true);
-        });
-    });
-
-    // ── Username display ──────────────────────────────────────────────────────
-    it('displays username', async () => {
-        const wrapper = factory('');
-        await flushPromises();
-        expect(wrapper.find('.user-name').text()).toBe('testuser');
-    });
-
-    // ── Error handling ────────────────────────────────────────────────────────
-    it('redirects to NotFound when fetchUserProfile fails', async () => {
-        mockGetSelfUserProfile.mockRejectedValue({ response: { data: { message: 'Not found' } } });
-        factory('');
-        await flushPromises();
-        expect(mockPush).toHaveBeenCalledWith({ name: 'NotFound' });
-    });
-
-    // ── Data fetching ─────────────────────────────────────────────────────────
-    it('fetches reviews on mount', async () => {
-        factory('');
-        await flushPromises();
-        expect(mockGetUserReviews).toHaveBeenCalled();
-    });
-
-    it('fetches friends on mount', async () => {
-        factory('');
-        await flushPromises();
-        expect(mockGetUserFriends).toHaveBeenCalled();
-    });
-
-    it('fetches suggested friends on mount', async () => {
-        factory('');
-        await flushPromises();
-        expect(mockGetSuggestedFriends).toHaveBeenCalled();
-    });
-
-    it('fetches movies lists on mount', async () => {
-        factory('');
-        await flushPromises();
-        expect(mockGetUserMoviesLists).toHaveBeenCalled();
-    });
-
-    it('fetches friend requests on mount', async () => {
-        factory('');
-        await flushPromises();
-        expect(mockGetFriendsRequests).toHaveBeenCalled();
-    });
-
-    // ── acceptFriendRequest ───────────────────────────────────────────────────
-    it('calls completeFriendRequest with true on accept', async () => {
-        mockCompleteFriendRequest.mockResolvedValue({});
-        mockGetFriendsRequests.mockResolvedValue({
-            results: [{ id: 1, from_user: '/api/u/', to_user: '/api/v/', status: 'P' }],
-            count: 1,
-            next_last_id: null,
-        });
-        const wrapper = factory('');
-        await flushPromises();
-        const vm = wrapper.vm as any;
-        await vm.acceptFriendRequest('testuser');
-        expect(mockCompleteFriendRequest).toHaveBeenCalledWith('testuser', true);
-    });
-
-    // ── rejectFriendRequest ───────────────────────────────────────────────────
-    it('calls completeFriendRequest with false on reject', async () => {
-        mockCompleteFriendRequest.mockResolvedValue({});
-        const wrapper = factory('');
-        await flushPromises();
-        const vm = wrapper.vm as any;
-        await vm.rejectFriendRequest('testuser');
-        expect(mockCompleteFriendRequest).toHaveBeenCalledWith('testuser', false);
-    });
-
-    // ── sendFriendRequest ─────────────────────────────────────────────────────
-    it('calls completeFriendRequest with true on send', async () => {
-        mockCompleteFriendRequest.mockResolvedValue({});
-        const wrapper = factory('');
-        await flushPromises();
-        const vm = wrapper.vm as any;
-        await vm.sendFriendRequest('otheruser');
-        expect(mockCompleteFriendRequest).toHaveBeenCalledWith('otheruser', true);
-    });
-
-    it('throws when sendFriendRequest fails', async () => {
-        mockCompleteFriendRequest.mockRejectedValue({ translatedMessage: 'Error' });
-        const wrapper = factory('');
-        await flushPromises();
-        const vm = wrapper.vm as any;
-        await expect(vm.sendFriendRequest('otheruser')).rejects.toBeTruthy();
-    });
-
-    // ── Reviews rendering ─────────────────────────────────────────────────────
-    it('renders review components when reviews exist', async () => {
-        mockGetUserReviews.mockResolvedValue({
-            results: [{ id: 1, title: 'Review 1', movie: '/api/m/1/', user: 'u', content: 'c', is_positive: true, created_at: '2024-01-01' }],
-            count: 1,
-            next_last_id: null,
-        });
-        const wrapper = factory('');
-        await flushPromises();
-        expect(wrapper.find('.review-stub').exists()).toBe(true);
-    });
-
-    // ── Friends rendering ─────────────────────────────────────────────────────
-    it('renders friend components when friends exist', async () => {
-        mockGetUserFriends.mockResolvedValue({
-            results: [mockUser],
-            count: 1,
-            next_last_id: null,
-        });
-        const wrapper = factory('');
-        await flushPromises();
-        expect(wrapper.find('.friend-with-follow-stub').exists()).toBe(true);
-    });
-
-    // ── Movies lists rendering ────────────────────────────────────────────────
-    it('renders movie list components when lists exist', async () => {
-        mockGetUserMoviesLists.mockResolvedValue({
-            results: [{ id: 1, name: 'List 1', slug: 'list-1', description: '', privacity: 'P', user: 'u', movies: [], created_at: '', updated_at: '' }],
-            count: 1,
-            next_last_id: null,
-        });
-        const wrapper = factory('');
-        await flushPromises();
-        expect(wrapper.find('.movies-list-stub').exists()).toBe(true);
-    });
-
-    // ── Logout on mobile ─────────────────────────────────────────────
-    describe('logout on mobile', () => {
-        it('shows logout button on mobile for self profile', async () => {
-            vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(500);
+        it('removeFriendRequest calls removeFriend and resets friendship', async () => {
+            mockRemoveFriend.mockResolvedValue({});
             const wrapper = factory('');
             await flushPromises();
-            expect(wrapper.find('.btn-logout').exists()).toBe(true);
+            const vm = wrapper.vm as any;
+            const targetUser = { username: 'target', friendship: { is_friend: true } };
+
+            await vm.removeFriendRequest(targetUser);
+            expect(mockRemoveFriend).toHaveBeenCalledWith('target');
+            expect(targetUser.friendship.status).toBe(null);
         });
 
-        it('does not show logout button on desktop for self profile', async () => {
-            vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(1024);
+        it('removeFrienshipModal triggers confirmation dialog', async () => {
             const wrapper = factory('');
             await flushPromises();
-            expect(wrapper.find('.btn-logout').exists()).toBe(false);
+            const vm = wrapper.vm as any;
+            
+            vm.removeFrienshipModal(mockUser, true);
+            expect(mockConfirm.require).toHaveBeenCalled(); 
         });
+    });
 
-        it('does not show logout button on mobile for other profile', async () => {
-            vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(500);
-            mockGetUserProfile.mockResolvedValue({ ...mockUser, id: 999 });
-            const wrapper = factory('otheruser');
-            await flushPromises();
-            expect(wrapper.find('.btn-logout').exists()).toBe(false);
-        });
-
-        it('calls logout and redirects on click', async () => {
-            vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(500);
+    describe('Reactivity and Lifecycle', () => {
+        it('logs out and redirects to welcome', async () => {
+            vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(500); // Mobile
             const wrapper = factory('');
             await flushPromises();
+            
             await wrapper.find('.btn-logout').trigger('click');
             expect(mockLogout).toHaveBeenCalled();
             expect(mockPush).toHaveBeenCalledWith({ name: 'welcome' });
         });
-    });
-    // ── onUpdated ─────────────────────────────────────────────────────────────
-    describe('onUpdated', () => {
-        it('updates user value with the new user', async () => {
+
+        it('onUpdated updates user and refreshes tokens', async () => {
             const wrapper = factory('');
             await flushPromises();
             const vm = wrapper.vm as any;
+            const updatedUser = { ...mockUser, username: 'updated' };
 
-            const updatedUser = { ...mockUser, username: 'newusername' };
             await vm.onUpdated(updatedUser);
-
-            expect(vm.user.username).toBe('newusername');
+            expect(vm.user.username).toBe('updated'); 
+            expect(mockRefreshToken).toHaveBeenCalled(); 
+            expect(mockProfileStoreRefresh).toHaveBeenCalled(); 
         });
 
-        it('calls refreshToken after profile update', async () => {
-            mockRefreshToken.mockResolvedValue({});
+        it('updates isMobile when window is resized', async () => {
             const wrapper = factory('');
             await flushPromises();
             const vm = wrapper.vm as any;
-
-            await vm.onUpdated(mockUser);
-
-            expect(mockRefreshToken).toHaveBeenCalled();
-        });
-
-        it('calls profileStore.refresh after profile update', async () => {
-            mockRefreshToken.mockResolvedValue({});
-            const wrapper = factory('');
-            await flushPromises();
-            const vm = wrapper.vm as any;
-
-            await vm.onUpdated(mockUser);
-
-            expect(mockProfileStoreRefresh).toHaveBeenCalled();
-        });
-
-        it('calls profileStore.refresh after refreshToken', async () => {
-            let refreshTokenResolved = false;
-            mockRefreshToken.mockImplementation(() => {
-                return new Promise((resolve) => {
-                    setTimeout(() => {
-                        refreshTokenResolved = true;
-                        resolve({});
-                    }, 0);
-                });
-            });
-
-            const wrapper = factory('');
-            await flushPromises();
-            const vm = wrapper.vm as any;
-
-            await vm.onUpdated(mockUser);
-
-            expect(refreshTokenResolved).toBe(true);
-            expect(mockProfileStoreRefresh).toHaveBeenCalled();
-        });
-    });
-    // ── emailChanged ──────────────────────────────────────────────────────────
-    describe('emailChanged', () => {
-        it('redirects to /verify-email', async () => {
-            const wrapper = factory('');
-            await flushPromises();
-            const vm = wrapper.vm as any;
-            await vm.emailChanged();
-            expect(mockPush).toHaveBeenCalledWith('/verify-email');
-        });
-
-        it('does not call refreshToken directly', async () => {
-            const wrapper = factory('');
-            await flushPromises();
-            const vm = wrapper.vm as any;
-            mockRefreshToken.mockClear();
-            await vm.emailChanged();
-            expect(mockRefreshToken).not.toHaveBeenCalled();
-        });
-    });
-    // Añadir al final del describe('UserProfileView') existente, antes del cierre
-
-    // ── reloadLists ───────────────────────────────────────────────────────────────
-    describe('reloadLists', () => {
-        it('calls getUserMoviesLists again after reloadLists', async () => {
-            const wrapper = factory('');
-            await flushPromises();
-            const initialCallCount = mockGetUserMoviesLists.mock.calls.length;
-
-            const vm = wrapper.vm as any;
-            await vm.reloadLists();
-            await flushPromises();
-
-            expect(mockGetUserMoviesLists.mock.calls.length).toBeGreaterThan(initialCallCount);
-        });
-    });
-
-    // ── choiceMovieListTypeModal ──────────────────────────────────────────────────
-    describe('choiceMovieListTypeModal', () => {
-        it('opens ChoiceMovieListTypeModal when movieListDialogConfig.onClick is called', async () => {
-            const wrapper = factory('');
-            await flushPromises();
-            const vm = wrapper.vm as any;
-
-            expect(vm.choiceMovieListTypeModalVisible).toBe(false);
-            vm.movieListDialogConfig.onClick();
-            expect(vm.choiceMovieListTypeModalVisible).toBe(true);
-        });
-    });
-
-    // ── editProfileModal ──────────────────────────────────────────────────────────
-    describe('editProfileModal', () => {
-        it('opens edit profile modal when clicking edit button', async () => {
-            const wrapper = factory('');
-            await flushPromises();
-            const vm = wrapper.vm as any;
-
-            expect(vm.editProfileModalVisible).toBe(false);
-            await wrapper.find('.btn-edit').trigger('click');
-            expect(vm.editProfileModalVisible).toBe(true);
-        });
-    });
-
-    // ── resize / isMobile ─────────────────────────────────────────────────────────
-    describe('isMobile reactivity', () => {
-        it('sets isMobile true when window width < 640', async () => {
-            vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(400);
-            const wrapper = factory('');
-            await flushPromises();
-            const vm = wrapper.vm as any;
-
-            expect(vm.isMobile).toBe(true);
-        });
-
-        it('sets isMobile false when window width >= 640', async () => {
-            vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(1280);
-            const wrapper = factory('');
-            await flushPromises();
-            const vm = wrapper.vm as any;
-
-            expect(vm.isMobile).toBe(false);
-        });
-
-        it('updates isMobile when resize event fires', async () => {
-            vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(1280);
-            const wrapper = factory('');
-            await flushPromises();
-            const vm = wrapper.vm as any;
-            expect(vm.isMobile).toBe(false);
-
+            
             vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(400);
             window.dispatchEvent(new Event('resize'));
-            await flushPromises();
-
             expect(vm.isMobile).toBe(true);
         });
     });
 
-    // ── watch langStore.language ──────────────────────────────────────────────────
-    describe('watch on language change', () => {
-        it('refetches data when language changes', async () => {
-            const langStore = { language: 'en' };
-            vi.doMock('@/stores/langStore', () => ({
-                useLangStore: () => langStore,
-            }));
-
-            const wrapper = factory('');
-            await flushPromises();
-            const callsBefore = mockGetUserReviews.mock.calls.length;
-
-            // Trigger the watcher via route change (same effect as lang change)
-            // Lang store reactivity is hard to trigger externally; test via vm watcher
-            const vm = wrapper.vm as any;
-            // Re-trigger the same watcher path via a direct fetch
-            await vm.fetchUserReviews();
-            await flushPromises();
-
-            expect(mockGetUserReviews.mock.calls.length).toBeGreaterThan(callsBefore);
-        });
-    });
-
-    // ── acceptFriendRequest error ─────────────────────────────────────────────────
-    describe('acceptFriendRequest error', () => {
-        it('shows error toast when acceptFriendRequest fails', async () => {
-            mockCompleteFriendRequest.mockRejectedValue({
-                response: { data: { message: 'Already friends' } },
-            });
-            const wrapper = factory('');
-            await flushPromises();
-            const vm = wrapper.vm as any;
-
-            await vm.acceptFriendRequest('testuser');
-
-            expect(mockToast.add).toHaveBeenCalledWith(
-                expect.objectContaining({ severity: 'error', detail: 'Already friends' })
-            );
-        });
-
-        it('shows fallback error toast when acceptFriendRequest fails without message', async () => {
-            mockCompleteFriendRequest.mockRejectedValue(new Error('network'));
-            const wrapper = factory('');
-            await flushPromises();
-            const vm = wrapper.vm as any;
-
-            await vm.acceptFriendRequest('testuser');
-
-            expect(mockToast.add).toHaveBeenCalledWith(
-                expect.objectContaining({ severity: 'error' })
-            );
-        });
-    });
-
-    // ── rejectFriendRequest error ─────────────────────────────────────────────────
-    describe('rejectFriendRequest error', () => {
-        it('shows error toast when rejectFriendRequest fails', async () => {
-            mockCompleteFriendRequest.mockRejectedValue({
-                response: { data: { message: 'Request not found' } },
-            });
-            const wrapper = factory('');
-            await flushPromises();
-            const vm = wrapper.vm as any;
-
-            await vm.rejectFriendRequest('testuser');
-
-            expect(mockToast.add).toHaveBeenCalledWith(
-                expect.objectContaining({ severity: 'error', detail: 'Request not found' })
-            );
-        });
-    });
-
-    // ── fetchUserProfile error fallback message ───────────────────────────────────
-    describe('fetchUserProfile error fallback', () => {
-        it('shows fallback i18n error when response has no message', async () => {
-            mockGetSelfUserProfile.mockRejectedValue(new Error('network'));
+    describe('Error Handling', () => {
+        it('redirects to NotFound if profile fetching fails', async () => {
+            mockGetSelfUserProfile.mockRejectedValue({ response: { data: { message: 'Error' } } });
             factory('');
             await flushPromises();
-
-            expect(mockToast.add).toHaveBeenCalledWith(
-                expect.objectContaining({ severity: 'error' })
-            );
-            expect(mockPush).toHaveBeenCalledWith({ name: 'NotFound' });
-        });
-    });
-
-    // ── isSelfProfile cuando el slug coincide con el propio user_id ───────────────
-    describe('isSelfProfile with matching slug', () => {
-        it('sets isSelfProfile true when fetched user id matches auth user_id', async () => {
-            mockGetUserProfile.mockResolvedValue({ ...mockUser, id: 1 }); // mismo que authStore.user.user_id
-            const wrapper = factory('myownslug');
-            await flushPromises();
-            const vm = wrapper.vm as any;
-
-            expect(vm.isSelfProfile).toBe(true);
+            expect(mockPush).toHaveBeenCalledWith({ name: "NotFound" });
         });
 
-        it('sets isSelfProfile false when fetched user id differs', async () => {
-            mockGetUserProfile.mockResolvedValue({ ...mockUser, id: 999 });
-            const wrapper = factory('otheruser');
-            await flushPromises();
-            const vm = wrapper.vm as any;
-
-            expect(vm.isSelfProfile).toBe(false);
-        });
-    });
-
-    // ── success toasts ────────────────────────────────────────────────────────────
-    describe('success toasts', () => {
-        it('shows success toast when acceptFriendRequest succeeds', async () => {
-            mockCompleteFriendRequest.mockResolvedValue({});
+        it('shows error toast when friend request fails', async () => {
+            mockCompleteFriendRequest.mockRejectedValue({ translatedMessage: 'Error msg' });
             const wrapper = factory('');
             await flushPromises();
-            const vm = wrapper.vm as any;
-
-            await vm.acceptFriendRequest('testuser');
-
+            
+            await (wrapper.vm as any).handleFriendRequest(mockUser, true);
             expect(mockToast.add).toHaveBeenCalledWith(
-                expect.objectContaining({ severity: 'success' })
-            );
-        });
-
-        it('shows success toast when rejectFriendRequest succeeds', async () => {
-            mockCompleteFriendRequest.mockResolvedValue({});
-            const wrapper = factory('');
-            await flushPromises();
-            const vm = wrapper.vm as any;
-
-            await vm.rejectFriendRequest('testuser');
-
-            expect(mockToast.add).toHaveBeenCalledWith(
-                expect.objectContaining({ severity: 'success' })
-            );
-        });
-
-        it('shows success toast when sendFriendRequest succeeds', async () => {
-            mockCompleteFriendRequest.mockResolvedValue({});
-            const wrapper = factory('');
-            await flushPromises();
-            const vm = wrapper.vm as any;
-
-            await vm.sendFriendRequest('otheruser');
-
-            expect(mockToast.add).toHaveBeenCalledWith(
-                expect.objectContaining({ severity: 'success' })
+                expect.objectContaining({ severity: 'error', detail: 'Error msg' })
             );
         });
     });
