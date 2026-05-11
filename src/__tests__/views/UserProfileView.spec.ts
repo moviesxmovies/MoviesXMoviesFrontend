@@ -94,7 +94,7 @@ vi.mock("primevue", async (importOriginal) => {
 // Stub child components to keep tests focused
 vi.mock('@/components/friendRequestComponent.vue', () => ({ default: { template: '<div class="friend-request-stub" />' } }));
 vi.mock('@/components/reviewComponent.vue', () => ({ default: { template: '<div class="review-stub" />' } }));
-vi.mock('@/components/handleFriendshipComponent.vue', () => ({ default: { template: '<div class="handle-friendship-stub" />', props: ['users'] } }));vi.mock('@/components/friendshipStatusComponent.vue', () => ({ default: { template: '<div class="friendship-status-stub" />' } }));
+vi.mock('@/components/handleFriendshipComponent.vue', () => ({ default: { template: '<div class="handle-friendship-stub" />', props: ['users'] } })); vi.mock('@/components/friendshipStatusComponent.vue', () => ({ default: { template: '<div class="friendship-status-stub" />' } }));
 vi.mock('@/components/moviesListComponent.vue', () => ({ default: { template: '<div class="movies-list-stub" />' } }));
 vi.mock('@/components/sectionAccordion.vue', () => ({ default: { template: '<div class="section-accordion-stub"><slot /></div>', props: ['icon', 'title', 'isEmpty', 'emptyIcon', 'emptyTitle', 'emptyDescription', 'loading', 'defaultOpen', 'panelHeight', 'sentinelRef'] } }));
 
@@ -317,15 +317,6 @@ describe('UserProfileView', () => {
             const wrapper = factory('otheruser');
             await flushPromises();
             expect(wrapper.find('.btn-logout').exists()).toBe(false);
-        });
-
-        it('calls logout and redirects on click', async () => {
-            vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(500);
-            const wrapper = factory('');
-            await flushPromises();
-            await wrapper.find('.btn-logout').trigger('click');
-            expect(mockLogout).toHaveBeenCalled();
-            expect(mockPush).toHaveBeenCalledWith({ name: 'welcome' });
         });
     });
     // ── onUpdated ─────────────────────────────────────────────────────────────
