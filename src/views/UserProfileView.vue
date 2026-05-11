@@ -9,7 +9,6 @@ import {
   getSuggestedFriends,
   getUserMoviesLists,
   getUserTranslations,
-  removeFriend,
 } from "@/repositories/userRepository";
 import type { FriendRequest, MovieList, Review, User } from "@/types";
 import {
@@ -20,7 +19,6 @@ import {
   ConfirmDialog,
   Skeleton,
   useToast,
-  useConfirm,
 } from "primevue";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
@@ -32,7 +30,6 @@ import { usePaginatedFetch } from "@/composables/usePaginatedFetch";
 import { useInfinitePagination } from "@/composables/useInfinitePagination";
 import FriendRequestComponent from "@/components/friendRequestComponent.vue";
 import ReviewComponent from "@/components/reviewComponent.vue";
-import FriendWithFollow from "@/components/friendWithFollow.vue";
 import FriendshipStatusComponent from "@/components/friendshipStatusComponent.vue";
 import MoviesListComponent from "@/components/moviesListComponent.vue";
 import SectionAccordion from "@/components/sectionAccordion.vue";
