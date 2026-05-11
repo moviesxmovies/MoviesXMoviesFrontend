@@ -3,19 +3,21 @@ import { mount, flushPromises } from "@vue/test-utils";
 import { userSearching } from "@/repositories/userRepository";
 import SearchUsersView from "@/views/SearchUsersView.vue";
 import type { Pagination, User } from "@/types";
+import ConfirmationService from "primevue/confirmationservice";
 
 // -- Mocks --
 
-vi.mock("@/components/friendWithFollow.vue", () => ({
+vi.mock("@/components/handleFriendshipComponent.vue", () => ({
   default: {
-    template: '<div data-testid="friend-component" />',
-    props: ["user"],
+    name: "HandleFriendshipComponent",
+    template: '<div data-testid="FriendComponent" />',
+    props: ["users"],
   },
 }));
 
 vi.mock("@/components/paginationComponent.vue", () => ({
   default: {
-    template: '<div data-testid="pagination-component" />',
+    template: '<div data-testid="PaginationComponent" />',
     props: ["total_pages", "current_page"],
     emits: ["change-page"],
   },
@@ -26,11 +28,13 @@ vi.mock("@/repositories/userRepository", () => ({
 }));
 
 const mockToastAdd = vi.fn();
+const mockConfirm = { require: vi.fn() };
 vi.mock("primevue", async (importOriginal) => {
   const actual: any = await importOriginal();
   return {
     ...actual,
     useToast: vi.fn(() => ({ add: mockToastAdd })),
+    useConfirm: vi.fn(() => mockConfirm),
     Skeleton: { template: '<div class="skeleton-mock" />' },
   };
 });
@@ -63,6 +67,7 @@ const emptyPagination: Pagination<User> = {
 const createWrapper = () =>
   mount(SearchUsersView, {
     global: {
+      plugins: [ConfirmationService],
       stubs: { teleport: true },
       mocks: { $t: (key: string) => key },
     },
@@ -94,20 +99,21 @@ describe("SearchUsersView", () => {
       expect(wrapper.find(".empty-title").text()).toBe("search.empty");
     });
 
-    it("renders a FriendComponent for each user result", async () => {
+    it("renders HandleFriendshipComponent when there are results", async () => {
       vi.mocked(userSearching).mockResolvedValue({
         ...emptyPagination,
         results: [
-          { id: 1, username: "alice", email: "a@a.com" } as any,
-          { id: 2, username: "bob", email: "b@b.com" } as any,
+          { id: 1, username: "alice" } as any,
+          { id: 2, username: "bob" } as any,
         ],
       });
       const wrapper = createWrapper();
       await flushPromises();
 
-      expect(wrapper.findAll('[data-testid="friend-component"]')).toHaveLength(
-        2,
-      );
+      expect(wrapper.findAll('[data-testid="FriendComponent"]')).toHaveLength(1);
+      
+      const handleFriendship = wrapper.getComponent('[data-testid="FriendComponent"]');
+      expect(handleFriendship.props("users")).toHaveLength(2);
     });
   });
 

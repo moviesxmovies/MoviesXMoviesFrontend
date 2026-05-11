@@ -200,4 +200,13 @@ export const getUserTranslations = async (slug: string) => {
   } catch (error: any) {
     throw new TranslatedError(error, error.response?.data?.status);
   }
-}
+};
+
+export const removeFriend = async (username: string) => {
+  try {
+    const { data } = await api.delete(`/users/friends/`, { params: { username } });
+    return data;
+  } catch (error: any) {
+    throw new TranslatedError(error, error.response?.data?.status);
+  }
+};

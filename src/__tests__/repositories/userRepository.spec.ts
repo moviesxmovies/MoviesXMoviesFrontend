@@ -1,6 +1,7 @@
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import {
   getSelfUserProfile,
+  updateSelfUserProfile,
   getPersonProfile,
   getPersonMovieListsFromMovie,
   getPersonFilmography,
@@ -13,14 +14,16 @@ import {
   getUserMoviesLists,
   userSearching,
   getUserTranslations,
+  removeFriend,
 } from "@/repositories/userRepository";
 
 // ── Mocks ────────────────────────────────────────────────────────────────────
 
-const { mockGet, mockPost, mockDelete } = vi.hoisted(() => ({
+const { mockGet, mockPost, mockDelete, mockPut } = vi.hoisted(() => ({
   mockGet: vi.fn(),
   mockPost: vi.fn(),
   mockDelete: vi.fn(),
+  mockPut: vi.fn(),
 }));
 
 vi.mock("@/composables/useAPI", () => ({
@@ -28,6 +31,7 @@ vi.mock("@/composables/useAPI", () => ({
     get: mockGet,
     post: mockPost,
     delete: mockDelete,
+    put: mockPut,
   },
 }));
 
@@ -58,8 +62,40 @@ describe("UserRepository", () => {
       await expect(getSelfUserProfile()).rejects.toThrow("Not found");
     });
   });
-  // // ── updateUserProfile ──────────────────────────────────────────────────────────
+  // ── updateSelfUserProfile ──────────────────────────────────────────────────────
+  describe("updateSelfUserProfile", () => {
+    it("calls API with correct endpoint and returns user data", async () => {
+      const mockProfile = {
+        id: "1",
+        name: "Christopher Nolan",
+        slug: "christopher-nolan",
+      };
 
+      mockPut.mockResolvedValueOnce({ data: mockProfile });
+      const result = await updateSelfUserProfile({ username: "UpdatedName" });
+
+      expect(mockPut).toHaveBeenCalledWith(
+        "/users/",
+        {
+          username: "UpdatedName",
+        },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+      expect(result).toEqual(mockProfile);
+    });
+
+    it("throws when API fails", async () => {
+      mockPut.mockRejectedValueOnce(new Error("Not found"));
+
+      await expect(
+        updateSelfUserProfile({ username: "UpdatedName" }),
+      ).rejects.toThrow("Not found");
+    });
+  });
   // ── getPersonProfile ──────────────────────────────────────────────────────────
   describe("getPersonProfile", () => {
     it("calls API with correct endpoint and returns profile data", async () => {
@@ -463,6 +499,24 @@ describe("UserRepository", () => {
       await expect(getUserTranslations("testuser")).rejects.toThrow(
         "Server error",
       );
+    });
+  });
+  // ── removeFriend ───────────────────────────────────────────────────────────────
+  describe("removeFriend", () => {
+    it("calls API with correct endpoint and returns success status", async () => {
+      mockDelete.mockResolvedValueOnce({ data: { status: "success" } });
+      const result = await removeFriend("john");
+
+      expect(mockDelete).toHaveBeenCalledWith("/users/friends/", {
+        params: { username: "john" },
+      });
+      expect(result).toEqual({ status: "success" });
+    });
+
+    it("throws when API fails", async () => {
+      mockDelete.mockRejectedValueOnce(new Error("Server error"));
+
+      await expect(removeFriend("john")).rejects.toThrow("Server error");
     });
   });
 });

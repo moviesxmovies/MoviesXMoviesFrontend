@@ -2,7 +2,7 @@ dev:
     npm run dev
 build:
     npm run build
-cv:
-    npm run test:unit -- --coverage
+cv *FILE:
+    npm run test:unit -- --coverage {{FILE}}
 host:
     npm run dev -- --host
