@@ -34,6 +34,7 @@ vi.mock("vue-router", () => ({
     afterEach: vi.fn(),
     currentRoute: { value: {} },
   })),
+  createWebHistory: vi.fn(() => ({})),
 }));
 
 vi.mock("vue-i18n", () => ({

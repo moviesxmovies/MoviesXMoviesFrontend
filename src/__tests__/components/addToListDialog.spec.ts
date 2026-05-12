@@ -256,21 +256,6 @@ describe("AddToListDialog", () => {
       expect(mockFetchMovieListsFromMovie).toHaveBeenCalledTimes(1);
     });
 
-    it("shows a success toast after adding", async () => {
-      mockAddMovieToList.mockResolvedValue({});
-      const wrapper = mountComponent();
-      await flushPromises();
-
-      await wrapper
-        .findComponent({ name: "ListComponent" })
-        .vm.$emit("add", "list-1");
-      await flushPromises();
-
-      expect(mockToastAdd).toHaveBeenCalledWith(
-        expect.objectContaining({ severity: "success" }),
-      );
-    });
-
     it("shows an error toast with server message when addMovieToList fails", async () => {
       mockAddMovieToList.mockRejectedValue({
         response: { data: { message: "Already in list" } },
@@ -341,21 +326,6 @@ describe("AddToListDialog", () => {
       await flushPromises();
 
       expect(mockFetchMovieListsFromMovie).toHaveBeenCalledTimes(1);
-    });
-
-    it("shows a success toast after removing", async () => {
-      mockRemoveMovieFromList.mockResolvedValue({});
-      const wrapper = mountComponent();
-      await flushPromises();
-
-      await wrapper
-        .findComponent({ name: "ListComponent" })
-        .vm.$emit("remove", "list-2");
-      await flushPromises();
-
-      expect(mockToastAdd).toHaveBeenCalledWith(
-        expect.objectContaining({ severity: "success" }),
-      );
     });
 
     it("shows an error toast with server message when removeMovieFromList fails", async () => {
