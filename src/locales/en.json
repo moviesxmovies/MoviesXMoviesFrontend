@@ -76,6 +76,7 @@
       "formName": "Name",
       "formDescription": "Description",
       "header": "Create List",
+      "headerEdit": "Edit list",
       "submit": "Create",
       "cancel": "Cancel"
     },

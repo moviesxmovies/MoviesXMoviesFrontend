@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import CreateListDialog from "@/components/createListDialog.vue";
 import MovieCardComponent from "@/components/movieCardComponent.vue";
 import PaginationComponent from "@/components/paginationComponent.vue";
 import { api } from "@/composables/useAPI";
@@ -36,6 +37,7 @@ const loadingComputed = computed(() => loading.value || loadingMovies.value);
 
 const confirmDeleteListVisible = ref(false);
 const confirmDeleteMovieVisible = ref(false);
+const createListDialogVisible = ref(false);
 const movieToDelete = ref<string | null>(null);
 
 const { formatRelativeTime } = useDate();
@@ -203,6 +205,12 @@ watch(
     </template>
   </Dialog>
 
+  <!-- EDIT LIST DIALOG -->
+  <CreateListDialog
+    v-model:visible="createListDialogVisible"
+    :movieList="movieList"
+  />
+
   <!-- CONFIRM DELETE LIST DIALOG -->
   <Dialog v-model:visible="confirmDeleteListVisible" modal :draggable="false" :dismissableMask="true"
     :style="{ width: '90vw', maxWidth: '380px' }" :pt="{
@@ -331,6 +339,10 @@ watch(
                   }}</span>
               </div>
               <div v-if="user.username === authStore.user?.username" class="actions-wrapper">
+                <button @click="createListDialogVisible = true" class="btn-edit-list" data-testid="edit-list-btn">
+                  <i class="pi pi-pencil" />
+                  {{ t("common.edit") }}
+                </button>
                 <button @click="removeListModal" class="btn-delete-list" data-testid="delete-list-btn">
                   <i class="pi pi-trash" />
                   {{ t("common.delete") }}
@@ -495,6 +507,9 @@ watch(
 }
 
 .actions-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   margin-left: auto;
 }
 
@@ -533,6 +548,26 @@ watch(
 .badge-friends {
   background: rgba(99, 102, 241, 0.2);
   color: #4d57bd;
+}
+
+.btn-edit-list {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 1px solid var(--orange);
+  background: transparent;
+  color: var(--orange);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-edit-list:hover {
+  background: var(--orange);
+  color: white;
 }
 
 .btn-delete-list {
