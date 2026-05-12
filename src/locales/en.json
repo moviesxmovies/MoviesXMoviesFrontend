@@ -442,7 +442,10 @@
     "confirmDeleteList": "Are you sure you want to delete the list \"{0}\"?",
     "getMoviesError": "Failed to load movies in this list. Please try again later.",
     "movieRemoved": "Movie removed from list successfully",
-    "removeMovieError": "Failed to remove movie from list. Please try again."
+    "removeMovieError": "Failed to remove movie from list. Please try again.",
+    "emptyTitle": "This list has no movies",
+    "emptyDescription": "Start adding movies to this list to see them here.",
+    "searchMovies": "Search movies"
   },
   "actions": {
     "addToList": "Add to list",
