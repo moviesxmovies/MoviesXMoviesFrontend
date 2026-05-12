@@ -3,6 +3,7 @@ import { useDate } from "@/composables/useDate";
 import type { Movie } from "@/types";
 import { goToMovie } from "@/utils/goTo";
 import { Skeleton } from "primevue";
+import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
@@ -12,6 +13,7 @@ const props = defineProps<{
   movie: Movie;
   delete?: boolean;
 }>();
+const loadingImage = ref(true);
 
 const emit = defineEmits<{
   (e: "removeMovie", slug: string): void;
@@ -29,18 +31,17 @@ const emit = defineEmits<{
 
   <template v-else>
     <div class="movie-card-container">
-      <button
-        v-if="delete"
-        class="delete-btn"
-        @click.stop="emit('removeMovie', movie.slug)"
-        :aria-label="$t('actions.delete')"
-      >
+      <button v-if="delete" class="delete-btn" @click.stop="emit('removeMovie', movie.slug)"
+        :aria-label="$t('actions.delete')">
         <i class="pi pi-trash" />
       </button>
 
       <div class="movie-card" @click="goToMovie(movie.slug)">
         <div class="movie-poster-wrap">
-          <img :src="movie.cover" :alt="movie.title" class="movie-poster" />
+          <Skeleton v-if="loadingImage" class="movie-poster-skeleton" border-radius="0" />
+
+          <img v-show="!loadingImage" :src="movie.cover" :alt="movie.title" class="movie-poster"
+            @load="loadingImage = false" />
         </div>
         <div class="movie-info">
           <p class="movie-title">{{ movie.title }}</p>
@@ -67,9 +68,9 @@ const emit = defineEmits<{
   height: 2rem;
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(15, 23, 42, 0.6); /* Slate muy oscuro con transparencia */
+  background: rgba(15, 23, 42, 0.6);
   backdrop-filter: blur(8px);
-  color: #f87171; /* Rojo suave elegante */
+  color: #f87171;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -113,20 +114,30 @@ const emit = defineEmits<{
 }
 
 .movie-poster-wrap {
+  position: relative;
   width: 100%;
   aspect-ratio: 2 / 3;
   overflow: hidden;
   flex-shrink: 0;
+  background: var(--secondary);
+}
+
+.movie-poster-skeleton {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .movie-poster {
   width: 100%;
   height: 100%;
-  aspect-ratio: 2 / 3;
   object-fit: cover;
   display: block;
   transition: transform 0.5s;
 }
+
 
 .movie-info {
   padding: 0.6rem 0.75rem;

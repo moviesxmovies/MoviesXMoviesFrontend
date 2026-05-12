@@ -90,15 +90,7 @@ watch(
 </template>
 
 <style scoped>
-.movie-list {
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
+
 
 .movielist-grid {
   display: grid;
@@ -108,24 +100,13 @@ watch(
 }
 
 @media (min-width: 768px) {
-  .movie-list {
-    padding: 0 1.5rem;
-  }
   .movielist-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
-@media (min-width: 1024px) {
-  .movielist-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
 
 @media (min-width: 1280px) {
-  .movie-list {
-    padding: 0 3rem;
-  }
   .movielist-grid {
     grid-template-columns: repeat(5, 1fr);
   }
