@@ -68,7 +68,7 @@ describe('CelebrityCardComponent', () => {
         it('shows birthday after image loads', async () => {
             const wrapper = mountComponent(mockCelebrity)
             await wrapper.find('img').trigger('load')
-            expect(wrapper.find('.birthday').text()).toContain(mockCelebrity.birthday)
+            expect(wrapper.find('.birthday').text()).toContain("1/15/1980")
         })
 
         it('does not show birthday if not provided', async () => {

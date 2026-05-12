@@ -1,11 +1,12 @@
 <script lang="ts" setup>
+import { useDate } from "@/composables/useDate";
 import type { Movie } from "@/types";
 import { goToMovie } from "@/utils/goTo";
 import { Skeleton } from "primevue";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
-
+const { formatRelativeTime } = useDate();
 const props = defineProps<{
   loading?: boolean;
   movie: Movie;
@@ -43,7 +44,7 @@ const emit = defineEmits<{
         </div>
         <div class="movie-info">
           <p class="movie-title">{{ movie.title }}</p>
-          <p class="movie-year">{{ movie.release_date }}</p>
+          <p class="movie-year">{{ formatRelativeTime(movie.release_date) }}</p>
         </div>
       </div>
     </div>
