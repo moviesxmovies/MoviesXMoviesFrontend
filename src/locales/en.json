@@ -46,7 +46,7 @@
       "profile": "My Profile"
     },
     "movieList": {
-      "moviesCount": "{count} film | {count} films",
+      "moviesCount": "{count} movie | {count} movies",
       "errorDetail": "Could not load movies. Please try again later."
     },
     "lists": {
