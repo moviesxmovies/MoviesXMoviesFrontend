@@ -68,6 +68,14 @@ vi.mock('@/components/addReviewDialog.vue', () => ({
   }),
 }))
 
+vi.mock('@/components/addToListDialog.vue', () => ({
+  default: defineComponent({
+    props: ['visible', 'movie'],
+    emits: ['update:visible'],
+    template: '<div class="add-to-list-dialog" v-if="visible" />',
+  }),
+}))
+
 vi.mock('@/composables/usePaginatedFetch', () => ({
   // Always return the same shared spies so the component and tests
   // reference the exact same refs and functions.
@@ -223,6 +231,50 @@ describe('MovieDetail', () => {
       const wrapper = mountComponent()
       await flushPromises()
       expect(wrapper.text()).not.toContain('Sci-Fi')
+    })
+  })
+
+  // ── Add To List ──────────────────────────────────────────────────────────────
+
+  describe('add to list section', () => {
+    it('mounts AddToListDialog in the DOM', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
+      expect(wrapper.findComponent({ name: 'AddToListDialog' }).exists()).toBe(true)
+    })
+
+    it('passes the full movie object to AddToListDialog', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
+      const dialog = wrapper.findComponent({ name: 'AddToListDialog' })
+      
+      expect(dialog.props('movie')).toEqual(expect.objectContaining({
+        slug: 'blade-runner-2049',
+        title: 'Blade Runner 2049'
+      }))
+    })
+
+    it('opens the dialog when the "add to list" button is clicked', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      const btn = wrapper.find('.btn-add-list')
+      expect(btn.exists()).toBe(true)
+
+      let dialog = wrapper.findComponent({ name: 'AddToListDialog' })
+      expect(dialog.props('visible')).toBe(false)
+      await btn.trigger('click')
+
+      expect(dialog.props('visible')).toBe(true)
+    })
+
+    it('updates addToListDialogVisible when the dialog emits update:visible', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
+      const dialog = wrapper.findComponent({ name: 'AddToListDialog' })
+
+      await dialog.vm.$emit('update:visible', false)
+      expect(dialog.props('visible')).toBe(false)
     })
   })
 

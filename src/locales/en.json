@@ -370,6 +370,7 @@
     "no_platforms_description": "No platforms available for this movie.",
     "no_synopsis_description": "No synopsis available for this movie.",
     "add_review": "Write a Review",
+    "add_to_list": "Add to List",
     "error": {
       "fetchingMovie": "Failed to load movie details. Please try again later.",
       "fetchingPerson": "Failed to load person details. Please try again later."
