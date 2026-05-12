@@ -185,7 +185,7 @@ watch(
           <i class="pi pi-trash" />
         </div>
         <div>
-          <p class="confirm-title">{{ t("list.confirmation") }}</p>
+          <p class="confirm-title">{{ t("list.confirmationMovie") }}</p>
         </div>
       </div>
     </template>
@@ -236,13 +236,13 @@ watch(
           <i class="pi pi-trash" />
         </div>
         <div>
-          <p class="confirm-title">{{ t("list.confirmation") }}</p>
+          <p class="confirm-title">{{ t("list.confirmationList") }}</p>
         </div>
       </div>
     </template>
 
     <p class="confirm-body">
-      {{ t("list.confirmRemoveList", [movieList.slug]) }}
+      {{ t("list.confirmDeleteList", [movieList.slug]) }}
     </p>
 
     <template #footer>
@@ -362,7 +362,7 @@ watch(
                   data-testid="delete-list-btn"
                 >
                   <i class="pi pi-trash" />
-                  {{ t("list.delete") }}
+                  {{ t("common.delete") }}
                 </button>
               </div>
             </div>

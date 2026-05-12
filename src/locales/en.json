@@ -346,7 +346,9 @@
       "updatingProfile": "Failed to update profile. Please try again.",
       "acceptingFriendRequest": "Failed to accept friend request. Please try again.",
       "rejectingFriendRequest": "Failed to reject friend request. Please try again."
-    }
+    },
+    "confirmation": "Delete friend",
+    "confirmRemoveFriend": "Are you sure you want to remove this friend?"
   },
   "movie": {
     "synopsis": "Synopsis",
@@ -434,8 +436,10 @@
     "createdBy": "Created by",
     "moviesCount": "{count} movie | {count} movies",
     "updated": "Last updated {0}",
-    "confirmation": "Remove movie from list",
+    "confirmationMovie": "Remove movie from list",
+    "confirmationList": "Delete list",
     "confirmRemoveMovie": "Are you sure you want to remove \"{0}\" from the list?",
+    "confirmDeleteList": "Are you sure you want to delete the list \"{0}\"?",
     "getMoviesError": "Failed to load movies in this list. Please try again later.",
     "movieRemoved": "Movie removed from list successfully",
     "removeMovieError": "Failed to remove movie from list. Please try again."
