@@ -30,6 +30,7 @@ const movieList = ref<MovieList>({} as MovieList);
 const user = ref<User>({} as User);
 const movies = ref<Pagination<Movie>>({} as Pagination<Movie>);
 const loading = ref(false);
+const loadingMovies = ref(false);
 
 const confirmDeleteListVisible = ref(false);
 const confirmDeleteMovieVisible = ref(false);
@@ -68,6 +69,7 @@ const fetchUser = async () => {
 };
 
 const fetchMovies = async (page?: number) => {
+  loadingMovies.value = true;
   try {
     movies.value = await movieSearchingInList(
       route.params.user as string,
@@ -77,6 +79,8 @@ const fetchMovies = async (page?: number) => {
     );
   } catch (error: any) {
     console.error(error);
+  } finally {
+    loadingMovies.value = false;
   }
 };
 
@@ -371,7 +375,7 @@ watch(
           v-for="movie in movies.results"
           :key="movie.id"
           :movie="movie"
-          :loading="loading"
+          :loading="loadingMovies"
           :delete="true"
           data-testid="movie-card"
           @remove-movie="removeMovieModal"
