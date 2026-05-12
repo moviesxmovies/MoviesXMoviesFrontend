@@ -106,7 +106,7 @@ describe("MovieCardComponent", () => {
 
     it("displays the release date", () => {
       const wrapper = mountComponent(sampleMovie, false);
-      expect(wrapper.find(".movie-year").text()).toBe("2010-07-16");
+      expect(wrapper.find(".movie-year").text()).toBe("7/16/2010");
     });
 
     it("renders the poster with correct src and alt", () => {
