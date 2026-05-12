@@ -97,12 +97,12 @@ const confirmAction = async () => {
           <i class="pi pi-user-minus" />
         </div>
         <div>
-          <p class="confirm-title">{{ t("search.confirmation") }}</p>
+          <p class="confirm-title">{{ t("user.confirmation") }}</p>
         </div>
       </div>
     </template>
 
-    <p class="confirm-body">{{ t("search.confirmRemoveFriend") }}</p>
+    <p class="confirm-body">{{ t("user.confirmRemoveFriend") }}</p>
 
     <template #footer>
       <div class="footer-actions">
@@ -111,7 +111,7 @@ const confirmAction = async () => {
         </button>
         <button class="btn-remove" @click="confirmAction">
           <i class="pi pi-user-minus" />
-          <span>{{ t("common.remove") }}</span>
+          <span>{{ t("common.confirm") }}</span>
         </button>
       </div>
     </template>

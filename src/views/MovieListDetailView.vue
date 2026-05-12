@@ -16,6 +16,7 @@ import {
   type MovieList,
   type User,
 } from "@/types";
+import { computed } from "@vue/reactivity";
 import { Dialog, Skeleton } from "primevue";
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
@@ -31,6 +32,7 @@ const user = ref<User>({} as User);
 const movies = ref<Pagination<Movie>>({} as Pagination<Movie>);
 const loading = ref(false);
 const loadingMovies = ref(false);
+const loadingComputed = computed(() => loading.value || loadingMovies.value);
 
 const confirmDeleteListVisible = ref(false);
 const confirmDeleteMovieVisible = ref(false);
@@ -185,7 +187,7 @@ watch(
           <i class="pi pi-trash" />
         </div>
         <div>
-          <p class="confirm-title">{{ t("list.confirmation") }}</p>
+          <p class="confirm-title">{{ t("list.confirmationMovie") }}</p>
         </div>
       </div>
     </template>
@@ -236,13 +238,13 @@ watch(
           <i class="pi pi-trash" />
         </div>
         <div>
-          <p class="confirm-title">{{ t("list.confirmation") }}</p>
+          <p class="confirm-title">{{ t("list.confirmationList") }}</p>
         </div>
       </div>
     </template>
 
     <p class="confirm-body">
-      {{ t("list.confirmRemoveList", [movieList.slug]) }}
+      {{ t("list.confirmDeleteList", [movieList.slug]) }}
     </p>
 
     <template #footer>
@@ -362,7 +364,7 @@ watch(
                   data-testid="delete-list-btn"
                 >
                   <i class="pi pi-trash" />
-                  {{ t("list.delete") }}
+                  {{ t("common.delete") }}
                 </button>
               </div>
             </div>
@@ -370,19 +372,40 @@ watch(
         </div>
       </div>
 
-      <div class="movies-grid">
+      <div
+        v-if="!loadingComputed && !movies.results"
+        class="empty-list-container"
+      >
+        <div class="empty-card">
+          <div class="icon-circle">
+            <i class="pi pi-video text-3xl" />
+          </div>
+          <h3 class="empty-title">
+            {{ t("list.emptyTitle") }}
+          </h3>
+          <p class="empty-description">
+            {{ t("list.emptyDescription") }}
+          </p>
+          <button class="btn-search-redirect" @click="router.push('/search')">
+            <i class="pi pi-search" />
+            <span>{{ t("list.searchMovies") }}</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="movies-grid" v-else>
         <MovieCardComponent
           v-for="movie in movies.results"
           :key="movie.id"
           :movie="movie"
-          :loading="loadingMovies"
-          :delete="true"
+          :loading="loadingComputed"
+          :delete="user.username === authStore.user?.username"
           data-testid="movie-card"
           @remove-movie="removeMovieModal"
         />
       </div>
 
-      <div v-if="!loading && movies.total_pages > 1">
+      <div v-if="!loadingComputed && movies.total_pages > 1">
         <PaginationComponent
           data-testid="PaginationComponent"
           :data-total="movies.total_pages"
@@ -676,5 +699,71 @@ watch(
 
 .mb-4 {
   margin-bottom: 1rem;
+}
+
+.empty-card {
+  background: color-mix(in srgb, var(--background) 40%, transparent);
+  border-radius: 2rem;
+  padding: 4rem 2rem;
+  border: 2px dashed var(--secondary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.icon-circle {
+  width: 5rem;
+  height: 5rem;
+  color: color-mix(in srgb, var(--accent) 50%, transparent);
+  background: color-mix(in srgb, var(--secondary) 70%, transparent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.empty-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  opacity: 0.7;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.empty-description {
+  font-size: 0.875rem;
+  opacity: 0.5;
+  max-width: 300px;
+  margin: 0 auto 2rem;
+  line-height: 1.6;
+}
+
+.btn-search-redirect {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.8rem 1.5rem;
+  border-radius: 999px;
+  border: none;
+  background: var(--primary);
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    opacity 0.2s;
+}
+
+.btn-search-redirect:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.btn-search-redirect:active {
+  transform: translateY(0);
 }
 </style>

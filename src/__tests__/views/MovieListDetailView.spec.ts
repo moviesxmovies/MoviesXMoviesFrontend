@@ -353,19 +353,25 @@ describe("MovieListView", () => {
     it("shows delete-list button when authenticated user is the list owner", async () => {
       setAuthUser({ username: "johndoe" });
       const wrapper = await mountComponent();
-      expect(wrapper.find('[data-testid="delete-list-btn"]').exists()).toBe(true);
+      expect(wrapper.find('[data-testid="delete-list-btn"]').exists()).toBe(
+        true,
+      );
     });
 
     it("hides delete-list button when authenticated user is not the list owner", async () => {
       setAuthUser({ username: "anotheruser" });
       const wrapper = await mountComponent();
-      expect(wrapper.find('[data-testid="delete-list-btn"]').exists()).toBe(false);
+      expect(wrapper.find('[data-testid="delete-list-btn"]').exists()).toBe(
+        false,
+      );
     });
 
     it("hides delete-list button when there is no authenticated user", async () => {
       setAuthUser(null);
       const wrapper = await mountComponent();
-      expect(wrapper.find('[data-testid="delete-list-btn"]').exists()).toBe(false);
+      expect(wrapper.find('[data-testid="delete-list-btn"]').exists()).toBe(
+        false,
+      );
     });
 
     it("opens the confirm dialog when delete-list button is clicked", async () => {
@@ -439,6 +445,36 @@ describe("MovieListView", () => {
       const wrapper = await mountComponent();
       const stats = wrapper.find(".list-footer-stats");
       expect(stats.text()).toContain("relative(2024-01-01T00:00:00Z)");
+    });
+  });
+
+  // ── Empty state ────────────────────────────────────────────────────────────
+
+  describe("Empty state", () => {
+    it("shows empty state when results is null/undefined", async () => {
+      (movieSearchingInList as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ...mockMovies,
+        results: null,
+      });
+      const wrapper = await mountComponent();
+      expect(wrapper.find(".empty-list-container").exists()).toBe(true);
+      expect(wrapper.find(".movies-grid").exists()).toBe(false);
+    });
+
+    it("hides empty state when results exist", async () => {
+      const wrapper = await mountComponent();
+      expect(wrapper.find(".empty-list-container").exists()).toBe(false);
+      expect(wrapper.find(".movies-grid").exists()).toBe(true);
+    });
+
+    it("navigates to /search when search button is clicked", async () => {
+      (movieSearchingInList as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ...mockMovies,
+        results: null,
+      });
+      const wrapper = await mountComponent();
+      await wrapper.find(".btn-search-redirect").trigger("click");
+      expect(mockRouter.push).toHaveBeenCalledWith("/search");
     });
   });
 });
