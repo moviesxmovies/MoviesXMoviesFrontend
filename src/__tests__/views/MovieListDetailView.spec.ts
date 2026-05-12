@@ -176,14 +176,14 @@ describe("MovieListView", () => {
         global: { stubs: { teleport: true } },
       });
 
-      expect(wrapper.find(".header-skeleton").exists()).toBe(true);
+      expect(wrapper.find(".skeleton-wrapper").exists()).toBe(true);
       expect(wrapper.find(".movie-list-info").exists()).toBe(false);
     });
 
     it("renders movie list info after loading", async () => {
       const wrapper = await mountComponent();
       expect(wrapper.find(".movie-list-info").exists()).toBe(true);
-      expect(wrapper.find(".header-skeleton").exists()).toBe(false);
+      expect(wrapper.find(".skeleton-wrapper").exists()).toBe(false);
     });
 
     it("displays the list name", async () => {
