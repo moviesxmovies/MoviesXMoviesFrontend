@@ -33,6 +33,9 @@ const activeFiltersCount = computed(() => {
     (typeof route.query.platforms === "string"
       ? 1
       : (route.query.platforms?.length ?? 0)) +
+    (typeof route.query.celebrities === "string"
+      ? 1
+      : (route.query.celebrities?.length ?? 0)) +
     (route.query.marked_unseen === "true" ? 1 : 0) +
     (route.query.reviewed === "true" ? 1 : 0)
   );
@@ -75,6 +78,7 @@ const normalizeQueryParams = (query: typeof route.query): searchData => {
     genres: toArray(query.genres),
     platforms: toArray(query.platforms),
     stars: toArray(query.stars),
+    celebrities: toArray(query.celebrities),
   } as searchData;
 };
 
@@ -131,6 +135,9 @@ watch(
       @filter-stars="(stars: number[]) => updateRoute({ stars })"
       @filter-unseen="(marked_unseen: string) => updateRoute({ marked_unseen })"
       @filter-reviewed="(reviewed: string) => updateRoute({ reviewed })"
+      @filter-celebrities="
+        (celebrities: string[]) => updateRoute({ celebrities })
+      "
       @close="filtersOpen = false"
     />
   </Drawer>
@@ -145,6 +152,9 @@ watch(
           (marked_unseen: string) => updateRoute({ marked_unseen })
         "
         @filter-reviewed="(reviewed: string) => updateRoute({ reviewed })"
+        @filter-celebrities="
+          (celebrities: string[]) => updateRoute({ celebrities })
+        "
         @close="filtersOpen = false"
       />
     </aside>
