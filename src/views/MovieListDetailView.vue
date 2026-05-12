@@ -256,11 +256,48 @@ watch(
 
   <div class="page">
     <template v-if="loading">
-      <div class="header-skeleton">
-        <Skeleton shape="circle" size="10rem" class="mr-4" />
-        <div class="flex-1">
-          <Skeleton width="40%" height="2.5rem" class="mb-2" />
-          <Skeleton width="60%" height="1.5rem" />
+      <div class="info-card skeleton-wrapper">
+        <div class="author-section">
+          <div class="avatar-wrapper">
+            <Skeleton shape="circle" size="120px" />
+          </div>
+          <div
+            class="author-meta"
+            style="
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 0.5rem;
+            "
+          >
+            <Skeleton width="4rem" height="0.75rem" />
+            <Skeleton width="8rem" height="1.25rem" />
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="list-content">
+          <div class="list-header">
+            <Skeleton width="60%" height="2.5rem" />
+            <Skeleton width="2.5rem" height="2.5rem" border-radius="0.75rem" />
+          </div>
+
+          <div class="mb-4">
+            <Skeleton width="100%" height="1rem" class="mb-2" />
+            <Skeleton width="80%" height="1rem" />
+          </div>
+
+          <div class="list-footer-stats">
+            <Skeleton width="6rem" height="1rem" />
+            <Skeleton width="8rem" height="1rem" />
+            <Skeleton
+              width="5rem"
+              height="2rem"
+              border-radius="999px"
+              style="margin-left: auto"
+            />
+          </div>
         </div>
       </div>
     </template>
@@ -283,19 +320,13 @@ watch(
             </div>
           </div>
 
-          <!-- Only in desktop -->
           <div class="divider"></div>
 
           <!-- List info -->
           <div class="list-content">
             <div class="list-header">
               <h1 class="list-name">{{ movieList.name }}</h1>
-              <span
-                v-if="privacy"
-                class="privacy-badge"
-                :class="privacy.class"
-                v-tooltip="movieList.privacity"
-              >
+              <span v-if="privacy" class="privacy-badge" :class="privacy.class">
                 <i :class="privacy.icon" />
               </span>
             </div>
@@ -307,11 +338,9 @@ watch(
             <div class="list-footer-stats">
               <div class="stat">
                 <i class="pi pi-video" />
-                <span>
-                  {{
-                    t("list.moviesCount", movieList.movies?.length || 0)
-                  }}</span
-                >
+                <span>{{
+                  t("list.moviesCount", movieList.movies?.length || 0)
+                }}</span>
               </div>
               <div class="stat">
                 <i class="pi pi-calendar" />
@@ -319,9 +348,17 @@ watch(
                   t("list.updated", [formatRelativeTime(movieList.updated_at)])
                 }}</span>
               </div>
-              <div v-if="user.username === authStore.user?.username">
-                <button @click="removeListModal" class="btn-delete-list" data-testid="delete-list-btn">
-                  Delete list
+              <div
+                v-if="user.username === authStore.user?.username"
+                class="actions-wrapper"
+              >
+                <button
+                  @click="removeListModal"
+                  class="btn-delete-list"
+                  data-testid="delete-list-btn"
+                >
+                  <i class="pi pi-trash" />
+                  {{ t("list.delete") }}
                 </button>
               </div>
             </div>
@@ -359,7 +396,7 @@ watch(
 .page {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 4rem 1rem;
+  padding: 2rem 1rem;
 }
 
 .movie-list-info {
@@ -369,19 +406,23 @@ watch(
 .info-card {
   display: flex;
   flex-direction: column;
-  background: var(--secondary);
-  border-radius: 1.25rem;
+  background: var(--background);
+  border-radius: 1.5rem;
   padding: 2rem;
   gap: 2rem;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--secondary);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
 @media (min-width: 768px) {
   .info-card {
     flex-direction: row;
-    align-items: stretch;
   }
+}
+
+.skeleton-wrapper :deep(.p-skeleton) {
+  background-color: var(--secondary);
+  opacity: 0.5;
 }
 
 .author-section {
@@ -389,16 +430,15 @@ watch(
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-width: 200px;
-  text-align: center;
+  min-width: 180px;
 }
 
 .avatar-wrapper {
-  position: relative;
-  padding: 5px;
-  background: var(--primary);
+  padding: 4px;
+  background: var(--secondary);
   border-radius: 50%;
   margin-bottom: 1rem;
+  line-height: 0;
 }
 
 .author-img {
@@ -406,7 +446,7 @@ watch(
   height: 120px;
   border-radius: 50%;
   object-fit: cover;
-  border: 4px solid var(--secondary);
+  border: 2px solid var(--background);
 }
 
 .author-meta .label {
@@ -419,6 +459,7 @@ watch(
 }
 
 .username {
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--primary);
   margin: 0;
@@ -426,15 +467,19 @@ watch(
 
 .divider {
   width: 1px;
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--secondary);
   margin: 0 1rem;
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .divider {
+    display: block;
+  }
 }
 
 .list-content {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 
 .list-header {
@@ -445,27 +490,30 @@ watch(
 }
 
 .list-name {
-  font-size: 2.25rem;
+  font-size: 2rem;
   font-weight: 800;
-  margin: 0;
   color: var(--text);
-  line-height: 1.2;
+  margin: 0;
 }
 
 .list-description {
-  font-size: 1.1rem;
-  line-height: 1.6;
-  opacity: 0.8;
+  color: var(--gray);
+  font-size: 1rem;
+  line-height: 1.5;
   margin-bottom: 1.5rem;
-  max-width: 800px;
 }
 
 .list-footer-stats {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
   gap: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.4);
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--secondary);
+}
+
+.actions-wrapper {
+  margin-left: auto;
 }
 
 .stat {
@@ -481,12 +529,10 @@ watch(
 }
 
 .privacy-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem;
-  border-radius: 0.75rem;
-  font-size: 1rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 800;
 }
 
 .badge-public {
@@ -507,30 +553,21 @@ watch(
 .btn-delete-list {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.9rem;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
   border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  border: 1px solid var(--red);
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 1px solid #ef4444;
   background: transparent;
-  color: var(--red);
+  color: #ef4444;
   cursor: pointer;
-  transition:
-    background 0.2s,
-    color 0.2s,
-    transform 0.1s;
-  white-space: nowrap;
-  flex-shrink: 0;
+  transition: all 0.2s;
 }
 
 .btn-delete-list:hover {
-  background: var(--red);
-  color: var(--background);
-}
-
-.btn-delete-list:active {
-  transform: scale(0.97);
+  background: #ef4444;
+  color: white;
 }
 
 .header-skeleton {
@@ -640,5 +677,9 @@ watch(
 
 .btn-delete:hover {
   opacity: 0.85;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
 }
 </style>
