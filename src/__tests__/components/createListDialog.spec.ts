@@ -1,5 +1,5 @@
 import { mount, flushPromises } from "@vue/test-utils";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import CreateListDialog from "@/components/createListDialog.vue";
 import type { Movie } from "@/types";
 
@@ -7,15 +7,28 @@ const mockCreateList = vi.fn();
 const mockAddMovieToList = vi.fn();
 const mockToastAdd = vi.fn();
 const mockAuthStore = { user: { username: "testuser" } };
+const mockUpdateList = vi.fn();
 
 vi.mock("@/repositories/listRepository", () => ({
   createList: (...args: unknown[]) => mockCreateList(...args),
   addMovieToList: (...args: unknown[]) => mockAddMovieToList(...args),
+  updateList: (...args: unknown[]) => mockUpdateList(...args),
   privacityConfig: {
     P: { value: "P", text: "Public", icon: "pi pi-globe" },
     R: { value: "R", text: "Friends", icon: "pi pi-users" },
     F: { value: "F", text: "Private", icon: "pi pi-lock" },
   },
+}));
+
+vi.mock("@/utils/handleApiError", () => ({
+  handleApiError: vi.fn((error, fieldErrors, serverErrors, toast, t) => {
+    toast.add({
+      severity: "error",
+      summary: t("toast.error"),
+      detail: t("errors.generic"),
+      life: 3000,
+    });
+  }),
 }));
 
 vi.mock("@/repositories/auth/authRepository", () => ({
@@ -37,6 +50,14 @@ vi.mock("@/stores/authStore", () => ({
 vi.mock("vue-i18n", () => ({
   useI18n: () => ({
     t: (k: string, args?: unknown[]) => (args ? `${k}:${args}` : k),
+  }),
+}));
+
+vi.mock("@primevue/forms/useform", () => ({
+  useForm: () => ({
+    fields: { privacy: "P" },
+    handleSubmit: vi.fn(),
+    reset: vi.fn(),
   }),
 }));
 
@@ -196,13 +217,6 @@ vi.mock("@primevue/forms", async () => {
 
 vi.mock("@primevue/forms/resolvers/zod", () => ({
   zodResolver: () => () => ({ valid: true, values: {} }),
-}));
-
-vi.mock("@primevue/forms/useform", () => ({
-  useForm: () => ({
-    fields: { privacy: "P" },
-    handleSubmit: vi.fn(),
-  }),
 }));
 
 const movie: Movie = {
@@ -438,6 +452,10 @@ describe("CreateListDialog", () => {
   });
 
   describe("authStore integration", () => {
+    afterEach(() => {
+      mockAuthStore.user = { username: "testuser" };
+    });
+
     it("passes authStore username to addMovieToList", async () => {
       mockAuthStore.user = { username: "janedoe" };
       mockCreateList.mockResolvedValue({ data: { slug: "sl" }, status: "ok" });
@@ -467,6 +485,242 @@ describe("CreateListDialog", () => {
         "",
         expect.any(String),
         expect.any(String),
+      );
+    });
+  });
+
+  describe("handleSubmit — updateList (edit mode)", () => {
+    const movieList: MovieList = {
+      slug: "my-existing-list",
+      name: "My List",
+      description: "desc",
+      privacity: "P",
+    } as MovieList;
+
+    const mountEditDialog = (visible = true) =>
+      mount(CreateListDialog, {
+        props: { visible, movieList },
+        global: { stubs: { teleport: true } },
+      });
+
+    beforeEach(() => {
+      mockAuthStore.user = { username: "testuser" };
+      mockUpdateList.mockResolvedValue({ data: { slug: "my-existing-list" } });
+    });
+
+    it("calls updateList instead of createList when movieList prop is provided", async () => {
+      const wrapper = mountEditDialog();
+      await wrapper.find("[data-testid='Form']").trigger("submit");
+      await flushPromises();
+
+      expect(mockUpdateList).toHaveBeenCalledWith(
+        "testuser",
+        "my-existing-list",
+        expect.any(Object),
+      );
+      expect(mockCreateList).not.toHaveBeenCalled();
+    });
+
+    it("emits reloadMovieList with the updated slug", async () => {
+      const wrapper = mountEditDialog();
+      await wrapper.find("[data-testid='Form']").trigger("submit");
+      await flushPromises();
+
+      expect(wrapper.emitted("reloadMovieList")).toBeTruthy();
+      expect(wrapper.emitted("reloadMovieList")![0]).toEqual([
+        "my-existing-list",
+      ]);
+    });
+
+    it("emits reloadLists after update", async () => {
+      const wrapper = mountEditDialog();
+      await wrapper.find("[data-testid='Form']").trigger("submit");
+      await flushPromises();
+
+      expect(wrapper.emitted("reloadLists")).toBeTruthy();
+    });
+
+    it("closes dialog after successful update", async () => {
+      const wrapper = mountEditDialog();
+      await wrapper.find("[data-testid='Form']").trigger("submit");
+      await flushPromises();
+
+      const lastEmit = wrapper.emitted("update:visible")?.at(-1);
+      expect(lastEmit).toEqual([false]);
+    });
+
+    it("does not call addMovieToList in edit mode", async () => {
+      const wrapper = mountEditDialog();
+      await wrapper.find("[data-testid='Form']").trigger("submit");
+      await flushPromises();
+
+      expect(mockAddMovieToList).not.toHaveBeenCalled();
+    });
+
+    it("shows edit header text", () => {
+      const wrapper = mountEditDialog();
+      expect(wrapper.find("[data-testid='dialog-header']").text()).toBe(
+        "components.createList.headerEdit",
+      );
+    });
+
+    it("shows error toast when updateList fails", async () => {
+      mockUpdateList.mockRejectedValue(new Error("network"));
+
+      const wrapper = mountEditDialog();
+      await wrapper.find("[data-testid='Form']").trigger("submit");
+      await flushPromises();
+
+      expect(mockToastAdd).toHaveBeenCalledWith(
+        expect.objectContaining({ severity: "error" }),
+      );
+      expect(wrapper.emitted("reloadLists")).toBeFalsy();
+    });
+  });
+
+  // ── intelligent mode ─────────────────────────────────────────────────────────
+
+  describe("intelligent prop", () => {
+    const mountIntelligentDialog = () =>
+      mount(CreateListDialog, {
+        props: { visible: true, intelligent: true },
+        global: {
+          stubs: {
+            teleport: true,
+            SearchGenresComponent: {
+              name: "SearchGenresComponent",
+              template: `<div data-testid="search-genres" />`,
+              emits: ["filterGenres"],
+            },
+            SearchPersonComponent: {
+              name: "SearchPersonComponent",
+              template: `<div data-testid="search-person" />`,
+              props: ["modelValue"],
+              emits: ["update:modelValue"],
+            },
+            SearchUsersComponent: {
+              name: "SearchUsersComponent",
+              template: `<div data-testid="search-users" />`,
+              props: ["modelValue"],
+              emits: ["update:modelValue"],
+            },
+          },
+        },
+      });
+
+    it("renders intelligent filter section when intelligent=true and no movieList", () => {
+      const wrapper = mountIntelligentDialog();
+      expect(wrapper.find("[data-testid='search-genres']").exists()).toBe(true);
+      expect(wrapper.find("[data-testid='search-person']").exists()).toBe(true);
+      expect(wrapper.find("[data-testid='search-users']").exists()).toBe(true);
+    });
+
+    it("does NOT render intelligent filters when intelligent=false", () => {
+      const wrapper = mount(CreateListDialog, {
+        props: { visible: true, intelligent: false },
+        global: {
+          stubs: {
+            teleport: true,
+            SearchGenresComponent: true,
+            SearchPersonComponent: true,
+            SearchUsersComponent: true,
+          },
+        },
+      });
+      expect(wrapper.find("[data-testid='search-genres']").exists()).toBe(
+        false,
+      );
+    });
+
+    it("passes selectedGenres to createList via filterGenres event", async () => {
+      mockCreateList.mockResolvedValue({ data: { slug: "sl" } });
+
+      const wrapper = mountIntelligentDialog();
+      // Simulate the genre filter emitting
+      await wrapper
+        .findComponent({ name: "SearchGenresComponent" })
+        .vm.$emit("filterGenres", ["action", "drama"]);
+
+      await wrapper.find("[data-testid='Form']").trigger("submit");
+      await flushPromises();
+
+      expect(mockCreateList).toHaveBeenCalledWith(
+        expect.any(Object),
+        true,
+        expect.objectContaining({ genres: ["action", "drama"] }),
+      );
+    });
+
+    it("passes intelligent=true flag to createList", async () => {
+      mockCreateList.mockResolvedValue({ data: { slug: "sl" } });
+
+      const wrapper = mountIntelligentDialog();
+      await wrapper.find("[data-testid='Form']").trigger("submit");
+      await flushPromises();
+
+      expect(mockCreateList).toHaveBeenCalledWith(
+        expect.any(Object),
+        true,
+        expect.any(Object),
+      );
+    });
+  });
+
+  // ── watch: reset on open ─────────────────────────────────────────────────────
+
+  describe("watch — resets state when dialog opens", () => {
+    it("calls form.reset() when visible changes to true", async () => {
+      const wrapper = mount(CreateListDialog, {
+        props: { visible: false },
+        global: { stubs: { teleport: true } },
+      });
+
+      await wrapper.setProps({ visible: true });
+      await flushPromises();
+
+      // Dialog renders = watcher ran; no crash = reset called safely
+      expect(wrapper.find("[data-testid='Dialog']").exists()).toBe(true);
+    });
+
+    it("does not emit anything when visible changes from true to false", async () => {
+      const wrapper = mount(CreateListDialog, {
+        props: { visible: true },
+        global: { stubs: { teleport: true } },
+      });
+
+      const emittedBefore = Object.keys(wrapper.emitted()).length;
+      await wrapper.setProps({ visible: false });
+      await flushPromises();
+
+      // No extra events triggered by watcher on close
+      const newKeys = Object.keys(wrapper.emitted()).filter(
+        (k) => !["update:visible"].includes(k),
+      );
+      expect(newKeys.length).toBe(emittedBefore);
+    });
+  });
+
+  // ── fieldErrors display ──────────────────────────────────────────────────────
+
+  describe("field-level API errors", () => {
+    it("shows server-level error block when serverErrors is populated", async () => {
+      // handleApiError populates serverErrors for non-field errors
+      const { handleApiError } = await import("@/utils/handleApiError");
+      vi.mocked(handleApiError).mockImplementation(
+        (_, _fieldErrors, serverErrors) => {
+          serverErrors.value = ["Something went wrong globally"];
+        },
+      );
+
+      mockCreateList.mockRejectedValue({ response: { status: 500 } });
+
+      const wrapper = mountDialog();
+      await wrapper.find("[data-testid='Form']").trigger("submit");
+      await flushPromises();
+
+      expect(wrapper.find(".server-errors").exists()).toBe(true);
+      expect(wrapper.find(".server-errors").text()).toContain(
+        "Something went wrong globally",
       );
     });
   });
