@@ -25,7 +25,6 @@ const { t } = useI18n();
 const toast = useToast();
 
 const getComments = async (lastId?: number) => {
-    console.log('Fetching comments', { lastId });
     if (lastId) progressiveLoading.value = true;
     else
         initialLoading.value = true;

@@ -9,13 +9,15 @@ import {
   listSearching,
   movieSearchingInList,
   deleteList,
+  updateList,
 } from "@/repositories/listRepository";
 
 // ── Mocks ────────────────────────────────────────────────────────────────────
-const { mockGet, mockPost, mockDelete } = vi.hoisted(() => ({
+const { mockGet, mockPost, mockDelete, mockPut } = vi.hoisted(() => ({
   mockGet: vi.fn(),
   mockPost: vi.fn(),
   mockDelete: vi.fn(),
+  mockPut: vi.fn(),
 }));
 
 vi.mock("@/composables/useAPI", () => ({
@@ -23,6 +25,7 @@ vi.mock("@/composables/useAPI", () => ({
     get: mockGet,
     post: mockPost,
     delete: mockDelete,
+    put: mockPut,
   },
 }));
 
@@ -161,6 +164,25 @@ describe("ListRepository", () => {
       const networkError = new Error("Network error");
       mockPost.mockRejectedValueOnce(networkError);
       await expect(createList({} as any)).rejects.toThrow("Network error");
+    });
+  });
+
+  // ── updateList ────────────────────────────────────────────────────────────
+  describe("updateList", () => {
+    it("calls PUT with list payload and returns updated data", async () => {
+      const updatedList = { name: "Updated List", privacy: "P" };
+      await updateList("johndoe", "updated-list", updatedList as any);
+
+      expect(mockPut).toHaveBeenCalledWith(
+        "/movies-lists/johndoe/updated-list/",
+        updatedList,
+      );
+    });
+
+    it("throws error when updateList fails", async () => {
+      const networkError = new Error("Network error");
+      mockPut.mockRejectedValueOnce(networkError);
+      await expect(updateList({} as any)).rejects.toThrow("Network error");
     });
   });
 

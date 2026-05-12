@@ -27,6 +27,14 @@ vi.mock("@/repositories/listRepository", () => ({
 vi.mock("vue-router", () => ({
   useRoute: vi.fn(),
   useRouter: vi.fn(),
+  createRouter: vi.fn(() => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    beforeEach: vi.fn(),
+    afterEach: vi.fn(),
+    currentRoute: { value: {} },
+  })),
+  createWebHistory: vi.fn(() => ({})),
 }));
 
 vi.mock("vue-i18n", () => ({

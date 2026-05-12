@@ -4,10 +4,11 @@ import {
   addMovieToList,
   createList,
   privacityConfig,
+  updateList,
 } from "@/repositories/listRepository";
 import { defaultListSchema } from "@/schemas/listSchema";
 import { useAuthStore } from "@/stores/authStore";
-import type { CreateList, Movie } from "@/types";
+import type { CreateList, Movie, MovieList } from "@/types";
 import { Form, FormField, type FormSubmitEvent } from "@primevue/forms";
 import { zodResolver } from "@primevue/forms/resolvers/zod";
 import { useForm } from "@primevue/forms/useform";
@@ -21,70 +22,86 @@ import {
   RadioButton,
   useToast,
 } from "primevue";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import SearchGenresComponent from "./searchGenresComponent.vue";
 import SearchPersonComponent from "./searchPersonComponent.vue";
 import SearchUsersComponent from "./searchUsersComponent.vue";
-const visible = defineModel<boolean>("visible", { default: false });
+import { handleApiError } from "@/utils/handleApiError";
 
+const visible = defineModel<boolean>("visible", { default: false });
 const authStore = useAuthStore();
 const toast = useToast();
 const { t } = useI18n();
 const resolver = zodResolver(defaultListSchema);
 const form = useForm({ resolver: zodResolver(defaultListSchema) });
 const props = defineProps<{
+  movieList?: MovieList;
   movie?: Movie;
   intelligent?: boolean;
 }>();
 
-const emit = defineEmits(["reloadLists"]);
+const emit = defineEmits(["reloadLists", "reloadMovieList"]);
 
 const selectedCelebrities = ref<string[]>([]);
 const selectedFriends = ref<string[]>([]);
 const selectedGenres = ref<string[]>([]);
 
+// ── Field errors ────────────────────────────────────────────────────────────
+const fieldErrors = ref<Record<string, string[]>>({});
+const serverErrors = ref<string[]>([]);
+
+const clearError = (field: string) => {
+  if (fieldErrors.value[field]) {
+    fieldErrors.value[field] = [];
+  }
+};
+
+const clearAllErrors = () => {
+  fieldErrors.value = {};
+  serverErrors.value = [];
+};
+
+// ── Submit ───────────────────────────────────────────────────────────────────
 const handleSubmit = async ({
   valid,
   values,
 }: FormSubmitEvent<Record<string, any>>) => {
   if (!valid) return;
+  clearAllErrors();
+
   try {
-    const data = await createList(values as CreateList, props.intelligent, {
-      celebrities: selectedCelebrities.value || undefined,
-      friends: selectedFriends.value || undefined,
-      genres: selectedGenres.value || undefined,
-    });
-    if (props.movie) {
-      await addToList(data.data.slug, props.movie);
+    if (props.movieList) {
+      const { data } = await updateList(
+        authStore.user?.username || "",
+        props.movieList.slug,
+        values as CreateList,
+      );
+      emit("reloadMovieList", data.slug);
+    } else {
+      const data = await createList(values as CreateList, props.intelligent, {
+        celebrities: selectedCelebrities.value || undefined,
+        friends: selectedFriends.value || undefined,
+        genres: selectedGenres.value || undefined,
+      });
+
+      if (props.movie) {
+        await addToList(data.data.slug, props.movie);
+      }
     }
-    toast.add({
-      severity: "success",
-      summary: t("toast.success"),
-      detail: t("components.createList.success"),
-      life: 3000,
-    });
+
     emit("reloadLists");
     visible.value = false;
   } catch (error: any) {
-    toast.add({
-      severity: "error",
-      summary: t("toast.error"),
-      detail: error.response?.data?.message || t("components.createList.error"),
-      life: 3000,
-    });
+    fieldErrors.value = {};
+    serverErrors.value = [];
+    handleApiError(error, fieldErrors, serverErrors, toast, t);
   }
 };
 
 const addToList = async (listSlug: string, movie: Movie) => {
   try {
     await addMovieToList(authStore.user?.username || "", listSlug, movie.slug);
-    toast.add({
-      severity: "success",
-      summary: t("toast.success"),
-      detail: t("components.addToList.success", [movie.title, listSlug]),
-      life: 3000,
-    });
   } catch (error: any) {
     toast.add({
       severity: "error",
@@ -96,6 +113,19 @@ const addToList = async (listSlug: string, movie: Movie) => {
     });
   }
 };
+
+watch(
+  () => visible.value,
+  (newVal) => {
+    if (newVal) {
+      clearAllErrors();
+      form.reset();
+      selectedCelebrities.value = [];
+      selectedFriends.value = [];
+      selectedGenres.value = [];
+    }
+  },
+);
 </script>
 
 <template>
@@ -104,7 +134,11 @@ const addToList = async (listSlug: string, movie: Movie) => {
     modal
     :draggable="false"
     :dismissableMask="true"
-    :header="t('components.createList.header')"
+    :header="
+      props.movieList
+        ? t('components.createList.headerEdit')
+        : t('components.createList.header')
+    "
     :style="{ width: '90vw', maxWidth: '400px' }"
     :pt="{
       root: {
@@ -133,8 +167,20 @@ const addToList = async (listSlug: string, movie: Movie) => {
           class="text-[10px] font-black uppercase tracking-[0.2em] opacity-60 mt-2 px-2"
           style="color: var(--text)"
         >
-          {{ t("components.createList.description") }}
+          {{
+            props.movieList
+              ? t("components.createList.descriptionUpdate")
+              : t("components.createList.description")
+          }}
         </p>
+      </div>
+
+      <!-- Server-level errors -->
+      <div v-if="serverErrors.length" class="server-errors mb-6">
+        <i class="pi pi-exclamation-circle" />
+        <ul>
+          <li v-for="(err, i) in serverErrors" :key="i">{{ err }}</li>
+        </ul>
       </div>
 
       <Form
@@ -142,10 +188,11 @@ const addToList = async (listSlug: string, movie: Movie) => {
         @submit="handleSubmit"
         class="flex flex-col gap-5 w-full"
       >
+        <!-- NAME -->
         <FormField
           v-slot="$field"
           name="name"
-          initialValue=""
+          :initialValue="props.movieList?.name || ''"
           class="flex flex-col gap-1"
         >
           <FloatLabel variant="over">
@@ -155,32 +202,55 @@ const addToList = async (listSlug: string, movie: Movie) => {
                 id="name"
                 fluid
                 :class="{
-                  'p-invalid': $field?.invalid,
-                  'p-valid': $field?.dirty && !$field?.invalid,
+                  'p-invalid': $field?.invalid || fieldErrors.name?.length,
+                  'p-valid':
+                    $field?.dirty &&
+                    !$field?.invalid &&
+                    !fieldErrors.name?.length,
                 }"
+                @input="clearError('name')"
               />
               <InputIcon
                 v-if="$field?.dirty"
-                :class="$field?.invalid ? 'pi pi-times-circle' : 'pi pi-pencil'"
+                :class="
+                  $field?.invalid || fieldErrors.name?.length
+                    ? 'pi pi-times-circle'
+                    : 'pi pi-pencil'
+                "
                 :style="{
-                  color: $field?.invalid ? '#ef4444' : 'var(--primary)',
+                  color:
+                    $field?.invalid || fieldErrors.name?.length
+                      ? '#ef4444'
+                      : 'var(--primary)',
                 }"
               />
             </IconField>
-            <label for="name">{{ $t("components.createList.formName") }}</label>
+            <label for="name">{{ t("components.createList.formName") }}</label>
           </FloatLabel>
+          <!-- Zod error -->
           <FieldMsg :field="$field" />
+          <!-- API field error -->
+          <span v-if="fieldErrors.name?.length" class="field-error">
+            {{ fieldErrors.name[0] }}
+          </span>
         </FormField>
 
+        <!-- DESCRIPTION -->
         <FormField
           v-slot="$field"
           name="description"
-          initialValue=""
+          :initialValue="props.movieList?.description || ''"
           class="flex flex-col gap-1"
         >
           <FloatLabel variant="over">
             <IconField>
-              <InputText id="description" v-bind="$field" fluid />
+              <InputText
+                id="description"
+                v-bind="$field"
+                fluid
+                :class="{ 'p-invalid': fieldErrors.description?.length }"
+                @input="clearError('description')"
+              />
               <InputIcon
                 class="pi pi-pencil"
                 style="color: var(--primary); opacity: 0.5"
@@ -190,9 +260,13 @@ const addToList = async (listSlug: string, movie: Movie) => {
               t("components.createList.formDescription")
             }}</label>
           </FloatLabel>
+          <span v-if="fieldErrors.description?.length" class="field-error">
+            {{ fieldErrors.description[0] }}
+          </span>
         </FormField>
 
-        <template v-if="intelligent">
+        <!-- INTELLIGENT filters -->
+        <template v-if="intelligent && !props.movieList">
           <div
             class="flex flex-col gap-4 p-4 rounded-2xl"
             style="
@@ -209,14 +283,16 @@ const addToList = async (listSlug: string, movie: Movie) => {
           </div>
         </template>
 
+        <!-- PRIVACY -->
         <FormField
           v-slot="$field"
           name="privacity"
-          initialValue="P"
+          :initialValue="props.movieList?.privacity || 'P'"
           class="flex flex-col gap-1"
         >
           <div
             class="flex justify-evenly gap-4 p-4 rounded-2xl"
+            :class="{ 'border-red-400': fieldErrors.privacity?.length }"
             style="
               background: color-mix(in srgb, var(--secondary) 10%, transparent);
               border: 1.5px solid
@@ -233,6 +309,7 @@ const addToList = async (listSlug: string, movie: Movie) => {
                 name="privacity"
                 :value="option.value"
                 v-model="form.fields.privacy"
+                @change="clearError('privacity')"
               />
               <label
                 :for="`privacity-${key}`"
@@ -244,12 +321,20 @@ const addToList = async (listSlug: string, movie: Movie) => {
               </label>
             </div>
           </div>
+          <span v-if="fieldErrors.privacity?.length" class="field-error">
+            {{ fieldErrors.privacity[0] }}
+          </span>
         </FormField>
 
         <div class="flex flex-col gap-3 pt-2">
           <Button
+            data-testid='Form'
             type="submit"
-            :label="t('components.createList.submit')"
+            :label="
+              props.movieList
+                ? t('components.createList.submitEdit')
+                : t('components.createList.submit')
+            "
             fluid
           />
           <button type="button" class="cancel-btn" @click="visible = false">
@@ -333,5 +418,31 @@ const addToList = async (listSlug: string, movie: Movie) => {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.server-errors {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--red) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--red) 30%, transparent);
+  color: var(--red);
+  font-size: 0.82rem;
+}
+
+.server-errors i {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.server-errors ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
 }
 </style>

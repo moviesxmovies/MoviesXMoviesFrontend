@@ -103,17 +103,22 @@ export const createList = async (
   intelligent?: boolean,
   params?: IntelligentListParams,
 ) => {
-  try {
-    const data = await api.post("/movies-lists/", list, {
-      params: {
-        intelligent,
-        ...params,
-      },
-    });
-    return data;
-  } catch (error: any) {
-    throw new TranslatedError(error, error.response?.data?.status);
-  }
+  const data = await api.post("/movies-lists/", list, {
+    params: {
+      intelligent,
+      ...params,
+    },
+  });
+  return data;
+};
+
+export const updateList = async (
+  user: string,
+  slug: string,
+  list: CreateList,
+) => {
+  const data = await api.put(`/movies-lists/${user}/${slug}/`, list);
+  return data;
 };
 
 export const getMovieList = async (user: string, slug: string) => {

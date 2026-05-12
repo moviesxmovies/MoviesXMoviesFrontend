@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import CreateListDialog from "@/components/createListDialog.vue";
 import MovieCardComponent from "@/components/movieCardComponent.vue";
 import PaginationComponent from "@/components/paginationComponent.vue";
 import { api } from "@/composables/useAPI";
@@ -16,6 +17,7 @@ import {
   type MovieList,
   type User,
 } from "@/types";
+import { goToMovieList } from "@/utils/goTo";
 import { computed } from "@vue/reactivity";
 import { Dialog, Skeleton } from "primevue";
 import { ref, watch } from "vue";
@@ -36,6 +38,7 @@ const loadingComputed = computed(() => loading.value || loadingMovies.value);
 
 const confirmDeleteListVisible = ref(false);
 const confirmDeleteMovieVisible = ref(false);
+const createListDialogVisible = ref(false);
 const movieToDelete = ref<string | null>(null);
 
 const { formatRelativeTime } = useDate();
@@ -94,6 +97,11 @@ const updateRoute = (page: number) => {
       page,
     },
   });
+};
+
+const handleReloadMovieList = async (slug: string) => {
+  if (slug === movieList.value.slug) await fetchMovieList();
+  else goToMovieList(user.value.username, slug);
 };
 
 const removeMovieModal = (slug: string) => {
@@ -159,8 +167,13 @@ watch(
 
 <template>
   <!-- CONFIRM DELETE MOVIE DIALOG -->
-  <Dialog v-model:visible="confirmDeleteMovieVisible" modal :draggable="false" :dismissableMask="true"
-    :style="{ width: '90vw', maxWidth: '380px' }" :pt="{
+  <Dialog
+    v-model:visible="confirmDeleteMovieVisible"
+    modal
+    :draggable="false"
+    :dismissableMask="true"
+    :style="{ width: '90vw', maxWidth: '380px' }"
+    :pt="{
       root: {
         class:
           'rounded-[2rem] border-none shadow-2xl bg-[var(--background)] overflow-hidden',
@@ -174,7 +187,8 @@ watch(
       closeButton: {
         class: 'hover:bg-[var(--secondary)]/20 transition-colors',
       },
-    }">
+    }"
+  >
     <template #header>
       <div class="confirm-header">
         <div class="confirm-icon">
@@ -203,9 +217,21 @@ watch(
     </template>
   </Dialog>
 
+  <!-- EDIT LIST DIALOG -->
+  <CreateListDialog
+    v-model:visible="createListDialogVisible"
+    :movieList="movieList"
+    @reloadMovieList="handleReloadMovieList"
+  />
+
   <!-- CONFIRM DELETE LIST DIALOG -->
-  <Dialog v-model:visible="confirmDeleteListVisible" modal :draggable="false" :dismissableMask="true"
-    :style="{ width: '90vw', maxWidth: '380px' }" :pt="{
+  <Dialog
+    v-model:visible="confirmDeleteListVisible"
+    modal
+    :draggable="false"
+    :dismissableMask="true"
+    :style="{ width: '90vw', maxWidth: '380px' }"
+    :pt="{
       root: {
         class:
           'rounded-[2rem] border-none shadow-2xl bg-[var(--background)] overflow-hidden',
@@ -219,7 +245,8 @@ watch(
       closeButton: {
         class: 'hover:bg-[var(--secondary)]/20 transition-colors',
       },
-    }">
+    }"
+  >
     <template #header>
       <div class="confirm-header">
         <div class="confirm-icon">
@@ -255,12 +282,15 @@ watch(
           <div class="avatar-wrapper">
             <Skeleton shape="circle" size="120px" />
           </div>
-          <div class="author-meta" style="
+          <div
+            class="author-meta"
+            style="
               display: flex;
               flex-direction: column;
               align-items: center;
               gap: 0.5rem;
-            ">
+            "
+          >
             <Skeleton width="4rem" height="0.75rem" />
             <Skeleton width="8rem" height="1.25rem" />
           </div>
@@ -282,7 +312,12 @@ watch(
           <div class="list-footer-stats">
             <Skeleton width="6rem" height="1rem" />
             <Skeleton width="8rem" height="1rem" />
-            <Skeleton width="5rem" height="2rem" border-radius="999px" style="margin-left: auto" />
+            <Skeleton
+              width="5rem"
+              height="2rem"
+              border-radius="999px"
+              style="margin-left: auto"
+            />
           </div>
         </div>
       </div>
@@ -294,7 +329,11 @@ watch(
           <!-- User -->
           <div class="author-section">
             <div class="avatar-wrapper">
-              <img :src="user.picture" :alt="user.username" class="author-img" />
+              <img
+                :src="user.picture"
+                :alt="user.username"
+                class="author-img"
+              />
             </div>
             <div class="author-meta">
               <span class="label">{{ t("list.createdBy") }}</span>
@@ -322,16 +361,31 @@ watch(
                 <i class="pi pi-video" />
                 <span>{{
                   t("list.moviesCount", movieList.movies?.length || 0)
-                  }}</span>
+                }}</span>
               </div>
               <div class="stat">
                 <i class="pi pi-calendar" />
                 <span>{{
                   t("list.updated", [formatRelativeTime(movieList.updated_at)])
-                  }}</span>
+                }}</span>
               </div>
-              <div v-if="user.username === authStore.user?.username" class="actions-wrapper">
-                <button @click="removeListModal" class="btn-delete-list" data-testid="delete-list-btn">
+              <div
+                v-if="user.username === authStore.user?.username"
+                class="actions-wrapper"
+              >
+                <button
+                  @click="createListDialogVisible = true"
+                  class="btn-edit-list"
+                  data-testid="edit-list-btn"
+                >
+                  <i class="pi pi-pencil" />
+                  {{ t("common.edit") }}
+                </button>
+                <button
+                  @click="removeListModal"
+                  class="btn-delete-list"
+                  data-testid="delete-list-btn"
+                >
                   <i class="pi pi-trash" />
                   {{ t("common.delete") }}
                 </button>
@@ -341,7 +395,10 @@ watch(
         </div>
       </div>
 
-      <div v-if="!loadingComputed && !movies.results" class="empty-list-container">
+      <div
+        v-if="!loadingComputed && !movies.results"
+        class="empty-list-container"
+      >
         <div class="empty-card">
           <div class="icon-circle">
             <i class="pi pi-video text-3xl" />
@@ -360,15 +417,26 @@ watch(
       </div>
 
       <div class="movies-grid" v-else>
-        <MovieCardComponent v-for="movie in movies.results" :key="movie.id" :movie="movie" :loading="loadingComputed"
-          :delete="user.username === authStore.user?.username" data-testid="movie-card"
-          @remove-movie="removeMovieModal" />
+        <MovieCardComponent
+          v-for="movie in movies.results"
+          :key="movie.id"
+          :movie="movie"
+          :loading="loadingComputed"
+          :delete="user.username === authStore.user?.username"
+          data-testid="movie-card"
+          @remove-movie="removeMovieModal"
+        />
       </div>
 
       <div v-if="!loadingComputed && movies.total_pages > 1">
-        <PaginationComponent data-testid="PaginationComponent" :data-total="movies.total_pages"
-          :data-current="movies.current_page" :total_pages="movies.total_pages" :current_page="movies.current_page"
-          @change-page="updateRoute" />
+        <PaginationComponent
+          data-testid="PaginationComponent"
+          :data-total="movies.total_pages"
+          :data-current="movies.current_page"
+          :total_pages="movies.total_pages"
+          :current_page="movies.current_page"
+          @change-page="updateRoute"
+        />
       </div>
     </template>
   </div>
@@ -495,6 +563,9 @@ watch(
 }
 
 .actions-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   margin-left: auto;
 }
 
@@ -533,6 +604,26 @@ watch(
 .badge-friends {
   background: rgba(99, 102, 241, 0.2);
   color: #4d57bd;
+}
+
+.btn-edit-list {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 1px solid var(--orange);
+  background: transparent;
+  color: var(--orange);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-edit-list:hover {
+  background: var(--orange);
+  color: white;
 }
 
 .btn-delete-list {

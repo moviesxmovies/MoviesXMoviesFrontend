@@ -73,10 +73,13 @@
       "error": "Error creating list",
       "success": "List created successfully",
       "description": "Create a new list",
+      "descriptionUpdate": "Update list",
       "formName": "Name",
       "formDescription": "Description",
       "header": "Create List",
+      "headerEdit": "Edit list",
       "submit": "Create",
+      "submitEdit": "Update",
       "cancel": "Cancel"
     },
     "friendWithFollow": {
