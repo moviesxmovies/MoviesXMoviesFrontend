@@ -31,12 +31,6 @@ const addToList = async (listSlug: string) => {
   try {
     await addMovieToList(authStore.user?.username || "", listSlug, props.movie.slug);
     await checkMovieInLists();
-    toast.add({
-      severity: "success",
-      summary: t("toast.success"),
-      detail: t("components.addToList.success", [props.movie.title, listSlug]),
-      life: 3000,
-    });
   } catch (error: any) {
     toast.add({
       severity: "error",
@@ -51,12 +45,6 @@ const removeFromList = async (listSlug: string) => {
   try {
     await removeMovieFromList(authStore.user?.username || "", listSlug, props.movie.slug);
     await checkMovieInLists();
-    toast.add({
-      severity: "success",
-      summary: t("toast.success"),
-      detail: t("components.addToList.removeFromListSuccess", [props.movie.title, listSlug]),
-      life: 3000,
-    });
   } catch (error: any) {
     toast.add({
       severity: "error",

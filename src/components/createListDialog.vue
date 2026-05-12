@@ -58,12 +58,6 @@ const handleSubmit = async ({
     if (props.movie) {
       await addToList(data.data.slug, props.movie);
     }
-    toast.add({
-      severity: "success",
-      summary: t("toast.success"),
-      detail: t("components.createList.success"),
-      life: 3000,
-    });
     emit("reloadLists");
     visible.value = false;
   } catch (error: any) {
@@ -79,12 +73,6 @@ const handleSubmit = async ({
 const addToList = async (listSlug: string, movie: Movie) => {
   try {
     await addMovieToList(authStore.user?.username || "", listSlug, movie.slug);
-    toast.add({
-      severity: "success",
-      summary: t("toast.success"),
-      detail: t("components.addToList.success", [movie.title, listSlug]),
-      life: 3000,
-    });
   } catch (error: any) {
     toast.add({
       severity: "error",

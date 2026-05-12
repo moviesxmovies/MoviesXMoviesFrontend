@@ -53,7 +53,7 @@ const props = defineProps<{
           </div>
 
           <div class="flex items-center">
-            <Checkbox :binary="true" :modelValue="item.containsMovie" class="custom-checkbox" @click.stop />
+            <Checkbox :binary="true" :modelValue="item.containsMovie" class="custom-checkbox" @click.stop hidden />
           </div>
         </div>
 
