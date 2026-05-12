@@ -43,6 +43,8 @@ watch(
       selectedGenres.value = genres.value?.filter((g: Genre) =>
         [route.query.genres].flat().includes(g.slug),
       );
+    } else {
+      selectedGenres.value = [];
     }
   },
   { immediate: true },
