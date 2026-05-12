@@ -13,6 +13,7 @@ const props = defineProps<{
 
 const user = ref<User | null>(null);
 const loading = ref(true);
+const loadingImage = ref(true);
 const fetchUserData = async () => {
     if (!props.fromUser && !props.username) {
         console.warn('No user identifier provided to FriendComponent');
@@ -52,8 +53,12 @@ onMounted(() => {
         </template>
         <template v-else>
             <div class="user-info">
-                <img :src="user?.picture" :alt="user?.username" class="profile-image cursor-pointer"
-                    @click="goToUser(user?.username)" />
+                <div class="profile-image-wrapper">
+                    <Skeleton v-if="loadingImage" shape="circle" width="2.5rem" height="2.5rem" class="absolute" />
+                    <img v-show="!loadingImage" :src="user?.picture" :alt="user?.username"
+                        class="profile-image cursor-pointer" @click="goToUser(user?.username)"
+                        @load="loadingImage = false" />
+                </div>
                 <span class="username cursor-pointer" @click="goToUser(user?.username)">{{ user?.username }}</span>
             </div>
 
@@ -84,12 +89,28 @@ onMounted(() => {
     min-width: 0;
 }
 
+.profile-image-wrapper {
+    position: relative;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.absolute {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
 .profile-image {
     width: 2.5rem;
     height: 2.5rem;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--primary);
+    display: block;
 }
 
 .username {

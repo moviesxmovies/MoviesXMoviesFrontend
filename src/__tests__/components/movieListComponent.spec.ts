@@ -28,6 +28,9 @@ vi.mock("@/utils/goTo", () => ({
 
 vi.mock("primevue", () => ({
   useToast: () => ({ add: mockToastAdd }),
+  Skeleton: {
+    template: "<div class='skeleton'></div>",
+  },
 }));
 
 vi.mock("vue-i18n", () => ({
