@@ -6,6 +6,7 @@ import { useI18n } from "vue-i18n";
 import { api } from "@/composables/useAPI";
 import { RouterLink } from "vue-router";
 import { goToMovie } from "@/utils/goTo";
+import { useDate } from "@/composables/useDate";
 
 const props = defineProps<{
   movie: Movie;
@@ -20,6 +21,7 @@ const loading = ref(false);
 const actorsScroll = ref();
 const directorsScroll = ref();
 const hasDragged = ref(false);
+const { formatRelativeTime } = useDate();
 
 const fetchDetails = async (finalList: Ref<Person[]>, list: string[]) => {
   if (!list) return;
@@ -110,7 +112,7 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll();
           @click="goToMovie(movie.slug)" />
         <div class="drawer-title-block">
           <h2 class="drawer-title">{{ movie.title }}</h2>
-          <span class="drawer-year">{{ movie.release_date }}</span>
+          <span class="drawer-year">{{ formatRelativeTime(movie.release_date) }}</span>
         </div>
       </div>
     </template>

@@ -159,7 +159,7 @@ describe("CelebrityView", () => {
     it("renders the birthday", async () => {
       const wrapper = mountView();
       await flushPromises();
-      expect(wrapper.text()).toContain("1964-09-02");
+      expect(wrapper.text()).toContain("9/2/1964");
     });
 
     it("does NOT render deathday when null", async () => {
@@ -170,12 +170,12 @@ describe("CelebrityView", () => {
 
     it("renders deathday when present", async () => {
       mockGetPersonProfile.mockResolvedValue(
-        makePerson({ deathday: "2099-01-01" }),
+        makePerson({ deathday: "2010-01-01" }),
       );
       const wrapper = mountView();
       await flushPromises();
       expect(wrapper.find(".death-icon").exists()).toBe(true);
-      expect(wrapper.text()).toContain("2099-01-01");
+      expect(wrapper.text()).toContain("1/1/2010");
     });
   });
 

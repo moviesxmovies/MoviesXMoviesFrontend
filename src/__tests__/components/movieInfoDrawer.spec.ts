@@ -142,7 +142,7 @@ describe("MovieInfoDrawer", () => {
       const wrapper = mountComponent();
       await flushPromises();
 
-      expect(wrapper.find(".drawer-year").text()).toBe("2010");
+      expect(wrapper.find(".drawer-year").text()).toBe("1/1/2010");
     });
 
     it("Should show the cover image if it exists", async () => {

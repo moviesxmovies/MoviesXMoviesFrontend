@@ -18,6 +18,7 @@ import { useRoute, useRouter } from "vue-router";
 import { useInfiniteScroll } from "@/composables/useInfiniteScroll";
 import FilmographyComponent from "@/components/filmographyComponent.vue";
 import { useLangStore } from "@/stores/langStore";
+import { useDate } from "@/composables/useDate";
 
 const route = useRoute();
 const user = ref<Person>({} as Person);
@@ -30,7 +31,7 @@ const router = useRouter();
 const acted_movies = ref<DynamicPagination<Movie>>({} as DynamicPagination<Movie>);
 const directed_movies = ref<DynamicPagination<Movie>>({} as DynamicPagination<Movie>);
 const langStore = useLangStore();
-
+const { formatRelativeTime } = useDate();
 const genderMap: Record<string, { color: string; icon: string }> = {
   "0": { color: "var(--secondary)", icon: "pi pi-minus" },
   "1": { color: "var(--accent)", icon: "pi pi-venus" },
@@ -168,12 +169,12 @@ watch(
               <div v-if="user.birthday" class="date-row">
                 <i class="pi pi-calendar accent-icon" />
                 <span><b>{{ t("celebrity.birthday") }}:</b>
-                  {{ user.birthday }}</span>
+                  {{ formatRelativeTime(user.birthday) }}</span>
               </div>
               <div v-if="user.deathday" class="date-row">
                 <i class="pi pi-heart-fill death-icon" />
                 <span><b>{{ t("celebrity.deathday") }}:</b>
-                  {{ user.deathday }}</span>
+                  {{ formatRelativeTime(user.deathday) }}</span>
               </div>
             </div>
           </div>
