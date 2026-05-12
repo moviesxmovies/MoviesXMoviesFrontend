@@ -102,7 +102,9 @@
       "stars": "Filter by Stars",
       "preferences": "Preferences",
       "unseen": "Show only unseen movies",
-      "reviewed": "Show only reviewed movies"
+      "reviewed": "Show only reviewed movies",
+      "celebrities": "Filter by Celebrities",
+      "clear": "Clear filters"
     }
   },
   "signup": {
