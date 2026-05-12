@@ -10,6 +10,7 @@ import {
   AccordionPanel,
 } from "primevue";
 import FilterPreferencesComponent from "./filterPreferencesComponent.vue";
+import SearchPersonComponent from "./searchPersonComponent.vue";
 
 const { t } = useI18n();
 const emit = defineEmits([
@@ -18,11 +19,12 @@ const emit = defineEmits([
   "filterStars",
   "filterUnseen",
   "filterReviewed",
+  "filterCelebrities",
 ]);
 </script>
 
 <template>
-  <Accordion class="filters-content" multiple :value="['0', '1', '2', '3']">
+  <Accordion class="filters-content" multiple :value="['0', '1', '2', '3', '4']">
     <AccordionPanel value="0" class="filter-group">
       <AccordionHeader class="filter-label">{{
         t("components.filter.genres")
@@ -43,13 +45,23 @@ const emit = defineEmits([
     </AccordionPanel>
     <AccordionPanel value="2" class="filter-group">
       <AccordionHeader class="filter-label">{{
+        t("components.filter.celebrities")
+      }}</AccordionHeader>
+      <AccordionContent>
+        <SearchPersonComponent
+          @filter-persons="emit('filterCelebrities', $event)"
+        />
+      </AccordionContent>
+    </AccordionPanel>
+    <AccordionPanel value="3" class="filter-group">
+      <AccordionHeader class="filter-label">{{
         t("components.filter.stars")
       }}</AccordionHeader>
       <AccordionContent>
         <SearchStarsComponent @filter-stars="emit('filterStars', $event)" />
       </AccordionContent>
     </AccordionPanel>
-    <AccordionPanel value="3" class="filter-group">
+    <AccordionPanel value="4" class="filter-group">
       <AccordionHeader class="filter-label">{{
         t("components.filter.preferences")
       }}</AccordionHeader>

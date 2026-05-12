@@ -102,7 +102,8 @@
       "stars": "Filter by Stars",
       "preferences": "Preferences",
       "unseen": "Show only unseen movies",
-      "reviewed": "Show only reviewed movies"
+      "reviewed": "Show only reviewed movies",
+      "celebrities": "Filter by Celebrities"
     }
   },
   "signup": {
@@ -299,7 +300,8 @@
     "lists": "Lists",
     "actors": "Actors",
     "directors": "Directors",
-    "celebrities": "Celebrities"
+    "celebrities": "Celebrities",
+    "clearFilters": "Clear filters"
   },
   "user": {
     "editProfile": "Edit",

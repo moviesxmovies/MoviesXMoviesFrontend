@@ -41,6 +41,8 @@ watch(
       selectedPlatforms.value = platforms.value?.filter((p: Platform) =>
         [route.query.platforms].flat().includes(p.slug),
       );
+    } else {
+      selectedPlatforms.value = [];
     }
   },
   { immediate: true },
@@ -105,7 +107,6 @@ watch(
   background: color-mix(in srgb, var(--primary) 15%, transparent) !important;
   color: var(--primary) !important;
 }
-
 
 :deep(.p-multiselect-option.p-selected .p-checkbox .p-checkbox-box) {
   background: var(--primary) !important;

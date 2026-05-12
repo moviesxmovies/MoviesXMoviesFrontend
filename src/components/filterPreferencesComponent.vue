@@ -12,12 +12,12 @@ const { t } = useI18n();
 watch(
   () => [route.query.marked_unseen, route.query.reviewed],
   () => {
-    if (route.query.marked_unseen) {
-      marked_unseen.value = route.query.marked_unseen === "true";
-    }
-    if (route.query.reviewed) {
-      reviewed.value = route.query.reviewed === "true";
-    }
+    marked_unseen.value = route.query.marked_unseen
+      ? route.query.marked_unseen === "true"
+      : false;
+    reviewed.value = route.query.reviewed
+      ? route.query.reviewed === "true"
+      : false;
   },
   { immediate: true },
 );
