@@ -574,15 +574,6 @@ watch(
   color: white;
 }
 
-.header-skeleton {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  padding: 2rem;
-  background: var(--secondary);
-  border-radius: 1.25rem;
-}
-
 .movies-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
