@@ -320,7 +320,7 @@ watch(
                 }}</span>
               </div>
               <div v-if="user.username === authStore.user?.username">
-                <button @click="removeListModal" class="btn-delete-list">
+                <button @click="removeListModal" class="btn-delete-list" data-testid="delete-list-btn">
                   Delete list
                 </button>
               </div>

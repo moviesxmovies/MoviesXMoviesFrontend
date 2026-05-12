@@ -8,6 +8,7 @@ import {
   getMovieList,
   listSearching,
   movieSearchingInList,
+  deleteList,
 } from "@/repositories/listRepository";
 
 // ── Mocks ────────────────────────────────────────────────────────────────────
@@ -202,7 +203,6 @@ describe("ListRepository", () => {
       await expect(listSearching("action")).rejects.toThrow("Network error");
     });
   });
-
   // ── movieSearchingInList ────────────────────────────────────────────────────
   describe("movieSearchingInList", () => {
     it("calls GET with constructed path", async () => {
@@ -229,6 +229,25 @@ describe("ListRepository", () => {
       await expect(
         movieSearchingInList("john", "action-movies", "action"),
       ).rejects.toThrow("Network error");
+    });
+  });
+  // ── deleteList ────────────────────────────────────────────────────
+  describe("deleteList", () => {
+    it("calls DELETE with constructed path", async () => {
+      const user = "diego";
+      const list = "action-movies";
+
+      mockDelete.mockResolvedValueOnce({ data: {} });
+
+      await deleteList(user, list);
+
+      expect(mockDelete).toHaveBeenCalledWith(`/movies-lists/${user}/${list}/`);
+    });
+
+    it("throws error when deleteList fails", async () => {
+      const networkError = new Error("Network error");
+      mockDelete.mockRejectedValueOnce(networkError);
+      await expect(deleteList("user", "list")).rejects.toThrow("Network error");
     });
   });
 });

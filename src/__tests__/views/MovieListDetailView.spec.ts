@@ -21,6 +21,7 @@ vi.mock("@/repositories/listRepository", () => ({
   getMovieList: vi.fn(),
   movieSearchingInList: vi.fn(),
   removeMovieFromList: vi.fn(),
+  deleteList: vi.fn(),
 }));
 
 vi.mock("vue-router", () => ({
@@ -61,6 +62,20 @@ vi.mock("@/components/paginationComponent.vue", () => ({
   }),
 }));
 
+// ─── Mock Pinia authStore ──────────────────────────────────────────────────────
+
+const mockAuthUser = { username: "johndoe" };
+
+vi.mock("@/stores/authStore", () => ({
+  useAuthStore: vi.fn(() => ({ user: mockAuthUser })),
+}));
+
+import { useAuthStore } from "@/stores/authStore";
+
+function setAuthUser(user: { username: string } | null) {
+  (useAuthStore as ReturnType<typeof vi.fn>).mockReturnValue({ user });
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 import { api } from "@/composables/useAPI";
@@ -68,6 +83,7 @@ import {
   getMovieList,
   movieSearchingInList,
   removeMovieFromList,
+  deleteList,
 } from "@/repositories/listRepository";
 import { useRoute, useRouter } from "vue-router";
 
@@ -86,6 +102,7 @@ const mockMovieList = {
   description: "A great list",
   privacity: "P",
   user: "/api/users/1/",
+  slug: "my-list",
   movies: [{ id: 1 }, { id: 2 }],
   updated_at: "2024-01-01T00:00:00Z",
 };
@@ -119,6 +136,9 @@ function setupMocks(overrides: Partial<typeof mockMovieList> = {}) {
 
 async function mountComponent() {
   const wrapper = mount(MovieListView, {
+    props: {
+      user: { username: "johndoe" },
+    },
     global: {
       stubs: { teleport: true },
     },
@@ -133,6 +153,7 @@ describe("MovieListView", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     setupMocks();
+    setAuthUser({ username: "johndoe" });
   });
 
   // ── Rendering ──────────────────────────────────────────────────────────────
@@ -278,28 +299,17 @@ describe("MovieListView", () => {
   describe("Remove movie", () => {
     it("opens the confirm dialog when remove-movie is emitted", async () => {
       const wrapper = await mountComponent();
-
-      // Dialog should be hidden before clicking
       expect(wrapper.find(".confirm-title").exists()).toBe(false);
-
       await wrapper.find('[data-testid="movie-card"]').trigger("click");
-
-      // Dialog should now be visible
       expect(wrapper.find(".confirm-title").exists()).toBe(true);
     });
 
     it("calls removeMovieFromList with correct args when confirm button is clicked", async () => {
       (removeMovieFromList as ReturnType<typeof vi.fn>).mockResolvedValue({});
-
       const wrapper = await mountComponent();
-
-      // Open the dialog
       await wrapper.find('[data-testid="movie-card"]').trigger("click");
-
-      // Click the confirm (delete) button
       await wrapper.find(".btn-delete").trigger("click");
       await flushPromises();
-
       expect(removeMovieFromList).toHaveBeenCalledWith(
         "johndoe",
         "my-list",
@@ -309,16 +319,12 @@ describe("MovieListView", () => {
 
     it("refreshes movie list after successful removal", async () => {
       (removeMovieFromList as ReturnType<typeof vi.fn>).mockResolvedValue({});
-
       const callsBefore = (movieSearchingInList as ReturnType<typeof vi.fn>)
         .mock.calls.length;
-
       const wrapper = await mountComponent();
-
       await wrapper.find('[data-testid="movie-card"]').trigger("click");
       await wrapper.find(".btn-delete").trigger("click");
       await flushPromises();
-
       expect(
         (movieSearchingInList as ReturnType<typeof vi.fn>).mock.calls.length,
       ).toBeGreaterThan(callsBefore);
@@ -326,22 +332,73 @@ describe("MovieListView", () => {
 
     it("closes the dialog when cancel is clicked", async () => {
       const wrapper = await mountComponent();
-
       await wrapper.find('[data-testid="movie-card"]').trigger("click");
       expect(wrapper.find(".confirm-title").exists()).toBe(true);
-
       await wrapper.find(".btn-cancel").trigger("click");
       expect(wrapper.find(".confirm-title").exists()).toBe(false);
     });
 
     it("does not call removeMovieFromList when cancel is clicked", async () => {
       const wrapper = await mountComponent();
-
       await wrapper.find('[data-testid="movie-card"]').trigger("click");
       await wrapper.find(".btn-cancel").trigger("click");
       await flushPromises();
-
       expect(removeMovieFromList).not.toHaveBeenCalled();
+    });
+  });
+
+  // ── Delete list ───────────────────────────────────────────────────────────
+
+  describe("Delete list", () => {
+    it("shows delete-list button when authenticated user is the list owner", async () => {
+      setAuthUser({ username: "johndoe" });
+      const wrapper = await mountComponent();
+      expect(wrapper.find('[data-testid="delete-list-btn"]').exists()).toBe(true);
+    });
+
+    it("hides delete-list button when authenticated user is not the list owner", async () => {
+      setAuthUser({ username: "anotheruser" });
+      const wrapper = await mountComponent();
+      expect(wrapper.find('[data-testid="delete-list-btn"]').exists()).toBe(false);
+    });
+
+    it("hides delete-list button when there is no authenticated user", async () => {
+      setAuthUser(null);
+      const wrapper = await mountComponent();
+      expect(wrapper.find('[data-testid="delete-list-btn"]').exists()).toBe(false);
+    });
+
+    it("opens the confirm dialog when delete-list button is clicked", async () => {
+      const wrapper = await mountComponent();
+      expect(wrapper.find(".confirm-title").exists()).toBe(false);
+      await wrapper.find('[data-testid="delete-list-btn"]').trigger("click");
+      expect(wrapper.find(".confirm-title").exists()).toBe(true);
+    });
+
+    it("calls deleteList with correct args when confirm button is clicked", async () => {
+      (deleteList as ReturnType<typeof vi.fn>).mockResolvedValue({});
+      const wrapper = await mountComponent();
+      await wrapper.find('[data-testid="delete-list-btn"]').trigger("click");
+      await wrapper.find(".btn-delete").trigger("click");
+      await flushPromises();
+      expect(deleteList).toHaveBeenCalledWith("johndoe", "my-list");
+    });
+
+    it("closes the dialog when cancel is clicked", async () => {
+      const wrapper = await mountComponent();
+      await wrapper.find('[data-testid="delete-list-btn"]').trigger("click");
+      expect(wrapper.find(".confirm-title").exists()).toBe(true);
+      await wrapper.find(".btn-cancel").trigger("click");
+      expect(wrapper.find(".confirm-title").exists()).toBe(false);
+    });
+
+    it("does not call deleteList when cancel is clicked", async () => {
+      const wrapper = await mountComponent();
+      await wrapper.find('[data-testid="delete-list-btn"]').trigger("click");
+      await wrapper.find(".btn-cancel").trigger("click");
+      await flushPromises();
+
+      expect(deleteList).not.toHaveBeenCalled();
     });
   });
 
@@ -368,7 +425,6 @@ describe("MovieListView", () => {
       expect(api.get).toHaveBeenCalledWith("/api/users/1/");
     });
   });
-
 
   // ── Stats display ──────────────────────────────────────────────────────────
 
