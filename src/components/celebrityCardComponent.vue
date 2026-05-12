@@ -3,10 +3,13 @@ import type { Person } from "@/types";
 import { goToPerson } from "@/utils/goTo";
 import { computed, ref } from "vue";
 import { Skeleton } from "primevue";
+import { useDate } from "@/composables/useDate";
 
 const props = defineProps<{
     celebrity: Person;
 }>();
+
+const { formatRelativeTime } = useDate();
 
 const genderMap: Record<string, { color: string; icon: string }> = {
     "0": { color: "var(--secondary)", icon: "pi pi-minus" },
@@ -69,7 +72,7 @@ const hideTooltip = () => {
                     <p class="name">{{ celebrity.name }}</p>
                     <span v-if="celebrity.birthday" class="birthday">
                         <i class="pi pi-calendar" />
-                        {{ celebrity.birthday }}
+                        {{ formatRelativeTime(celebrity.birthday) }}
                     </span>
                 </div>
             </template>
@@ -79,7 +82,7 @@ const hideTooltip = () => {
     <Teleport to="body">
         <div v-if="tooltipVisible && celebrity.deathday" class="death-tooltip"
             :style="{ top: `${tooltipY}px`, left: `${tooltipX}px` }">
-            {{ celebrity.deathday }}
+            {{ formatRelativeTime(celebrity.deathday) }}
         </div>
     </Teleport>
 </template>

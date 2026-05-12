@@ -138,7 +138,7 @@ describe("SearchPlatformsComponent", () => {
       const wrapper = mountComponent();
       await flushPromises();
       const ms = wrapper.findComponent({ name: "MultiSelectComponent" });
-      expect(ms.props("modelValue")).toBeFalsy();
+      expect(ms.props("modelValue")).toEqual([]);
     });
 
     it("re-fetches platforms when route.query.platforms changes", async () => {

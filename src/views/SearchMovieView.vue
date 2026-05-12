@@ -33,6 +33,9 @@ const activeFiltersCount = computed(() => {
     (typeof route.query.platforms === "string"
       ? 1
       : (route.query.platforms?.length ?? 0)) +
+    (typeof route.query.celebrities === "string"
+      ? 1
+      : (route.query.celebrities?.length ?? 0)) +
     (route.query.marked_unseen === "true" ? 1 : 0) +
     (route.query.reviewed === "true" ? 1 : 0)
   );
@@ -75,6 +78,7 @@ const normalizeQueryParams = (query: typeof route.query): searchData => {
     genres: toArray(query.genres),
     platforms: toArray(query.platforms),
     stars: toArray(query.stars),
+    celebrities: toArray(query.celebrities),
   } as searchData;
 };
 
@@ -125,18 +129,43 @@ watch(
       mask: { style: 'transition: none' },
     }"
   >
+    <div class="clear-filters-wrapper">
+      <button class="btn-clear-filters" @click="router.push('/search')">
+        <span class="btn-content">
+          <i class="pi pi-filter-slash" />
+          <span>{{ $t("search.clearFilters") }}</span>
+        </span>
+        <span v-if="activeFiltersCount" class="filters-badge">
+          {{ activeFiltersCount }}
+        </span>
+      </button>
+    </div>
     <FilterComponent
       @filter-genres="(genres: string[]) => updateRoute({ genres })"
       @filter-platforms="(platforms: string[]) => updateRoute({ platforms })"
       @filter-stars="(stars: number[]) => updateRoute({ stars })"
       @filter-unseen="(marked_unseen: string) => updateRoute({ marked_unseen })"
       @filter-reviewed="(reviewed: string) => updateRoute({ reviewed })"
+      @filter-celebrities="
+        (celebrities: string[]) => updateRoute({ celebrities })
+      "
       @close="filtersOpen = false"
     />
   </Drawer>
 
   <div class="content-layout">
     <aside class="desktop-only filters-sidebar">
+      <div class="clear-filters-wrapper">
+        <button class="btn-clear-filters" @click="router.push('/search')">
+          <span class="btn-content">
+            <i class="pi pi-filter-slash" />
+            <span>{{ $t("search.clearFilters") }}</span>
+          </span>
+          <span v-if="activeFiltersCount" class="filters-badge">
+            {{ activeFiltersCount }}
+          </span>
+        </button>
+      </div>
       <FilterComponent
         @filter-genres="(genres: string[]) => updateRoute({ genres })"
         @filter-platforms="(platforms: string[]) => updateRoute({ platforms })"
@@ -145,6 +174,9 @@ watch(
           (marked_unseen: string) => updateRoute({ marked_unseen })
         "
         @filter-reviewed="(reviewed: string) => updateRoute({ reviewed })"
+        @filter-celebrities="
+          (celebrities: string[]) => updateRoute({ celebrities })
+        "
         @close="filtersOpen = false"
       />
     </aside>
@@ -308,18 +340,18 @@ watch(
 }
 
 .filters-badge {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
-  border-radius: 2rem;
   background: var(--primary);
   color: white;
-  font-size: 0.7rem;
-  font-weight: 700;
-  line-height: 1;
+  font-size: 0.75rem;
+  font-weight: 800;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  padding: 2px;
+  box-shadow: 0 2px 4px color-mix(in srgb, var(--primary) 30%, transparent);
 }
 
 .filters-sidebar {
@@ -338,5 +370,47 @@ watch(
   aspect-ratio: 2 / 3;
   border-radius: 1rem;
   overflow: hidden;
+}
+
+.clear-filters-wrapper {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  padding: 0 0.5rem;
+}
+
+.btn-clear-filters {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: color-mix(in srgb, var(--background) 95%, var(--text)) !important;
+  border: 1px solid color-mix(in srgb, var(--secondary) 20%, transparent) !important;
+  border-radius: 1.25rem !important;
+  color: color-mix(in srgb, var(--text) 35%, transparent) !important;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+}
+
+.btn-content i {
+  color: var(--primary);
+  font-size: 0.9rem;
+}
+
+.btn-clear-filters:hover {
+  border-color: var(--primary) !important;
+  color: var(--text) !important;
+  background: color-mix(in srgb, var(--background) 90%, var(--text)) !important;
+}
+
+.btn-clear-filters:active {
+  transform: scale(0.98);
 }
 </style>

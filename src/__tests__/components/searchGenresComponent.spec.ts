@@ -136,7 +136,7 @@ describe("SearchGenresComponent", () => {
       const wrapper = mountComponent();
       await flushPromises();
       const ms = wrapper.findComponent({ name: "MultiSelectComponent" });
-      expect(ms.props("modelValue")).toBeFalsy();
+      expect(ms.props("modelValue")).toEqual([]);
     });
 
     it("re-fetches genres when route.query.genres changes", async () => {

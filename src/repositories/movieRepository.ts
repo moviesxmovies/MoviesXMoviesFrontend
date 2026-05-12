@@ -6,8 +6,7 @@ export type searchData = {
   name?: string;
   marked_unseen?: string;
   reviewed?: string;
-  actors?: string[];
-  directors?: string[];
+  celebrities?: string[];
   genres?: string[];
   platforms?: string[];
   stars?: number[];
