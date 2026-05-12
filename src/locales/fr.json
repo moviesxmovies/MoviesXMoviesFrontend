@@ -1,23 +1,29 @@
 {
   "shortcuts": {
     "alternateInfo": "Afficher/masquer les infos",
-    "addToList": "Ajouter à une liste",
+    "addToList": "Ajouter à la liste",
     "markAsNotSeen": "Marquer comme non vu",
-    "rateNStars": "Noter {n} étoiles"
+    "rateNStars": "Noter {n} étoile(s)"
   },
   "cancel": "Annuler",
   "remove": "Supprimer",
   "next": "Suivant",
   "back": "Retour",
   "loading": "Chargement...",
+  "verifying": "Vérification...",
+  "error": "Erreur",
+  "errors": {
+    "generic": "Une erreur s'est produite. Veuillez réessayer."
+  },
   "toast": {
     "success": "Opération réussie",
-    "error": "Une erreur s'est produite"
+    "error": "Une erreur est survenue",
+    "close": "Fermer la notification"
   },
   "components": {
-    "selectLanguage": "Sélectionner une langue",
+    "selectLanguage": "Choisir une langue",
     "oauthButton": "Se connecter avec {0}",
-    "changeTheme": "Changer le thème",
+    "changeTheme": "Changer de thème",
     "form": {
       "requiredUsername": "Le nom d'utilisateur est requis",
       "requiredPassword": "Le mot de passe est requis",
@@ -33,41 +39,57 @@
     },
     "filmography": {
       "no_movies": "Aucun film trouvé",
-      "no_movies_description": "La filmographie de cette personnalité est vide ou en attente de mise à jour."
+      "no_movies_description": "La filmographie de cette célébrité est actuellement vide ou en attente de mise à jour."
     },
     "navbar": {
       "logout": "Se déconnecter",
       "profile": "Mon profil"
     },
     "movieList": {
-      "moviesCount": "{count} film | {count} films"
+      "moviesCount": "{count} film | {count} films",
+      "errorDetail": "Impossible de charger les films. Veuillez réessayer plus tard."
     },
     "lists": {
       "public": "Publique",
       "private": "Privée",
       "friends": "Amis",
-      "noLists": "Vous n'avez pas encore de listes. Commencez à ajouter des films pour les voir ici.",
-      "noListDesc": "Vos listes apparaîtront ici une fois créées. Vous pouvez les organiser, les partager avec des amis ou les garder privées."
+      "noLists": "Vous n'avez pas encore de listes. Commencez à ajouter des films à vos listes pour les voir ici.",
+      "noListDesc": "Vos listes apparaîtront ici une fois créées. Vous pouvez créer des listes pour organiser vos films préférés, les partager avec des amis ou les garder privées.",
+      "noListsDesc": "Vous n'avez pas encore créé de listes."
     },
     "addToList": {
       "success": "'{0}' ajouté à {1} avec succès",
       "error": "Erreur lors de l'ajout de '{0}' à '{1}'",
       "removeFromListSuccess": "'{0}' retiré de '{1}' avec succès",
-      "removeFromListError": "Erreur lors de la suppression de '{0}' de '{1}'",
-      "fetchListsError": "Erreur lors du chargement des listes",
-      "checkMovieInListsError": "Erreur lors de la recherche des relations de listes",
-      "title": "Ajouter à une liste",
+      "removeFromListError": "Erreur lors du retrait de '{0}' de '{1}'",
+      "fetchListsError": "Erreur lors du chargement des listes de l'utilisateur",
+      "checkMovieInListsError": "Erreur lors de la recherche des relations entre films et listes",
+      "addToListError": "Erreur lors de l'ajout du film à la liste",
+      "title": "Ajouter à la liste",
       "description": "Ajouter '{0}' à une liste",
       "createList": "Créer une nouvelle liste"
     },
     "createList": {
       "error": "Erreur lors de la création de la liste",
+      "success": "Liste créée avec succès",
       "description": "Créer une nouvelle liste",
+      "descriptionUpdate": "Mettre à jour la liste",
       "formName": "Nom",
       "formDescription": "Description",
       "header": "Créer une liste",
+      "headerEdit": "Modifier la liste",
       "submit": "Créer",
+      "submitEdit": "Mettre à jour",
       "cancel": "Annuler"
+    },
+    "friendWithFollow": {
+      "status": {
+        "add": "Ajouter un ami",
+        "pending": "Demande en attente",
+        "friend": "Amis",
+        "self": "C'est vous",
+        "failed": "Demande échouée"
+      }
     },
     "searchGenres": {
       "genres": "Genres",
@@ -83,13 +105,14 @@
       "stars": "Filtrer par étoiles",
       "preferences": "Préférences",
       "unseen": "Afficher uniquement les films non vus",
-      "reviewed": "Afficher uniquement les films notés"
+      "reviewed": "Afficher uniquement les films notés",
+      "celebrities": "Filtrer par célébrités"
     }
   },
   "signup": {
     "toast": {
       "success": "Votre compte a été créé",
-      "failed": "L'inscription a échoué"
+      "failed": "Échec de l'inscription"
     },
     "step1": {
       "subtitle": "Créez votre compte pour commencer à partager vos films préférés."
@@ -107,7 +130,8 @@
     "or": "ou continuer avec",
     "password": "Mot de passe",
     "confirmPassword": "Confirmer le mot de passe",
-    "login": "Vous avez déjà un compte ? Connectez-vous ici"
+    "login": "Vous avez déjà un compte ? Connectez-vous ici",
+    "progress": "Progression de l'inscription"
   },
   "login": {
     "toast": {
@@ -122,9 +146,9 @@
     "forgotPassword": "Mot de passe oublié ?"
   },
   "notFound": {
-    "title": "404 - Non trouvé",
+    "title": "404 - Introuvable",
     "description": "La page que vous recherchez n'existe pas.",
-    "linkText": "Retourner à l'accueil"
+    "linkText": "Retour à l'accueil"
   },
   "oauth": {
     "toast": {
@@ -136,7 +160,7 @@
   },
   "forgotPassword": {
     "toast": {
-      "error": "Impossible d'envoyer l'e-mail de réinitialisation. Veuillez réessayer."
+      "error": "Échec de l'envoi de l'e-mail de réinitialisation. Veuillez réessayer."
     },
     "title": "Mot de passe oublié",
     "description": "Entrez votre adresse e-mail et nous vous enverrons un lien pour réinitialiser votre mot de passe.",
@@ -146,7 +170,7 @@
   },
   "resetPassword": {
     "toast": {
-      "error": "Impossible de réinitialiser le mot de passe. Veuillez réessayer."
+      "error": "Échec de la réinitialisation du mot de passe. Veuillez réessayer."
     },
     "title": "Réinitialiser le mot de passe",
     "description": "Entrez votre nouveau mot de passe ci-dessous.",
@@ -170,12 +194,12 @@
     "search": "Rechercher"
   },
   "onboarding": {
-    "step1": "Laissez-nous vous faire une visite rapide",
-    "step2": "Notez les films en cliquant sur les étoiles",
+    "step1": "Faisons une visite guidée rapide",
+    "step2": "Notez des films en cliquant sur les étoiles",
     "step3": "Ajoutez de nouveaux films à vos listes",
-    "step4": "Marquez les films comme non vus",
-    "step5": "Cliquez sur le bouton info pour voir plus de détails",
-    "step6": "Vous voulez aller vite ? Glissez gauche/droite pour noter et haut/bas pour ajouter ou marquer",
+    "step4": "Marquez des films comme non vus",
+    "step5": "Cliquez sur le bouton d'info pour voir plus de détails sur le film",
+    "step6": "Vous voulez aller vite ? Faites glisser à gauche ou à droite pour noter les films, et vers le haut ou le bas pour les ajouter à vos listes ou les marquer comme non vus",
     "finish": "Commencer",
     "continue": "Continuer",
     "skip": "Passer",
@@ -185,33 +209,31 @@
     "step4Label": "Non vu",
     "step5Label": "Info",
     "step6Label": "Glisser",
-    "hint": "Vous pouvez passer ceci à tout moment"
+    "hint": "Vous pouvez ignorer ceci à tout moment"
   },
   "verify": {
     "toast": {
       "success": "E-mail vérifié avec succès",
       "inocrrectLength": "Veuillez entrer le code complet à 6 chiffres.",
+      "incorrectLength": "Veuillez entrer le code complet à 6 chiffres.",
       "invalidCode": "Code de vérification invalide",
       "resendSuccess": "Code de vérification renvoyé à votre e-mail",
-      "resendError": "Impossible de renvoyer le code. Veuillez réessayer."
+      "resendError": "Échec du renvoi du code de vérification. Veuillez réessayer."
     },
     "title": "Vérifiez votre e-mail",
     "description": "Nous vous avons envoyé un code à 6 chiffres à votre adresse e-mail.",
     "button": "VÉRIFIER LE CODE",
     "resend": "Renvoyer le code",
-    "didntReceive": "Vous n'avez pas reçu le code ?"
+    "didntReceive": "Vous n'avez pas reçu le code ?",
+    "ariaLabel": "Chiffre {index} du code de vérification"
   },
   "schema": {
     "username": {
       "required": "Le nom d'utilisateur est requis",
       "maxLength": "Le nom d'utilisateur ne peut pas dépasser 15 caractères"
     },
-    "firstName": {
-      "required": "Le prénom est requis"
-    },
-    "lastName": {
-      "required": "Le nom est requis"
-    },
+    "firstName": { "required": "Le prénom est requis" },
+    "lastName": { "required": "Le nom est requis" },
     "email": {
       "required": "L'e-mail est requis",
       "invalid": "Adresse e-mail invalide"
@@ -219,7 +241,7 @@
     "password": {
       "required": "Le mot de passe est requis",
       "minLength": "Au moins 10 caractères",
-      "upperCase": "Le mot de passe doit contenir une majuscule",
+      "upperCase": "Le mot de passe doit contenir une lettre majuscule",
       "number": "Le mot de passe doit contenir un chiffre"
     },
     "confirmPassword": {
@@ -231,27 +253,22 @@
       "first_name": "prénom",
       "last_name": "nom",
       "email": "e-mail",
-      "samePasswordAs": "Le mot de passe ne peut pas être le même que votre {0}"
+      "samePasswordAs": "Le mot de passe ne peut pas être identique à votre {0}",
+      "passwordSameAsEmail": "Le mot de passe ne peut pas être identique à votre e-mail"
     },
-    "forgotPasswordCode": {
-      "required": "Le code de réinitialisation est requis"
-    },
-    "listName": {
-      "min": "Le nom est requis"
-    },
-    "privacity": {
-      "required": "La confidentialité est requise"
-    }
+    "forgotPasswordCode": { "required": "Le code de réinitialisation du mot de passe est requis" },
+    "listName": { "min": "Le nom est requis" },
+    "privacity": { "required": "Le paramètre de confidentialité est requis" }
   },
   "checkEmail": {
     "title": "Vérifiez votre e-mail",
-    "description": "Nous vous avons envoyé un code de réinitialisation. Entrez-le ci-dessous.",
+    "description": "Nous vous avons envoyé un code de réinitialisation à votre adresse e-mail. Entrez le code ci-dessous pour réinitialiser votre mot de passe.",
     "button": "Aller à la connexion"
   },
   "celebrity": {
     "error": {
-      "fetchingProfile": "Impossible de charger les données de cette personnalité.",
-      "fetchingMovies": "Impossible de charger les films de cette personnalité."
+      "fetchingProfile": "Impossible de charger les données de la célébrité. Veuillez réessayer plus tard.",
+      "fetchingMovies": "Impossible de charger les films de la célébrité. Veuillez réessayer plus tard."
     },
     "birthday": "Date de naissance",
     "deathday": "Date de décès",
@@ -265,21 +282,24 @@
   "search": {
     "searchPlaceholder": "Rechercher",
     "empty": "Aucun résultat trouvé",
-    "help": "Essayez d'autres termes",
+    "help": "Essayez d'autres valeurs",
     "searchMoviesError": "Erreur lors de la recherche de films",
     "searchUsersError": "Erreur lors de la recherche d'utilisateurs",
-    "searchMovieListsError": "Erreur lors de la recherche de listes",
+    "searchCelebritiesError": "Erreur lors de la recherche de célébrités",
+    "searchMovieListsError": "Erreur lors de la recherche de listes de films",
     "filters": "Filtres",
     "movies": "Films",
     "users": "Utilisateurs",
     "lists": "Listes",
     "actors": "Acteurs",
-    "directors": "Réalisateurs"
+    "directors": "Réalisateurs",
+    "celebrities": "Célébrités",
+    "clearFilters": "Effacer les filtres"
   },
   "user": {
     "editProfile": "Modifier",
     "editProfileTitle": "Modifier le profil",
-    "friendsRequests": "Demandes d'amis",
+    "friendsRequests": "Demandes d'amitié",
     "friends": "Amis",
     "biography": "Biographie",
     "no_biography": "Aucune biographie disponible.",
@@ -287,18 +307,18 @@
     "no_user": "Aucun utilisateur trouvé",
     "no_reviews": "Aucun avis disponible.",
     "no_reviews_description": "Cet utilisateur n'a pas encore écrit d'avis.",
-    "no_friends_requests": "Aucune demande",
-    "no_friends_requests_description": "Vous n'avez aucune demande d'ami en attente",
-    "no_friends": "Aucun ami",
+    "no_friends_requests": "Aucune demande disponible",
+    "no_friends_requests_description": "Vous n'avez aucune demande d'amitié en attente",
+    "no_friends": "Aucun ami disponible",
     "no_friends_description": "Cet utilisateur n'a pas encore d'amis.",
     "suggested_friends": "Amis suggérés",
-    "no_suggested_friends": "Aucune suggestion",
-    "no_suggested_friends_description": "Nous n'avons pas trouvé de suggestions d'amis pour le moment",
+    "no_suggested_friends": "Aucun ami suggéré disponible",
+    "no_suggested_friends_description": "Nous n'avons pas trouvé d'amis suggérés pour vous pour le moment",
     "movies_lists": "Listes de films",
-    "no_movies_lists": "Aucune liste de films",
-    "no_movies_lists_description": "Cet utilisateur n'a pas encore créé de listes.",
+    "no_movies_lists": "Aucune liste de films disponible",
+    "no_movies_lists_description": "Cet utilisateur n'a pas encore créé de listes de films.",
     "logout": "Se déconnecter",
-    "clickToChangePicture": "Cliquer pour changer la photo",
+    "clickToChangePicture": "Cliquez pour changer de photo",
     "firstName": "Prénom",
     "lastName": "Nom",
     "username": "Nom d'utilisateur",
@@ -309,9 +329,21 @@
     "leaveBlankToKeep": "Laisser vide pour conserver le mot de passe actuel",
     "yourProfile": "Votre photo de profil",
     "profileUpdated": "Profil mis à jour avec succès",
-    "chooseMoviesListType": "Choisir le type de liste",
+    "chooseMoviesListType": "Choisissez le type de liste",
     "createNormalList": "Liste normale",
-    "createIntelligentList": "Liste intelligente"
+    "createIntelligentList": "Liste intelligente",
+    "addMoviesList": "Créer une nouvelle liste",
+    "friendRequestSent": "Demande d'amitié envoyée",
+    "friendRequestAccepted": "Demande d'amitié acceptée",
+    "friendRequestRejected": "Demande d'amitié refusée",
+    "error": {
+      "fetchingProfile": "Impossible de charger le profil. Veuillez réessayer plus tard.",
+      "updatingProfile": "Impossible de mettre à jour le profil. Veuillez réessayer.",
+      "acceptingFriendRequest": "Impossible d'accepter la demande d'amitié. Veuillez réessayer.",
+      "rejectingFriendRequest": "Impossible de refuser la demande d'amitié. Veuillez réessayer."
+    },
+    "confirmation": "Supprimer l'ami",
+    "confirmRemoveFriend": "Êtes-vous sûr de vouloir supprimer cet ami ?"
   },
   "movie": {
     "synopsis": "Synopsis",
@@ -331,7 +363,13 @@
     "no_actors_description": "Aucun acteur disponible pour ce film.",
     "no_genres_description": "Aucun genre disponible pour ce film.",
     "no_platforms_description": "Aucune plateforme disponible pour ce film.",
-    "no_synopsis_description": "Aucun synopsis disponible pour ce film."
+    "no_synopsis_description": "Aucun synopsis disponible pour ce film.",
+    "add_review": "Écrire un avis",
+    "add_to_list": "Ajouter à la liste",
+    "error": {
+      "fetchingMovie": "Impossible de charger les détails du film. Veuillez réessayer plus tard.",
+      "fetchingPerson": "Impossible de charger les détails de la personne. Veuillez réessayer plus tard."
+    }
   },
   "review": {
     "addReview": "Ajouter un avis",
@@ -347,7 +385,8 @@
     "deleteConfirmBody": "Êtes-vous sûr de vouloir supprimer cet avis ?",
     "error": {
       "titleRequired": "Le titre est requis",
-      "contentRequired": "Le contenu est requis"
+      "contentRequired": "Le contenu est requis",
+      "fetching": "Impossible de charger l'avis. Veuillez réessayer plus tard."
     },
     "updated": "Avis mis à jour avec succès",
     "submitted": "Avis créé avec succès",
@@ -364,7 +403,7 @@
       "contentRequired": "Le contenu du commentaire est requis"
     },
     "commentAdded": "Commentaire ajouté avec succès",
-    "empty": "Aucun commentaire pour l'instant"
+    "empty": "Pas encore de commentaires"
   },
   "comment": {
     "reply": "Répondre",
@@ -372,7 +411,8 @@
     "placeholder": "Écrivez votre commentaire ici...",
     "hideReplies": "Masquer les réponses",
     "showReplies": "Afficher les réponses",
-    "loadMoreReplies": "Charger plus de réponses"
+    "loadMoreReplies": "Charger plus de réponses",
+    "postError": "Impossible de publier le commentaire. Veuillez réessayer."
   },
   "common": {
     "save": "Enregistrer",
@@ -388,11 +428,35 @@
   },
   "list": {
     "noDescription": "Cette liste n'a pas de description.",
-    "getListError": "Erreur lors du chargement des détails de la liste.",
+    "getListError": "Erreur lors du chargement des détails de la liste. Veuillez réessayer plus tard.",
     "createdBy": "Créée par",
     "moviesCount": "{count} film | {count} films",
     "updated": "Dernière mise à jour {0}",
-    "confirmation": "Retirer le film de la liste",
-    "confirmRemoveMovie": "Êtes-vous sûr de vouloir retirer \"{0}\" de la liste ?"
+    "confirmationMovie": "Retirer le film de la liste",
+    "confirmationList": "Supprimer la liste",
+    "confirmRemoveMovie": "Êtes-vous sûr de vouloir retirer \"{0}\" de la liste ?",
+    "confirmDeleteList": "Êtes-vous sûr de vouloir supprimer la liste \"{0}\" ?",
+    "getMoviesError": "Impossible de charger les films de cette liste. Veuillez réessayer plus tard.",
+    "movieRemoved": "Film retiré de la liste avec succès",
+    "removeMovieError": "Impossible de retirer le film de la liste. Veuillez réessayer.",
+    "emptyTitle": "Cette liste ne contient aucun film",
+    "emptyDescription": "Commencez à ajouter des films à cette liste pour les voir ici.",
+    "searchMovies": "Rechercher des films"
+  },
+  "actions": {
+    "addToList": "Ajouter à la liste",
+    "markAsNotSeen": "Marquer comme non vu",
+    "rateNStars": "Noter {n} étoile(s)",
+    "showMoreInfo": "Afficher plus d'informations",
+    "delete": "Supprimer"
+  },
+  "navbar": {
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu"
+  },
+  "translation": {
+    "translate": "Traduire",
+    "showOriginal": "Afficher l'original",
+    "loading": "Traduction en cours..."
   }
 }
