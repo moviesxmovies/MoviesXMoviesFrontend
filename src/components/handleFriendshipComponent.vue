@@ -1,10 +1,13 @@
 <script lang="ts" setup>
-import { completeFriendRequest, removeFriend } from '@/repositories/userRepository';
-import type { User } from '@/types';
-import { Dialog, useToast } from 'primevue';
-import { ref } from 'vue';
-import { useI18n } from 'vue-i18n';
-import FriendWithFollow from './friendWithFollow.vue';
+import {
+  completeFriendRequest,
+  removeFriend,
+} from "@/repositories/userRepository";
+import type { User } from "@/types";
+import { Dialog, useToast } from "primevue";
+import { ref } from "vue";
+import { useI18n } from "vue-i18n";
+import FriendWithFollow from "./friendWithFollow.vue";
 
 const { t } = useI18n();
 const toast = useToast();
@@ -24,7 +27,6 @@ const handleFriendRequest = async (user: User, accept: boolean) => {
     } else {
       user.friendship = { is_friend: false, status: null };
     }
-
   } catch (error: any) {
     toast.add({
       severity: "error",
@@ -47,19 +49,19 @@ const removeFriendRequest = async (user: User) => {
   }
 };
 
-const removeFrienshipModal = (user: User, already_friends: boolean) => {
+const removeFrienshipModal = async (user: User, already_friends: boolean) => {
   pendingUser.value = user;
   pendingAlreadyFriends.value = already_friends;
   confirmVisible.value = true;
 };
 
-const confirmAction = () => {
+const confirmAction = async () => {
   confirmVisible.value = false;
   if (!pendingUser.value) return;
   if (pendingAlreadyFriends.value) {
-    removeFriendRequest(pendingUser.value);
+    await removeFriendRequest(pendingUser.value);
   } else {
-    handleFriendRequest(pendingUser.value, false);
+    await handleFriendRequest(pendingUser.value, false);
   }
   pendingUser.value = null;
 };
@@ -67,44 +69,62 @@ const confirmAction = () => {
 
 <template>
   <!-- CONFIRM DIALOG -->
-  <Dialog v-model:visible="confirmVisible" modal :draggable="false" :dismissableMask="true"
-    :style="{ width: '90vw', maxWidth: '380px' }" :pt="{
-      root: { class: 'rounded-[2rem] border-none shadow-2xl bg-[var(--background)] overflow-hidden' },
+  <Dialog
+    v-model:visible="confirmVisible"
+    modal
+    :draggable="false"
+    :dismissableMask="true"
+    :style="{ width: '90vw', maxWidth: '380px' }"
+    :pt="{
+      root: {
+        class:
+          'rounded-[2rem] border-none shadow-2xl bg-[var(--background)] overflow-hidden',
+      },
       header: { class: 'bg-[var(--background)] pb-0' },
       title: { class: 'text-xl font-bold text-[var(--primary)]' },
       content: { class: 'bg-[var(--background)]' },
-      footer: { class: 'bg-[var(--background)] border-t border-[var(--secondary)]' },
-      closeButton: { class: 'hover:bg-[var(--secondary)]/20 transition-colors' },
-    }">
+      footer: {
+        class: 'bg-[var(--background)] border-t border-[var(--secondary)]',
+      },
+      closeButton: {
+        class: 'hover:bg-[var(--secondary)]/20 transition-colors',
+      },
+    }"
+  >
     <template #header>
       <div class="confirm-header">
         <div class="confirm-icon">
           <i class="pi pi-user-minus" />
         </div>
         <div>
-          <p class="confirm-title">{{ t('search.confirmation') }}</p>
+          <p class="confirm-title">{{ t("search.confirmation") }}</p>
         </div>
       </div>
     </template>
 
-    <p class="confirm-body">{{ t('search.confirmRemoveFriend') }}</p>
+    <p class="confirm-body">{{ t("search.confirmRemoveFriend") }}</p>
 
     <template #footer>
       <div class="footer-actions">
         <button class="btn-cancel" @click="confirmVisible = false">
-          {{ t('common.cancel') }}
+          {{ t("common.cancel") }}
         </button>
         <button class="btn-remove" @click="confirmAction">
           <i class="pi pi-user-minus" />
-          <span>{{ t('common.remove') }}</span>
+          <span>{{ t("common.remove") }}</span>
         </button>
       </div>
     </template>
   </Dialog>
 
-  <FriendWithFollow v-for="user in users" :key="user.id" :user="user"
-    :onAddFriend="() => handleFriendRequest(user, true)" :onRemoveFriend="() => removeFrienshipModal(user, true)"
-    :onRemovePending="() => removeFrienshipModal(user, false)" />
+  <FriendWithFollow
+    v-for="user in users"
+    :key="user.id"
+    :user="user"
+    :onAddFriend="() => handleFriendRequest(user, true)"
+    :onRemoveFriend="async () => removeFrienshipModal(user, true)"
+    :onRemovePending="async () => removeFrienshipModal(user, false)"
+  />
 </template>
 
 <style scoped>
