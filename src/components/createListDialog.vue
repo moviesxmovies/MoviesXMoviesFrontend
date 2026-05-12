@@ -328,6 +328,7 @@ watch(
 
         <div class="flex flex-col gap-3 pt-2">
           <Button
+            data-testid='Form'
             type="submit"
             :label="
               props.movieList
