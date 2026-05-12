@@ -22,7 +22,7 @@ import {
   RadioButton,
   useToast,
 } from "primevue";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import SearchGenresComponent from "./searchGenresComponent.vue";
 import SearchPersonComponent from "./searchPersonComponent.vue";
@@ -41,7 +41,7 @@ const props = defineProps<{
   intelligent?: boolean;
 }>();
 
-const emit = defineEmits(["reloadLists"]);
+const emit = defineEmits(["reloadLists", "reloadMovieList"]);
 
 const selectedCelebrities = ref<string[]>([]);
 const selectedFriends = ref<string[]>([]);
@@ -72,11 +72,12 @@ const handleSubmit = async ({
 
   try {
     if (props.movieList) {
-      await updateList(
+      const { data } = await updateList(
         authStore.user?.username || "",
         props.movieList.slug,
         values as CreateList,
       );
+      emit("reloadMovieList", data.slug);
     } else {
       const data = await createList(values as CreateList, props.intelligent, {
         celebrities: selectedCelebrities.value || undefined,
@@ -94,7 +95,6 @@ const handleSubmit = async ({
   } catch (error: any) {
     fieldErrors.value = {};
     serverErrors.value = [];
-    console.log(error);
     handleApiError(error, fieldErrors, serverErrors, toast, t);
   }
 };
@@ -113,6 +113,19 @@ const addToList = async (listSlug: string, movie: Movie) => {
     });
   }
 };
+
+watch(
+  () => visible.value,
+  (newVal) => {
+    if (newVal) {
+      clearAllErrors();
+      form.reset();
+      selectedCelebrities.value = [];
+      selectedFriends.value = [];
+      selectedGenres.value = [];
+    }
+  },
+);
 </script>
 
 <template>
@@ -154,7 +167,11 @@ const addToList = async (listSlug: string, movie: Movie) => {
           class="text-[10px] font-black uppercase tracking-[0.2em] opacity-60 mt-2 px-2"
           style="color: var(--text)"
         >
-          {{ t("components.createList.description") }}
+          {{
+            props.movieList
+              ? t("components.createList.descriptionUpdate")
+              : t("components.createList.description")
+          }}
         </p>
       </div>
 
