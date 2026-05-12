@@ -81,7 +81,7 @@ describe("MovieRepository", () => {
     });
 
     it("throws TranslatedError when API fails", async () => {
-      mockPost.mockRejectedValueOnce(makeApiError("Unauthorized"));
+      mockPost.mockRejectedValue(makeApiError("Unauthorized"));
 
       await expect(submitRating("inception", 5)).rejects.toBeInstanceOf(TranslatedError);
     });
@@ -99,7 +99,7 @@ describe("MovieRepository", () => {
     });
 
     it("throws TranslatedError when API fails", async () => {
-      mockPost.mockRejectedValueOnce(makeApiError("Server error"));
+      mockPost.mockRejectedValue(makeApiError("Server error"));
 
       await expect(setAsNotSeen("inception")).rejects.toBeInstanceOf(TranslatedError);
     });
@@ -269,7 +269,7 @@ describe("MovieRepository", () => {
 
     it("throws the original error (not TranslatedError) when API fails", async () => {
       const rawError = new Error("Validation failed");
-      mockPost.mockRejectedValueOnce(rawError);
+      mockPost.mockRejectedValue(rawError);
 
       await expect(submitReview("inception", reviewBody)).rejects.toThrow("Validation failed");
       await expect(submitReview("inception", reviewBody)).rejects.not.toBeInstanceOf(TranslatedError);
@@ -295,7 +295,7 @@ describe("MovieRepository", () => {
 
     it("throws the original error (not TranslatedError) when API fails", async () => {
       const rawError = new Error("Forbidden");
-      mockPut.mockRejectedValueOnce(rawError);
+      mockPut.mockRejectedValue(rawError);
 
       await expect(updateReview(1, reviewBody)).rejects.toThrow("Forbidden");
       await expect(updateReview(1, reviewBody)).rejects.not.toBeInstanceOf(TranslatedError);
