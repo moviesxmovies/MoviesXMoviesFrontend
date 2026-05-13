@@ -1,6 +1,6 @@
 {
   "name": "movies-x-movies-frontend",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "private": true,
   "type": "module",
   "engines": {
@@ -19,8 +19,9 @@
     "lint": "eslint . --fix --cache",
     "format": "prettier --write --experimental-cli src/",
     "test:coverage": "vitest run --coverage",
-    "test:ui": "vitest --ui"
-  },
+    "test:ui": "vitest --ui",
+    "host": "vite --host"
+    },
   "dependencies": {
     "@fontsource/inter": "^5.2.8",
     "@primeuix/themes": "^2.0.3",
