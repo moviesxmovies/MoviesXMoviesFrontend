@@ -90,7 +90,26 @@ watch(
 </template>
 
 <style scoped>
+.movie-list {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
 
+@media (min-width: 768px) {
+    .movie-list {
+        max-width: 800px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .movie-list {
+        max-width: 1200px;
+    }
+}
 
 .movielist-grid {
   display: grid;
