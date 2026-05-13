@@ -17,7 +17,7 @@ import {
   type MovieList,
   type User,
 } from "@/types";
-import { goToMovieList } from "@/utils/goTo";
+import { goToMovieList, goToUser } from "@/utils/goTo";
 import { computed } from "@vue/reactivity";
 import { Dialog, Skeleton } from "primevue";
 import { ref, watch } from "vue";
@@ -61,6 +61,7 @@ const fetchMovieList = async () => {
     privacy.value = privacyConfig[movieList.value.privacity];
   } catch (error: any) {
     console.error(error);
+    router.push({ name: "NotFound" });
   }
 };
 
@@ -135,7 +136,7 @@ const removeListConfirm = async () => {
   confirmDeleteListVisible.value = false;
   try {
     await deleteList(user.value.username, movieList.value.slug);
-    router.push("/home");
+    goToUser(user.value.username);
   } catch (error: any) {
     console.error(error);
   }
@@ -396,7 +397,7 @@ watch(
       </div>
 
       <div
-        v-if="!loadingComputed && !movies.results"
+        v-if="!loadingComputed && movies.results.length === 0"
         class="empty-list-container"
       >
         <div class="empty-card">
@@ -406,13 +407,15 @@ watch(
           <h3 class="empty-title">
             {{ t("list.emptyTitle") }}
           </h3>
-          <p class="empty-description">
-            {{ t("list.emptyDescription") }}
-          </p>
-          <button class="btn-search-redirect" @click="router.push('/search')">
-            <i class="pi pi-search" />
-            <span>{{ t("list.searchMovies") }}</span>
-          </button>
+          <div v-if="user.username === authStore.user?.username" class="empty-content">
+            <p class="empty-description">
+              {{ t("list.emptyDescription") }}
+            </p>
+            <button class="btn-search-redirect" @click="router.push('/search')">
+              <i class="pi pi-search" />
+              <span>{{ t("list.searchMovies") }}</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -780,6 +783,13 @@ watch(
   opacity: 0.7;
   color: var(--text);
   margin-bottom: 0.5rem;
+}
+
+.empty-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
 }
 
 .empty-description {
