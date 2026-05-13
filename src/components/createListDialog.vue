@@ -19,7 +19,6 @@ import {
   IconField,
   InputIcon,
   InputText,
-  RadioButton,
   useToast,
 } from "primevue";
 import { ref, watch } from "vue";
@@ -287,7 +286,7 @@ watch(
         </template>
 
         <FormField
-          v-slot="{ value, props: fieldProps }"
+          v-slot="$field"
           name="privacity"
           :initialValue="props.movieList?.privacity || 'P'"
           class="flex flex-col gap-1"
@@ -301,10 +300,10 @@ watch(
               :key="key"
               type="button"
               class="privacy-btn"
-              :class="[option.class, { active: value === option.value }]"
+              :class="[option.class, { active: $field.value === option.value }]"
               @click="
                 () => {
-                  form.setFieldValue('privacity', option.value);
+                  $field.props.onChange({ target: { value: option.value } });
                   clearError('privacity');
                 }
               "
