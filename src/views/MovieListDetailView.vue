@@ -397,7 +397,7 @@ watch(
       </div>
 
       <div
-        v-if="!loadingComputed && movies.results.length === 0"
+        v-if="!loadingComputed && movies.results?.length === 0"
         class="empty-list-container"
       >
         <div class="empty-card">
