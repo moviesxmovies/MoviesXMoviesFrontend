@@ -703,12 +703,18 @@ watch(
   }
 }
 
+.movies-lists-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
 @media (min-width: 1024px) {
   .layout {
     grid-template-columns: 1.5fr 3fr 1.5fr;
   }
 
-  :deep(.movies-lists-grid) {
+  .movies-lists-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
@@ -803,12 +809,6 @@ watch(
   color: var(--gray);
   font-style: italic;
   margin: 0;
-}
-
-:deep(.movies-lists-grid) {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
 }
 
 .sentinel {
