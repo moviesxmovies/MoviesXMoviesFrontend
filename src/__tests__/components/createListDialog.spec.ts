@@ -14,9 +14,24 @@ vi.mock("@/repositories/listRepository", () => ({
   addMovieToList: (...args: unknown[]) => mockAddMovieToList(...args),
   updateList: (...args: unknown[]) => mockUpdateList(...args),
   privacityConfig: {
-    P: { value: "P", text: "Public", icon: "pi pi-globe" },
-    R: { value: "R", text: "Friends", icon: "pi pi-users" },
-    F: { value: "F", text: "Private", icon: "pi pi-lock" },
+    P: {
+      value: "P",
+      text: "Public",
+      icon: "pi pi-globe",
+      class: "badge-public",
+    },
+    R: {
+      value: "R",
+      text: "Private",
+      icon: "pi pi-lock",
+      class: "badge-private",
+    },
+    F: {
+      value: "F",
+      text: "Friends",
+      icon: "pi pi-users",
+      class: "badge-friends",
+    },
   },
 }));
 
@@ -275,11 +290,29 @@ describe("CreateListDialog", () => {
       );
     });
 
-    it("renders the 3 privacy RadioButtons", () => {
+    // Actualizado: ahora son botones, no RadioButtons
+    it("renders the 3 privacy buttons", () => {
       const wrapper = mountDialog();
-      expect(wrapper.find("[data-testid='radio-P']").exists()).toBe(true);
-      expect(wrapper.find("[data-testid='radio-R']").exists()).toBe(true);
-      expect(wrapper.find("[data-testid='radio-F']").exists()).toBe(true);
+      const privacyButtons = wrapper.findAll(".privacy-btn");
+      expect(privacyButtons).toHaveLength(3);
+    });
+
+    it("renders Public privacy button", () => {
+      const wrapper = mountDialog();
+      const buttons = wrapper.findAll(".privacy-btn");
+      expect(buttons.some((b) => b.classes("badge-public"))).toBe(true);
+    });
+
+    it("renders Private privacy button", () => {
+      const wrapper = mountDialog();
+      const buttons = wrapper.findAll(".privacy-btn");
+      expect(buttons.some((b) => b.classes("badge-private"))).toBe(true);
+    });
+
+    it("renders Friends privacy button", () => {
+      const wrapper = mountDialog();
+      const buttons = wrapper.findAll(".privacy-btn");
+      expect(buttons.some((b) => b.classes("badge-friends"))).toBe(true);
     });
 
     it("renders name and description InputText", () => {
