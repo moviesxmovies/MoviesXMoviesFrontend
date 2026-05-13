@@ -13,25 +13,25 @@ const { t } = i18n.global;
 
 export const privacityConfig: Record<
   string,
-  { text: string; icon: string; class: string; value: string }
+  { key: string; icon: string; class: string; value: string }
 > = {
   P: {
-    text: t("components.lists.public"),
     icon: "pi pi-globe",
     class: "badge-public",
     value: "P",
+    key: "components.lists.public",
   },
   R: {
-    text: t("components.lists.private"),
     icon: "pi pi-lock",
     class: "badge-private",
     value: "R",
+    key: "components.lists.private",
   },
   F: {
-    text: t("components.lists.friends"),
     icon: "pi pi-users",
     class: "badge-friends",
     value: "F",
+    key: "components.lists.friends",
   },
 };
 
