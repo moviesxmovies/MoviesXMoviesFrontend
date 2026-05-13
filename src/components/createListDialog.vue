@@ -21,7 +21,7 @@ import {
   InputText,
   useToast,
 } from "primevue";
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import SearchGenresComponent from "./searchGenresComponent.vue";
 import SearchPersonComponent from "./searchPersonComponent.vue";
@@ -61,6 +61,17 @@ const clearAllErrors = () => {
   fieldErrors.value = {};
   serverErrors.value = [];
 };
+
+const localizedPrivacyConfig = computed(() => {
+  return Object.keys(privacityConfig).reduce((acc, key) => {
+    const option = privacityConfig[key as keyof typeof privacityConfig];
+    acc[key] = {
+      ...option,
+      text: t(option?.key || ""),
+    };
+    return acc;
+  }, {} as any);
+});
 
 // ── Submit ───────────────────────────────────────────────────────────────────
 const handleSubmit = async ({
@@ -295,7 +306,7 @@ watch(
             :class="{ 'border-red-400': fieldErrors.privacity?.length }"
           >
             <button
-              v-for="(option, key) in privacityConfig"
+              v-for="(option, key) in localizedPrivacyConfig"
               :key="key"
               type="button"
               class="privacy-btn"
