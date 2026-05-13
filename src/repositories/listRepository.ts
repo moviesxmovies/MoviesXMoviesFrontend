@@ -135,7 +135,7 @@ export const getMovieList = async (user: string, slug: string) => {
 export const listSearching = async (
   query: string,
   page?: number,
-  limit?: number,
+  limit: number = 15,
 ) => {
   try {
     const { data }: { data: Pagination<MovieList> } = await api.get(

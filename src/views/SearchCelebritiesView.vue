@@ -2,7 +2,6 @@
 import CelebrityCardComponent from "@/components/celebrityCardComponent.vue";
 import PaginationComponent from "@/components/paginationComponent.vue";
 import { celebritySearching } from "@/repositories/personRepository";
-import { useAuthStore } from "@/stores/authStore";
 import type { Pagination, Person } from "@/types";
 import { Skeleton, useToast } from "primevue";
 import { ref, watch } from "vue";
@@ -15,7 +14,6 @@ const toast = useToast();
 const celebrities = ref<Pagination<Person>>({} as Pagination<Person>);
 const { t } = useI18n();
 const loading = ref<boolean>(false);
-const authStore = useAuthStore();
 
 const searchCelebrities = async () => {
     try {

@@ -214,7 +214,7 @@ describe("ListRepository", () => {
       const result = await listSearching("action");
 
       expect(mockGet).toHaveBeenCalledWith("/movies-lists/searching/", {
-        params: { query: "action", page: undefined, limit: undefined },
+        params: { query: "action", page: undefined, limit: 15 },
       });
       expect(result).toEqual(mockLists);
     });
