@@ -28,6 +28,7 @@ import SearchGenresComponent from "./searchGenresComponent.vue";
 import SearchPersonComponent from "./searchPersonComponent.vue";
 import SearchUsersComponent from "./searchUsersComponent.vue";
 import { handleApiError } from "@/utils/handleApiError";
+import { goToMovieList } from "@/utils/goTo";
 
 const visible = defineModel<boolean>("visible", { default: false });
 const authStore = useAuthStore();
@@ -87,6 +88,8 @@ const handleSubmit = async ({
 
       if (props.movie) {
         await addToList(data.data.slug, props.movie);
+      } else {
+        goToMovieList(authStore.user?.username, data.data.slug);
       }
     }
 
@@ -328,7 +331,7 @@ watch(
 
         <div class="flex flex-col gap-3 pt-2">
           <Button
-            data-testid='Form'
+            data-testid="Form"
             type="submit"
             :label="
               props.movieList
