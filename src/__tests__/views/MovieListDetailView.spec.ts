@@ -462,7 +462,7 @@ describe("MovieListView", () => {
     it("shows empty state when results is null/undefined", async () => {
       (movieSearchingInList as ReturnType<typeof vi.fn>).mockResolvedValue({
         ...mockMovies,
-        results: null,
+        results: [],
       });
       const wrapper = await mountComponent();
       expect(wrapper.find(".empty-list-container").exists()).toBe(true);
@@ -478,7 +478,7 @@ describe("MovieListView", () => {
     it("navigates to /search when search button is clicked", async () => {
       (movieSearchingInList as ReturnType<typeof vi.fn>).mockResolvedValue({
         ...mockMovies,
-        results: null,
+        results: [],
       });
       const wrapper = await mountComponent();
       await wrapper.find(".btn-search-redirect").trigger("click");
