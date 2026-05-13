@@ -135,7 +135,7 @@ const removeListConfirm = async () => {
   confirmDeleteListVisible.value = false;
   try {
     await deleteList(user.value.username, movieList.value.slug);
-    router.back();
+    router.push("/home");
   } catch (error: any) {
     console.error(error);
   }
