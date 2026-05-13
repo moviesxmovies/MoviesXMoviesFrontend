@@ -157,7 +157,7 @@ export const listSearching = async (
 export const movieSearchingInList = async (
   user: string,
   slug: string,
-  query: string,
+  query?: string,
   page?: number,
   limit?: number,
 ) => {

@@ -80,7 +80,7 @@ const fetchMovies = async (page?: number) => {
     movies.value = await movieSearchingInList(
       route.params.user as string,
       route.params.slug as string,
-      search.value,
+      search.value || undefined,
       page,
     );
   } catch (error: any) {
@@ -123,7 +123,7 @@ const removeMovieConfirm = async () => {
       route.params.slug as string,
       movieToDelete.value,
     );
-    fetchMovies(movies.value.current_page);
+    await reloadData();
   } catch (error: any) {
     console.error(error);
   } finally {
@@ -142,16 +142,20 @@ const removeListConfirm = async () => {
   }
 };
 
+const reloadData = async () => {
+  loading.value = true;
+  await Promise.all([
+    await fetchMovieList(),
+    fetchUser(),
+    fetchMovies(Number(route.query.page)),
+  ]);
+  loading.value = false;
+};
+
 watch(
   () => [route.params.user, route.params.slug],
   async () => {
-    loading.value = true;
-    await Promise.all([
-      await fetchMovieList(),
-      fetchUser(),
-      fetchMovies(Number(route.query.page)),
-    ]);
-    loading.value = false;
+    await reloadData();
   },
   { immediate: true },
 );
@@ -407,7 +411,10 @@ watch(
           <h3 class="empty-title">
             {{ t("list.emptyTitle") }}
           </h3>
-          <div v-if="user.username === authStore.user?.username" class="empty-content">
+          <div
+            v-if="user.username === authStore.user?.username"
+            class="empty-content"
+          >
             <p class="empty-description">
               {{ t("list.emptyDescription") }}
             </p>
