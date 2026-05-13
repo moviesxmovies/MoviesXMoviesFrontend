@@ -239,7 +239,7 @@ describe("ListRepository", () => {
       expect(mockGet).toHaveBeenCalledWith(
         "/movies-lists/john/action-movies/movies/searching/",
         {
-          params: { query: "action", page: undefined, limit: undefined },
+          params: { query: "action", page: undefined, limit: 15 },
         },
       );
       expect(result).toEqual(mockMovies);
