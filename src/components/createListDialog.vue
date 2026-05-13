@@ -70,7 +70,7 @@ const handleSubmit = async ({
 }: FormSubmitEvent<Record<string, any>>) => {
   if (!valid) return;
   clearAllErrors();
-
+  console.log(values.privacity);
   try {
     if (props.movieList) {
       const { data } = await updateList(
@@ -286,43 +286,32 @@ watch(
           </div>
         </template>
 
-        <!-- PRIVACY -->
         <FormField
-          v-slot="$field"
+          v-slot="{ value, props: fieldProps }"
           name="privacity"
           :initialValue="props.movieList?.privacity || 'P'"
           class="flex flex-col gap-1"
         >
           <div
-            class="flex justify-evenly gap-4 p-4 rounded-2xl"
+            class="privacy-toggle"
             :class="{ 'border-red-400': fieldErrors.privacity?.length }"
-            style="
-              background: color-mix(in srgb, var(--secondary) 10%, transparent);
-              border: 1.5px solid
-                color-mix(in srgb, var(--secondary) 40%, transparent);
-            "
           >
-            <div
+            <button
               v-for="(option, key) in privacityConfig"
               :key="key"
-              class="flex items-center gap-2"
+              type="button"
+              class="privacy-btn"
+              :class="[option.class, { active: value === option.value }]"
+              @click="
+                () => {
+                  form.setFieldValue('privacity', option.value);
+                  clearError('privacity');
+                }
+              "
             >
-              <RadioButton
-                :inputId="`privacity-${key}`"
-                name="privacity"
-                :value="option.value"
-                v-model="form.fields.privacy"
-                @change="clearError('privacity')"
-              />
-              <label
-                :for="`privacity-${key}`"
-                class="text-sm font-medium cursor-pointer"
-                style="color: var(--text)"
-              >
-                <i :class="option.icon" class="text-xs opacity-70"></i>
-                {{ option.text }}
-              </label>
-            </div>
+              <i :class="option.icon" />
+              {{ option.text }}
+            </button>
           </div>
           <span v-if="fieldErrors.privacity?.length" class="field-error">
             {{ fieldErrors.privacity[0] }}
@@ -383,15 +372,6 @@ watch(
   border-radius: 0.75rem !important;
 }
 
-:deep(.p-radiobutton .p-radiobutton-box) {
-  border-color: var(--secondary) !important;
-}
-
-:deep(.p-radiobutton-checked .p-radiobutton-box) {
-  background: var(--primary) !important;
-  border-color: var(--primary) !important;
-}
-
 .cancel-btn {
   width: 100%;
   padding: 0.75rem;
@@ -447,5 +427,75 @@ watch(
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
+}
+
+.privacy-toggle {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  padding: 0.4rem;
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--secondary) 10%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--secondary) 40%, transparent);
+}
+
+.privacy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.6rem 0.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid transparent;
+  background: transparent;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    color 0.2s,
+    opacity 0.2s;
+  font-family: inherit;
+  opacity: 0.45;
+  white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.privacy-btn.active {
+  opacity: 1;
+}
+
+.privacy-btn:not(.active):hover {
+  opacity: 0.7;
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+}
+
+/* Public */
+.privacy-btn.badge-public {
+  color: #309153;
+}
+.privacy-btn.badge-public.active {
+  border-color: color-mix(in srgb, #309153 60%, transparent);
+  background: rgba(34, 197, 94, 0.12);
+}
+
+/* Private */
+.privacy-btn.badge-private {
+  color: #b73b3b;
+}
+.privacy-btn.badge-private.active {
+  border-color: color-mix(in srgb, #b73b3b 60%, transparent);
+  background: rgba(239, 68, 68, 0.12);
+}
+
+/* Friends */
+.privacy-btn.badge-friends {
+  color: #4d57bd;
+}
+.privacy-btn.badge-friends.active {
+  border-color: color-mix(in srgb, #4d57bd 60%, transparent);
+  background: rgba(99, 102, 241, 0.12);
 }
 </style>
