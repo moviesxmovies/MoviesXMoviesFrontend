@@ -1,7 +1,69 @@
+.p-multiselect {
+  background: color-mix(in srgb, var(--background) 95%, var(--text)) !important;
+  border: 1px solid color-mix(in srgb, var(--secondary) 20%, transparent) !important;
+  border-radius: 1.25rem !important;
+  color: var(--text) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.p-multiselect:hover {
+  border-color: var(--primary) !important;
+}
+
+.p-multiselect.p-focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 1px var(--primary) !important;
+}
+
+.p-multiselect-label {
+  color: var(--text) !important;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 6px 8px;
+  white-space: normal;
+  height: auto !important;
+}
+
+.p-multiselect-label.p-placeholder {
+  color: color-mix(in srgb, var(--text) 35%, transparent) !important;
+}
+
+.p-chip {
+  background: color-mix(in srgb, var(--primary) 15%, transparent) !important;
+  color: var(--primary) !important;
+  border-radius: 2rem !important;
+  font-size: 0.7rem !important;
+  font-weight: 600 !important;
+  padding: 2px 10px !important;
+}
+
+.p-chip-remove-icon {
+  color: var(--primary) !important;
+  opacity: 0.7;
+}
+
+.p-chip-remove-icon:hover {
+  opacity: 1;
+}
+
 .p-multiselect-overlay {
   background: var(--background) !important;
   border: 1px solid color-mix(in srgb, var(--secondary) 20%, transparent) !important;
   border-radius: 1.25rem !important;
+  overflow: hidden;
+}
+
+.p-multiselect-filter-input {
+  background: color-mix(in srgb, var(--background) 95%, var(--text)) !important;
+  border: 1px solid color-mix(in srgb, var(--secondary) 20%, transparent) !important;
+  border-radius: 0.75rem !important;
+  color: var(--text) !important;
+}
+
+.p-multiselect-filter-input:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 1px var(--primary) !important;
 }
 
 .p-multiselect-overlay .p-checkbox .p-checkbox-box {
@@ -12,6 +74,12 @@
     transparent
   ) !important;
   border-radius: 6px !important;
+}
+
+.p-multiselect-overlay .p-checkbox .p-checkbox-box[data-p="checked"] {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: white !important;
 }
 
 .p-multiselect-filter {
