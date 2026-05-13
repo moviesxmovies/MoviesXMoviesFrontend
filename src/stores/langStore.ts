@@ -30,9 +30,11 @@ export const useLangStore = defineStore("lang", {
     async fetchLanguage() {
       try {
         const token = localStorage.getItem("access_token");
+        console.log("Fetching preferred language with token:", token);
 
         if (token) {
           const { data } = await api.get("/users/preferred-language/");
+          console.log("Fetched preferred language:", data);
           if (data?.preferred_language) {
             this.setLanguage(data.preferred_language);
             return;

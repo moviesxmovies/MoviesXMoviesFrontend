@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import Select from "primevue/select";
 import { useLangStore } from "@/stores/langStore";
 import { availableCountries } from "@/types";
 
 const langStore = useLangStore();
+const getCountryObject = (lang: string) => ({
+  label: lang.toUpperCase(),
+  value: lang
+});
 const selectedCountry = ref<{ label: string; value: string } | null>(
-  langStore.language
-    ? { label: langStore.language.toUpperCase(), value: langStore.language }
-    : null,
+  langStore.language ? getCountryObject(langStore.language) : null
 );
 
 
@@ -17,6 +19,11 @@ const getFlagUrl = (label: string) => {
   return `https://flagcdn.com/w20/${label === 'EN' ? 'us' : label.toLocaleLowerCase()}.png`;
 }
 
+watch(() => langStore.language, (newLang) => {
+  if (newLang) {
+    selectedCountry.value = getCountryObject(newLang);
+  }
+});
 </script>
 
 <template>
