@@ -69,7 +69,6 @@ const handleSubmit = async ({
 }: FormSubmitEvent<Record<string, any>>) => {
   if (!valid) return;
   clearAllErrors();
-  console.log(values.privacity);
   try {
     if (props.movieList) {
       const { data } = await updateList(
