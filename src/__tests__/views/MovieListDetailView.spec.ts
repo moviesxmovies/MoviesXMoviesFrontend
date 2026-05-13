@@ -429,7 +429,7 @@ describe("MovieListView", () => {
       expect(movieSearchingInList).toHaveBeenCalledWith(
         "johndoe",
         "my-list",
-        "",
+        undefined,
         1,
       );
     });
