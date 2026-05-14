@@ -62,7 +62,7 @@ const rateMovie = async (rating: number) => {
         'text-5xl mx-2 transition-all duration-200 star-icon z-1000',
         !loading ? 'cursor-pointer' : 'cursor-default',
         i <= focusedRating
-          ? 'pi pi-star-fill text-[var(--yellow)] focused-rating'
+          ? 'pi pi-star-fill focused-rating'
           : 'pi pi-star text-primary',
       ]"
       @mouseenter="!loading && handleMouseEnter(i)"
@@ -85,6 +85,7 @@ const rateMovie = async (rating: number) => {
 }
 
 .pi-star-fill {
+  color: var(--yellow);
   transform: scale(1.1);
   display: inline-block;
 }

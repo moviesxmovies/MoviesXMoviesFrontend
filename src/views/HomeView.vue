@@ -15,7 +15,9 @@ import ActionsComponent from "@/components/actionsComponent.vue";
 import DraggeableComponent from "@/components/draggeableComponent.vue";
 import MovieInfoDrawer from "@/components/movieInfoDrawer.vue";
 import AddToListDialog from "@/components/addToListDialog.vue";
-import KeyboardShorcuts, { type DropdownOption } from "@/components/keyboardShorcuts.vue";
+import KeyboardShorcuts, {
+  type DropdownOption,
+} from "@/components/keyboardShorcuts.vue";
 import FriendsRatingsComponent from "@/components/friendsRatingsComponent.vue";
 
 const PREDICTED_COLORS: Record<string, string> = {
@@ -97,21 +99,28 @@ const glowStyle = computed(() => {
   const color = PREDICTED_COLORS[direction.value || ""] || "transparent";
   const isActive = !!direction.value;
 
+  if (!isActive) {
+    return {
+      transform: "scale(0.95)",
+      transition: "all 0.3s ease-in",
+    };
+  }
+
   return {
-    border: isActive ? `2px solid ${color}` : "2px solid transparent",
-    boxShadow: isActive
-      ? `0 0 40px -10px ${color}, 0 0 100px -20px ${color}`
-      : "none",
-    backgroundColor: isActive ? `${color}` : "transparent",
-    opacity: isActive ? 0.7 : 0,
-    filter: "blur(2px)",
+    background: `radial-gradient(circle, transparent 10%, color-mix(in srgb, ${color} 25%, transparent) 100%)`,
+    border: `3px solid ${color}`,
+    filter: `drop-shadow(0 0 8px ${color}) blur(1px)`,
+    opacity: 1,
+    transform: "scale(1.04)",
+    boxShadow: `inset 0 0 15px color-mix(in srgb, ${color} 40%, transparent)`,
+    transition: "all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+    willChange: "transform, opacity",
   };
 });
 
 const markAsNotSeen = async () => {
   loading.value = true;
-  if (navigator.vibrate)
-    navigator.vibrate(100);
+  if (navigator.vibrate) navigator.vibrate(100);
   if (actualMovie.value) {
     await setAsNotSeen(actualMovie.value.slug);
   }
@@ -122,14 +131,12 @@ const markAsNotSeen = async () => {
 const rateMovie = async (rating: number) => {
   if (rating === 0) return;
   loading.value = true;
-  if (navigator.vibrate)
-    navigator.vibrate(100);
+  if (navigator.vibrate) navigator.vibrate(100);
   if (actualMovie.value) {
     await submitRating(actualMovie.value.slug, rating);
   }
   loading.value = false;
   showNextRecommendedMovie();
-
 };
 
 const shortcuts = [
@@ -164,7 +171,7 @@ const shortcuts = [
     handler: () => rateMovie(1),
     shortcut: "a",
   },
-] as DropdownOption[]
+] as DropdownOption[];
 
 for (let i = 1; i <= 5; i++) {
   shortcuts.push({
@@ -172,26 +179,52 @@ for (let i = 1; i <= 5; i++) {
     icon: `i-heroicons-${i}-solid`,
     handler: () => rateMovie(i),
     shortcut: `${i}`,
-  })
+  });
 }
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center overflow-hidden fixed inset-0"
-    :class="isDragging && 'z-50'">
+  <div
+    class="min-h-screen flex items-center justify-center overflow-hidden fixed inset-0"
+    :class="isDragging && 'z-50'"
+  >
     <KeyboardShorcuts :options="shortcuts" />
     <FriendsRatingsComponent v-if="actualMovie" :movieSlug="actualMovie.slug" />
-    <MovieInfoDrawer v-model:visible="visibleDrawer" :movie="actualMovie || ({} as Movie)" />
-    <AddToListDialog v-model:visible="visibleDialog" :movie="actualMovie || ({} as Movie)" />
-    <div v-if="loading || actualMovie" class="overflow-visible min-w-screen px-14 md:px-0">
-      <DraggeableComponent :swipeThreshold="100" @right="rateMovie(5)" @left="rateMovie(1)"
-        @up="() => (visibleDialog = true)" @down="markAsNotSeen" v-model:direction="direction"
-        v-model:isDragging="isDragging">
+    <MovieInfoDrawer
+      v-model:visible="visibleDrawer"
+      :movie="actualMovie || ({} as Movie)"
+    />
+    <AddToListDialog
+      v-model:visible="visibleDialog"
+      :movie="actualMovie || ({} as Movie)"
+    />
+    <div
+      v-if="loading || actualMovie"
+      class="overflow-visible min-w-screen px-14 md:px-0"
+    >
+      <DraggeableComponent
+        :swipeThreshold="100"
+        @right="rateMovie(5)"
+        @left="rateMovie(1)"
+        @up="() => (visibleDialog = true)"
+        @down="markAsNotSeen"
+        v-model:direction="direction"
+        v-model:isDragging="isDragging"
+      >
         <div id="mainSwipe">
-          <MovieComponent class="select-none" :movie="actualMovie || ({} as Movie)" :loading="loading" />
-          <ActionsComponent class="select-none" :loading="loading" :movie="actualMovie || ({} as Movie)"
-            @markAsNotSeen="markAsNotSeen" @showMoreInfo="() => (visibleDrawer = !visibleDrawer)"
-            @addToList="() => (visibleDialog = !visibleDialog)" />
+          <MovieComponent
+            class="select-none"
+            :movie="actualMovie || ({} as Movie)"
+            :loading="loading"
+          />
+          <ActionsComponent
+            class="select-none"
+            :loading="loading"
+            :movie="actualMovie || ({} as Movie)"
+            @markAsNotSeen="markAsNotSeen"
+            @showMoreInfo="() => (visibleDrawer = !visibleDrawer)"
+            @addToList="() => (visibleDialog = !visibleDialog)"
+          />
         </div>
       </DraggeableComponent>
       <div class="icon-container mb-7 px-14 md:px-0">
@@ -213,9 +246,14 @@ for (let i = 1; i <= 5; i++) {
           </div>
         </div>
       </div>
-      <div class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center mb-7 px-14 md:px-0">
-        <div class="w-full max-w-sm aspect-[3/5] rounded-3xl transition-all duration-500 ease-out" :style="glowStyle"
-          id="glow-container"></div>
+      <div
+        class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center mb-7 px-14 md:px-0"
+      >
+        <div
+          class="w-full max-w-sm aspect-[3/5] rounded-3xl transition-all duration-500 ease-out"
+          :style="glowStyle"
+          id="glow-container"
+        ></div>
       </div>
       <div class="flex justify-center mt-4 relative z-">
         <StarsComponent id="stars" :loading="loading" @rateMovie="rateMovie" />
@@ -226,118 +264,120 @@ for (let i = 1; i <= 5; i++) {
 </template>
 
 <style>
+#mainSwipe,
+#glow-container,
+.cell,
+.star-icon {
+  will-change: transform, opacity;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+#glow-container {
+  filter: blur(40px);
+  box-shadow: none !important;
+  will-change: opacity, transform;
+  contain: paint;
+}
+
+.active-icon {
+  opacity: 1 !important;
+  transform: scale(1.4) translateZ(0);
+  text-shadow:
+    0 0 10px var(--glow-color),
+    0 0 20px var(--glow-color),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+  color: #ffffff;
+}
+
 #mainSwipe.animate-boarding {
   z-index: 1001;
   animation: swipe-tutorial 8s ease-in-out infinite;
 }
 
-.overflow-visible:has(#mainSwipe.animate-boarding) #glow-container {
-  animation: glow-tutorial 8s ease-in-out infinite !important;
-  opacity: 0.7 !important;
-}
-
-.overflow-visible:has(#mainSwipe.animate-boarding) .cell.left {
-  animation: icon-left-tutorial 8s infinite;
-}
-
-.overflow-visible:has(#mainSwipe.animate-boarding) .cell.right {
-  animation: icon-right-tutorial 8s infinite;
-}
-
-.overflow-visible:has(#mainSwipe.animate-boarding) .cell.bottom {
-  animation: icon-bottom-tutorial 8s infinite;
-}
-
-.overflow-visible:has(#mainSwipe.animate-boarding) .cell.top {
-  animation: icon-top-tutorial 8s infinite;
-}
-
 @keyframes swipe-tutorial {
-
   0%,
   10%,
   100% {
-    transform: translate(0, 0) rotate(0);
+    transform: translate3d(0, 0, 0) rotate(0);
   }
-
   15%,
   25% {
-    transform: translate(60px, 5px) rotate(4deg);
+    transform: translate3d(60px, 5px, 0) rotate(4deg);
   }
-
   30%,
   35% {
-    transform: translate(0, 0) rotate(0);
+    transform: translate3d(0, 0, 0) rotate(0);
   }
-
   40%,
   50% {
-    transform: translate(-60px, 5px) rotate(-4deg);
+    transform: translate3d(-60px, 5px, 0) rotate(-4deg);
   }
-
   55%,
   60% {
-    transform: translate(0, 0) rotate(0);
+    transform: translate3d(0, 0, 0) rotate(0);
   }
-
   65%,
   75% {
-    transform: translate(0, -60px) scale(0.98);
+    transform: translate3d(0, -60px, 0) scale(0.98);
   }
-
   80%,
   85% {
-    transform: translate(0, 0) rotate(0);
+    transform: translate3d(0, 0, 0) rotate(0);
   }
-
   90%,
   98% {
-    transform: translate(0, 60px) scale(1.02);
+    transform: translate3d(0, 60px, 0) scale(1.02);
   }
 }
 
+.overflow-visible:has(#mainSwipe.animate-boarding) #glow-container {
+  animation: glow-tutorial 8s ease-in-out infinite !important;
+  filter: blur(1px); 
+}
+
 @keyframes glow-tutorial {
-
-  0%,
-  12%,
-  28%,
-  37%,
-  53%,
-  62%,
-  78%,
-  87%,
-  100% {
-    background-color: transparent;
-    box-shadow: none;
+  0%, 12%, 28%, 37%, 53%, 62%, 78%, 87%, 100% {
+    opacity: 0;
+    transform: scale(0.95);
+    border: 3px solid transparent;
   }
-
-  15%,
-  25% {
-    background-color: var(--yellow);
-    box-shadow: 0 0 80px var(--yellow);
+  /* Like - Yellow */
+  15%, 25% {
+    opacity: 0.7;
+    transform: scale(1.04);
+    background: radial-gradient(circle, transparent 10%, color-mix(in srgb, var(--yellow) 25%, transparent) 100%);
+    border: 3px solid var(--yellow);
+    box-shadow: 0 0 15px var(--yellow);
   }
-
-  40%,
-  50% {
-    background-color: var(--red);
-    box-shadow: 0 0 80px var(--red);
+  /* Dislike - Red */
+  40%, 50% {
+    opacity: 0.7;
+    transform: scale(1.04);
+    background: radial-gradient(circle, transparent 10%, color-mix(in srgb, var(--red) 25%, transparent) 100%);
+    border: 3px solid var(--red);
+    box-shadow: 0 0 15px var(--red);
   }
-
-  65%,
-  75% {
-    background-color: var(--primary);
-    box-shadow: 0 0 80px var(--primary);
+  /* Up - Azul/Primary */
+  65%, 75% {
+    opacity: 0.7;
+    transform: scale(1.04);
+    background: radial-gradient(circle, transparent 10%, color-mix(in srgb, var(--primary) 25%, transparent) 100%);
+    border: 3px solid var(--primary);
+    box-shadow: 0 0 15px var(--primary);
   }
-
-  90%,
-  98% {
-    background-color: var(--gray);
-    box-shadow: 0 0 80px var(--gray);
+  /* Down - Gris */
+  90%, 98% {
+    opacity: 0.7;
+    transform: scale(1.04);
+    background: radial-gradient(circle, transparent 10%, color-mix(in srgb, var(--gray) 25%, transparent) 100%);
+    border: 3px solid var(--gray);
+    box-shadow: 0 0 15px var(--gray);
   }
 }
 
 @keyframes icon-left-tutorial {
-
   15%,
   25% {
     opacity: 1;
@@ -355,7 +395,6 @@ for (let i = 1; i <= 5; i++) {
 }
 
 @keyframes icon-right-tutorial {
-
   40%,
   50% {
     opacity: 1;
@@ -373,7 +412,6 @@ for (let i = 1; i <= 5; i++) {
 }
 
 @keyframes icon-bottom-tutorial {
-
   65%,
   75% {
     opacity: 1;
@@ -391,7 +429,6 @@ for (let i = 1; i <= 5; i++) {
 }
 
 @keyframes icon-top-tutorial {
-
   90%,
   98% {
     opacity: 1;
@@ -414,12 +451,21 @@ for (let i = 1; i <= 5; i++) {
   background: rgba(var(--primary-rgb), 0.1);
   padding: 1.5rem;
   border-radius: 1rem;
-  border: 2px dashed var(--accent);
+  border: 2px dashed var(--yellow);
+  display: flex;
+  justify-content: center;
+  min-height: 4rem; 
 }
 
 .animate-boarding .star-icon {
-  animation: star-fill-sweep 2.5s alternate infinite ease-in-out;
-  position: relative;
+  display: inline-block !important;
+  color: var(--primary);
+  animation: star-fill-sweep 2.5s alternate infinite ease-in-out !important;
+}
+
+.animate-boarding .star-icon:before {
+  display: inline-block;
+  animation: icon-change 2.5s infinite ease-in-out;
 }
 
 .animate-boarding .star-icon:nth-child(1) {
@@ -443,23 +489,23 @@ for (let i = 1; i <= 5; i++) {
 }
 
 @keyframes star-fill-sweep {
-
-  0%,
-  100% {
+  0%, 100% {
     color: var(--primary);
-    transform: scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
   }
-
-  30%,
-  70% {
-    color: var(--accent);
-    transform: scale(1.15);
-    filter: drop-shadow(0 0 10px var(--accent));
+  30%, 70% {
+    color: var(--yellow);
+    transform: translate3d(0, 0, 0) scale(1.15);
   }
 }
 
-.animate-boarding .star-icon.pi-star:before {
-  animation: icon-change 2.5s infinite ease-in-out;
+@keyframes icon-change {
+  0%, 100%, 20%, 80% {
+    content: "\e937";
+  }
+  30%, 70% {
+    content: "\e936";
+  }
 }
 
 .animate-boarding .star-icon:nth-child(1):before {
@@ -482,21 +528,6 @@ for (let i = 1; i <= 5; i++) {
   animation-delay: 0.8s;
 }
 
-@keyframes icon-change {
-
-  0%,
-  100%,
-  20%,
-  80% {
-    content: "\e937";
-  }
-
-  30%,
-  70% {
-    content: "\e936";
-  }
-}
-
 .icon-container {
   position: absolute;
   inset: 0;
@@ -515,15 +546,19 @@ for (let i = 1; i <= 5; i++) {
   max-width: 24rem;
   aspect-ratio: 3 / 5;
   border-radius: 1.5rem;
-  transition: all 0.5s ease-out;
+  transition: transform 0.5s ease-out;
 }
 
 .cell {
   display: flex;
   color: var(--text);
   font-size: 2rem;
-  transition: all 0.3s ease;
-  opacity: 0.1;
+  transition:
+    transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    opacity 0.3s ease,
+    color 0.3s ease;
+  opacity: 0.15;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .cell.top {
@@ -558,10 +593,17 @@ for (let i = 1; i <= 5; i++) {
   padding-bottom: 2rem;
 }
 
-.active-icon {
-  opacity: 1;
-  transform: scale(1.25);
-  filter: drop-shadow(0 0 10px var(--text));
+.animate-boarding .cell.left {
+  animation: icon-left-tutorial 8s infinite;
+}
+.animate-boarding .cell.right {
+  animation: icon-right-tutorial 8s infinite;
+}
+.animate-boarding .cell.bottom {
+  animation: icon-bottom-tutorial 8s infinite;
+}
+.animate-boarding .cell.top {
+  animation: icon-top-tutorial 8s infinite;
 }
 
 .w-full.max-w-sm.aspect-\[3\/5\] {
