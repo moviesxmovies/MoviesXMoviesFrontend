@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-
+const draggableWrapper = ref<HTMLElement | null>(null);
 const props = defineProps({
   swipeThreshold: {
     type: Number,
@@ -48,21 +48,21 @@ const offsetY = computed(() => {
   return distance;
 });
 
-// Dynamic styles to move the card
-const cardStyle = computed(() => {
+// As actualValue approaches MAX_TRAVEL, the increment gets smaller
+const getResistedValue = (actualValue: number) => {
   const RESISTANCE = 0.25;
 
-  // As actualValue approaches MAX_TRAVEL, the increment gets smaller
-  const getResistedValue = (actualValue: number) => {
-    return (
-      props.maxDragDistance *
-      Math.tanh(actualValue / (props.maxDragDistance / RESISTANCE))
-    );
-  };
+  return (
+    props.maxDragDistance *
+    Math.tanh(actualValue / (props.maxDragDistance / RESISTANCE))
+  );
+};
 
+// Dynamic styles to move the card
+const cardStyle = computed(() => {
   const visualX = getResistedValue(offsetX.value);
   const visualY = getResistedValue(offsetY.value);
-  
+
   return {
     transform: `
       translateX(${visualX}px) 
@@ -101,6 +101,12 @@ const onDrag = (event: MouseEvent | TouchEvent) => {
       }
     });
   }
+
+  if (draggableWrapper.value) {
+    const visualX = getResistedValue(offsetX.value);
+    const visualY = getResistedValue(offsetY.value);
+    draggableWrapper.value.style.transform = `translate3d(${visualX}px, ${visualY}px, 0)`;
+  }
 };
 
 const endDrag = () => {
@@ -137,7 +143,7 @@ const checkSwipe = (func: Function) => {
     @mouseup="endDrag"
     @mouseleave="endDrag"
     @touchstart="startDrag"
-    @touchmove="onDrag"
+    @touchmove.prevent="onDrag"
     @touchend="endDrag"
   >
     <div v-if="isDragging" class="fixed inset-0 z-11 cursor-grabbing"></div>
@@ -152,10 +158,18 @@ const checkSwipe = (func: Function) => {
 .select-none {
   user-select: none;
   -webkit-user-select: none;
-  touch-action: none; 
+  touch-action: none;
+}
+
+.min-h-screen {
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
 }
 
 .draggable-wrapper {
   will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 </style>

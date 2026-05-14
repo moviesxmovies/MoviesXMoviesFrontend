@@ -53,13 +53,14 @@ const props = defineProps<{
   border: 1px solid var(--secondary);
   border-radius: 0 0 1.5rem 1.5rem;
   background: var(--background);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   overflow: hidden;
+  transform: translateZ(0);
 }
 
 .action-btn {
   flex: 1;
-  height: 3rem;
+  height: 3.5rem;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -70,7 +71,9 @@ const props = defineProps<{
   color: var(--text);
   font-size: 1.1rem;
   font-weight: 600;
-  transition: background 0.2s, color 0.2s, transform 0.1s;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
 
 .action-btn:last-child {
@@ -78,7 +81,7 @@ const props = defineProps<{
 }
 
 .action-btn:active {
-  transform: scale(0.97);
+  transform: scale(0.92);
 }
 
 .action-btn:disabled {
@@ -86,57 +89,35 @@ const props = defineProps<{
   pointer-events: none;
 }
 
-.accent-btn {
-  color: var(--accent);
+.accent-btn { color: var(--accent); }
+.neutral-btn { color: var(--text); }
+.primary-btn { color: var(--primary); }
+
+@media (hover: hover) {
+  .accent-btn:hover { background: var(--accent); color: var(--background); }
+  .neutral-btn:hover { background: var(--secondary); }
+  .primary-btn:hover { background: var(--primary); color: var(--background); }
 }
 
-.accent-btn:hover,#more-info.animate-boarding {
-  background: var(--accent);
-  color: var(--background);
-}
-
-.neutral-btn {
-  color: var(--text);
-}
-
-.neutral-btn:hover,#unseen-button.animate-boarding {
-  background: var(--secondary);
-  color: var(--text);
-}
-
-.primary-btn {
-  color: var(--primary);
-}
-
-.primary-btn:hover,#add-to-list-button.animate-boarding {
-  background: var(--primary);
-  color: var(--background);
-}
-
-/* Boarding animation */
 #more-info.animate-boarding,
 #unseen-button.animate-boarding,
 #add-to-list-button.animate-boarding {
   position: relative;
   z-index: 1001;
   animation: button-cinematic-pop 1.5s infinite;
-  border-color: white !important;
 }
 
+#more-info.animate-boarding { background: var(--accent); color: var(--background); }
+#unseen-button.animate-boarding { background: var(--secondary); }
+#add-to-list-button.animate-boarding { background: var(--primary); color: var(--background); }
 
 @keyframes button-cinematic-pop {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+  0%, 100% {
+    transform: scale(1) translateZ(0);
   }
-  70% {
-    transform: scale(1.08);
-    box-shadow: 0 0 20px 10px rgba(255, 255, 255, 0);
-    filter: brightness(1.3);
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+  50% {
+    transform: scale(1.08) translateZ(0);
+    background-color: rgba(255, 255, 255, 0.25);
   }
 }
 </style>

@@ -1,5 +1,5 @@
 import { mount, flushPromises } from "@vue/test-utils";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import CreateListDialog from "@/components/createListDialog.vue";
 import type { Movie, MovieList } from "@/types";
 
@@ -49,7 +49,7 @@ vi.mock("vue-i18n", () => ({
 }));
 
 vi.mock("primevue", async () => {
-  const { defineComponent, h } = await import("vue");
+  const { defineComponent } = await import("vue");
   return {
     Dialog: defineComponent({
       name: "Dialog",
@@ -79,7 +79,7 @@ vi.mock("primevue", async () => {
 
 // Mock del sistema de formularios de PrimeVue
 vi.mock("@primevue/forms", async () => {
-  const { defineComponent, h, ref } = await import("vue");
+  const { defineComponent, h } = await import("vue");
   return {
     Form: defineComponent({
       name: "Form",

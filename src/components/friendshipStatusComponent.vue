@@ -172,13 +172,13 @@ const handleFriends = () => {
 }
 
 .status-pending {
-  border: 1px solid var(--yellow);
-  color: var(--yellow);
+  border: 1px solid var(--gold);
+  color: var(--gold);
   animation: pulse 2s infinite;
 }
 
 .status-pending:hover {
-  background: var(--yellow);
+  background: var(--gold);
   color: var(--background);
 }
 

@@ -46,11 +46,8 @@ const rateMovie = async (rating: number) => {
 <template>
   <div
     ref="starsContainer"
-    :class="[
-      'touch-none select-none flex justify-center transition-opacity duration-300',
-      loading ? 'opacity-40 pointer-events-none' : 'opacity-100',
-    ]"
-    @contextmenu.prevent
+    class="touch-none select-none flex justify-center transition-opacity duration-300"
+    :class="loading ? 'opacity-40 pointer-events-none' : 'opacity-100'"
     @mouseleave="handleMouseLeave"
     @touchend.prevent="rateMovie(focusedRating)"
     @touchmove.prevent="handleTouchMove"
@@ -58,34 +55,39 @@ const rateMovie = async (rating: number) => {
     <i
       v-for="i in 5"
       :key="i"
+      class="pi text-5xl mx-2 star-icon"
       :class="[
-        'text-5xl mx-2 transition-all duration-200 star-icon z-1000',
-        !loading ? 'cursor-pointer' : 'cursor-default',
-        i <= focusedRating
-          ? 'pi pi-star-fill text-[var(--yellow)] focused-rating'
-          : 'pi pi-star text-primary',
+        i <= focusedRating ? 'pi-star-fill active' : 'pi-star',
+        { 'cursor-pointer': !loading }
       ]"
       @mouseenter="!loading && handleMouseEnter(i)"
-      @touchstart="!loading && handleMouseEnter(i)"
       @click="!loading && rateMovie(i)"
-      :aria-label="$t('actions.rateNStars', { n: i })"
     />
   </div>
 </template>
 
 <style scoped>
-.focused-rating {
-  transform: scale(1.15);
-  filter: drop-shadow(0 0 10px var(--yellow));
-  transition:
-    transform 0.2s ease,
-    filter 0.2s ease;
-  cursor: pointer;
-  color: var(--yellow) !important;
+.star-icon {
+  transform: translateZ(0);
+  will-change: transform, color;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s ease;
+  color: var(--primary); 
 }
 
-.pi-star-fill {
-  transform: scale(1.1);
-  display: inline-block;
+.pi-star-fill.active {
+  color: var(--yellow);
+  transform: scale(1.15);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--yellow) 60%, transparent);
+}
+
+@media (hover: hover) {
+  .star-icon:hover {
+    transform: scale(1.2);
+    color: var(--yellow);
+  }
+}
+
+:deep(.animate-boarding) .star-icon {
+  text-shadow: none;
 }
 </style>

@@ -67,7 +67,7 @@ const localizedPrivacyConfig = computed(() => {
     const option = privacityConfig[key as keyof typeof privacityConfig];
     acc[key] = {
       ...option,
-      text: t(option?.key || ""),
+      key: t(option?.key || ""),
     };
     return acc;
   }, {} as any);
@@ -319,7 +319,7 @@ watch(
               "
             >
               <i :class="option.icon" />
-              {{ option.text }}
+              {{ option.key }}
             </button>
           </div>
           <span v-if="fieldErrors.privacity?.length" class="field-error">
