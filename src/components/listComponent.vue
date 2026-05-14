@@ -2,6 +2,7 @@
 import { privacityConfig } from "@/repositories/listRepository";
 import type { UserMovieList } from "@/types";
 import { Checkbox, ScrollPanel, Skeleton } from "primevue";
+import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
@@ -17,6 +18,17 @@ const props = defineProps<{
   loading: boolean;
   sentinelRef?: HTMLElement | null;
 }>();
+
+const localizedPrivacyConfig = computed(() => {
+  return Object.keys(privacityConfig).reduce((acc, key) => {
+    const option = privacityConfig[key as keyof typeof privacityConfig];
+    acc[key] = {
+      ...option,
+      key: t(option?.key || ""),
+    };
+    return acc;
+  }, {} as any);
+});
 </script>
 
 <template>
@@ -45,9 +57,9 @@ const props = defineProps<{
 
             <div class="flex flex-col gap-0.5">
               <span class="list-name">{{ item.list.name }}</span>
-              <div v-if="item.list.privacity" :class="['privacity-badge', privacityConfig[item.list.privacity]?.class]">
-                <i :class="[privacityConfig[item.list.privacity]?.icon, 'text-[10px]']" />
-                <span>{{ privacityConfig[item.list.privacity]?.text }}</span>
+              <div v-if="item.list.privacity" :class="['privacity-badge', localizedPrivacyConfig[item.list.privacity]?.class]">
+                <i :class="[localizedPrivacyConfig[item.list.privacity]?.icon, 'text-[10px]']" />
+                <span>{{ localizedPrivacyConfig[item.list.privacity]?.key }}</span>
               </div>
             </div>
           </div>
@@ -147,18 +159,18 @@ const props = defineProps<{
 }
 
 .badge-public {
-  background: color-mix(in srgb, var(--primary) 15%, transparent);
-  color: var(--primary);
+  background: rgba(34, 197, 94, 0.12);
+  color: #309153;
 }
 
 .badge-private {
-  background: color-mix(in srgb, var(--secondary) 15%, transparent);
-  color: color-mix(in srgb, var(--text) 75%, transparent);
+  background: rgba(239, 68, 68, 0.12);
+  color: #b73b3b;
 }
 
 .badge-friends {
-  background: color-mix(in srgb, var(--accent) 15%, transparent);
-  color: var(--accent);
+  background: rgba(99, 102, 241, 0.12);
+  color: #4d57bd;
 }
 
 .empty-state {
