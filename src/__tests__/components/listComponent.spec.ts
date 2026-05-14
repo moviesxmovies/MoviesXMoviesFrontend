@@ -1,18 +1,27 @@
 import { mount } from "@vue/test-utils";
 import { describe, it, expect, vi } from "vitest";
-import ListComponent from "@/components/listComponent.vue"; // ajusta la ruta
+import ListComponent from "@/components/listComponent.vue";
 import type { UserMovieList } from "@/types";
 
 vi.mock("@/repositories/listRepository", () => ({
   privacityConfig: {
-    P: { text: "Public",  icon: "pi pi-globe",  class: "badge-public"  },
-    R: { text: "Friends", icon: "pi pi-users",  class: "badge-friends" },
-    F: { text: "Private", icon: "pi pi-lock",   class: "badge-private" },
+    P: { key: "privacy.public",  icon: "pi pi-globe",  class: "badge-public"  },
+    R: { key: "privacy.friends", icon: "pi pi-users",  class: "badge-friends" },
+    F: { key: "privacy.private", icon: "pi pi-lock",   class: "badge-private" },
   },
 }));
 
 vi.mock("vue-i18n", () => ({
-  useI18n: () => ({ t: (k: string) => k }),
+  useI18n: () => ({
+    t: (k: string) => {
+      const translations: Record<string, string> = {
+        "privacy.public":  "Public",
+        "privacy.friends": "Friends",
+        "privacy.private": "Private",
+      };
+      return translations[k] ?? k;
+    },
+  }),
 }));
 
 vi.mock("primevue", async () => {
@@ -127,7 +136,7 @@ describe("ListComponent", () => {
       expect(wrapper.find(".list-item").classes()).toContain("item-selected");
     });
 
-    it("Doesn't applu item-selected when containsMovie is false", () => {
+    it("Doesn't apply item-selected when containsMovie is false", () => {
       const wrapper = mountComponent({ items: [makeItem(1, false)] });
       expect(wrapper.find(".list-item").classes()).not.toContain("item-selected");
     });
@@ -150,12 +159,12 @@ describe("ListComponent", () => {
       ["R", "badge-friends", "Friends"],
       ["F", "badge-private", "Private"],
     ] as const)(
-      "privacity shows class and text",
-      (privacity, cssClass, text) => {
+      "privacity '%s' shows class '%s' and translated text '%s'",
+      (privacity, cssClass, translatedText) => {
         const wrapper = mountComponent({ items: [makeItem(1, false, privacity)] });
         const badge = wrapper.find(".privacity-badge");
         expect(badge.classes()).toContain(cssClass);
-        expect(badge.text()).toContain(text);
+        expect(badge.text()).toContain(translatedText);
       }
     );
 
@@ -167,7 +176,7 @@ describe("ListComponent", () => {
 
   // ── Checkbox ────────────────────────────────────────────────────────────────
   describe("checkbox", () => {
-    it("Marked checkboxwhen containsMovie is true", () => {
+    it("Marked checkbox when containsMovie is true", () => {
       const wrapper = mountComponent({ items: [makeItem(1, true)] });
       const checkbox = wrapper.find("[data-testid='checkbox']") as ReturnType<typeof wrapper.find>;
       expect((checkbox.element as HTMLInputElement).checked).toBe(true);
@@ -182,7 +191,7 @@ describe("ListComponent", () => {
 
   // ── Emitted events ────────────────────────────────────────────────────────
   describe("emitted events", () => {
-    it("emits 'add'when when list is clicked", async () => {
+    it("emits 'add' when list is clicked", async () => {
       const wrapper = mountComponent({ items: [makeItem(1, false)] });
       await wrapper.find(".list-item").trigger("click");
       expect(wrapper.emitted("add")).toBeTruthy();
@@ -201,14 +210,14 @@ describe("ListComponent", () => {
       const wrapper = mountComponent({ items });
       const listItems = wrapper.findAll(".list-item");
 
-      await listItems[0].trigger("click"); // containsMovie false → add
-      await listItems[1].trigger("click"); // containsMovie true  → remove
+      await listItems[0].trigger("click");
+      await listItems[1].trigger("click");
 
       expect(wrapper.emitted("add")[0]).toEqual(["list-10"]);
       expect(wrapper.emitted("remove")[0]).toEqual(["list-20"]);
     });
 
-    it("checkbox input doen't emit father events", async () => {
+    it("checkbox input doesn't emit parent events", async () => {
       const wrapper = mountComponent({ items: [makeItem(1, false)] });
       await wrapper.find("[data-testid='checkbox']").trigger("click");
       expect(wrapper.emitted("add")).toBeFalsy();
