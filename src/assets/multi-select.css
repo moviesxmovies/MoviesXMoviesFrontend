@@ -68,11 +68,9 @@
 
 .p-multiselect-overlay .p-checkbox .p-checkbox-box {
   background: var(--background) !important;
-  border-color: color-mix(
-    in srgb,
-    var(--secondary) 40%,
-    transparent
-  ) !important;
+  border-color: color-mix(in srgb,
+      var(--secondary) 40%,
+      transparent) !important;
   border-radius: 6px !important;
 }
 
@@ -109,7 +107,8 @@
   transition: all 0.2s ease;
 }
 
-.p-multiselect-option:hover {
+.p-multiselect-option:hover,
+.p-multiselect-option.p-focus {
   background: color-mix(in srgb, var(--primary) 10%, transparent) !important;
 }
 
