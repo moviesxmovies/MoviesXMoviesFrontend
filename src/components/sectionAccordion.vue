@@ -33,6 +33,8 @@ const getAccordionValue = () => {
     return props.isEmpty ? 'empty' : 'open';
 };
 const accordionValue = ref(getAccordionValue());
+defineExpose({ accordionValue });
+
 const scrollPanelRef = ref();
 const handleSentinelRef = (el: HTMLElement | null) => {
     emit('update:sentinelRef', el);
