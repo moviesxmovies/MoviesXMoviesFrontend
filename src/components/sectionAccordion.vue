@@ -6,6 +6,7 @@ import {
     AccordionPanel,
     ScrollPanel,
 } from 'primevue';
+import { nextTick, ref, watch } from 'vue';
 
 const emit = defineEmits<{
     'update:sentinelRef': [el: HTMLElement | null];
@@ -27,16 +28,34 @@ const props = defineProps<{
         onClick: () => void;
     };
 }>();
+const getAccordionValue = () => {
+    if (props.defaultOpen === false) return null;
+    return props.isEmpty ? 'empty' : 'open';
+};
+const accordionValue = ref(getAccordionValue());
+defineExpose({ accordionValue });
 
-
-
+const scrollPanelRef = ref();
 const handleSentinelRef = (el: HTMLElement | null) => {
     emit('update:sentinelRef', el);
 };
+const handleAccordionChange = (value: string | string[] | null | undefined) => {
+    accordionValue.value = value as string | null;
+
+    if (value === 'open') {
+        nextTick(() => {
+            setTimeout(() => scrollPanelRef.value?.refresh(), 150);
+        });
+    }
+};
+
+watch(() => [props.isEmpty, props.defaultOpen], () => {
+    accordionValue.value = getAccordionValue();
+});
 </script>
 
 <template>
-    <Accordion :value="defaultOpen === false ? null : (isEmpty ? 'empty' : 'open')">
+    <Accordion :value="accordionValue" @update:value="handleAccordionChange">
         <AccordionPanel value="open" v-if="!isEmpty" class="section">
             <AccordionHeader class="section-header">
                 <i :class="[icon, iconClass]" />
@@ -45,7 +64,7 @@ const handleSentinelRef = (el: HTMLElement | null) => {
                     label="{{ dialogOptions.label }}" @click.stop="dialogOptions.onClick" />
             </AccordionHeader>
             <AccordionContent class="section-body">
-                <ScrollPanel :style="`width: 100%; height: ${props.panelHeight || '350px'}`">
+                <ScrollPanel :style="`width: 100%; height: ${props.panelHeight || '350px'}`" ref="scrollPanelRef">
                     <div class="scroll-inner">
                         <slot />
                         <div :ref="(el) => handleSentinelRef(el as HTMLElement | null)" class="sentinel" />
