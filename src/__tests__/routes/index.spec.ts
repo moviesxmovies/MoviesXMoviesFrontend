@@ -1,148 +1,195 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { router } from '../../router/index';
-import { useAuthStore } from '../../stores/authStore';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { router } from "../../router/index";
+import { useAuthStore } from "../../stores/authStore";
 
-vi.mock('../../views/OnBoardingView.vue', () => ({ default: {} }));
-vi.mock('../../views/VerifyEmail.vue', () => ({ default: {} }));
-vi.mock('../../views/LoginView.vue', () => ({ default: {} }));
-vi.mock('../../views/SignupView.vue', () => ({ default: {} }));
-vi.mock('../../views/HomeView.vue', () => ({ default: {} }));
-vi.mock('../../views/WelcomeView.vue', () => ({ default: {} }));
-vi.mock('../../views/NotFoundView.vue', () => ({ default: {} }));
-vi.mock('../../views/ForgotPasswordView.vue', () => ({ default: {} }));
-vi.mock('../../views/ResetPasswordView.vue', () => ({ default: {} }));
-vi.mock('../../views/CheckEmailView.vue', () => ({ default: {} }));
+vi.mock("../../views/OnBoardingView.vue", () => ({ default: {} }));
+vi.mock("../../views/VerifyEmail.vue", () => ({ default: {} }));
+vi.mock("../../views/LoginView.vue", () => ({ default: {} }));
+vi.mock("../../views/SignupView.vue", () => ({ default: {} }));
+vi.mock("../../views/HomeView.vue", () => ({ default: {} }));
+vi.mock("../../views/WelcomeView.vue", () => ({ default: {} }));
+vi.mock("../../views/NotFoundView.vue", () => ({ default: {} }));
+vi.mock("../../views/ForgotPasswordView.vue", () => ({ default: {} }));
+vi.mock("../../views/ResetPasswordView.vue", () => ({ default: {} }));
+vi.mock("../../views/CheckEmailView.vue", () => ({ default: {} }));
 
-vi.mock('../../stores/authStore', () => ({
-    useAuthStore: vi.fn()
+vi.mock("../../stores/authStore", () => ({
+  useAuthStore: vi.fn(),
 }));
 let vi_storage: Record<string, string> = {};
-vi.stubGlobal('localStorage', {
-    getItem: vi.fn((key: string) => vi_storage[key] || null),
-    setItem: vi.fn((key: string, value: string) => { vi_storage[key] = value.toString(); }),
-    removeItem: vi.fn((key: string) => { delete vi_storage[key]; }),
-    clear: vi.fn(() => { vi_storage = {}; }),
+vi.stubGlobal("localStorage", {
+  getItem: vi.fn((key: string) => vi_storage[key] || null),
+  setItem: vi.fn((key: string, value: string) => {
+    vi_storage[key] = value.toString();
+  }),
+  removeItem: vi.fn((key: string) => {
+    delete vi_storage[key];
+  }),
+  clear: vi.fn(() => {
+    vi_storage = {};
+  }),
 });
 
-describe('Router & LocalStorage Isolation', () => {
+const scrollBehavior = router.options.scrollBehavior!;
 
-    beforeEach(async () => {
-        vi.clearAllMocks();
-        localStorage.clear();
-        vi.mocked(useAuthStore).mockImplementation(() => ({
-            isAuthenticated: false,
-            user: null
-        } as any));
-        await router.push('/');
+describe("Router & LocalStorage Isolation", () => {
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    localStorage.clear();
+    vi.mocked(useAuthStore).mockImplementation(
+      () =>
+        ({
+          isAuthenticated: false,
+          user: null,
+        }) as any,
+    );
+    await router.push("/");
+  });
+
+  it("should redirect to /login if there is no session", async () => {
+    vi.mocked(useAuthStore).mockReturnValue({
+      isAuthenticated: false,
+      user: null,
+    } as any);
+
+    await router.push("/home");
+
+    expect(router.currentRoute.value.path).toBe("/login");
+
+    expect(useAuthStore).toHaveBeenCalled();
+  });
+
+  it("should allow navigation if the store confirms authentication", async () => {
+    vi.mocked(useAuthStore).mockReturnValue({
+      isAuthenticated: true,
+      user: { verified: true, boarded: true },
+    } as any);
+
+    await router.push("/home");
+
+    expect(router.currentRoute.value.path).toBe("/home");
+
+    await router.push("/profiles/jhon-doe");
+
+    expect(router.currentRoute.value.path).toBe("/profiles/jhon-doe");
+
+    await router.push("/search");
+
+    expect(router.currentRoute.value.path).toBe("/search");
+  });
+
+  it("should handle the unverified email flow regardless of storage", async () => {
+    vi.mocked(useAuthStore).mockReturnValue({
+      isAuthenticated: true,
+      user: { verified: false, boarded: false },
+    } as any);
+
+    await router.push("/home");
+
+    expect(router.currentRoute.value.path).toBe("/verify-email");
+  });
+  it("should redirect to onboarding if user is verified but not boarded", async () => {
+    vi.mocked(useAuthStore).mockReturnValue({
+      isAuthenticated: true,
+      user: { verified: true, boarded: false },
+    } as any);
+
+    await router.push("/home");
+
+    expect(router.currentRoute.value.path).toBe("/onboarding");
+  });
+  it("should redirect to home if user is verified and boarded but tries to access login/signup/verify-email/onboarding", async () => {
+    vi.mocked(useAuthStore).mockReturnValue({
+      isAuthenticated: true,
+      user: { verified: true, boarded: true },
+    } as any);
+
+    await router.push("/login");
+    expect(router.currentRoute.value.path).toBe("/home");
+
+    await router.push("/signup");
+    expect(router.currentRoute.value.path).toBe("/home");
+
+    await router.push("/verify-email");
+    expect(router.currentRoute.value.path).toBe("/home");
+
+    await router.push("/onboarding");
+    expect(router.currentRoute.value.path).toBe("/home");
+  });
+
+  it("should allow access to public routes without authentication", async () => {
+    vi.mocked(useAuthStore).mockReturnValue({
+      isAuthenticated: false,
+      user: null,
+    } as any);
+
+    await router.push("/");
+
+    expect(router.currentRoute.value.path).toBe("/");
+
+    await router.push("/login");
+
+    expect(router.currentRoute.value.path).toBe("/login");
+
+    await router.push("/signup");
+
+    expect(router.currentRoute.value.path).toBe("/signup");
+
+    await router.push("/accounts/google/login/callback/");
+
+    expect(router.currentRoute.value.path).toBe(
+      "/accounts/google/login/callback/",
+    );
+
+    await router.push("/non-existent");
+
+    expect(router.currentRoute.value.path).toBe("/non-existent");
+
+    await router.push("/forgot-password");
+
+    expect(router.currentRoute.value.path).toBe("/forgot-password");
+
+    await router.push("/reset-password");
+
+    expect(router.currentRoute.value.path).toBe("/reset-password");
+
+    await router.push("/check-email");
+
+    expect(router.currentRoute.value.path).toBe("/check-email");
+  });
+
+  describe("scrollBehavior", () => {
+    const mockTo = { path: "/home" } as any;
+    const mockFrom = { path: "/" } as any;
+
+    it("should return savedPosition when it exists", () => {
+      const savedPosition = { left: 100, top: 200 };
+
+      const result = scrollBehavior(mockTo, mockFrom, savedPosition);
+
+      expect(result).toEqual({ left: 100, top: 200 });
     });
 
-    it('should redirect to /login if there is no session', async () => {
-        vi.mocked(useAuthStore).mockReturnValue({
-            isAuthenticated: false,
-            user: null
-        } as any);
+    it("should return { left: 0, top: 0 } when savedPosition is null", () => {
+      const result = scrollBehavior(mockTo, mockFrom, null);
 
-        await router.push('/home');
-
-        expect(router.currentRoute.value.path).toBe('/login');
-
-        expect(useAuthStore).toHaveBeenCalled();
+      expect(result).toEqual({ left: 0, top: 0 });
     });
 
-    it('should allow navigation if the store confirms authentication', async () => {
-        vi.mocked(useAuthStore).mockReturnValue({
-            isAuthenticated: true,
-            user: { verified: true, boarded: true }
-        } as any);
+    it("should return { left: 0, top: 0 } when savedPosition is falsy", () => {
+      const result = scrollBehavior(mockTo, mockFrom, undefined as any);
 
-        await router.push('/home');
-
-        expect(router.currentRoute.value.path).toBe('/home');
-
-        await router.push('/profiles/jhon-doe');
-        
-        expect(router.currentRoute.value.path).toBe('/profiles/jhon-doe');
-
-        await router.push('/search');
-        
-        expect(router.currentRoute.value.path).toBe('/search');
+      expect(result).toEqual({ left: 0, top: 0 });
     });
 
-    it('should handle the unverified email flow regardless of storage', async () => {
-        vi.mocked(useAuthStore).mockReturnValue({
-            isAuthenticated: true,
-            user: { verified: false, boarded: false }
-        } as any);
+    it("should prioritize savedPosition over default scroll-to-top", () => {
+      const savedPosition = { left: 0, top: 500 };
 
-        await router.push('/home');
+      const result = scrollBehavior(mockTo, mockFrom, savedPosition);
 
-        expect(router.currentRoute.value.path).toBe('/verify-email');
+      // Even though left is 0, it should return savedPosition, not the default
+      expect(result).toEqual({ left: 0, top: 500 });
+      expect(result).not.toEqual({ left: 0, top: 0 });
     });
-    it('should redirect to onboarding if user is verified but not boarded', async () => {
-        vi.mocked(useAuthStore).mockReturnValue({
-            isAuthenticated: true,
-            user: { verified: true, boarded: false }
-        } as any);
-
-        await router.push('/home');
-
-        expect(router.currentRoute.value.path).toBe('/onboarding');
-    });
-    it('should redirect to home if user is verified and boarded but tries to access login/signup/verify-email/onboarding', async () => {
-        vi.mocked(useAuthStore).mockReturnValue({
-            isAuthenticated: true,
-            user: { verified: true, boarded: true }
-        } as any);
-
-        await router.push('/login');
-        expect(router.currentRoute.value.path).toBe('/home');
-
-        await router.push('/signup');
-        expect(router.currentRoute.value.path).toBe('/home');
-
-        await router.push('/verify-email');
-        expect(router.currentRoute.value.path).toBe('/home');
-
-        await router.push('/onboarding');
-        expect(router.currentRoute.value.path).toBe('/home');
-    });
-
-    it('should allow access to public routes without authentication', async () => {
-        vi.mocked(useAuthStore).mockReturnValue({
-            isAuthenticated: false,
-            user: null
-        } as any);
-
-        await router.push('/');
-
-        expect(router.currentRoute.value.path).toBe('/');
-
-        await router.push('/login');
-
-        expect(router.currentRoute.value.path).toBe('/login');
-
-        await router.push('/signup');
-
-        expect(router.currentRoute.value.path).toBe('/signup');
-
-        await router.push('/accounts/google/login/callback/');
-
-        expect(router.currentRoute.value.path).toBe('/accounts/google/login/callback/');
-
-        await router.push('/non-existent');
-
-        expect(router.currentRoute.value.path).toBe('/non-existent');
-
-        await router.push('/forgot-password');
-
-        expect(router.currentRoute.value.path).toBe('/forgot-password');
-
-        await router.push('/reset-password');
-
-        expect(router.currentRoute.value.path).toBe('/reset-password');
-
-        await router.push('/check-email');
-
-        expect(router.currentRoute.value.path).toBe('/check-email');
-    });
+  });
 });
