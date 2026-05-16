@@ -13,8 +13,7 @@ const toast = useToast();
 const isLoading = ref(false);
 const selectedPlatforms = ref<Platform[]>();
 const platforms = ref<Platform[]>();
-const emit = defineEmits(["filterPlatforms"]);
-const message = t("components.searchPlatforms.platforms");
+const emit = defineEmits(["filterPlatforms"]);;
 
 const getPlatforms = async () => {
   isLoading.value = true;
@@ -51,7 +50,7 @@ watch(
 
 <template>
   <MultiSelectComponent
-    :message="message"
+    :message="t('components.searchPlatforms.platforms')"
     :isLoading="isLoading"
     :items="platforms as Platform[]"
     v-model="selectedPlatforms as Platform[]"

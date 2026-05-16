@@ -16,7 +16,6 @@ const isLoading = ref(false);
 const selectedGenres = ref<Genre[]>();
 const genres = ref<Genre[]>();
 const emit = defineEmits(["filterGenres"]);
-const message = t("components.searchGenres.genres");
 
 const getGenres = async () => {
   isLoading.value = true;
@@ -53,7 +52,7 @@ watch(
 
 <template>
   <MultiSelectComponent
-    :message="message"
+    :message="t('components.searchGenres.genres')"
     :isLoading="isLoading"
     :items="genres as Genre[]"
     v-model="selectedGenres as Genre[]"
