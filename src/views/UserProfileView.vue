@@ -414,12 +414,12 @@ watch(
           <i class="pi pi-user-minus" />
         </div>
         <div>
-          <p class="confirm-title">{{ t("user.removeFriendConfirmTitle") }}</p>
+          <p class="confirm-title">{{ t("user.confirmation") }}</p>
         </div>
       </div>
     </template>
     <p class="confirm-body">
-      {{ t("user.removeFriendConfirmBody", [pendingRemoveFriendUsername]) }}
+      {{ t("user.confirmRemoveFriend") }}
     </p>
     <template #footer>
       <div class="footer-actions">
@@ -428,7 +428,7 @@ watch(
         </button>
         <button class="btn-danger" @click="removeFriendConfirm">
           <i class="pi pi-user-minus" />
-          <span>{{ t("common.remove") }}</span>
+          <span>{{ t("common.confirm") }}</span>
         </button>
       </div>
     </template>
