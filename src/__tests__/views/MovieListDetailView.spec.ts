@@ -11,6 +11,10 @@ vi.mock("@/composables/useAPI", () => ({
   },
 }));
 
+vi.mock('@/stores/langStore', () => ({
+  useLangStore: () => ({ language: 'en' }),
+}));
+
 vi.mock("@/composables/useDate", () => ({
   useDate: () => ({
     formatRelativeTime: vi.fn((date: string) => `relative(${date})`),

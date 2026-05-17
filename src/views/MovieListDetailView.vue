@@ -11,6 +11,7 @@ import {
   removeMovieFromList,
 } from "@/repositories/listRepository";
 import { useAuthStore } from "@/stores/authStore";
+import { useLangStore } from "@/stores/langStore";
 import {
   type Pagination,
   type Movie,
@@ -27,6 +28,7 @@ import { useRoute, useRouter } from "vue-router";
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
+const langStore = useLangStore();
 const { t } = useI18n();
 const search = ref("");
 const movieList = ref<MovieList>({} as MovieList);
@@ -166,6 +168,13 @@ watch(
     if (newPage) {
       updateRoute(Number(newPage));
     }
+  },
+);
+
+watch(
+  () => langStore.language,
+  () => {
+    fetchMovies(Number(route.query.page));
   },
 );
 </script>
