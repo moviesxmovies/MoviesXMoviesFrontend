@@ -63,7 +63,7 @@ const emit = defineEmits<{
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
-  z-index: 10;
+  z-index: 1;
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
