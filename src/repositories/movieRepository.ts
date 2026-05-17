@@ -30,6 +30,20 @@ export const submitRating = async (movieSlug: string, rating: number) => {
   }
 };
 
+export const updateRating = async (movieSlug: string, rating: number) => {
+  try {
+    await api.put(`/movies/${movieSlug}/ratings/`, { rating });
+  } catch (error: any) {
+    throw new TranslatedError(error, error.response?.data?.status);
+  }
+};
+
+export const getRating = async (movieSlug: string) => {
+  const { data }: { data: any } = await api.get(`/movies/${movieSlug}/ratings/`);
+  return data;
+
+};
+
 export const setAsNotSeen = async (movieSlug: string) => {
   try {
     await api.post(`/movies/${movieSlug}/unseen/`);

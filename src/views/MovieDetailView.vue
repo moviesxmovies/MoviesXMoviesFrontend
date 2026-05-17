@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { getMovie, getMovieReviews } from "@/repositories/movieRepository";
+import { getMovie, getMovieReviews, getRating, submitRating, updateRating } from "@/repositories/movieRepository";
 import type { Movie, Review, Person } from "@/types";
 import {
   Accordion,
@@ -21,6 +21,7 @@ import { api } from "@/composables/useAPI";
 import AddReviewDialog from "@/components/addReviewDialog.vue";
 import { useDate } from "@/composables/useDate";
 import AddToListDialog from "@/components/addToListDialog.vue";
+import StarsComponent from "@/components/starsComponent.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -35,6 +36,8 @@ const actors = ref<Person[]>([]);
 const directors = ref<Person[]>([]);
 const loadingActors = ref(false);
 const loadingDirectors = ref(false);
+const loadingStars = ref(false);
+const userRating = ref(0);
 
 const addReviewDialogVisible = ref(false);
 const addToListDialogVisible = ref(false);
@@ -102,12 +105,39 @@ const { sentinelRef: reviewsSentinelRef } = useInfinitePagination(
   loadingReviews,
   fetchMovieReviews,
 );
+const rateMovie = async (rating: number) => {
+  if (rating === 0) return;
+  loadingStars.value = true;
+  if (navigator.vibrate) navigator.vibrate(100);
+  if (movie.value) {
+    if (userRating.value) {
+      updateRating(movie.value.slug, rating);
+    } else {
+      submitRating(movie.value.slug, rating);
+    }
+    userRating.value = rating;
+
+  }
+  loadingStars.value = false;
+};
+const fetchRating = async () => {
+  if (!movie.value) return;
+  try {
+    const { rating } = await getRating(movie.value.slug);
+
+    userRating.value = rating;
+  } catch (error: any) {
+    console.error("Error fetching rating:", error);
+  }
+};
+
 
 const reviewDialogConfig = {
   icon: "pi pi-plus",
   label: t("movie.add_review"),
   onClick: () => (addReviewDialogVisible.value = true),
 };
+
 
 watch(
   () => movie.value,
@@ -116,6 +146,7 @@ watch(
     await Promise.all([
       fetchPersonDetails(m.actors, actors, loadingActors),
       fetchPersonDetails(m.directors, directors, loadingDirectors),
+      fetchRating(),
     ]);
   },
 );
@@ -141,21 +172,13 @@ watch(
 </script>
 
 <template>
-  <AddReviewDialog
-    v-model:visible="addReviewDialogVisible"
-    :movieSlug="movie.slug"
-    @reload="
-      () => {
-        resetReviews();
-        fetchMovieReviews();
-      }
-    "
-  />
-  <AddToListDialog
-    v-model:visible="addToListDialogVisible"
-    :movie="movie"
-    class="card-section"
-  />
+  <AddReviewDialog v-model:visible="addReviewDialogVisible" :movieSlug="movie.slug" @reload="
+    () => {
+      resetReviews();
+      fetchMovieReviews();
+    }
+  " />
+  <AddToListDialog v-model:visible="addToListDialogVisible" :movie="movie" class="card-section" />
 
   <div class="page">
     <div class="layout">
@@ -183,30 +206,22 @@ watch(
                 </span>
               </div>
 
-              <button
-                class="btn-add-list"
-                @click="addToListDialogVisible = true"
-              >
+              <button class="btn-add-list" @click="addToListDialogVisible = true">
                 <i class="pi pi-plus" />
                 <span>{{ t("movie.add_to_list") }}</span>
               </button>
+            </div>
+            <div class="card-section">
+              <StarsComponent id="stars" :loading="loadingMovie" @rateMovie="rateMovie" :actualRating="userRating" />
             </div>
             <div v-if="movie.platforms?.length" class="card-section">
               <span class="card-section__label">{{
                 t("movie.platforms", movie.platforms.length)
               }}</span>
               <div class="platforms-list">
-                <RouterLink
-                  v-for="platform in movie.platforms"
-                  :key="platform.id"
-                  :to="`/search?platforms=${platform.slug}`"
-                  class="platform-item"
-                >
-                  <img
-                    :src="platform.image"
-                    :alt="platform.name"
-                    class="platform-item__img"
-                  />
+                <RouterLink v-for="platform in movie.platforms" :key="platform.id"
+                  :to="`/search?platforms=${platform.slug}`" class="platform-item">
+                  <img :src="platform.image" :alt="platform.name" class="platform-item__img" />
                   <span class="platform-item__name">{{ platform.name }}</span>
                 </RouterLink>
               </div>
@@ -216,16 +231,14 @@ watch(
                 t("movie.genres", movie.genres.length)
               }}</span>
               <div class="genre-list">
-                <RouterLink
-                  v-for="genre in movie.genres"
-                  :key="genre.id"
-                  :to="`/search?genres=${genre.slug}`"
-                  class="genre-tag"
-                >
+                <RouterLink v-for="genre in movie.genres" :key="genre.id" :to="`/search?genres=${genre.slug}`"
+                  class="genre-tag">
                   {{ genre.name }}
                 </RouterLink>
               </div>
             </div>
+
+
           </template>
         </div>
       </aside>
@@ -247,63 +260,34 @@ watch(
         </Accordion>
 
         <!-- REVIEWS -->
-        <SectionAccordion
-          icon="pi pi-file-word accent-icon"
-          :title="t('movie.reviews')"
-          :isEmpty="!reviews.results?.length"
-          :emptyIcon="'pi pi-file-word'"
-          :emptyTitle="t('movie.no_reviews')"
-          :emptyDescription="t('movie.no_reviews_description')"
-          :dialog-options="reviewDialogConfig"
-          :loading="loadingReviews"
-          v-model:sentinelRef="reviewsSentinelRef"
-          defaultOpen
-        >
-          <ReviewComponent
-            v-for="review in reviews.results"
-            :key="review.id"
-            :review="review"
-            @deleted="
-              () => {
-                resetReviews();
-                fetchMovieReviews();
-              }
-            "
-            @reload="
-              () => {
-                resetReviews();
-                fetchMovieReviews();
-              }
-            "
-          />
+        <SectionAccordion icon="pi pi-file-word accent-icon" :title="t('movie.reviews')"
+          :isEmpty="!reviews.results?.length" :emptyIcon="'pi pi-file-word'" :emptyTitle="t('movie.no_reviews')"
+          :emptyDescription="t('movie.no_reviews_description')" :dialog-options="reviewDialogConfig"
+          :loading="loadingReviews" v-model:sentinelRef="reviewsSentinelRef" defaultOpen>
+          <ReviewComponent v-for="review in reviews.results" :key="review.id" :review="review" @deleted="
+            () => {
+              resetReviews();
+              fetchMovieReviews();
+            }
+          " @reload="
+            () => {
+              resetReviews();
+              fetchMovieReviews();
+            }
+          " />
         </SectionAccordion>
       </div>
 
       <!-- CAST SECTION -->
       <div class="content cast-section">
         <!-- ACTORS -->
-        <SectionAccordion
-          icon="pi pi-users accent-icon"
-          :title="t('movie.actors', actors.length)"
-          :isEmpty="!actors.length"
-          :emptyIcon="'pi pi-users'"
-          :emptyTitle="t('movie.no_actors')"
-          :emptyDescription="t('movie.no_actors_description')"
-          :loading="loadingActors"
-        >
+        <SectionAccordion icon="pi pi-users accent-icon" :title="t('movie.actors', actors.length)"
+          :isEmpty="!actors.length" :emptyIcon="'pi pi-users'" :emptyTitle="t('movie.no_actors')"
+          :emptyDescription="t('movie.no_actors_description')" :loading="loadingActors">
           <div class="person-grid">
-            <RouterLink
-              v-for="actor in actors"
-              :key="actor.id"
-              :to="`/profiles/${actor.slug}`"
-              class="person-item"
-            >
+            <RouterLink v-for="actor in actors" :key="actor.id" :to="`/profiles/${actor.slug}`" class="person-item">
               <div class="person-item__avatar">
-                <img
-                  :src="actor.image"
-                  :alt="actor.name"
-                  class="person-item__img"
-                />
+                <img :src="actor.image" :alt="actor.name" class="person-item__img" />
               </div>
               <span class="person-item__name">{{ actor.name }}</span>
             </RouterLink>
@@ -311,28 +295,14 @@ watch(
         </SectionAccordion>
 
         <!-- DIRECTORS -->
-        <SectionAccordion
-          icon="pi pi-video accent-icon"
-          :title="t('movie.directors', directors.length)"
-          :isEmpty="!directors.length"
-          :emptyIcon="'pi pi-video'"
-          :emptyTitle="t('movie.no_directors')"
-          :emptyDescription="t('movie.no_directors_description')"
-          :loading="loadingDirectors"
-        >
+        <SectionAccordion icon="pi pi-video accent-icon" :title="t('movie.directors', directors.length)"
+          :isEmpty="!directors.length" :emptyIcon="'pi pi-video'" :emptyTitle="t('movie.no_directors')"
+          :emptyDescription="t('movie.no_directors_description')" :loading="loadingDirectors">
           <div class="person-grid">
-            <RouterLink
-              v-for="director in directors"
-              :key="director.id"
-              :to="`/profiles/${director.slug}`"
-              class="person-item"
-            >
+            <RouterLink v-for="director in directors" :key="director.id" :to="`/profiles/${director.slug}`"
+              class="person-item">
               <div class="person-item__avatar">
-                <img
-                  :src="director.image"
-                  :alt="director.name"
-                  class="person-item__img"
-                />
+                <img :src="director.image" :alt="director.name" class="person-item__img" />
               </div>
               <span class="person-item__name">{{ director.name }}</span>
             </RouterLink>
@@ -473,7 +443,8 @@ watch(
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  overflow: hidden; /* Evita que títulos largos rompan el layout */
+  overflow: hidden;
+  /* Evita que títulos largos rompan el layout */
 }
 
 .movie-title {
@@ -525,6 +496,7 @@ watch(
     flex-direction: column;
     align-items: flex-start;
   }
+
   .btn-add-list {
     width: 100%;
     justify-content: center;
