@@ -11,6 +11,8 @@ import {
   updateReview,
   deleteReview,
   getReview,
+  updateRating,
+  getRating,
   type searchData,
 } from "@/repositories/movieRepository";
 import type { Movie, Pagination } from "@/types";
@@ -337,6 +339,30 @@ describe("MovieRepository", () => {
       mockGet.mockRejectedValueOnce(makeApiError("Not found"));
 
       await expect(getReview(1)).rejects.toBeInstanceOf(TranslatedError);
+    });
+  });
+
+  //  ── updateRating ──────────────────────────────────────────────────────────────
+  describe("updateRating", () => {
+    it("calls API with correct endpoint and payload", async () => {
+      mockPut.mockResolvedValueOnce({ data: {} });
+
+      await updateRating("inception", 4);
+
+      expect(mockPut).toHaveBeenCalledWith("/movies/inception/ratings/", { rating: 4 });
+    });
+
+  });
+  //  ── getRating ──────────────────────────────────────────────────────────────
+  describe("getRating", () => {
+    it("calls API with correct endpoint and returns rating", async () => {
+      const mockRating = { rating: 5 };
+      mockGet.mockResolvedValueOnce({ data: mockRating });
+
+      const result = await getRating("inception");
+
+      expect(mockGet).toHaveBeenCalledWith("/movies/inception/ratings/");
+      expect(result).toEqual(mockRating);
     });
   });
 });

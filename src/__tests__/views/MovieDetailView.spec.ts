@@ -18,7 +18,18 @@ const mockReviewsData = ref<{ results: any[]; next: null }>({ results: [], next:
 vi.mock('@/repositories/movieRepository', () => ({
   getMovie: vi.fn(),
   getMovieReviews: vi.fn(),
+  getRating: vi.fn(),
+  submitRating: vi.fn(),
+  updateRating: vi.fn(),
 }))
+vi.mock('@/components/starsComponent.vue', () => ({
+  default: defineComponent({
+    props: ['loading', 'actualRating'],
+    emits: ['rateMovie'],
+    template: '<div class="stars-component" :data-rating="actualRating" :data-loading="loading" />',
+  }),
+}))
+
 
 vi.mock('@/composables/useAPI', () => ({
   api: { get: vi.fn() },
@@ -54,7 +65,7 @@ vi.mock('@/components/reviewComponent.vue', () => ({
 vi.mock('@/components/sectionAccordion.vue', () => ({
   default: defineComponent({
     props: ['icon', 'title', 'isEmpty', 'emptyIcon', 'emptyTitle', 'emptyDescription',
-            'dialogOptions', 'loading', 'sentinelRef', 'defaultOpen'],
+      'dialogOptions', 'loading', 'sentinelRef', 'defaultOpen'],
     emits: ['update:sentinelRef'],
     template: '<div class="section-accordion" :data-title="title"><slot /></div>',
   }),
@@ -77,8 +88,6 @@ vi.mock('@/components/addToListDialog.vue', () => ({
 }))
 
 vi.mock('@/composables/usePaginatedFetch', () => ({
-  // Always return the same shared spies so the component and tests
-  // reference the exact same refs and functions.
   usePaginatedFetch: () => ({
     data: mockReviewsData,
     loading: ref(false),
@@ -97,7 +106,7 @@ vi.mock('@/stores/langStore', () => ({
 
 // ─── Imports after mocks ──────────────────────────────────────────────────────
 
-import { getMovie, getMovieReviews } from '@/repositories/movieRepository'
+import { getMovie, getMovieReviews, getRating, submitRating, updateRating } from '@/repositories/movieRepository'
 import { api } from '@/composables/useAPI'
 import MovieDetail from '@/views/MovieDetailView.vue'
 
@@ -152,7 +161,7 @@ describe('MovieDetail', () => {
 
   describe('initial load', () => {
     it('shows skeletons while the movie is loading', () => {
-      vi.mocked(getMovie).mockImplementation(() => new Promise(() => {}))
+      vi.mocked(getMovie).mockImplementation(() => new Promise(() => { }))
       const wrapper = mountComponent()
       expect(wrapper.findAll('.skeleton').length).toBeGreaterThan(0)
     })
@@ -247,7 +256,7 @@ describe('MovieDetail', () => {
       const wrapper = mountComponent()
       await flushPromises()
       const dialog = wrapper.findComponent({ name: 'AddToListDialog' })
-      
+
       expect(dialog.props('movie')).toEqual(expect.objectContaining({
         slug: 'blade-runner-2049',
         title: 'Blade Runner 2049'
@@ -389,4 +398,99 @@ describe('MovieDetail', () => {
       expect(mockFetch).toHaveBeenCalled()
     })
   })
+  // ─── Rating ───────────────────────────────────────────────────────────────────
+  describe('rating', () => {
+
+    beforeEach(() => {
+      vi.mocked(getRating).mockResolvedValue({ rating: 0 })
+      vi.mocked(submitRating).mockResolvedValue(undefined)
+      vi.mocked(updateRating).mockResolvedValue(undefined)
+    })
+
+    it('mounts StarsComponent in the DOM', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
+      expect(wrapper.find('.stars-component').exists()).toBe(true)
+    })
+
+    it('passes the fetched rating as actualRating to StarsComponent', async () => {
+      vi.mocked(getRating).mockResolvedValue({ rating: 3 })
+      const wrapper = mountComponent()
+      await flushPromises()
+      expect(wrapper.find('.stars-component').attributes('data-rating')).toBe('3')
+    })
+
+    it('passes loading=false to StarsComponent after movie loads', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
+      expect(wrapper.find('.stars-component').attributes('data-loading')).toBe('false')
+    })
+
+    it('calls fetchRating after movie is loaded', async () => {
+      mountComponent()
+      await flushPromises()
+      expect(getRating).toHaveBeenCalledWith('blade-runner-2049')
+    })
+
+    it('calls submitRating when no previous rating exists and rating > 0', async () => {
+      vi.mocked(getRating).mockResolvedValue({ rating: 0 })
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      await wrapper.findComponent({ name: 'StarsComponent' }).vm.$emit('rateMovie', 4)
+      await flushPromises()
+
+      expect(submitRating).toHaveBeenCalledWith('blade-runner-2049', 4)
+      expect(updateRating).not.toHaveBeenCalled()
+    })
+
+    it('calls updateRating when a previous rating exists', async () => {
+      vi.mocked(getRating).mockResolvedValue({ rating: 3 })
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      await wrapper.findComponent({ name: 'StarsComponent' }).vm.$emit('rateMovie', 5)
+      await flushPromises()
+
+      expect(updateRating).toHaveBeenCalledWith('blade-runner-2049', 5)
+      expect(submitRating).not.toHaveBeenCalled()
+    })
+
+    it('updates actualRating on StarsComponent after rating', async () => {
+      vi.mocked(getRating).mockResolvedValue({ rating: 0 })
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      await wrapper.findComponent({ name: 'StarsComponent' }).vm.$emit('rateMovie', 4)
+      await flushPromises()
+
+      expect(wrapper.find('.stars-component').attributes('data-rating')).toBe('4')
+    })
+
+    it('does nothing when rateMovie is called with rating 0', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      await wrapper.findComponent({ name: 'StarsComponent' }).vm.$emit('rateMovie', 0)
+      await flushPromises()
+
+      expect(submitRating).not.toHaveBeenCalled()
+      expect(updateRating).not.toHaveBeenCalled()
+    })
+
+    it('does not throw when fetchRating fails', async () => {
+      vi.mocked(getRating).mockRejectedValue(new Error('Unauthorized'))
+      const wrapper = mountComponent()
+      await expect(flushPromises()).resolves.not.toThrow()
+      expect(wrapper.find('.stars-component').exists()).toBe(true)
+    })
+
+    it('keeps userRating at 0 when fetchRating fails', async () => {
+      vi.mocked(getRating).mockRejectedValue(new Error('Unauthorized'))
+      const wrapper = mountComponent()
+      await flushPromises()
+      expect(wrapper.find('.stars-component').attributes('data-rating')).toBe('0')
+    })
+  })
+
 })
