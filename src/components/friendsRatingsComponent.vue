@@ -231,8 +231,7 @@ onUnmounted(() => { if (bubbleTimer) clearInterval(bubbleTimer); });
     gap: 0.5rem;
     padding: 0.4rem 0.75rem 0.4rem 0.4rem;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--background) 85%, transparent);
-    backdrop-filter: blur(12px);
+    background: color-mix(in srgb, var(--background) 92%, transparent);
     border: 0.5px solid color-mix(in srgb, var(--bubble-color) 35%, var(--ob-card-border));
     box-shadow:
         0 0 14px -4px color-mix(in srgb, var(--bubble-color) 60%, transparent),

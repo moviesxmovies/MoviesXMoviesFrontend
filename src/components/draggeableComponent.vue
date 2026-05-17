@@ -136,19 +136,12 @@ const checkSwipe = (func: Function) => {
 </script>
 
 <template>
-  <div
-    class="draggable-container select-none relative w-full h-full"
-    @mousedown="startDrag"
-    @mousemove="onDrag"
-    @mouseup="endDrag"
-    @mouseleave="endDrag"
-    @touchstart="startDrag"
-    @touchmove.prevent="onDrag"
-    @touchend="endDrag"
-  >
+  <div class="draggable-container select-none relative w-full h-full" @mousedown="startDrag" @mousemove="onDrag"
+    @mouseup="endDrag" @mouseleave="endDrag" @touchstart="startDrag" @touchmove.prevent="onDrag" @touchend="endDrag">
     <div v-if="isDragging" class="fixed inset-0 z-11 cursor-grabbing"></div>
 
-    <div :style="cardStyle" class="draggable-wrapper z-10 relative">
+    <div :style="[cardStyle, isDragging ? { willChange: 'transform' } : { willChange: 'auto' }]"
+      class="draggable-wrapper z-10 relative">
       <slot></slot>
     </div>
   </div>
@@ -166,10 +159,4 @@ const checkSwipe = (func: Function) => {
   min-height: -webkit-fill-available;
 }
 
-.draggable-wrapper {
-  will-change: transform;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  perspective: 1000px;
-}
 </style>

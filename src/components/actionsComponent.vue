@@ -55,7 +55,6 @@ const props = defineProps<{
   background: var(--background);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  transform: translateZ(0);
 }
 
 .action-btn {
@@ -113,10 +112,10 @@ const props = defineProps<{
 
 @keyframes button-cinematic-pop {
   0%, 100% {
-    transform: scale(1) translateZ(0);
+    transform: scale(1);
   }
   50% {
-    transform: scale(1.08) translateZ(0);
+    transform: scale(1.08);
     background-color: rgba(255, 255, 255, 0.25);
   }
 }
