@@ -58,31 +58,21 @@ const getResistedValue = (actualValue: number) => {
   );
 };
 
-// Dynamic styles to move the card
-const cardStyle = computed(() => {
-  const visualX = getResistedValue(offsetX.value);
-  const visualY = getResistedValue(offsetY.value);
-
-  return {
-    transform: `
-      translateX(${visualX}px) 
-      translateY(${visualY}px) 
-    `,
-    transition: isDragging.value
-      ? "none"
-      : "transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)",
-    cursor: isDragging.value ? "grabbing" : "grab",
-    transformOrigin: "center center",
-  };
-});
 
 // Event Handlers
+const onPrepare = () => {
+  draggableWrapper.value?.style.setProperty('will-change', 'transform');
+};
+
 const startDrag = (event: MouseEvent | TouchEvent) => {
   isDragging.value = true;
+  const el = draggableWrapper.value;
+  if (el) {
+    el.style.transition = 'none';
+    el.style.cursor = 'grabbing';
+  }
 
   const point = "touches" in event ? event.touches[0] : event;
-  draggableWrapper.value?.style.setProperty('will-change', 'transform');
-
   if (point) {
     startX.value = point.clientX;
     startY.value = point.clientY;
@@ -91,6 +81,7 @@ const startDrag = (event: MouseEvent | TouchEvent) => {
   }
 };
 
+
 const onDrag = (event: MouseEvent | TouchEvent) => {
   if (!isDragging.value) return;
   const point = "touches" in event ? event.touches[0] : event;
@@ -98,29 +89,40 @@ const onDrag = (event: MouseEvent | TouchEvent) => {
     currentX.value = point.clientX;
     currentY.value = point.clientY;
     checkSwipe((value: string) => {
-      if (value !== direction.value) {
-        direction.value = value;
-      }
+      if (value !== direction.value) direction.value = value;
     });
   }
 
-  if (draggableWrapper.value) {
+  const el = draggableWrapper.value;
+  if (el) {
     const visualX = getResistedValue(offsetX.value);
     const visualY = getResistedValue(offsetY.value);
-    draggableWrapper.value.style.transform = `translate3d(${visualX}px, ${visualY}px, 0)`;
+    el.style.transform = `translate3d(${visualX}px, ${visualY}px, 0)`;
   }
 };
+
 
 const endDrag = () => {
   if (!isDragging.value) return;
   isDragging.value = false;
-  draggableWrapper.value?.style.setProperty('will-change', 'auto');
 
   checkSwipe(emit);
   direction.value = "";
-
   currentX.value = startX.value;
   currentY.value = startY.value;
+
+  const el = draggableWrapper.value;
+  if (el) {
+    el.style.transition = 'transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)';
+    el.style.cursor = 'grab';
+    el.style.transform = 'translate3d(0px, 0px, 0)';
+  }
+
+  setTimeout(() => {
+    if (!isDragging.value) {
+      draggableWrapper.value?.style.setProperty('will-change', 'auto');
+    }
+  }, 600); // mayor que la duración de la transición
 };
 
 const checkSwipe = (func: Function) => {
@@ -139,11 +141,11 @@ const checkSwipe = (func: Function) => {
 </script>
 
 <template>
-  <div class="draggable-container select-none relative w-full h-full" @mousedown="startDrag" @mousemove="onDrag"
-    @mouseup="endDrag" @mouseleave="endDrag" @touchstart="startDrag" @touchmove.prevent="onDrag" @touchend="endDrag">
+  <div class="draggable-container select-none relative w-full h-full" @mouseenter="onPrepare"
+    @touchstart.passive="onPrepare" @mousedown="startDrag" @mousemove="onDrag" @mouseup="endDrag" @mouseleave="endDrag"
+    @touchmove.prevent="onDrag" @touchend="endDrag">
     <div v-if="isDragging" class="fixed inset-0 z-11 cursor-grabbing"></div>
-
-    <div :style="cardStyle" class="draggable-wrapper z-10 relative">
+    <div ref="draggableWrapper" class="draggable-wrapper z-10 relative">
       <slot></slot>
     </div>
   </div>

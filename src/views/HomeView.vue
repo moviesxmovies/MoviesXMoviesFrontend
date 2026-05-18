@@ -123,7 +123,7 @@ const updateGlow = (dir: string) => {
   }
 
   const color = PREDICTED_COLORS[dir];
-  el.style.setProperty('--glow-color', color);
+  el.style.setProperty('--glow-color', color ?? 'transparent');
   el.style.setProperty('--glow-opacity', '1');
   el.style.transform = 'scale(1.04)';
 };
