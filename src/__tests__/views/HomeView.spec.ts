@@ -136,7 +136,14 @@ describe("HomeView", () => {
         stubs: {
           MovieComponent: true,
           ActionsComponent: true,
-          StarsComponent: true,
+          starsComponent: {
+            name: 'starsComponent',
+            template: '<div />',
+            methods: {
+              triggerAnimation: vi.fn(), // ← add this
+            },
+          },
+
           DraggeableComponent: false,
           MovieInfoDrawer: true,
           AddToListDialog: true,
