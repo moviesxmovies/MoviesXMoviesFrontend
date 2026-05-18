@@ -81,6 +81,8 @@ const startDrag = (event: MouseEvent | TouchEvent) => {
   isDragging.value = true;
 
   const point = "touches" in event ? event.touches[0] : event;
+  draggableWrapper.value?.style.setProperty('will-change', 'transform');
+
   if (point) {
     startX.value = point.clientX;
     startY.value = point.clientY;
@@ -112,6 +114,7 @@ const onDrag = (event: MouseEvent | TouchEvent) => {
 const endDrag = () => {
   if (!isDragging.value) return;
   isDragging.value = false;
+  draggableWrapper.value?.style.setProperty('will-change', 'auto');
 
   checkSwipe(emit);
   direction.value = "";
@@ -136,16 +139,8 @@ const checkSwipe = (func: Function) => {
 </script>
 
 <template>
-  <div
-    class="draggable-container select-none relative w-full h-full"
-    @mousedown="startDrag"
-    @mousemove="onDrag"
-    @mouseup="endDrag"
-    @mouseleave="endDrag"
-    @touchstart="startDrag"
-    @touchmove.prevent="onDrag"
-    @touchend="endDrag"
-  >
+  <div class="draggable-container select-none relative w-full h-full" @mousedown="startDrag" @mousemove="onDrag"
+    @mouseup="endDrag" @mouseleave="endDrag" @touchstart="startDrag" @touchmove.prevent="onDrag" @touchend="endDrag">
     <div v-if="isDragging" class="fixed inset-0 z-11 cursor-grabbing"></div>
 
     <div :style="cardStyle" class="draggable-wrapper z-10 relative">
@@ -167,7 +162,6 @@ const checkSwipe = (func: Function) => {
 }
 
 .draggable-wrapper {
-  will-change: transform;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   perspective: 1000px;
