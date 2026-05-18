@@ -1,6 +1,6 @@
 {
   "name": "movies-x-movies-frontend",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -21,7 +21,7 @@
     "test:coverage": "vitest run --coverage",
     "test:ui": "vitest --ui",
     "host": "vite --host"
-    },
+  },
   "dependencies": {
     "@fontsource/inter": "^5.2.8",
     "@primeuix/themes": "^2.0.3",

@@ -38,6 +38,8 @@ const visibleDrawer = ref<boolean>(false);
 const visibleDialog = ref<boolean>(false);
 const glowEl = ref<HTMLElement | null>(null);
 const swipeEl = ref<HTMLElement | null>(null);
+const starsRef = ref<InstanceType<typeof StarsComponent> | null>(null)
+
 let rafId: number | null = null;
 
 const actualMovie = computed(() => {
@@ -141,6 +143,7 @@ const markAsNotSeen = async () => {
 
 const rateMovie = async (rating: number) => {
   if (rating === 0) return;
+  starsRef.value?.triggerAnimation(rating);
   loading.value = true;
   if (navigator.vibrate) navigator.vibrate(100);
   if (actualMovie.value) {
@@ -235,7 +238,7 @@ for (let i = 1; i <= 5; i++) {
         <div ref="glowEl" class="glow-container w-full max-w-sm aspect-[3/5] rounded-3xl" id="glow-container" />
       </div>
       <div class="flex justify-center mt-4 relative z-">
-        <StarsComponent id="stars" :loading="loading" @rateMovie="rateMovie" />
+        <StarsComponent id="stars" :loading="loading" @rateMovie="rateMovie" ref="starsRef" />
       </div>
     </div>
     <div v-else>No movies found.</div>
