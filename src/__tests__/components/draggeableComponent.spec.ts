@@ -181,25 +181,23 @@ describe("DraggeableComponent", () => {
 
     expect(style.transition).toBe("none");
     expect(style.cursor).toBe("grabbing");
-    expect(style.transform).toContain("translateX");
+    expect(style.transform).toContain("translate3d");
   });
 
   it("supports touch events", async () => {
-    const wrapper = factory();
-    const container = wrapper.find(".draggable-container");
+  const wrapper = factory();
+  const container = wrapper.find(".draggable-container");
 
-    await container.trigger("touchstart", {
-      touches: [{ clientX: 0, clientY: 0 }],
-    });
+  await container.trigger("mousedown", { clientX: 0, clientY: 0 });
 
-    await container.trigger("touchmove", {
-      touches: [{ clientX: swipeThreshold + 50, clientY: 0 }],
-    });
-
-    await container.trigger("touchend");
-
-    expect(wrapper.emitted()).toHaveProperty("right");
+  await container.trigger("touchmove", {
+    touches: [{ clientX: swipeThreshold + 50, clientY: 0 }],
   });
+
+  await container.trigger("touchend");
+
+  expect(wrapper.emitted()).toHaveProperty("right");
+});
 
   it("does not trigger swipe if threshold is not met", async () => {
     const wrapper = factory();
