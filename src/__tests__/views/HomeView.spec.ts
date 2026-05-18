@@ -41,6 +41,92 @@ describe("HomeView", () => {
     (getRecommendedMovies as any).mockResolvedValue(mockMovies);
     (submitRating as any).mockResolvedValue({});
     (setAsNotSeen as any).mockResolvedValue({});
+
+    vi.stubGlobal("requestAnimationFrame", (cb: FrameRequestCallback) => {
+      cb(0);
+      return 0;
+    });
+  });
+  describe("updateGlow", () => {
+    it("sets opacity to 0 and scale to 0.95 when direction is empty", async () => {
+      const wrapper = mountWrapper();
+      await flushPromises();
+
+      const glowEl = wrapper.find("#glow-container");
+      await (wrapper.vm as any).updateGlow("");
+
+      expect((glowEl.element as HTMLElement).style.getPropertyValue("--glow-opacity")).toBe("0");
+      expect((glowEl.element as HTMLElement).style.transform).toBe("scale(0.95)");
+    });
+
+    it("sets correct color and opacity when direction is 'right'", async () => {
+      const wrapper = mountWrapper();
+      await flushPromises();
+
+      const glowEl = wrapper.find("#glow-container");
+      await (wrapper.vm as any).updateGlow("right");
+
+      expect((glowEl.element as HTMLElement).style.getPropertyValue("--glow-color")).toBe("var(--yellow)");
+      expect((glowEl.element as HTMLElement).style.getPropertyValue("--glow-opacity")).toBe("1");
+      expect((glowEl.element as HTMLElement).style.transform).toBe("scale(1.04)");
+    });
+
+    it("sets correct color when direction is 'left'", async () => {
+      const wrapper = mountWrapper();
+      await flushPromises();
+
+      const glowEl = wrapper.find("#glow-container");
+      await (wrapper.vm as any).updateGlow("left");
+
+      expect((glowEl.element as HTMLElement).style.getPropertyValue("--glow-color")).toBe("var(--red)");
+      expect((glowEl.element as HTMLElement).style.getPropertyValue("--glow-opacity")).toBe("1");
+    });
+
+    it("sets correct color when direction is 'up'", async () => {
+      const wrapper = mountWrapper();
+      await flushPromises();
+
+      const glowEl = wrapper.find("#glow-container");
+      await (wrapper.vm as any).updateGlow("up");
+
+      expect((glowEl.element as HTMLElement).style.getPropertyValue("--glow-color")).toBe("var(--primary)");
+      expect((glowEl.element as HTMLElement).style.getPropertyValue("--glow-opacity")).toBe("1");
+    });
+
+    it("sets correct color when direction is 'down'", async () => {
+      const wrapper = mountWrapper();
+      await flushPromises();
+
+      const glowEl = wrapper.find("#glow-container");
+      await (wrapper.vm as any).updateGlow("down");
+
+      expect((glowEl.element as HTMLElement).style.getPropertyValue("--glow-color")).toBe("var(--gray)");
+      expect((glowEl.element as HTMLElement).style.getPropertyValue("--glow-opacity")).toBe("1");
+    });
+
+    it("sets transparent color for unknown direction", async () => {
+      const wrapper = mountWrapper();
+      await flushPromises();
+
+      const glowEl = wrapper.find("#glow-container");
+      await (wrapper.vm as any).updateGlow("unknown");
+
+      expect((glowEl.element as HTMLElement).style.getPropertyValue("--glow-color")).toBe("transparent");
+      expect((glowEl.element as HTMLElement).style.getPropertyValue("--glow-opacity")).toBe("1");
+    });
+
+    it("updates glow when direction model changes", async () => {
+      const wrapper = mountWrapper();
+      await flushPromises();
+
+      const draggable = wrapper.findComponent({ name: "DraggeableComponent" });
+      const glowEl = wrapper.find("#glow-container");
+
+      await draggable.vm.$emit("update:direction", "right");
+      await flushPromises();
+
+      expect((glowEl.element as HTMLElement).style.getPropertyValue("--glow-color")).toBe("var(--yellow)");
+    });
   });
 
   const mountWrapper = () => {
@@ -60,7 +146,7 @@ describe("HomeView", () => {
   };
 
   it("prevents multiple simultaneous fetchMovies calls if already loading", async () => {
-    const longPendingPromise = new Promise((resolve) => {});
+    const longPendingPromise = new Promise((resolve) => { });
     (getRecommendedMovies as any).mockReturnValue(longPendingPromise);
     mountWrapper();
     expect(getRecommendedMovies).toHaveBeenCalledTimes(1);
