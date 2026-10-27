@@ -108,7 +108,7 @@ onUnmounted(() => {
                     :disabled="isDisabled(group.items[0]?.disabled)" class="menu-item"
                     :class="{ 'menu-item--danger': group.danger }" @click="handleGroupClick(group)">
                     <div class="item-content">
-                        <span v-if="group.icon" :class="group.icon" class="item-icon"></span>
+                        <span v-if="group.icon" :class="group.icon" class="item-icon" aria-hidden="true"></span>
                         <span class="item-label">{{ group.label }}</span>
                     </div>
 
@@ -130,7 +130,8 @@ onUnmounted(() => {
             </div>
         </Transition>
 
-        <button class="fab-button" :class="{ 'fab-button--active': open }" @click="toggle">
+        <button class="fab-button" :class="{ 'fab-button--active': open }" @click="toggle" :aria-expanded="open"
+            :aria-label="$t('home.shortcuts')" :title="$t('home.shortcuts')">
             <svg v-if="!open" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-kb">
                 <rect width="20" height="16" x="2" y="4" rx="2" />
@@ -163,81 +164,81 @@ onUnmounted(() => {
     align-items: flex-end;
     gap: 12px;
     z-index: 100;
-    font-family: 'DM Sans', sans-serif;
+    font-family: var(--font-sans);
 }
 
-/* BOTÓN FAB */
 .fab-button {
-    width: 54px;
-    height: 54px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
     background: var(--primary);
-    color: white;
+    color: var(--on-primary);
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 20px rgba(47, 39, 206, 0.3);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-lg);
+    transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
 .fab-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(47, 39, 206, 0.4);
-    filter: brightness(1.1);
+    background: var(--primary-hover);
 }
 
 .fab-button--active {
-    background: var(--accent);
-    transform: rotate(0deg);
+    background: var(--text);
+    color: var(--background);
 }
 
-/* MENÚ */
+.fab-button--active:hover {
+    background: var(--text);
+}
+
 .fab-menu {
-    background: var(--background);
-    border: 0.5px solid rgba(47, 39, 206, 0.2);
-    border-radius: 16px;
-    padding: 8px;
-    min-width: 220px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 6px;
+    min-width: 280px;
+    box-shadow: var(--shadow-lg);
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
 }
 
 .menu-header {
-    padding: 8px 12px;
-    font-size: 0.7rem;
-    font-weight: 700;
+    padding: 8px 12px 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--primary);
-    opacity: 0.6;
+    letter-spacing: 0.08em;
+    color: var(--text-subtle);
 }
 
 .menu-item {
     display: flex;
     align-items: center;
-    padding: 10px 12px;
-    border-radius: 10px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
     border: none;
     background: transparent;
     cursor: pointer;
-    transition: all 0.2s;
-    min-height: 44px;
+    transition: background-color 0.15s;
+    min-height: 42px;
     justify-content: space-between;
     gap: 12px;
     color: var(--text);
+    text-align: left;
 }
 
 .menu-item:hover:not(:disabled) {
-    background: var(--secondary);
-    color: var(--primary);
+    background: var(--primary-soft);
 }
 
 .menu-item:disabled {
-    opacity: 0.4;
+    opacity: 0.45;
     cursor: not-allowed;
 }
 
@@ -247,79 +248,71 @@ onUnmounted(() => {
     gap: 10px;
 }
 
-.item-label {
+.item-icon {
+    color: var(--primary);
     font-size: 0.9rem;
+    width: 1rem;
+    text-align: center;
+}
+
+.item-label {
+    font-size: 0.9375rem;
     font-weight: 500;
 }
 
-.shortcut-badge {
-    font-size: 0.7rem;
-    font-weight: 600;
-    background: rgba(47, 39, 206, 0.08);
-    color: var(--primary);
-    padding: 2px 6px;
-    border-radius: 6px;
-    text-transform: uppercase;
-    font-family: monospace;
-}
-
 .menu-item--danger:hover {
-    background: #fff1f2 !important;
-    color: #e11d48 !important;
+    background: var(--danger-soft) !important;
+    color: var(--danger) !important;
 }
 
-/* TRANSICIÓN */
 .fab-menu-enter-active,
 .fab-menu-leave-active {
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 }
 
 .fab-menu-enter-from,
 .fab-menu-leave-to {
     opacity: 0;
-    transform: translateY(10px) scale(0.95);
+    transform: translateY(8px) scale(0.97);
 }
 
 .shortcut-container {
     display: flex;
     align-items: center;
     gap: 4px;
-    margin-left: 12px;
 }
 
 .kbd-key {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 20px;
-    height: 20px;
-    padding: 0 5px;
-    font-size: 0.65rem;
-    font-weight: 700;
-    font-family: 'DM Sans', sans-serif;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-family: var(--font-mono);
     text-transform: uppercase;
-    background: var(--background);
-    color: var(--primary);
-    border: 0.5px solid rgba(47, 39, 206, 0.2);
-    border-radius: 4px;
-    box-shadow: 0 1px 0 rgba(47, 39, 206, 0.2);
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-bottom-width: 2px;
+    border-radius: 5px;
 }
 
 .kbd-space {
-    min-width: 50px;
-    font-size: 0.6rem;
-    letter-spacing: 0.05em;
+    min-width: 52px;
+    font-size: 0.7rem;
 }
 
 .kbd-plus {
-    font-size: 0.7rem;
-    opacity: 0.4;
+    font-size: 0.75rem;
+    color: var(--text-subtle);
     font-weight: 600;
 }
 
 .menu-item:hover .kbd-key {
-    background: white;
-    border-color: var(--primary);
+    border-color: color-mix(in srgb, var(--primary) 50%, var(--border));
 }
 
 .group-shortcuts {
@@ -329,14 +322,8 @@ onUnmounted(() => {
 }
 
 .shortcut-separator {
-    font-size: 0.8rem;
-    opacity: 0.3;
-    color: var(--text);
-    font-weight: 300;
-}
-
-.group-shortcuts>.shortcut-container {
-    margin-left: 0;
+    font-size: 0.8125rem;
+    color: var(--text-subtle);
 }
 
 @media (max-width: 640px) {

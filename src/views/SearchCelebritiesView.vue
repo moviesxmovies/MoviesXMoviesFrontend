@@ -68,7 +68,7 @@ watch(
         <!-- ── EMPTY STATE ─────────────────────────────────── -->
         <div v-else-if="!celebrities.results?.length" class="state-box">
             <div class="empty-icon">
-                <i class="pi pi-search" style="font-size: 1rem" />
+                <i class="pi pi-search" aria-hidden="true" />
             </div>
             <p class="empty-title">{{ t("search.empty") }}</p>
             <span class="empty-sub">{{ t("search.help") }}</span>
@@ -91,7 +91,6 @@ watch(
     width: 100%;
     max-width: 480px;
     margin: 0 auto;
-    padding: 0 1rem;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -119,6 +118,13 @@ watch(
 
 @media (min-width: 768px) {
     .celebs-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+    }
+}
+
+@media (min-width: 1100px) {
+    .celebs-grid {
         grid-template-columns: repeat(5, 1fr);
     }
 }
@@ -127,9 +133,9 @@ watch(
 .skeleton-card {
     position: relative;
     aspect-ratio: 2 / 3;
-    border-radius: 1.25rem;
+    border-radius: var(--radius-lg);
     overflow: hidden;
-    border: 1px solid var(--secondary);
+    border: 1px solid var(--border);
 }
 
 :deep(.skeleton-img) {
@@ -158,39 +164,41 @@ watch(
     z-index: 2;
 }
 
-/* ── Empty state ────────────────────────────────────────── */
 .state-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 4rem 1rem;
-    gap: 8px;
-    color: var(--text-color-secondary);
-    text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1rem;
+  gap: 0.5rem;
+  text-align: center;
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
 }
 
 .empty-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: var(--surface-100);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-color-secondary);
-    margin-bottom: 4px;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: var(--primary-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  margin-bottom: 0.25rem;
 }
 
 .empty-title {
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: var(--text-color);
-    margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
 }
 
 .empty-sub {
-    font-size: 0.85rem;
-    color: var(--text-color-secondary);
+  font-size: 0.9375rem;
+  color: var(--text-muted);
 }
 </style>

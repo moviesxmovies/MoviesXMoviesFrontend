@@ -50,10 +50,11 @@ const props = defineProps<{
 
 <style scoped>
 .action-bar {
-  border: 1px solid var(--secondary);
+  border: 1px solid var(--border);
+  border-top: none;
   border-radius: 0 0 1.5rem 1.5rem;
-  background: var(--background);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
   overflow: hidden;
   transform: translateZ(0);
 }
@@ -66,14 +67,18 @@ const props = defineProps<{
   align-items: center;
   justify-content: center;
   border: none;
-  border-right: 1px solid var(--secondary);
+  border-right: 1px solid var(--border);
   background: transparent;
   color: var(--text);
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  transition: background 0.2s ease, color 0.2s ease, transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   -webkit-tap-highlight-color: transparent;
-  outline: none;
+}
+
+.action-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -4px;
 }
 
 .action-btn:last-child {
@@ -85,18 +90,18 @@ const props = defineProps<{
 }
 
 .action-btn:disabled {
-  opacity: 0.4;
+  opacity: 0.45;
   pointer-events: none;
 }
 
 .accent-btn { color: var(--accent); }
-.neutral-btn { color: var(--text); }
+.neutral-btn { color: var(--text-muted); }
 .primary-btn { color: var(--primary); }
 
 @media (hover: hover) {
-  .accent-btn:hover { background: var(--accent); color: var(--background); }
-  .neutral-btn:hover { background: var(--secondary); }
-  .primary-btn:hover { background: var(--primary); color: var(--background); }
+  .accent-btn:hover { background: var(--accent); color: var(--on-accent); }
+  .neutral-btn:hover { background: var(--surface-hover); color: var(--text); }
+  .primary-btn:hover { background: var(--primary); color: var(--on-primary); }
 }
 
 #more-info.animate-boarding,
@@ -107,9 +112,9 @@ const props = defineProps<{
   animation: button-cinematic-pop 1.5s infinite;
 }
 
-#more-info.animate-boarding { background: var(--accent); color: var(--background); }
-#unseen-button.animate-boarding { background: var(--secondary); }
-#add-to-list-button.animate-boarding { background: var(--primary); color: var(--background); }
+#more-info.animate-boarding { background: var(--accent); color: var(--on-accent); }
+#unseen-button.animate-boarding { background: var(--surface-hover); color: var(--text); }
+#add-to-list-button.animate-boarding { background: var(--primary); color: var(--on-primary); }
 
 @keyframes button-cinematic-pop {
   0%, 100% {
@@ -117,7 +122,6 @@ const props = defineProps<{
   }
   50% {
     transform: scale(1.08) translateZ(0);
-    background-color: rgba(255, 255, 255, 0.25);
   }
 }
 </style>

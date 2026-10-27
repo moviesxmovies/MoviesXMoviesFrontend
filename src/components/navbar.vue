@@ -7,7 +7,6 @@ import { useAuthStore } from "@/stores/authStore";
 import { getFriendsRequests, getSelfUserProfile } from "@/repositories/userRepository";
 import Menu from "primevue/menu";
 import { useI18n } from "vue-i18n";
-import { useThemeStore } from "@/stores/themeStore";
 import { useNotificationsStore } from "@/stores/notificationStore";
 import { Skeleton } from "primevue";
 import { useProfileStore } from "@/stores/profileStore";
@@ -15,7 +14,6 @@ import { useProfileStore } from "@/stores/profileStore";
 const { t } = useI18n();
 const router = useRouter();
 const authStore = useAuthStore();
-const themeStore = useThemeStore();
 const menuOpen = ref(false);
 const profilePicture = ref<string | null>(null);
 const notificationsStore = useNotificationsStore();
@@ -105,29 +103,24 @@ watch(() => profileStore.refreshKey, () => {
 
 <template>
   <nav class="nav">
-    <div class="nav-logo" @click="router.push('/')" style="cursor: pointer">
+    <a class="nav-logo" href="/" @click.prevent="router.push('/')" aria-label="MoviesXMovies">
       <span class="logo-icon">
-        <img src="/favicon.svg" alt="Logo" />
+        <img src="/favicon.svg" alt="" />
       </span>
       <span class="logo-text">Movies<span class="logo-x">×</span>Movies</span>
-    </div>
+    </a>
 
     <div class="nav-right desktop-only">
       <button id="search-btn" class="search-trigger" @click="router.push('/search')">
         <div class="search-content">
-          <i class="pi pi-search" :style="{
-            color:
-              themeStore.theme === 'dark'
-                ? 'var(--accent)'
-                : 'var(--primary)',
-          }" />
+          <i class="pi pi-search search-icon" aria-hidden="true" />
           <span class="search-text">{{ $t("home.search") }}</span>
         </div>
       </button>
       <LangComponent />
       <ThemeComponent />
       <template v-if="authStore.isAuthenticated">
-        <button class="btn-profile" @click="(e) => profileMenu.toggle(e)">
+        <button class="btn-profile" @click="(e) => profileMenu.toggle(e)" :aria-label="$t('home.profile')" aria-haspopup="true">
           <div class="profile-wrapper">
             <Skeleton v-if="loadingProfile || !profileImageLoaded" shape="circle" width="2.5rem" height="2.5rem" />
             <img :src="profilePicture ?? ''" :alt="$t('home.profile')"
@@ -140,7 +133,7 @@ watch(() => profileStore.refreshKey, () => {
         </button>
         <Menu ref="profileMenu" :model="menuItems" popup class="profile-menu" appendTo="self" />
       </template>
-      <button class="btn-ghost" @click="router.push('/login')" v-else>
+      <button class="btn-ghost btn-login" @click="router.push('/login')" v-else>
         {{ $t("home.login") }}
       </button>
     </div>
@@ -182,7 +175,7 @@ watch(() => profileStore.refreshKey, () => {
             </div>
             {{ $t("home.profile") }}
           </button>
-          <button id="profile-btn-mobile" class="btn-ghost" @click="navigate('/login')" v-else>
+          <button id="profile-btn-mobile" class="btn-ghost btn-login" @click="navigate('/login')" v-else>
             {{ $t("home.login") }}
           </button>
         </div>
@@ -196,63 +189,92 @@ watch(() => profileStore.refreshKey, () => {
 </template>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap");
-
 .nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.3rem 2rem;
+  gap: 1rem;
+  height: 3.75rem;
+  padding: 0 2rem;
   position: fixed;
   top: 0;
   z-index: 10;
   width: 100%;
+  background: color-mix(in srgb, var(--background) 82%, transparent);
+  backdrop-filter: saturate(160%) blur(14px);
+  -webkit-backdrop-filter: saturate(160%) blur(14px);
+  border-bottom: 1px solid var(--border);
 }
 
 .nav-logo {
   display: flex;
   align-items: center;
   gap: 10px;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .nav-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 0.625rem;
   flex-grow: 1;
   justify-content: flex-end;
 }
 
-.btn-ghost {
-  background: color-mix(in srgb, var(--text) 8%, transparent);
-  border: 0.5px solid rgba(47, 39, 206, 0.15);
+.btn-ghost,
+.btn-login {
   height: 2.5rem;
   padding: 0 1.1rem;
   display: flex;
   align-items: center;
   gap: 8px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-ghost {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-ghost:hover {
+  border-color: var(--primary);
+  background: var(--surface-hover);
+}
+
+.btn-login {
+  background: var(--primary);
+  color: var(--on-primary);
+  border: 1px solid transparent;
+}
+
+.btn-login:hover {
+  background: var(--primary-hover);
 }
 
 .btn-profile {
-  background: color-mix(in srgb, var(--text) 8%, transparent);
-  border: 0.5px solid rgba(47, 39, 206, 0.15);
-  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
   height: 2.5rem;
   width: 2.5rem;
-  padding: 3px;
+  padding: 2px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .btn-profile:hover {
   border-color: var(--primary);
-  background: color-mix(in srgb, var(--text) 12%, transparent);
+  box-shadow: var(--focus-ring);
 }
 
 .btn-profile img,
@@ -262,57 +284,52 @@ watch(() => profileStore.refreshKey, () => {
 }
 
 .btn-profile-img {
-  width: 2.5rem;
+  width: 2.25rem;
   aspect-ratio: 1/1;
 }
 
 #profile-btn-mobile .btn-profile-img {
-  width: 1.5rem;
+  width: 1.75rem;
   aspect-ratio: 1 / 1;
 }
 
-
 /* MENU */
 :deep(.profile-menu.p-menu) {
-  background: var(--background);
-  border: 0.5px solid rgba(47, 39, 206, 0.2);
-  border-radius: 12px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
   padding: 6px;
   margin-top: 8px;
-  min-width: 180px;
-  font-family: "DM Sans", sans-serif;
+  min-width: 200px;
+  font-family: var(--font-sans);
 }
 
 :deep(.profile-menu .p-menu-item-link) {
-  padding: 0.6rem 1rem;
-  border-radius: 8px;
+  padding: 0.65rem 0.9rem;
+  border-radius: var(--radius-sm);
   color: var(--text);
-  font-size: 0.85rem;
+  font-size: 0.9375rem;
   font-weight: 500;
-  transition: all 0.1s ease;
+  transition: background-color 0.1s ease, color 0.1s ease;
   gap: 10px;
 }
 
 :deep(.profile-menu .p-menu-item-link:hover) {
-  background: var(--secondary);
+  background: var(--primary-soft);
   color: var(--primary);
 }
 
 :deep(.profile-menu .p-menu-item-content:focus),
 :deep(.profile-menu .p-menu-item-content:focus-visible),
 :deep(.profile-menu .p-menu-item-link:focus),
-:deep(.profile-menu .p-menu-item-link:focus-visible),
-:deep(.profile-menu .p-menu-item[data-p-focused="true"] .p-menu-item-content) {
-  background: transparent !important;
+:deep(.profile-menu .p-menu-item-link:focus-visible) {
   outline: none !important;
   box-shadow: none !important;
 }
 
-:deep(.profile-menu .p-menu-item[data-p-active="true"] .p-menu-item-content),
-:deep(.profile-menu .p-menu-item-link:active .p-menu-item-content),
-:deep(.profile-menu .p-menu-item-content:active) {
-  background: color-mix(in srgb, var(--primary) 15%, transparent) !important;
+:deep(.profile-menu .p-menu-item[data-p-focused="true"] .p-menu-item-content) {
+  background: var(--primary-soft) !important;
 }
 
 :deep(.profile-menu .p-menu-item[data-p-active="true"] .p-menu-item-link),
@@ -322,41 +339,41 @@ watch(() => profileStore.refreshKey, () => {
 
 :deep(.profile-menu .p-menu-item-link .p-menu-item-icon) {
   color: inherit;
-  font-size: 0.85rem;
+  font-size: 0.9375rem;
 }
 
-:deep(.profile-menu .p-menuitem-separator) {
-  border-color: rgba(47, 39, 206, 0.1);
+:deep(.profile-menu .p-menu-separator) {
+  border-color: var(--border);
   margin: 4px 0;
 }
 
 .logo-icon {
-  width: 32px;
-  height: 32px;
-  background: var(--secondary);
-  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  background: var(--primary-soft);
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  padding: 3px;
+  padding: 4px;
 }
 
 .logo-text {
-  font-family: "Bebas Neue", sans-serif;
-  font-size: 1.45rem;
-  letter-spacing: 0.04em;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: var(--text);
   line-height: 1;
 }
 
 .logo-x {
-  color: var(--accent);
-  margin: 0 1px;
-}
-
-.btn-ghost:hover {
-  border-color: var(--primary);
+  background: var(--brand-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin: 0 2px;
 }
 
 .theme-wrapper {
@@ -370,14 +387,16 @@ watch(() => profileStore.refreshKey, () => {
   flex-direction: column;
   justify-content: center;
   gap: 5px;
-  width: 2.5rem;
-  height: 2.5rem;
-  background: color-mix(in srgb, var(--text) 15%, transparent);
-  border: 0.5px solid rgba(47, 39, 206, 0.2);
-  border-radius: 8px;
+  width: 2.75rem;
+  height: 2.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  padding: 0.45rem;
+  padding: 0.6rem;
   flex-shrink: 0;
+  position: relative;
+  z-index: 101;
 }
 
 .hamburger span {
@@ -409,13 +428,13 @@ watch(() => profileStore.refreshKey, () => {
   position: fixed;
   top: 0;
   right: 0;
-  width: min(300px, 90vw);
+  width: min(320px, 88vw);
   height: 100dvh;
-  background: color-mix(in srgb, var(--background) 95%, black);
-  backdrop-filter: blur(10px);
-  border-left: 1px solid rgba(47, 39, 206, 0.1);
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
   z-index: 100;
-  padding: 6rem 1.5rem 2rem;
+  padding: 5.5rem 1.25rem 2rem;
   display: flex;
   flex-direction: column;
 }
@@ -423,7 +442,7 @@ watch(() => profileStore.refreshKey, () => {
 .mobile-menu-items {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   width: 100%;
 }
 
@@ -431,29 +450,26 @@ watch(() => profileStore.refreshKey, () => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin-bottom: 8px;
 }
 
 .mobile-menu-items button,
 .mobile-menu-items :deep(.lang-select) {
   width: 100% !important;
   justify-content: center;
-  background: color-mix(in srgb, var(--text) 5%, transparent) !important;
-  border: 1px solid rgba(47, 39, 206, 0.1) !important;
-  font-size: 0.9rem;
-  letter-spacing: 0.02em;
+  font-size: 1rem;
 }
 
-.mobile-menu-items .btn-ghost {
-  font-weight: 600;
+.mobile-menu-items .btn-ghost,
+.mobile-menu-items .btn-login {
   height: 3rem;
-  color: var(--primary);
+  justify-content: flex-start;
+  padding: 0 1rem;
 }
 
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--overlay);
   z-index: 99;
 }
 
@@ -479,7 +495,7 @@ watch(() => profileStore.refreshKey, () => {
 
 @media (max-width: 640px) {
   .nav {
-    padding: 0.3rem 1rem;
+    padding: 0 1rem;
   }
 
   .desktop-only {
@@ -505,22 +521,20 @@ watch(() => profileStore.refreshKey, () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: color-mix(in srgb, var(--text) 5%, transparent);
-  border: 0.5px solid rgba(47, 39, 206, 0.15);
-  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
   height: 2.5rem;
-  padding: 0 0.8rem;
+  padding: 0 0.875rem;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  min-width: 140px;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+  min-width: 200px;
   gap: 12px;
 }
 
 .search-trigger:hover {
-  background: color-mix(in srgb, var(--text) 8%, transparent);
+  background: var(--surface-hover);
   border-color: var(--primary);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .search-content {
@@ -529,22 +543,15 @@ watch(() => profileStore.refreshKey, () => {
   gap: 10px;
 }
 
-.search-text {
-  font-family: "DM Sans", sans-serif;
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: color-mix(in srgb, var(--text) 60%, transparent);
+.search-icon {
+  color: var(--primary);
 }
 
-.search-shortcut {
-  background: color-mix(in srgb, var(--text) 10%, transparent);
-  border: 1px solid rgba(47, 39, 206, 0.1);
-  border-radius: 4px;
-  padding: 2px 5px;
-  font-size: 0.7rem;
-  font-family: sans-serif;
-  color: color-mix(in srgb, var(--text) 40%, transparent);
-  font-weight: 600;
+.search-text {
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-subtle);
 }
 
 .profile-wrapper {
@@ -558,27 +565,24 @@ watch(() => profileStore.refreshKey, () => {
   position: absolute;
   top: -6px;
   right: -6px;
-  background: var(--red);
-  color: #fff;
-  font-size: 0.55rem;
+  background: #c42020;
+  color: #ffffff;
+  font-size: 0.6875rem;
   font-weight: 700;
-  font-family: 'DM Sans', sans-serif;
-  min-width: 16px;
-  height: 16px;
+  font-family: var(--font-sans);
+  min-width: 18px;
+  height: 18px;
   border-radius: 999px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 3px;
-  border: 1.5px solid var(--background);
+  padding: 0 4px;
+  border: 2px solid var(--background);
   line-height: 1;
 }
 
 .notification-badge--sm {
   top: -4px;
-  right: 2px;
-  min-width: 14px;
-  height: 14px;
-  font-size: 0.5rem;
+  right: -4px;
 }
 </style>

@@ -63,14 +63,14 @@ const steps = [
 
             <button @click="handleFinish" class="skip-button">
                 {{ $t("onboarding.skip") }}
-                <span class="pi pi-step-forward" style="font-size:10px; opacity:0.6"></span>
+                <span class="pi pi-step-forward" aria-hidden="true"></span>
             </button>
 
             <div class="step-card pos-top-left">
                 <div class="card-inner">
                     <div class="card-header">
                         <div class="card-badge">
-                            <span class="badge-dot" />
+                            <span class="badge-dot" aria-hidden="true" />
                             <Transition name="fade" mode="out-in">
                                 <span :key="currentStep">{{ $t(`onboarding.step${currentStep + 1}Label`) || "Onboarding"
                                 }}</span>
@@ -111,9 +111,6 @@ const steps = [
 </template>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap');
-
-/* ── Animaciones de Transición ── */
 .fade-enter-active,
 .fade-leave-active {
     transition: opacity 0.25s ease, transform 0.25s ease;
@@ -129,7 +126,6 @@ const steps = [
     transform: translateY(-4px);
 }
 
-/* ── Layout ── */
 .no-cursor-interactions {
     pointer-events: none;
     user-select: none;
@@ -140,37 +136,39 @@ const steps = [
     inset: 0;
     z-index: 1000;
     pointer-events: auto;
+    background: color-mix(in srgb, var(--background) 35%, transparent);
 }
 
-/* ── Skip button (Base Light) ── */
 .skip-button {
     position: absolute;
-    top: calc(28px + 1.5rem);
-    right: 3.5rem;
+    top: 5rem;
+    right: 2rem;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    padding: 6px 14px;
+    gap: 8px;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
     border-radius: 999px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: border-color 0.15s, color 0.15s;
     z-index: 20;
-    background: var(--ob-card-bg);
-    border: 1px solid var(--ob-card-border);
-    color: var(--ob-text-muted);
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    color: var(--text-muted);
+    box-shadow: var(--shadow-md);
+}
+
+.skip-button .pi {
+    font-size: 0.75rem;
 }
 
 .skip-button:hover {
     border-color: var(--primary);
-    color: #000;
+    color: var(--primary);
 }
 
-/* ── Card position ── */
 .step-card {
     position: absolute;
     pointer-events: none;
@@ -186,15 +184,14 @@ const steps = [
     transform: translate(-50%, -50%);
 }
 
-/* ── Card inner (Base Light) ── */
 .card-inner {
-    background: var(--ob-card-bg);
-    border: 1px solid var(--ob-card-border);
-    border-radius: 16px;
-    padding: 1.5rem 1.7rem 1.3rem;
-    width: 340px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem 1.6rem 1.3rem;
+    width: 360px;
     max-width: 90vw;
-    box-shadow: var(--ob-card-shadow);
+    box-shadow: var(--shadow-lg);
     display: flex;
     flex-direction: column;
     pointer-events: auto;
@@ -202,7 +199,6 @@ const steps = [
     overflow: hidden;
 }
 
-/* ── Elementos internos (Base Light) ── */
 .card-header {
     display: flex;
     align-items: center;
@@ -213,27 +209,24 @@ const steps = [
 .card-badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    background: var(--ob-badge-bg);
+    gap: 8px;
+    background: var(--primary-soft);
     color: var(--primary);
     border-radius: 999px;
-    padding: 4px 10px;
-    font-size: 11px;
+    padding: 4px 12px;
+    font-size: 0.8125rem;
     font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
 }
 
 .badge-dot {
-    width: 5px;
-    height: 5px;
-    background: var(--accent);
+    width: 7px;
+    height: 7px;
+    background: var(--primary);
     border-radius: 50%;
     animation: pulse 2.2s ease-in-out infinite;
 }
 
 @keyframes pulse {
-
     0%,
     100% {
         opacity: 1;
@@ -247,72 +240,72 @@ const steps = [
 }
 
 .card-eyebrow {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--ob-text-muted);
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-subtle);
 }
 
 .card-text {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14.5px;
+    font-family: var(--font-sans);
+    font-size: 1rem;
     font-weight: 400;
-    color: var(--ob-text-color);
-    line-height: 1.65;
-    margin-bottom: 1.4rem;
+    color: var(--text);
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
 }
 
-/* ── Dots (Base Light) ── */
 .step-indicator {
     display: flex;
     justify-content: center;
-    gap: 5px;
+    gap: 6px;
     margin-bottom: 1rem;
 }
 
 .step-dot {
-    width: 6px;
     height: 6px;
-    border-radius: 50%;
-    transition: background 0.3s, transform 0.3s;
+    border-radius: 999px;
+    transition: background 0.3s, width 0.3s;
+    width: 6px;
 }
 
 .dot-active {
     background: var(--primary);
-    transform: scale(1.4);
+    width: 20px;
 }
 
 .dot-past {
-    background: rgba(47, 39, 206, 0.3);
+    background: color-mix(in srgb, var(--primary) 45%, transparent);
 }
 
 .dot-future {
-    background: var(--ob-dot-future);
+    background: var(--border);
 }
 
 .card-hint {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 11.5px;
-    color: var(--ob-text-muted);
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    color: var(--text-subtle);
     text-align: center;
     margin-top: 0.85rem;
+    margin-bottom: 0;
 }
 
-
-
-/* ── Button ── */
 :deep(.p-button) {
     background: var(--primary) !important;
     border: none !important;
-    border-radius: 8px !important;
+    border-radius: var(--radius-md) !important;
+    min-height: 2.75rem;
     padding: 0.65rem 1.3rem !important;
-    font-family: 'DM Sans', sans-serif !important;
-    font-size: 13.5px !important;
-    font-weight: 600 !important;
-    color: #fff !important;
+    font-family: var(--font-sans) !important;
+    font-size: 0.9375rem !important;
+    font-weight: 700 !important;
+    color: var(--on-primary) !important;
     width: 100% !important;
+}
+
+:deep(.p-button:hover) {
+    background: var(--primary-hover) !important;
 }
 
 @media (max-width: 640px) {
@@ -320,6 +313,10 @@ const steps = [
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
+    }
+
+    .skip-button {
+        right: 1rem;
     }
 }
 </style>

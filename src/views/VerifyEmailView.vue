@@ -61,37 +61,22 @@ const handleVerification = async (code: string) => {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6"
-    style="background-color: var(--background)">
-    <div class="w-full max-w-md my-4">
-      <div class="rounded-2xl border shadow-sm overflow-hidden text-center"
-        style="background-color: var(--background); border-color: var(--secondary)">
-
-        <div class="p-6 sm:p-8">
-          <div class="mb-8">
-            <div
-              class="w-full max-w-[100px] h-10 sm:w-16 sm:h-16 sm:aspect-square bg-primary/10 rounded-xl sm:rounded-full flex items-center justify-center m-auto mb-6 transition-all">
-              <i class="pi pi-shield text-lg sm:text-2xl" style="color: var(--primary)"></i>
-            </div>
-
-            <h2 class="text-xl sm:text-2xl font-bold" style="color: var(--text)">
-              {{ $t('verify.title') }}
-            </h2>
-            <p class="text-xs sm:text-sm mt-2 px-2" style="color: var(--text); opacity: 0.6">
-              {{ $t('verify.description') }}
-            </p>
-          </div>
-
-          <VerifyCodeComponent v-model:loading="loading" @sendCode="sendVerificationCode"
-            @handle-verification="handleVerification" />
-        </div>
+  <div class="auth-page">
+    <div class="auth-card text-center verify-card">
+      <div class="auth-header">
+        <div class="auth-icon" aria-hidden="true"><i class="pi pi-shield"></i></div>
+        <h1 class="auth-title">{{ $t('verify.title') }}</h1>
+        <p class="auth-subtitle">{{ $t('verify.description') }}</p>
       </div>
+
+      <VerifyCodeComponent v-model:loading="loading" @sendCode="sendVerificationCode"
+        @handle-verification="handleVerification" />
     </div>
   </div>
 </template>
 
 <style scoped>
-.p-6 {
+.verify-card {
   animation: fadeIn 0.5s ease-out;
 }
 

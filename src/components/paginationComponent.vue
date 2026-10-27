@@ -41,8 +41,12 @@ const emit = defineEmits(["changePage"]);
   background: transparent;
   border: none;
   padding: 0.5rem;
-  gap: 8px;
-  font-family: "DM Sans", sans-serif;
+  gap: 6px;
+  font-family: var(--font-sans);
+}
+
+:deep(.custom-paginator .p-paginator-pages) {
+  gap: 6px;
 }
 
 :deep(.custom-paginator .p-paginator-page),
@@ -50,25 +54,33 @@ const emit = defineEmits(["changePage"]);
 :deep(.custom-paginator .p-paginator-prev),
 :deep(.custom-paginator .p-paginator-next),
 :deep(.custom-paginator .p-paginator-last) {
-  border: 0.5px solid var(--secondary);
-  color: var(--primary);
-  border-radius: 8px;
-  transition: all 0.2s ease;
+  min-width: 2.5rem;
+  height: 2.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: var(--radius-md);
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   font-weight: 600;
+  font-size: 0.9375rem;
+}
+
+:deep(.custom-paginator .p-disabled) {
+  opacity: 0.45;
 }
 
 :deep(.custom-paginator .p-paginator-page:not(.p-highlight):hover),
-:deep(.custom-paginator .p-link:not(.p-disabled):hover) {
-  background: color-mix(in srgb, var(--text) 10%, transparent) !important;
+:deep(.custom-paginator button:not(.p-disabled):not(.p-highlight):hover) {
+  background: var(--primary-soft) !important;
   border-color: var(--primary) !important;
   color: var(--primary) !important;
 }
 
 :deep(.custom-paginator .p-paginator-page.p-highlight) {
   background: var(--primary) !important;
-  color: white !important;
+  color: var(--on-primary) !important;
   border-color: var(--primary);
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 30%, transparent);
+  box-shadow: var(--shadow-sm);
 }
 
 @media (max-width: 640px) {
@@ -77,8 +89,9 @@ const emit = defineEmits(["changePage"]);
   :deep(.custom-paginator .p-paginator-prev),
   :deep(.custom-paginator .p-paginator-next),
   :deep(.custom-paginator .p-paginator-last) {
-    min-width: 2rem;
-    font-size: 0.7rem;
+    min-width: 2.25rem;
+    height: 2.25rem;
+    font-size: 0.875rem;
   }
 }
 </style>

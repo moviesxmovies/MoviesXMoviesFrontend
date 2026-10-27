@@ -28,11 +28,12 @@ watch(() => langStore.language, (newLang) => {
 
 <template>
   <Select v-model="selectedCountry" :options="countries" optionLabel="label"
-    :placeholder="$t('components.selectLanguage')" class="lang-select" appendTo="self"
+    :placeholder="$t('components.selectLanguage')" class="lang-select" appendTo="self" :aria-label="$t('components.selectLanguage')"
     @change="langStore.changeLanguage(selectedCountry?.value || 'en')">
     <template #value="slotProps">
       <div v-if="slotProps.value" class="lang-value">
-        <img :alt="slotProps.value.label" :src="getFlagUrl(slotProps.value.label)" class="lang-flag" />
+        <img alt="" :src="getFlagUrl(slotProps.value.label)" class="lang-flag" />
+        <span class="lang-code">{{ slotProps.value.label }}</span>
       </div>
       <span v-else class="lang-placeholder">
         {{ slotProps.placeholder }}
@@ -49,67 +50,82 @@ watch(() => langStore.language, (newLang) => {
 </template>
 <style scoped>
 .lang-select {
-  background: color-mix(in srgb, var(--text) 8%, transparent) !important;
-  border: 0.5px solid rgba(47, 39, 206, 0.15) !important;
-  border-radius: 8px !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-md) !important;
   height: 2.5rem !important;
-  transition: all 0.2s ease;
-  font-family: 'DM Sans', sans-serif;
+  box-shadow: none !important;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+  font-family: var(--font-sans);
 }
 
 .lang-select:hover {
   border-color: var(--primary) !important;
-  background: color-mix(in srgb, var(--text) 12%, transparent) !important;
+  background: var(--surface-hover) !important;
 }
 
 .lang-select :deep(.p-select-dropdown) {
   width: 2rem;
-  color: var(--text);
-  opacity: 0.5;
+  color: var(--text-subtle);
 }
 
 .lang-select :deep(.p-select-label) {
-  padding: 0 0.75rem;
+  padding: 0 0.25rem 0 0.75rem;
   display: flex;
   align-items: center;
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--text);
 }
 
+.lang-value {
+  display: flex;
+  align-items: center;
+}
+
+.lang-code {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+
 .lang-select :deep(.p-select-overlay) {
-  background: var(--background) !important;
-  border: 0.5px solid rgba(47, 39, 206, 0.2) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12) !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-lg) !important;
   margin-top: 8px;
+  padding: 4px;
   overflow: hidden;
 }
 
 .lang-select :deep(.p-select-option) {
-  padding: 0.6rem 1rem;
-  font-size: 0.85rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9375rem;
   color: var(--text);
-  transition: all 0.1s;
+  transition: background-color 0.1s;
 }
 
 .lang-select :deep(.p-select-option.p-focus) {
-  background: var(--secondary) !important;
+  background: var(--primary-soft) !important;
   color: var(--primary) !important;
 }
 
 .lang-select :deep(.p-select-option-selected) {
-  background: color-mix(in srgb, var(--text) 8%, transparent) !important;
+  background: var(--surface-2) !important;
   color: var(--text) !important;
+  font-weight: 600;
 }
 
 .lang-flag {
-  width: 18px;
+  width: 20px;
   height: 14px;
   object-fit: cover;
   border-radius: 2px;
   margin-right: 8px;
-  filter: saturate(0.8);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--text) 12%, transparent);
 }
 
 .lang-option {

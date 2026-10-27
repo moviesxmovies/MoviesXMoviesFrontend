@@ -32,11 +32,11 @@ const pageCache = new Map<number, Rating[]>();
 const isMobile = window.innerWidth <= 640;
 
 const RATING_COLORS: Record<number, string> = {
-    1: "var(--red)",
-    2: "var(--red)",
-    3: "var(--gray)",
-    4: "var(--yellow)",
-    5: "var(--yellow)",
+    1: "var(--danger)",
+    2: "var(--danger)",
+    3: "var(--text-subtle)",
+    4: "var(--star)",
+    5: "var(--star)",
 };
 
 const getProfile = (userUrl: string): Promise<User> => {
@@ -231,16 +231,13 @@ onUnmounted(() => { if (bubbleTimer) clearInterval(bubbleTimer); });
     gap: 0.5rem;
     padding: 0.4rem 0.75rem 0.4rem 0.4rem;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--background) 85%, transparent);
+    background: color-mix(in srgb, var(--surface) 92%, transparent);
     backdrop-filter: blur(12px);
-    border: 0.5px solid color-mix(in srgb, var(--bubble-color) 35%, var(--ob-card-border));
-    box-shadow:
-        0 0 14px -4px color-mix(in srgb, var(--bubble-color) 60%, transparent),
-        0 2px 12px var(--ob-card-shadow),
-        inset 0 0 12px -8px color-mix(in srgb, var(--bubble-color) 20%, transparent);
+    border: 1px solid color-mix(in srgb, var(--bubble-color) 45%, var(--border));
+    box-shadow: var(--shadow-md);
     white-space: nowrap;
     animation: float-up 6s ease-in forwards;
-    font-family: 'DM Sans', sans-serif;
+    font-family: var(--font-sans);
     transform-origin: left center;
     cursor: pointer;
     pointer-events: all;
@@ -251,8 +248,8 @@ onUnmounted(() => { if (bubbleTimer) clearInterval(bubbleTimer); });
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    background: color-mix(in srgb, var(--bubble-color) 15%, var(--secondary));
-    border: 1.5px solid color-mix(in srgb, var(--bubble-color) 60%, transparent);
+    background: var(--surface-2);
+    border: 1.5px solid var(--bubble-color);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -268,9 +265,9 @@ onUnmounted(() => { if (bubbleTimer) clearInterval(bubbleTimer); });
 }
 
 .avatar-initials {
-    font-size: 0.6rem;
+    font-size: 0.7rem;
     font-weight: 700;
-    color: var(--bubble-color);
+    color: var(--text);
     letter-spacing: 0.02em;
 }
 
@@ -282,10 +279,9 @@ onUnmounted(() => { if (bubbleTimer) clearInterval(bubbleTimer); });
 }
 
 .bubble-user {
-    font-size: 0.65rem;
+    font-size: 0.8125rem;
     font-weight: 600;
     color: var(--text);
-    opacity: 0.75;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -297,7 +293,7 @@ onUnmounted(() => { if (bubbleTimer) clearInterval(bubbleTimer); });
 }
 
 .bubble-stars .pi {
-    font-size: 0.55rem;
+    font-size: 0.65rem;
     color: var(--bubble-color);
 }
 
@@ -361,15 +357,15 @@ onUnmounted(() => { if (bubbleTimer) clearInterval(bubbleTimer); });
     }
 
     .avatar-initials {
-        font-size: 0.55rem;
+        font-size: 0.65rem;
     }
 
     .bubble-user {
-        font-size: 0.6rem;
+        font-size: 0.75rem;
     }
 
     .bubble-stars .pi {
-        font-size: 0.5rem;
+        font-size: 0.6rem;
     }
 
     .bubble-enter-active {

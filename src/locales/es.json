@@ -191,7 +191,10 @@
     "fetchMoviesError": "Error al cargar las películas. Por favor, inténtalo más tarde.",
     "profile": "Mi perfil",
     "shortcuts": "Atajos",
-    "search": "Buscar"
+    "search": "Buscar",
+    "noMovies": "No hay más películas por ahora",
+    "tagline": "Desliza, puntúa y descubre películas con tus amigos. Recomendaciones que aprenden de ti.",
+    "emailLabel": "Correo electrónico"
   },
   "onboarding": {
     "step1": "Hagamos un recorrido rápido para comenzar",
@@ -379,7 +382,8 @@
     "error": {
       "fetchingMovie": "Error al cargar los detalles de la película. Por favor, inténtalo más tarde.",
       "fetchingPerson": "Error al cargar los detalles de la persona. Por favor, inténtalo más tarde."
-    }
+    },
+    "yourRating": "Tu valoración"
   },
   "review": {
     "addReview": "Añadir reseña",
@@ -434,7 +438,9 @@
     "close": "Cerrar",
     "confirm": "Confirmar",
     "seeMore": "Ver más",
-    "seeLess": "Ver menos"
+    "seeLess": "Ver menos",
+    "accept": "Aceptar",
+    "decline": "Rechazar"
   },
   "list": {
     "noDescription": "Esta lista no tiene descripción.",
@@ -468,5 +474,8 @@
     "translate": "Traducir",
     "showOriginal": "Mostrar original",
     "loading": "Traduciendo..."
+  },
+  "reactions": {
+    "add": "Añadir reacción"
   }
 }

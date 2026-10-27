@@ -13,10 +13,10 @@ const emit = defineEmits(['accept', 'decline']);
     <FriendComponent :from-user="request.from_user">
         <template #default="{ username }">
             <div class="request-actions">
-                <button class="btn btn-accept" @click="$emit('accept', username)">
+                <button class="btn btn-accept" @click="$emit('accept', username)" :aria-label="$t('common.accept')" :title="$t('common.accept')">
                     <i class="pi pi-check" />
                 </button>
-                <button class="btn btn-decline" @click="$emit('decline', username)">
+                <button class="btn btn-decline" @click="$emit('decline', username)" :aria-label="$t('common.decline')" :title="$t('common.decline')">
                     <i class="pi pi-times" />
                 </button>
             </div>
@@ -33,22 +33,34 @@ const emit = defineEmits(['accept', 'decline']);
 .btn {
     display: flex;
     align-items: center;
-    padding: 0.4rem 1rem;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
     border-radius: 999px;
-    border: none;
+    border: 1px solid transparent;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .btn-accept {
-    background: var(--accent);
-    color: white;
+    background: var(--primary);
+    color: var(--on-primary);
+}
+
+.btn-accept:hover {
+    background: var(--primary-hover);
 }
 
 .btn-decline {
     background: transparent;
-    color: var(--text);
-    border: 1px solid var(--secondary);
+    color: var(--text-muted);
+    border-color: var(--border-strong);
+}
+
+.btn-decline:hover {
+    color: var(--danger);
+    border-color: var(--danger);
+    background: var(--danger-soft);
 }
 
 @container (max-width: 280px) {

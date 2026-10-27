@@ -137,7 +137,7 @@ watch(() => props.visible, (val) => {
         }">
         <template #header>
             <div class="header-inner">
-                <div class="header-icon">
+                <div class="header-icon" aria-hidden="true">
                     <i class="pi pi-comments" />
                 </div>
                 <span class="header-text">{{ $t('commentsDialog.title') }}</span>
@@ -178,16 +178,18 @@ watch(() => props.visible, (val) => {
                             <strong>{{ replyingTo.username }}</strong>
                         </span>
                     </div>
-                    <button class="cancel-reply-btn" @click.stop="replyingTo = null">
+                    <button class="cancel-reply-btn" @click.stop="replyingTo = null" :aria-label="$t('common.cancel')">
                         <i class="pi pi-times" />
                     </button>
                 </div>
             </Transition>
 
             <div class="input-row">
-                <textarea v-model="newComment" class="comment-input" :placeholder="$t('comment.placeholder')" rows="2"
+                <textarea v-model="newComment" class="comment-input" :placeholder="$t('comment.placeholder')"
+                    :aria-label="$t('comment.placeholder')" rows="2"
                     :disabled="sending" @keydown="handleKeydown" />
-                <button class="send-btn" :disabled="!newComment.trim() || sending" @click="submitComment">
+                <button class="send-btn" :disabled="!newComment.trim() || sending" @click="submitComment"
+                    :aria-label="$t('common.submit')" :title="$t('common.submit')">
                     <i v-if="sending" class="pi pi-spin pi-spinner" />
                     <i v-else class="pi pi-send" />
                 </button>
@@ -197,77 +199,6 @@ watch(() => props.visible, (val) => {
 </template>
 
 <style scoped>
-.comment {
-    display: flex;
-    gap: 0.75rem;
-    padding: 0.5rem 0;
-}
-
-.comment-avatar-col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex-shrink: 0;
-}
-
-.comment-thread-line {
-    flex: 1;
-    width: 1.5px;
-    margin-top: 0.35rem;
-    background: color-mix(in srgb, var(--secondary) 30%, transparent);
-    min-height: 0.5rem;
-}
-
-.comment-body {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    flex: 1;
-    min-width: 0;
-    padding-bottom: 0.75rem;
-}
-
-.comment-header {
-    display: flex;
-    align-items: baseline;
-    gap: 0.5rem;
-}
-
-:deep(.comments-root) {
-    border-radius: 2rem;
-    border: none;
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
-    background: var(--background);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
-
-:deep(.comments-header) {
-    background: var(--background);
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid color-mix(in srgb, var(--secondary) 40%, transparent);
-    flex-shrink: 0;
-}
-
-:deep(.comments-content) {
-    background: var(--background);
-    padding: 0 !important;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    overflow: hidden;
-}
-
-:deep(.comments-close-btn) {
-    transition: background 0.2s;
-    border-radius: 50%;
-}
-
-:deep(.comments-close-btn:hover) {
-    background: color-mix(in srgb, var(--secondary) 20%, transparent);
-}
-
 .header-inner {
     display: flex;
     align-items: center;
@@ -280,16 +211,16 @@ watch(() => props.visible, (val) => {
     justify-content: center;
     width: 2.25rem;
     height: 2.25rem;
-    border-radius: 50%;
-    background: color-mix(in srgb, var(--primary) 12%, transparent);
-    border: 1px solid color-mix(in srgb, var(--primary) 25%, transparent);
+    border-radius: var(--radius-sm);
+    background: var(--primary-soft);
     color: var(--primary);
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     flex-shrink: 0;
 }
 
 .header-text {
-    font-size: 1.05rem;
+    font-family: var(--font-display);
+    font-size: 1.125rem;
     font-weight: 700;
     color: var(--text);
 }
@@ -297,22 +228,11 @@ watch(() => props.visible, (val) => {
 .scroll-area {
     flex: 1;
     overflow-y: auto;
-    padding: 0.75rem 1.25rem;
+    padding: 0.75rem 1rem;
     min-height: 200px;
-    max-height: 400px;
+    max-height: 420px;
     display: flex;
     flex-direction: column;
-    scrollbar-width: thin;
-    scrollbar-color: color-mix(in srgb, var(--secondary) 40%, transparent) transparent;
-}
-
-.scroll-area::-webkit-scrollbar {
-    width: 4px;
-}
-
-.scroll-area::-webkit-scrollbar-thumb {
-    background: color-mix(in srgb, var(--secondary) 40%, transparent);
-    border-radius: 999px;
 }
 
 .sentinel {
@@ -328,58 +248,63 @@ watch(() => props.visible, (val) => {
     gap: 0.75rem;
     flex: 1;
     padding: 2rem 0;
-    color: var(--gray);
-    opacity: 0.6;
+    color: var(--text-muted);
 }
 
 .empty-icon {
-    font-size: 2rem;
+    font-size: 1.75rem;
+    color: var(--primary);
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 999px;
+    background: var(--primary-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .empty-state p {
-    font-size: 0.85rem;
+    font-size: 0.9375rem;
     margin: 0;
 }
 
 .input-area {
-    border-top: 1px solid color-mix(in srgb, var(--secondary) 40%, transparent);
-    padding: 0.75rem 1.25rem 1rem;
+    border-top: 1px solid var(--border);
+    padding: 0.75rem 1rem 1rem;
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 0.5rem;
     flex-shrink: 0;
-    background: var(--background);
+    background: var(--surface);
 }
 
 .replying-banner {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.4rem 0.75rem;
-    border-radius: 0.6rem;
-    background: color-mix(in srgb, var(--primary) 8%, transparent);
-    border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
-    font-size: 0.78rem;
+    padding: 0.45rem 0.75rem;
+    border-radius: var(--radius-sm);
+    background: var(--primary-soft);
+    border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
+    font-size: 0.875rem;
     color: var(--text);
-    opacity: 0.9;
     cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
+    transition: border-color 0.15s;
 }
 
 .replying-banner:hover {
-    background: color-mix(in srgb, var(--primary) 14%, transparent);
-    border-color: color-mix(in srgb, var(--primary) 35%, transparent);
+    border-color: var(--primary);
 }
 
 .replying-info {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.45rem;
 }
 
 .replying-icon {
     color: var(--primary);
-    font-size: 0.7rem;
+    font-size: 0.8rem;
 }
 
 .replying-banner strong {
@@ -391,19 +316,20 @@ watch(() => props.visible, (val) => {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
     background: none;
     border: none;
     cursor: pointer;
-    color: var(--gray);
-    font-size: 0.7rem;
-    padding: 0.15rem;
+    color: var(--text-muted);
+    font-size: 0.75rem;
     border-radius: 50%;
-    transition: color 0.2s, background 0.2s;
+    transition: color 0.15s, background-color 0.15s;
 }
 
 .cancel-reply-btn:hover {
     color: var(--text);
-    background: color-mix(in srgb, var(--secondary) 20%, transparent);
+    background: var(--surface-hover);
 }
 
 .input-row {
@@ -414,50 +340,51 @@ watch(() => props.visible, (val) => {
 
 .comment-input {
     flex: 1;
-    background: color-mix(in srgb, var(--text) 5%, transparent);
-    border: 1px solid color-mix(in srgb, var(--secondary) 50%, transparent);
-    border-radius: 0.85rem;
-    padding: 0.6rem 0.9rem;
-    font-size: 0.875rem;
+    background: var(--background);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    padding: 0.65rem 0.9rem;
+    font-size: 0.9375rem;
     color: var(--text);
     font-family: inherit;
     outline: none;
     resize: none;
     line-height: 1.5;
-    transition: border-color 0.2s;
+    transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .comment-input:focus {
     border-color: var(--primary);
+    box-shadow: var(--focus-ring);
 }
 
 .comment-input:disabled {
-    opacity: 0.5;
+    opacity: 0.55;
 }
 
 .send-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 2.4rem;
-    height: 2.4rem;
-    border-radius: 50%;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--radius-md);
     border: none;
     background: var(--primary);
-    color: var(--background);
-    font-size: 0.85rem;
+    color: var(--on-primary);
+    font-size: 0.95rem;
     cursor: pointer;
     flex-shrink: 0;
-    transition: opacity 0.2s, transform 0.15s;
+    transition: background-color 0.15s, transform 0.15s;
 }
 
 .send-btn:hover:not(:disabled) {
-    opacity: 0.85;
-    transform: scale(1.05);
+    background: var(--primary-hover);
 }
 
 .send-btn:disabled {
-    opacity: 0.35;
+    background: var(--surface-2);
+    color: var(--text-subtle);
     cursor: not-allowed;
 }
 
@@ -473,30 +400,23 @@ watch(() => props.visible, (val) => {
 }
 </style>
 <style>
-.comments-root {
-    border-radius: 2rem !important;
-    border: none !important;
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35) !important;
-    background: var(--background) !important;
-    overflow: hidden !important;
+.p-dialog.comments-root {
+    display: flex;
+    flex-direction: column;
 }
 
 .comments-header {
-    background: var(--background) !important;
-    border-bottom: 1px solid color-mix(in srgb, var(--secondary) 50%, transparent) !important;
+    border-bottom: 1px solid var(--border) !important;
+    padding-bottom: 0.875rem !important;
+    flex-shrink: 0;
 }
 
 .comments-content {
-    background: var(--background) !important;
     padding: 0 !important;
-}
-
-.comments-close-btn {
-    border-radius: 50% !important;
-}
-
-.comments-close-btn:hover {
-    background: color-mix(in srgb, var(--secondary) 20%, transparent) !important;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
 }
 
 .loading-container {
@@ -509,16 +429,13 @@ watch(() => props.visible, (val) => {
 
 .loading-progressive-container {
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
     padding: 1rem 0;
 }
-.app-spinner :deep(.p-progressspinner-circle) {
-    stroke: var(--primary);
-    stroke-linecap: round;
-}
 
-.app-spinner {
-    opacity: 0.9;
+.app-spinner .p-progressspinner-circle {
+    stroke: var(--primary) !important;
+    stroke-linecap: round;
 }
 </style>

@@ -191,7 +191,10 @@
     "fetchMoviesError": "Failed to fetch movies. Please try again later.",
     "profile": "My Profile",
     "shortcuts": "Shortcuts",
-    "search": "Search"
+    "search": "Search",
+    "noMovies": "No more movies for now",
+    "tagline": "Swipe, rate and discover movies with your friends. Recommendations that learn from you.",
+    "emailLabel": "Email"
   },
   "onboarding": {
     "step1": "Let's get you started with a quick tour",
@@ -379,7 +382,8 @@
     "error": {
       "fetchingMovie": "Failed to load movie details. Please try again later.",
       "fetchingPerson": "Failed to load person details. Please try again later."
-    }
+    },
+    "yourRating": "Your rating"
   },
   "review": {
     "addReview": "Add Review",
@@ -434,7 +438,9 @@
     "close": "Close",
     "confirm": "Confirm",
     "seeMore": "See more",
-    "seeLess": "See less"
+    "seeLess": "See less",
+    "accept": "Accept",
+    "decline": "Decline"
   },
   "list": {
     "noDescription": "This list doesn't have a description.",
@@ -468,5 +474,8 @@
     "translate": "Translate",
     "showOriginal": "Show Original",
     "loading": "Translating..."
+  },
+  "reactions": {
+    "add": "Add reaction"
   }
 }

@@ -41,7 +41,10 @@ const localizedPrivacyConfig = computed(() => {
 
     <ScrollPanel v-else class="w-full" style="height: 350px">
       <div class="flex flex-col gap-2.5 py-1 pr-2">
-        <div v-for="item in props.items" :key="item.list.id" class="list-item group"
+        <div v-for="item in props.items" :key="item.list.id" class="list-item group" role="checkbox"
+          :aria-checked="!!item.containsMovie" tabindex="0"
+          @keydown.enter.prevent="item.containsMovie ? emit('remove', item.list.slug) : emit('add', item.list.slug)"
+          @keydown.space.prevent="item.containsMovie ? emit('remove', item.list.slug) : emit('add', item.list.slug)"
           :class="{ 'item-selected': item.containsMovie }" @click="
             item.containsMovie
               ? emit('remove', item.list.slug)
@@ -58,15 +61,16 @@ const localizedPrivacyConfig = computed(() => {
             <div class="flex flex-col gap-0.5">
               <span class="list-name">{{ item.list.name }}</span>
               <div v-if="item.list.privacity" :class="['privacity-badge', localizedPrivacyConfig[item.list.privacity]?.class]">
-                <i :class="[localizedPrivacyConfig[item.list.privacity]?.icon, 'text-[10px]']" />
+                <i :class="[localizedPrivacyConfig[item.list.privacity]?.icon]" aria-hidden="true" />
                 <span>{{ localizedPrivacyConfig[item.list.privacity]?.key }}</span>
               </div>
             </div>
           </div>
 
-          <div class="flex items-center">
-            <Checkbox :binary="true" :modelValue="item.containsMovie" class="custom-checkbox" @click.stop hidden />
-          </div>
+          <span class="check-indicator" aria-hidden="true">
+            <i v-if="item.containsMovie" class="pi pi-check" />
+          </span>
+          <Checkbox :binary="true" :modelValue="item.containsMovie" class="custom-checkbox" @click.stop hidden />
         </div>
 
         <div :ref="(el) => $emit('update:sentinelRef', el as HTMLElement | null)" class="h-px" />
@@ -92,89 +96,93 @@ const localizedPrivacyConfig = computed(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.85rem 1.25rem;
-  border-radius: 1.25rem;
-  background: color-mix(in srgb, var(--background) 95%, var(--text));
-  border: 1px solid color-mix(in srgb, var(--secondary) 20%, transparent);
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
   position: relative;
-  overflow: hidden;
 }
 
 .list-item:hover {
   border-color: var(--primary);
-  background: color-mix(in srgb, var(--primary) 5%, var(--background));
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: var(--surface-hover);
 }
 
 .item-selected {
-  border-color: color-mix(in srgb, var(--primary) 40%, transparent);
+  border-color: var(--primary);
+  background: var(--primary-soft);
 }
 
 .icon-wrapper {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: color-mix(in srgb, var(--secondary) 50%, transparent);
-  transition: all 0.3s ease;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  flex-shrink: 0;
 }
 
-.group:hover .icon-wrapper {
+.item-selected .icon-wrapper {
   background: var(--primary);
+  border-color: var(--primary);
 }
 
 .main-icon {
   color: var(--primary);
-  font-size: 1.1rem;
-  transition: all 0.3s ease;
+  font-size: 1rem;
 }
 
-.group:hover .main-icon {
-  color: var(--background);
-  transform: scale(1.1);
+.item-selected .main-icon {
+  color: var(--on-primary);
 }
 
 .list-name {
-  font-size: 0.95rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   color: var(--text);
-  letter-spacing: -0.01em;
 }
 
 .privacity-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 2px 10px;
-  border-radius: 2rem;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
+  gap: 5px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
   width: fit-content;
 }
 
-.badge-public {
-  background: rgba(34, 197, 94, 0.12);
-  color: #309153;
+.privacity-badge i {
+  font-size: 0.7rem;
 }
 
-.badge-private {
-  background: rgba(239, 68, 68, 0.12);
-  color: #b73b3b;
+.check-indicator {
+  width: 1.375rem;
+  height: 1.375rem;
+  border-radius: 6px;
+  border: 1.5px solid var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.7rem;
 }
 
-.badge-friends {
-  background: rgba(99, 102, 241, 0.12);
-  color: #4d57bd;
+.item-selected .check-indicator {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--on-primary);
 }
 
 .empty-state {
-  padding: 3rem 1.5rem;
+  padding: 2.5rem 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -182,35 +190,30 @@ const localizedPrivacyConfig = computed(() => {
 }
 
 .empty-icon-circle {
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--secondary) 10%, transparent);
+  background: var(--primary-soft);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
-  color: color-mix(in srgb, var(--secondary) 40%, var(--text));
+  margin-bottom: 0.75rem;
+  font-size: 1.4rem;
+  color: var(--primary);
 }
 
 .empty-title {
   font-weight: 600;
   color: var(--text);
-  opacity: 0.8;
 }
 
 .empty-desc {
-  font-size: 0.85rem;
-  opacity: 0.5;
+  font-size: 0.9375rem;
+  color: var(--text-muted);
   margin-top: 0.25rem;
 }
 
-:deep(.custom-skeleton) {
-  background: color-mix(in srgb, var(--secondary) 10%, transparent);
-}
-
 :deep(.p-scrollpanel-bar) {
-  background: color-mix(in srgb, var(--primary) 30%, transparent);
+  background: color-mix(in srgb, var(--text-subtle) 45%, transparent);
 }
 </style>

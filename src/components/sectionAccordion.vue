@@ -58,10 +58,13 @@ watch(() => [props.isEmpty, props.defaultOpen], () => {
     <Accordion :value="accordionValue" @update:value="handleAccordionChange">
         <AccordionPanel value="open" v-if="!isEmpty" class="section">
             <AccordionHeader class="section-header">
-                <i :class="[icon, iconClass]" />
+                <span class="section-icon" aria-hidden="true"><i :class="[icon, iconClass]" /></span>
                 <h2 class="section-title">{{ title }}</h2>
-                <Button v-if="dialogOptions" class="dialog-button" :class="dialogOptions.icon"
-                    label="{{ dialogOptions.label }}" @click.stop="dialogOptions.onClick" />
+                <button v-if="dialogOptions" type="button" class="dialog-button" :title="dialogOptions.label"
+                    @click.stop="dialogOptions.onClick" @keydown.enter.stop @keydown.space.stop>
+                    <i :class="dialogOptions.icon" aria-hidden="true" />
+                    <span class="dialog-button-label">{{ dialogOptions.label }}</span>
+                </button>
             </AccordionHeader>
             <AccordionContent class="section-body">
                 <ScrollPanel :style="`width: 100%; height: ${props.panelHeight || '350px'}`" ref="scrollPanelRef">
@@ -78,19 +81,21 @@ watch(() => [props.isEmpty, props.defaultOpen], () => {
 
         <AccordionPanel value="empty" v-else class="section">
             <AccordionHeader class="section-header">
-                <i :class="[icon, iconClass]" />
+                <span class="section-icon" aria-hidden="true"><i :class="[icon, iconClass]" /></span>
                 <h2 class="section-title">{{ title }}</h2>
-                <Button v-if="dialogOptions" class="dialog-button" :class="dialogOptions.icon"
-                    label="{{ dialogOptions.label }}" @click.stop="dialogOptions.onClick" />
+                <button v-if="dialogOptions" type="button" class="dialog-button" :title="dialogOptions.label"
+                    @click.stop="dialogOptions.onClick" @keydown.enter.stop @keydown.space.stop>
+                    <i :class="dialogOptions.icon" aria-hidden="true" />
+                    <span class="dialog-button-label">{{ dialogOptions.label }}</span>
+                </button>
             </AccordionHeader>
-            <AccordionContent
-                class="bg-secondary/5 rounded-[2rem] p-10 md:p-20 border-2 border-dashed border-secondary/40">
-                <div class="flex flex-col items-center justify-center text-center">
-                    <div class="w-20 h-20 bg-secondary/10 rounded-full flex items-center justify-center mb-4">
-                        <i :class="[(emptyIcon || icon), 'text-3xl text-secondary']" />
+            <AccordionContent class="section-body">
+                <div class="empty-state">
+                    <div class="empty-icon" aria-hidden="true">
+                        <i :class="(emptyIcon || icon)" />
                     </div>
-                    <h3 class="text-xl font-semibold opacity-70">{{ emptyTitle }}</h3>
-                    <p class="text-sm opacity-50 max-w-xs mx-auto">{{ emptyDescription }}</p>
+                    <h3 class="empty-title">{{ emptyTitle }}</h3>
+                    <p class="empty-description">{{ emptyDescription }}</p>
                 </div>
             </AccordionContent>
         </AccordionPanel>
@@ -100,6 +105,21 @@ watch(() => [props.isEmpty, props.defaultOpen], () => {
 <style scoped>
 :deep(.p-accordionheader) {
     color: var(--text);
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+}
+
+:deep(.p-accordionheader:hover) {
+    background: var(--surface-2) !important;
+}
+
+:deep(.p-accordionheader-toggle-icon) {
+    color: var(--text-subtle);
+}
+
+:deep(.p-accordionpanel) {
+    border: none;
 }
 
 :deep(.p-accordioncontent-content) {
@@ -107,10 +127,10 @@ watch(() => [props.isEmpty, props.defaultOpen], () => {
 }
 
 .section {
-    border-radius: 1.5rem;
-    border: 1px solid var(--secondary);
-    background: var(--background);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
     overflow: hidden;
 }
 
@@ -119,40 +139,81 @@ watch(() => [props.isEmpty, props.defaultOpen], () => {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid var(--secondary);
-    background: rgba(255, 255, 255, 0.05);
+    padding: 0.875rem 1.25rem !important;
+    min-height: 3.5rem;
+}
+
+:deep(.p-accordionheader[aria-expanded="true"]) {
+    border-bottom: 1px solid var(--border) !important;
+}
+
+.section-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+    border-radius: var(--radius-sm);
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-size: 0.95rem;
+}
+
+.section-icon :deep(i),
+.section-icon i {
+    color: var(--primary) !important;
 }
 
 .section-title {
-    font-weight: 900;
-    font-size: 0.6rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    opacity: 0.7;
+    flex: 1;
+    text-align: left;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: -0.01em;
+    color: var(--text);
     margin: 0;
 }
 
 .section-body {
-    padding: 1.5rem;
+    padding: 1.25rem;
 }
 
 .dialog-button {
-    position: absolute;
-    right: 3rem;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 0.75rem;
-    padding: 0.35rem 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-right: 0.5rem;
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    padding: 0.4rem 0.85rem;
     border-radius: 999px;
     font-weight: 600;
-    letter-spacing: 0.05em;
-    border: 1px solid var(--accent);
-    background: transparent;
-    color: var(--text);
+    border: 1px solid transparent;
+    background: var(--primary);
+    color: var(--on-primary);
     cursor: pointer;
-    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    transition: background-color 0.15s ease;
     white-space: nowrap;
+}
+
+.dialog-button i {
+    font-size: 0.75rem;
+}
+
+.dialog-button:hover {
+    background: var(--primary-hover);
+}
+
+@media (max-width: 480px) {
+    .dialog-button-label {
+        display: none;
+    }
+
+    .dialog-button {
+        padding: 0.5rem;
+    }
 }
 
 .accent-icon {
@@ -163,39 +224,18 @@ watch(() => [props.isEmpty, props.defaultOpen], () => {
     color: var(--primary);
 }
 
-.scroll-container {
-    max-height: 350px;
-    overflow-y: auto;
-    padding-right: 0.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.scroll-container::-webkit-scrollbar {
-    width: 4px;
-}
-
-.scroll-container::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.scroll-container::-webkit-scrollbar-thumb {
-    background: var(--secondary);
-    border-radius: 999px;
-}
-
 .loading-footer {
     display: flex;
     justify-content: center;
     padding: 1rem;
+    color: var(--primary);
 }
 
 .scroll-inner {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    padding-right: 0.5rem;
+    padding-right: 0.75rem;
 }
 
 .sentinel {
@@ -203,36 +243,57 @@ watch(() => [props.isEmpty, props.defaultOpen], () => {
 }
 
 :deep(.p-scrollpanel-bar) {
-    background: var(--secondary);
+    background: color-mix(in srgb, var(--text-subtle) 45%, transparent);
     border-radius: 999px;
-    width: 4px;
+    width: 6px;
     opacity: 1;
 }
 
 :deep(.p-scrollpanel-bar-y) {
-    width: 4px;
+    width: 6px;
 }
 
 :deep(.p-scrollpanel-bar:hover) {
     background: var(--primary);
 }
 
-:deep(.p-accordionheader[aria-expanded="true"]) .dialog-button i,
-:deep(.p-accordionheader[aria-expanded="true"]) .dialog-button::before,
-:deep(.p-accordionheader:hover) .dialog-button i,
-:deep(.p-accordionheader:hover) .dialog-button::before {
-    color: #000;
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 0.5rem;
+    padding: 2.5rem 1rem;
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface-2);
 }
 
-
-
-.dialog-button:hover {
-    background: var(--accent);
-    border-color: var(--accent);
+.empty-icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 999px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 0.25rem;
 }
 
-.dialog-button:hover i,
-.dialog-button:hover::before {
-    color: white !important;
+.empty-title {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+}
+
+.empty-description {
+    font-size: 0.9375rem;
+    color: var(--text-muted);
+    max-width: 22rem;
+    margin: 0;
 }
 </style>

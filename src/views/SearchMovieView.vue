@@ -132,7 +132,7 @@ watch(
     <div class="clear-filters-wrapper">
       <button class="btn-clear-filters" @click="router.push('/search')">
         <span class="btn-content">
-          <i class="pi pi-filter-slash" />
+          <i class="pi pi-filter-slash" aria-hidden="true" />
           <span>{{ $t("search.clearFilters") }}</span>
         </span>
         <span v-if="activeFiltersCount" class="filters-badge">
@@ -158,7 +158,7 @@ watch(
       <div class="clear-filters-wrapper">
         <button class="btn-clear-filters" @click="router.push('/search')">
           <span class="btn-content">
-            <i class="pi pi-filter-slash" />
+            <i class="pi pi-filter-slash" aria-hidden="true" />
             <span>{{ $t("search.clearFilters") }}</span>
           </span>
           <span v-if="activeFiltersCount" class="filters-badge">
@@ -183,7 +183,7 @@ watch(
 
     <div class="main-content">
       <div v-if="!loading && !movies.results?.length" class="empty-state">
-        <div class="empty-icon">
+        <div class="empty-icon" aria-hidden="true">
           <i class="pi pi-search"></i>
         </div>
         <p>{{ t("search.empty") }}</p>
@@ -216,9 +216,27 @@ watch(
 <style scoped>
 .movies-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
   min-height: 200px;
+}
+
+@media (min-width: 480px) {
+  .movies-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 900px) {
+  .movies-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .movies-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
 }
 
 .empty-state {
@@ -228,32 +246,37 @@ watch(
   align-items: center;
   justify-content: center;
   padding: 4rem 1rem;
-  gap: 8px;
+  gap: 0.5rem;
   text-align: center;
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
 }
 
 .empty-icon {
-  width: 48px;
-  height: 48px;
+  width: 3.5rem;
+  height: 3.5rem;
   border-radius: 50%;
-  background: var(--surface-100);
+  background: var(--primary-soft);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.25rem;
-  color: var(--text-color-secondary);
-  margin-bottom: 4px;
+  color: var(--primary);
+  margin-bottom: 0.25rem;
 }
 
 .empty-state p {
-  font-weight: 500;
-  color: var(--text-color);
-  font-size: 0.95rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--text);
+  font-size: 1.125rem;
+  margin: 0;
 }
 
 .empty-state span {
-  font-size: 0.85rem;
-  color: var(--text-color-secondary);
+  font-size: 0.9375rem;
+  color: var(--text-muted);
 }
 
 @media (max-width: 640px) {
@@ -276,7 +299,7 @@ watch(
   }
 
   .filters-sidebar {
-    width: 200px;
+    width: 240px;
   }
 
   .desktop-only {
@@ -284,19 +307,9 @@ watch(
   }
 }
 
-@media (min-width: 768px) {
-  .movies-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
 @media (min-width: 1024px) {
   .filters-sidebar {
-    width: 250px;
-  }
-
-  .movies-grid {
-    grid-template-columns: repeat(5, 1fr);
+    width: 272px;
   }
 }
 
@@ -304,6 +317,8 @@ watch(
   display: flex;
   gap: 1.5rem;
   align-items: flex-start;
+  max-width: 1440px;
+  margin: 0 auto;
 }
 
 .main-content {
@@ -315,23 +330,23 @@ watch(
   display: flex;
   align-items: center;
   gap: 8px;
+  min-height: 2.75rem;
   padding: 0.6rem 1.1rem;
-  border-radius: 1rem;
-  border: 1px solid color-mix(in srgb, var(--secondary) 20%, transparent);
-  background: color-mix(in srgb, var(--background) 95%, var(--text));
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
   color: var(--text);
-  font-family: "DM Sans", sans-serif;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: border-color 0.15s, background-color 0.15s;
   margin-bottom: 1rem;
 }
 
 .filters-toggle:hover {
   border-color: var(--primary);
-  background: color-mix(in srgb, var(--primary) 5%, var(--background));
-  transform: translateY(-1px);
+  background: var(--primary-soft);
 }
 
 .filters-toggle .pi-sliders-h {
@@ -344,59 +359,62 @@ watch(
   align-items: center;
   justify-content: center;
   background: var(--primary);
-  color: white;
+  color: var(--on-primary);
   font-size: 0.75rem;
-  font-weight: 800;
-  min-width: 1.25rem;
-  height: 1.25rem;
-  border-radius: 50%;
-  padding: 2px;
-  box-shadow: 0 2px 4px color-mix(in srgb, var(--primary) 30%, transparent);
+  font-weight: 700;
+  min-width: 1.375rem;
+  height: 1.375rem;
+  border-radius: 999px;
+  padding: 0 6px;
 }
 
 .filters-sidebar {
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
   position: sticky;
-  top: 1.5rem;
-  border: 1px solid var(--secondary);
-  border-radius: 1.25rem;
+  top: 5rem;
+  max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
   padding: 1.25rem;
 }
 
 .skeleton-card {
   aspect-ratio: 2 / 3;
-  border-radius: 1rem;
+  border-radius: var(--radius-lg);
   overflow: hidden;
 }
 
 .clear-filters-wrapper {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-  padding: 0 0.5rem;
+  margin: 0;
 }
 
 .btn-clear-filters {
   width: 100%;
+  min-height: 2.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: color-mix(in srgb, var(--background) 95%, var(--text)) !important;
-  border: 1px solid color-mix(in srgb, var(--secondary) 20%, transparent) !important;
-  border-radius: 1.25rem !important;
-  color: color-mix(in srgb, var(--text) 35%, transparent) !important;
-  padding: 8px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  padding: 0.5rem 0.875rem;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: border-color 0.15s, color 0.15s, background-color 0.15s;
 }
 
 .btn-content {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
 }
 
 .btn-content i {
@@ -405,9 +423,9 @@ watch(
 }
 
 .btn-clear-filters:hover {
-  border-color: var(--primary) !important;
-  color: var(--text) !important;
-  background: color-mix(in srgb, var(--background) 90%, var(--text)) !important;
+  border-color: var(--primary);
+  color: var(--text);
+  background: var(--primary-soft);
 }
 
 .btn-clear-filters:active {

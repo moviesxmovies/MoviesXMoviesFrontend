@@ -11,11 +11,11 @@ const props = defineProps<{
 
 const { formatRelativeTime } = useDate();
 
-const genderMap: Record<string, { color: string; icon: string }> = {
-    "0": { color: "var(--secondary)", icon: "pi pi-minus" },
-    "1": { color: "var(--accent)", icon: "pi pi-venus" },
-    "2": { color: "var(--primary)", icon: "pi pi-mars" },
-    "3": { color: "var(--secondary)", icon: "pi pi-question" },
+const genderMap: Record<string, { color: string; fg: string; icon: string }> = {
+    "0": { color: "var(--secondary)", fg: "var(--text)", icon: "pi pi-minus" },
+    "1": { color: "var(--accent)", fg: "var(--on-accent)", icon: "pi pi-venus" },
+    "2": { color: "var(--primary)", fg: "var(--on-primary)", icon: "pi pi-mars" },
+    "3": { color: "var(--secondary)", fg: "var(--text)", icon: "pi pi-question" },
 };
 
 const gender = computed(() => genderMap[props.celebrity.gender] ?? genderMap["0"]);
@@ -39,7 +39,8 @@ const hideTooltip = () => {
 </script>
 
 <template>
-    <div class="celeb-card" @click="goToPerson(celebrity.slug)">
+    <div class="celeb-card" role="link" tabindex="0" :aria-label="celebrity.name" @click="goToPerson(celebrity.slug)"
+        @keydown.enter="goToPerson(celebrity.slug)">
         <div class="cover">
 
             <img :src="celebrity.image" :alt="celebrity.name" class="cover-img" :class="{ loaded: imageLoaded }"
@@ -59,7 +60,7 @@ const hideTooltip = () => {
 
             <!-- ── LOADED STATE ───────────────────────────────── -->
             <template v-else>
-                <span v-if="gender" class="gender-badge" :style="{ background: gender.color }">
+                <span v-if="gender" class="gender-badge" :style="{ background: gender.color, color: gender.fg }">
                     <i :class="gender.icon" />
                 </span>
 
@@ -90,33 +91,32 @@ const hideTooltip = () => {
 <style scoped>
 .celeb-card {
     cursor: pointer;
-    border-radius: 1.25rem;
+    border-radius: var(--radius-lg);
     overflow: hidden;
-    border: 1px solid var(--secondary);
-    background: var(--background);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
     transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
 
-.celeb-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+.celeb-card:hover,
+.celeb-card:focus-visible {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
     border-color: var(--primary);
 }
 
 .celeb-card:active {
-    transform: scale(0.97);
+    transform: scale(0.98);
 }
 
-/* ── Cover ──────────────────────────────────────────────── */
 .cover {
     position: relative;
     aspect-ratio: 2 / 3;
     overflow: hidden;
-    background: var(--secondary);
+    background: var(--surface-2);
 }
 
-/* ── Skeletons ──────────────────────────────────────────── */
 :deep(.cover-skeleton) {
     position: absolute;
     inset: 0;
@@ -134,12 +134,10 @@ const hideTooltip = () => {
     right: 8px;
 }
 
-/* Los skeleton del footer heredan el layout del card-footer */
 :deep(.footer-skeleton) {
     display: block;
 }
 
-/* ── Image ──────────────────────────────────────────────── */
 .cover-img {
     position: absolute;
     inset: 0;
@@ -161,19 +159,17 @@ const hideTooltip = () => {
     transform: scale(1.04);
 }
 
-/* ── Badges ─────────────────────────────────────────────── */
 .gender-badge {
     position: absolute;
     top: 8px;
     right: 8px;
-    width: 22px;
-    height: 22px;
-    border-radius: 6px;
+    width: 26px;
+    height: 26px;
+    border-radius: var(--radius-sm);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.6rem;
-    color: #fff;
+    font-size: 0.75rem;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
     z-index: 3;
 }
@@ -182,56 +178,56 @@ const hideTooltip = () => {
     position: absolute;
     top: 8px;
     left: 8px;
-    width: 22px;
-    height: 22px;
-    border-radius: 6px;
+    width: 26px;
+    height: 26px;
+    border-radius: var(--radius-sm);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.55rem;
-    background: rgba(239, 68, 68, 0.88);
-    color: #fff;
+    font-size: 0.7rem;
+    background: rgba(8, 7, 14, 0.78);
+    color: #ffffff;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
     cursor: default;
     z-index: 3;
 }
 
-/* ── Footer ─────────────────────────────────────────────── */
+/* Gradiente siempre oscuro: el texto blanco mantiene ≥ 7:1 */
 .card-footer {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 1.5rem 0.75rem 0.75rem;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, transparent 100%);
+    padding: 2.5rem 0.8rem 0.8rem;
+    background: linear-gradient(to top, rgba(8, 7, 14, 0.94) 0%, rgba(8, 7, 14, 0.7) 55%, transparent 100%);
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
+    gap: 0.3rem;
     z-index: 3;
 }
 
 .name {
-    font-size: 0.8rem;
+    font-size: 0.9375rem;
     font-weight: 700;
-    color: #fff;
+    color: #ffffff;
     margin: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    line-height: 1.2;
+    line-height: 1.25;
 }
 
 .birthday {
     display: flex;
     align-items: center;
-    gap: 0.3rem;
-    font-size: 0.65rem;
-    color: rgba(255, 255, 255, 0.65);
+    gap: 0.35rem;
+    font-size: 0.8125rem;
+    color: rgba(255, 255, 255, 0.85);
 }
 
 .birthday i {
-    font-size: 0.6rem;
-    color: var(--accent);
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.85);
 }
 </style>
 
@@ -239,11 +235,12 @@ const hideTooltip = () => {
 .death-tooltip {
     position: fixed;
     transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.85);
-    color: #fff;
-    font-size: 0.65rem;
+    background: var(--text);
+    color: var(--background);
+    font-size: 0.8125rem;
+    font-weight: 500;
     white-space: nowrap;
-    padding: 3px 8px;
+    padding: 4px 9px;
     border-radius: 6px;
     pointer-events: none;
     z-index: 9999;

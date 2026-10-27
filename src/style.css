@@ -1,79 +1,320 @@
 @import "tailwindcss";
 
+/* =========================================================================
+   MoviesXMovies — Design tokens
+   Todos los colores de la app salen de aquí. Ver docs/guia-de-estilos.pdf.
+   Regla: ningún componente debe usar hex/rgba sueltos para texto o fondos;
+   usa siempre un token. Todas las parejas texto/fondo cumplen WCAG AA.
+   ========================================================================= */
+
 @theme {
   --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-text-subtle: var(--text-subtle);
   --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
   --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-primary-soft: var(--primary-soft);
   --color-secondary: var(--secondary);
   --color-accent: var(--accent);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+  --color-warning: var(--warning);
+  --color-star: var(--star);
 
-  --font-sans: "Inter", sans-serif;
-  --font-display: "Inter", sans-serif;
+  --font-sans: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Sora Variable", "Sora", "Inter Variable", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Fira Code", monospace;
 
-  --text-sm: 0.75rem;
+  /* Escala tipográfica (mínimo de lectura: 0.875rem / 14px) */
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.1rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.35rem;
   --text-base: 1rem;
-  --text-xl: 1.333rem;
-  --text-2xl: 1.777rem;
-  --text-3xl: 2.369rem;
-  --text-4xl: 3.158rem;
-  --text-5xl: 4.21rem;
+  --text-base--line-height: 1.6rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.7rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.75rem;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 2rem;
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: 2.25rem;
+  --text-4xl: 2.5rem;
+  --text-4xl--line-height: 1.15;
+  --text-5xl: 3.5rem;
+  --text-5xl--line-height: 1.05;
 
   --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
   --font-weight-bold: 700;
 }
 
+/* ---------- Tema claro ---------- */
 :root {
-  --text: #1f1f1f;
-  --background: #f2f2f2;
-  --primary: #2f27ce;
-  --secondary: #bcbbdd;
-  --accent: #bb3dff;
-  --yellow: #ffd700;
-  --gold: #827635;
-  --orange: #ff7f50;
-  --red: #ef4444;
-  --gray: #6b7280;
+  color-scheme: light;
 
-  --ob-card-bg: rgba(255, 255, 255, 0.95);
-  --ob-card-border: rgba(47, 39, 206, 0.15);
-  --ob-card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  --ob-text-muted: rgba(0, 0, 0, 0.4);
-  --ob-badge-bg: rgba(47, 39, 206, 0.08);
-  --ob-dot-future: rgba(0, 0, 0, 0.1);
+  /* Superficies */
+  --background: #f6f6fb;
+  --surface: #ffffff;
+  --surface-2: #eeeef6;
+  --surface-hover: #e7e6f3;
+  --border: #dcdbea;
+  --border-strong: #7c7a96; /* bordes de controles: 3.8:1 */
+
+  /* Texto */
+  --text: #15141f;        /* 16.9:1 */
+  --text-muted: #4a4960;  /*  8.1:1 */
+  --text-subtle: #626178; /*  5.6:1 – mínimo para texto */
+
+  /* Marca */
+  --primary: #3d34d6;       /* 7.3:1 sobre fondo */
+  --primary-hover: #3029ad;
+  --primary-active: #282487;
+  --on-primary: #ffffff;    /* 7.9:1 sobre primary */
+  --primary-soft: #ecebff;  /* fondo de chips / estados seleccionados */
+  --accent: #8a2bc9;        /* 6.0:1 */
+  --on-accent: #ffffff;
+  --brand-gradient: linear-gradient(135deg, #3d34d6 0%, #8a2bc9 100%);
+
+  /* Alias heredado: superficie tintada en la marca */
+  --secondary: #e4e2f6;
+
+  /* Semánticos */
+  --success: #15803d;
+  --success-soft: #dcfce7;
+  --danger: #c42020;
+  --danger-soft: #fde2e2;
+  --warning: #a15c07;
+  --warning-soft: #fef3c7;
+  --info: #1d63c9;
+  --star: #b87a00;          /* estrellas: 3.4:1 (no-texto) */
+  --star-fill: #f5b301;
+
+  /* Alias heredados (no usar en código nuevo) */
+  --yellow: var(--star-fill);
+  --gold: var(--star);
+  --orange: #c2410c;
+  --red: var(--danger);
+  --green: var(--success);
+  --gray: var(--text-subtle);
+  --text-color-secondary: var(--text-muted);
+  --text-color: var(--text);
+  --surface-100: var(--surface-2);
+  --accent-color: var(--accent);
+
+  /* Elevación y forma */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --shadow-sm: 0 1px 2px rgba(21, 20, 31, 0.06), 0 1px 3px rgba(21, 20, 31, 0.08);
+  --shadow-md: 0 4px 12px rgba(21, 20, 31, 0.08), 0 2px 4px rgba(21, 20, 31, 0.04);
+  --shadow-lg: 0 18px 40px rgba(21, 20, 31, 0.12);
+  --focus-ring: 0 0 0 3px color-mix(in srgb, var(--primary) 40%, transparent);
+  --overlay: rgba(10, 9, 20, 0.55);
+
+  /* Onboarding */
+  --ob-card-bg: var(--surface);
+  --ob-card-border: var(--border);
+  --ob-card-shadow: var(--shadow-lg);
+  --ob-text-muted: var(--text-subtle);
+  --ob-badge-bg: var(--primary-soft);
+  --ob-dot-future: var(--border);
 }
 
+/* ---------- Tema oscuro ---------- */
 .dark {
-  --text: #e0e0e0;
-  --background: #0d0d0d;
-  --primary: #3a31d8;
-  --secondary: #232244;
-  --accent: #7e00c2;
-  --yellow: #ffd700;
-  --gold: #ffd700;
+  color-scheme: dark;
 
-  --ob-card-bg: rgba(15, 15, 26, 0.93);
-  --ob-card-border: rgba(47, 39, 206, 0.35);
-  --ob-card-shadow: 0 2px 32px rgba(47, 39, 206, 0.15);
-  --ob-text-muted: rgba(255, 255, 255, 0.25);
-  --ob-badge-bg: rgba(47, 39, 206, 0.18);
-  --ob-dot-future: rgba(47, 39, 206, 0.18);
+  --background: #0f0e17;
+  --surface: #17162a;
+  --surface-2: #201e36;
+  --surface-hover: #29274a;
+  --border: #2e2c4a;
+  --border-strong: #6a6890;
+
+  --text: #ecebf5;        /* 16.2:1 */
+  --text-muted: #b4b2cc;  /*  9.3:1 */
+  --text-subtle: #9896b3; /*  6.7:1 */
+
+  --primary: #8b83ff;       /* 6.2:1 */
+  --primary-hover: #a39dff;
+  --primary-active: #bdb8ff;
+  --on-primary: #0f0e17;    /* 6.2:1 sobre primary */
+  --primary-soft: #26234a;
+  --accent: #c77dff;        /* 7.1:1 */
+  --on-accent: #0f0e17;
+  --brand-gradient: linear-gradient(135deg, #8b83ff 0%, #c77dff 100%);
+
+  --secondary: #232142;
+
+  --success: #4ade80;
+  --success-soft: #11291c;
+  --danger: #ff7a7a;
+  --danger-soft: #3a1518;
+  --warning: #fbbf24;
+  --warning-soft: #33260a;
+  --info: #6cb0ff;
+  --star: #ffc83d;
+  --star-fill: #ffc83d;
+
+  --orange: #fb923c;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.55);
+  --overlay: rgba(4, 3, 10, 0.7);
 }
 
+/* ---------- Base ---------- */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.55;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.015em;
+  color: var(--text);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--primary) 30%, transparent);
+  color: var(--text);
+}
+
+a {
+  color: inherit;
+}
+
+/* Foco visible y consistente para teclado */
+:where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Utilidades de texto */
+.text-muted {
+  color: var(--text-muted) !important;
+}
+
+.text-subtle {
+  color: var(--text-subtle) !important;
+}
+
+/* Etiqueta de sección: pequeña, en mayúsculas, legible */
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+/* Scrollbar discreta */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--text-subtle) 45%, transparent) transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------- Ajustes globales de PrimeVue ---------- */
 .p-skeleton {
-  background-color: color-mix(in srgb, var(--secondary) 30%, transparent) !important;
+  background-color: var(--surface-2) !important;
 }
 
 .p-skeleton::after {
   background: linear-gradient(90deg,
       transparent,
-      color-mix(in srgb, var(--secondary) 20%, var(--background)),
+      color-mix(in srgb, var(--surface-hover) 80%, transparent),
       transparent) !important;
 }
 
 .p-drawer,
 .p-drawer-header,
 .p-drawer-content {
-  background: var(--background) !important;
+  background: var(--surface) !important;
   color: var(--text) !important;
   border: none !important;
+}
+
+.p-dialog-mask,
+.p-drawer-mask {
+  background: var(--overlay) !important;
+  backdrop-filter: blur(4px);
+}
+
+.p-tooltip .p-tooltip-text {
+  background: var(--text) !important;
+  color: var(--background) !important;
+  font-size: 0.8125rem !important;
+  font-weight: 500;
+  padding: 0.4rem 0.65rem !important;
+  border-radius: var(--radius-sm) !important;
+}
+
+.p-inputtext::placeholder,
+.p-textarea::placeholder,
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-subtle) !important;
+  opacity: 1;
+}
+
+.p-message-error .p-message-text,
+.p-message-error.p-message-simple {
+  color: var(--danger) !important;
+}
+
+/* ---------- Insignias de privacidad (compartidas) ---------- */
+.badge-public,
+.badge-private,
+.badge-friends {
+  font-weight: 600;
+}
+
+.badge-public {
+  background: var(--success-soft) !important;
+  color: var(--success) !important;
+}
+
+.badge-private {
+  background: var(--danger-soft) !important;
+  color: var(--danger) !important;
+}
+
+.badge-friends {
+  background: var(--primary-soft) !important;
+  color: var(--primary) !important;
 }

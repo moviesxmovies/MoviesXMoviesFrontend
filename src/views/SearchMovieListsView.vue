@@ -62,7 +62,7 @@ watch(
 
     <div v-else-if="!movieLists.results?.length" class="state-box">
       <div class="empty-icon">
-        <i class="pi pi-search" style="font-size: 1rem" />
+        <i class="pi pi-search" aria-hidden="true" />
       </div>
       <p class="empty-title">{{ t("search.empty") }}</p>
       <span class="empty-sub">{{ t("search.help") }}</span>
@@ -114,7 +114,7 @@ watch(
 .movielist-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
+  gap: 1rem;
   min-height: 200px;
 }
 
@@ -127,7 +127,7 @@ watch(
 
 @media (min-width: 1280px) {
   .movielist-grid {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
@@ -137,37 +137,40 @@ watch(
   align-items: center;
   justify-content: center;
   padding: 4rem 1rem;
-  gap: 8px;
-  color: var(--text-color-secondary);
+  gap: 0.5rem;
   text-align: center;
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
 }
 
 .empty-icon {
-  width: 44px;
-  height: 44px;
+  width: 3.5rem;
+  height: 3.5rem;
   border-radius: 50%;
-  background: var(--surface-100);
+  background: var(--primary-soft);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-color-secondary);
-  margin-bottom: 4px;
+  color: var(--primary);
+  margin-bottom: 0.25rem;
 }
 
 .empty-title {
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: var(--text-color);
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text);
   margin: 0;
 }
 
 .empty-sub {
-  font-size: 0.85rem;
-  color: var(--text-color-secondary);
+  font-size: 0.9375rem;
+  color: var(--text-muted);
 }
 
 .skeleton-card {
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 4 / 5;
   border-radius: 1rem;
   overflow: hidden;
 }

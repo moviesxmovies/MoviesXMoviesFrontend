@@ -34,11 +34,11 @@ const isDark = computed(() => themeStore.theme === "dark");
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  background: color-mix(in srgb, var(--text) 8%, transparent);
-  border: 0.5px solid rgba(47, 39, 206, 0.15);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.1s ease;
   color: var(--text);
   overflow: hidden;
 }
@@ -58,11 +58,11 @@ const isDark = computed(() => themeStore.theme === "dark");
   height: 1.25rem;
   transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
     opacity 0.5s ease;
-  color: var(--primary);
+  color: var(--star);
 }
 
 .moon-icon {
-  color: var(--accent);
+  color: var(--primary);
 }
 
 .hidden-icon {
@@ -72,10 +72,10 @@ const isDark = computed(() => themeStore.theme === "dark");
 
 .theme-btn:hover {
   border-color: var(--primary);
-  background: color-mix(in srgb, var(--text) 12%, transparent);
+  background: var(--surface-hover);
 }
 
 .theme-btn:active {
-  transform: scale(0.92);
+  transform: scale(0.94);
 }
 </style>

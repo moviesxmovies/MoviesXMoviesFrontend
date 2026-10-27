@@ -4,70 +4,57 @@ const router = useRouter();
 </script>
 
 <template>
-  <div class="page min-h-dvh flex flex-col" style="
-      background: var(--background);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-    ">
-    <div class="nav-spacer h-13"></div>
-
-    <main class="flex-1 flex flex-col items-center justify-center px-6 py-16 text-center relative">
-      <div class="absolute inset-0 -z-10 blur-3xl bg-accent/10" />
-      <div class="check-email-card w-full max-w-sm rounded-2xl px-8 py-8 bg-background/80" style="
-          border: 0.5px solid rgba(47, 39, 206, 0.2);
-          box-shadow: 0 2px 24px rgba(47, 39, 206, 0.07);
-          backdrop-filter: blur(8px);
-        ">
-        <div class="hero-icon mb-6">
-          <i class="pi pi-envelope" style="
-              font-size: clamp(4rem, 15vw, 8rem);
-              color: var(--primary);
-              opacity: 0.9;
-            "></i>
-        </div>
-
-        <h2 class="text-sm font-semibold uppercase tracking-widest mb-2" style="color: var(--primary)">
-          {{ $t("checkEmail.title") }}
-        </h2>
-
-        <p class="text-sm leading-relaxed mb-8" style="color: var(--text); opacity: 0.6">
-          {{ $t("checkEmail.description") }}
-        </p>
-
-        <button
-          class="w-full rounded-lg py-3 text-sm font-semibold cursor-pointer transition-all duration-150 hover:-translate-y-px hover:opacity-90 active:scale-95 shadow-lg shadow-primary/20"
-          style="
-            background: var(--primary);
-            border: none;
-            color: #f2f2f2;
-            font-family: 'DM Sans', sans-serif;
-          " @click="router.push('/login')">
-          <i class="pi pi-arrow-left mr-2 text-xs"></i>
-          {{ $t("checkEmail.button") }}
-        </button>
+  <div class="auth-page">
+    <div class="auth-card text-center">
+      <div class="mail-icon" aria-hidden="true">
+        <i class="pi pi-envelope"></i>
       </div>
-    </main>
 
+      <h1 class="auth-title">{{ $t("checkEmail.title") }}</h1>
 
+      <p class="auth-subtitle mb-8">{{ $t("checkEmail.description") }}</p>
+
+      <button class="primary-btn" @click="router.push('/login')">
+        <i class="pi pi-arrow-left text-xs" aria-hidden="true"></i>
+        {{ $t("checkEmail.button") }}
+      </button>
+    </div>
   </div>
 </template>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap");
+.mail-icon {
+  width: 5.5rem;
+  height: 5.5rem;
+  margin: 0 auto 1.5rem;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-size: 2.5rem;
+  box-shadow: 0 0 0 10px color-mix(in srgb, var(--primary) 8%, transparent);
+}
 
-.film-strip {
+.primary-btn {
+  width: 100%;
+  min-height: 3rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+  border-radius: var(--radius-md);
   background: var(--primary);
+  color: var(--on-primary);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s;
 }
 
-.film-strip--top {
-  border-bottom: 2px solid var(--accent);
-}
-
-.film-strip--bottom {
-  border-top: 2px solid var(--accent);
-}
-
-.film-hole {
-  background: var(--background);
+.primary-btn:hover {
+  background: var(--primary-hover);
 }
 </style>

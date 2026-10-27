@@ -21,9 +21,9 @@ const icons: Record<string, string> = {
 };
 
 const accents: Record<string, string> = {
-    success: "var(--primary)",
-    error: "var(--accent)",
-    warn: "#f59e0b",
+    success: "var(--success)",
+    error: "var(--danger)",
+    warn: "var(--warning)",
     info: "var(--primary)",
 };
 
@@ -60,12 +60,13 @@ onMounted(() => {
         <div class="toast-stack" aria-live="polite" aria-atomic="false">
             <TransitionGroup name="toast">
                 <div v-for="toast in toasts" :key="toast.id" class="toast-card"
+                    :role="toast.severity === 'error' ? 'alert' : 'status'"
                     :style="{ '--accent-color': accents[toast.severity] }">
                     <!-- Left stripe -->
                     <span class="toast-stripe" />
 
                     <!-- Icon -->
-                    <span class="toast-icon" v-html="icons[toast.severity]" />
+                    <span class="toast-icon" aria-hidden="true" v-html="icons[toast.severity]" />
 
                     <!-- Text -->
                     <div class="toast-body">
@@ -92,36 +93,34 @@ onMounted(() => {
 </template>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap');
-
 /* ── STACK ── */
 .toast-stack {
     position: fixed;
-    top: 1.5rem;
+    top: 4.5rem;
     right: 1.5rem;
     z-index: 9999;
     display: flex;
     flex-direction: column;
     gap: 10px;
     pointer-events: none;
-    width: 340px;
+    width: 360px;
     max-width: calc(100vw - 2rem);
 }
 
 /* ── CARD ── */
 .toast-card {
     position: relative;
-    background: var(--background);
-    border: 0.5px solid rgba(47, 39, 206, 0.2);
-    border-radius: 16px;
-    box-shadow: 0 2px 24px rgba(47, 39, 206, 0.07);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
     display: flex;
     align-items: flex-start;
-    gap: 10px;
-    padding: 1rem 1.1rem 1.4rem 1rem;
+    gap: 12px;
+    padding: 0.9rem 1rem 1.15rem 1.1rem;
     overflow: hidden;
     pointer-events: all;
-    font-family: 'DM Sans', sans-serif;
+    font-family: var(--font-sans);
 }
 
 /* ── STRIPE ── */
@@ -130,23 +129,21 @@ onMounted(() => {
     left: 0;
     top: 0;
     bottom: 0;
-    width: 3px;
+    width: 4px;
     background: var(--accent-color);
-    border-radius: 16px 0 0 16px;
 }
 
 /* ── ICON ── */
 .toast-icon {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
-    background: var(--secondary);
+    background: color-mix(in srgb, var(--accent-color) 16%, transparent);
     color: var(--accent-color);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    margin-top: 1px;
 }
 
 /* ── BODY ── */
@@ -154,25 +151,22 @@ onMounted(() => {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 2px;
     min-width: 0;
 }
 
 .toast-summary {
-    font-size: 0.78rem;
-    font-weight: 600;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-    color: var(--accent-color);
-    line-height: 1.3;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.35;
 }
 
 .toast-detail {
     font-size: 0.875rem;
-    font-weight: 300;
-    color: var(--text);
-    opacity: 0.65;
-    line-height: 1.6;
+    font-weight: 400;
+    color: var(--text-muted);
+    line-height: 1.5;
     word-break: break-word;
 }
 
@@ -180,22 +174,21 @@ onMounted(() => {
 .toast-close {
     background: transparent;
     border: none;
-    color: var(--text);
-    opacity: 0.3;
+    color: var(--text-subtle);
     cursor: pointer;
-    border-radius: 8px;
-    padding: 3px;
+    border-radius: var(--radius-sm);
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    transition: opacity 0.15s, background 0.15s;
-    margin-top: 1px;
+    transition: color 0.15s, background-color 0.15s;
 }
 
 .toast-close:hover {
-    opacity: 0.7;
-    background: var(--secondary);
+    color: var(--text);
+    background: var(--surface-hover);
 }
 
 /* ── PROGRESS BAR ── */
@@ -205,8 +198,7 @@ onMounted(() => {
     left: 0;
     right: 0;
     height: 3px;
-    background: rgba(47, 39, 206, 0.08);
-    border-radius: 0 0 16px 16px;
+    background: var(--surface-2);
     overflow: hidden;
 }
 
@@ -251,6 +243,7 @@ onMounted(() => {
 /* ── MOBILE ── */
 @media (max-width: 480px) {
     .toast-stack {
+        top: auto;
         bottom: 1rem;
         right: 1rem;
         left: 1rem;

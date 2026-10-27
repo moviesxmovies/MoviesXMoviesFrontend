@@ -126,93 +126,90 @@ const handleFriends = () => {
 <style scoped>
 .btn-action {
   background: transparent;
-  border: 1px solid var(--accent);
-  color: var(--accent);
+  border: 1px solid var(--primary);
+  color: var(--primary);
   border-radius: 999px;
-  width: 2rem;
-  height: 2rem;
+  width: 2.25rem;
+  height: 2.25rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   transition:
-    background 0.2s,
-    color 0.2s,
+    background-color 0.15s,
+    color 0.15s,
     transform 0.1s;
   line-height: 1;
 }
 
 .btn-action:hover {
-  background: var(--accent);
-  color: #e0e0e0;
+  background: var(--primary);
+  color: var(--on-primary);
 }
 
 .btn-action:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
 }
 
 .status-info {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 2.25rem;
+  height: 2.25rem;
 }
 
-.status-friend {
-  border: 1px solid var(--primary);
-  color: var(--primary);
-}
-
-.status-friend:hover {
+/* Añadir: acción principal, relleno */
+.btn-action.status-add {
   background: var(--primary);
-  color: #e0e0e0;
+  color: var(--on-primary);
+  border-color: var(--primary);
+}
+
+.btn-action.status-add:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+/* Ya sois amigos: verde, al pasar indica que se puede quitar */
+.status-friend {
+  border: 1px solid var(--success);
+  color: var(--success);
+  background: var(--success-soft);
+}
+
+.btn-action.status-friend:hover {
+  background: var(--danger-soft);
+  border-color: var(--danger);
+  color: var(--danger);
 }
 
 .status-pending {
-  border: 1px solid var(--gold);
-  color: var(--gold);
-  animation: pulse 2s infinite;
+  border: 1px solid var(--warning);
+  color: var(--warning);
+  background: var(--warning-soft);
 }
 
-.status-pending:hover {
-  background: var(--gold);
+.btn-action.status-pending:hover {
+  background: var(--warning);
   color: var(--background);
 }
 
 .status-self {
   border: none;
-  color: var(--secondary);
+  color: var(--text-subtle);
 }
 
-.status-failed {
-  color: var(--red);
-  border-color: var(--red);
-}
-
+.status-failed,
 .btn-action.status-failed {
-  color: var(--red);
-  border-color: var(--red);
+  color: var(--danger);
+  border-color: var(--danger);
 }
 
 .btn-action.status-failed:hover {
-  background: var(--red);
-  color: white;
-}
-
-@keyframes pulse {
-  0% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.5;
-  }
-
-  100% {
-    opacity: 1;
-  }
+  background: var(--danger);
+  color: var(--background);
 }
 </style>

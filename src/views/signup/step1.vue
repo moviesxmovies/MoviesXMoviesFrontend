@@ -44,22 +44,16 @@ const route = useRoute();
 
 <template>
   <div class="flex flex-col gap-4 sm:gap-6">
-    <div class="text-center">
-      <img src="/favicon.svg" alt="Logo" class="w-16 h-16 m-auto" />
-      <h2 class="text-xl font-semibold" style="color: var(--text)">
-        {{ $t("signup.title") }}
-      </h2>
-      <p class="text-xs sm:text-sm mt-1" style="color: var(--text); opacity: 0.5">
-        {{ $t("signup.step1.subtitle") }}
-      </p>
+    <div class="auth-header !mb-0">
+      <div class="auth-logo"><img src="/favicon.svg" alt="" /></div>
+      <h1 class="auth-title">{{ $t("signup.title") }}</h1>
+      <p class="auth-subtitle">{{ $t("signup.step1.subtitle") }}</p>
     </div>
 
     <Form :resolver="resolver" @submit="onFormSubmit" class="flex flex-col gap-4 w-full">
-      <div v-if="fieldErrors?.__general__?.length" class="flex flex-col gap-1 rounded-lg p-3"
-        style="background-color: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3)">
-        <div v-for="msg in fieldErrors.__general__" :key="msg" class="flex items-center gap-1.5 text-xs"
-          style="color: #ef4444">
-          <i class="pi pi-exclamation-circle text-xs" />
+      <div v-if="fieldErrors?.__general__?.length" class="form-alert" role="alert">
+        <div v-for="msg in fieldErrors.__general__" :key="msg" class="field-msg error">
+          <i class="pi pi-exclamation-circle msg-icon" />
           {{ msg }}
         </div>
       </div>
@@ -71,14 +65,13 @@ const route = useRoute();
               'p-valid': $field?.dirty && !$field?.invalid,
             }" :aria-label="$t('signup.username')" />
             <InputIcon v-if="$field?.dirty" :class="$field?.invalid ? 'pi pi-times-circle' : 'pi pi-check-circle'
-              " :style="{ color: $field?.invalid ? '#ef4444' : '#22c55e' }" />
+              " :style="{ color: $field?.invalid ? 'var(--danger)' : 'var(--success)' }" />
           </IconField>
           <label for="username">{{ $t("signup.username") }}</label>
         </FloatLabel>
         <FieldMsg :field="$field" />
-        <div v-for="msg in (fieldErrors?.username ?? [])" :key="msg" class="flex items-center gap-1.5 text-xs"
-          style="color: #ef4444">
-          <i class="pi pi-times-circle text-xs" />
+        <div v-for="msg in (fieldErrors?.username ?? [])" :key="msg" class="field-msg error">
+          <i class="pi pi-times-circle msg-icon" />
           {{ msg }}
         </div>
       </FormField>
@@ -92,14 +85,13 @@ const route = useRoute();
               'p-valid': $field?.dirty && !$field?.invalid,
             }" :aria-label="$t('signup.email')" />
             <InputIcon v-if="$field?.dirty" :class="$field?.invalid ? 'pi pi-times-circle' : 'pi pi-check-circle'
-              " :style="{ color: $field?.invalid ? '#ef4444' : '#22c55e' }" />
+              " :style="{ color: $field?.invalid ? 'var(--danger)' : 'var(--success)' }" />
           </IconField>
           <label for="email">{{ $t("signup.email") }}</label>
         </FloatLabel>
         <FieldMsg :field="$field" />
-        <div v-for="msg in (fieldErrors?.email ?? [])" :key="msg" class="flex items-center gap-1.5 text-xs"
-          style="color: #ef4444">
-          <i class="pi pi-times-circle text-xs" />
+        <div v-for="msg in (fieldErrors?.email ?? [])" :key="msg" class="field-msg error">
+          <i class="pi pi-times-circle msg-icon" />
           {{ msg }}
         </div>
       </FormField>
@@ -113,9 +105,8 @@ const route = useRoute();
           <label for="password">{{ $t("signup.password") }}</label>
         </FloatLabel>
         <div v-if="$field?.dirty && $field?.invalid" class="flex flex-col gap-1 mt-1">
-          <div v-for="(error, i) of $field?.errors" :key="i" class="flex items-center gap-1.5 text-xs"
-            style="color: #ef4444">
-            <i class="pi pi-times-circle text-xs" />
+          <div v-for="(error, i) of $field?.errors" :key="i" class="field-msg error">
+            <i class="pi pi-times-circle msg-icon" />
             {{ error.message }}
           </div>
         </div>
@@ -132,9 +123,8 @@ const route = useRoute();
           }}</label>
         </FloatLabel>
         <FieldMsg :field="$field" />
-        <div v-for="msg in (fieldErrors?.confirm_password ?? [])" :key="msg" class="flex items-center gap-1.5 text-xs"
-          style="color: #ef4444">
-          <i class="pi pi-times-circle text-xs" />
+        <div v-for="msg in (fieldErrors?.confirm_password ?? [])" :key="msg" class="field-msg error">
+          <i class="pi pi-times-circle msg-icon" />
           {{ msg }}
         </div>
       </FormField>
@@ -142,37 +132,8 @@ const route = useRoute();
       <Button type="submit" :label="$t('next')" fluid class="mt-2" />
     </Form>
 
-    <div class="relative flex items-center gap-3">
-      <div class="flex-1 h-px" style="background-color: var(--secondary)" />
-      <span class="text-xs" style="color: var(--text); opacity: 0.4">{{
-        $t("signup.or")
-      }}</span>
-      <div class="flex-1 h-px" style="background-color: var(--secondary)" />
-    </div>
+    <div class="auth-divider !my-0"><span>{{ $t("signup.or") }}</span></div>
 
     <OauthButtonComponent @click="loginWithGoogle" />
   </div>
 </template>
-
-<style scoped>
-.field-msg {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.78rem;
-  animation: fadeIn 0.15s ease;
-}
-
-.field-msg.error {
-  color: #ef4444;
-}
-
-.field-msg.success {
-  color: #22c55e;
-}
-
-.msg-icon {
-  font-size: 0.85rem;
-  flex-shrink: 0;
-}
-</style>

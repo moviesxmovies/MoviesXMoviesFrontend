@@ -28,7 +28,7 @@ const emit = defineEmits<{
 <template>
   <AccordionPanel :value="index" v-if="props.list?.length" class="section">
     <AccordionHeader class="section-header">
-      <i :class="[props.icon || 'pi pi-video', 'primary-icon']" />
+      <span class="section-icon" aria-hidden="true"><i :class="props.icon || 'pi pi-video'" /></span>
       <h2 class="section-title">
         {{ props.title }}
       </h2>
@@ -48,21 +48,20 @@ const emit = defineEmits<{
 
   <AccordionPanel :value="index" v-if="props.empty" class="section">
     <AccordionHeader class="section-header">
-      <i :class="[props.icon || 'pi pi-video', 'primary-icon']" />
+      <span class="section-icon" aria-hidden="true"><i :class="props.icon || 'pi pi-video'" /></span>
       <h2 class="section-title">
         {{ props.title }}
       </h2>
     </AccordionHeader>
-    <AccordionContent class="bg-secondary/5 rounded-[2rem] p-10 md:p-20 border-2 border-dashed border-secondary/40">
-      <div class="flex flex-col items-center justify-center text-center">
-
-        <div class="w-20 h-20 bg-secondary/10 rounded-full flex items-center justify-center mb-4">
-          <i class="pi pi-video text-3xl text-secondary"></i>
+    <AccordionContent class="section-body">
+      <div class="empty-state">
+        <div class="empty-icon" aria-hidden="true">
+          <i class="pi pi-video"></i>
         </div>
-        <h3 class="text-xl font-semibold opacity-70">
+        <h3 class="empty-title">
           {{ t("components.filmography.no_movies") }}
         </h3>
-        <p class="text-sm opacity-50 max-w-xs mx-auto">
+        <p class="empty-description">
           {{ t("components.filmography.no_movies_description") }}
         </p>
       </div>
@@ -73,21 +72,32 @@ const emit = defineEmits<{
 <style scoped>
 :deep(.p-accordionheader) {
   color: var(--text);
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+:deep(.p-accordionheader:hover) {
+  background: var(--surface-2) !important;
+}
+
+:deep(.p-accordionheader[aria-expanded="true"]) {
+  border-bottom: 1px solid var(--border) !important;
+}
+
+:deep(.p-accordionheader-toggle-icon) {
+  color: var(--text-subtle);
 }
 
 :deep(.p-accordioncontent-content) {
   all: unset;
 }
 
-.primary-icon {
-  color: var(--primary);
-}
-
 .section {
-  border-radius: 1.5rem;
-  border: 1px solid var(--secondary);
-  background: var(--background);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
 }
 
@@ -95,54 +105,92 @@ const emit = defineEmits<{
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--secondary);
-  background: rgba(255, 255, 255, 0.05);
+  padding: 0.875rem 1.25rem !important;
+  min-height: 3.5rem;
+}
+
+.section-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-size: 0.95rem;
 }
 
 .section-title {
-  font-weight: 900;
-  font-size: 0.6rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  opacity: 0.7;
+  flex: 1;
+  text-align: left;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  color: var(--text);
   margin: 0;
 }
 
 .section-body {
-  padding: 1.5rem;
+  padding: 1.25rem;
 }
 
-.empty-movies {
+.empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
+  text-align: center;
   gap: 0.5rem;
-  padding: 3rem 0;
-  color: var(--gray);
+  padding: 2.5rem 1rem;
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
 }
 
 .empty-icon {
-  font-size: 2.5rem;
-  opacity: 0.2;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
 }
 
-.empty-label {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  font-weight: 700;
+.empty-title {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.empty-description {
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+  max-width: 22rem;
+  margin: 0;
 }
 
 :deep(.movies-grid) {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
+  padding-right: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  :deep(.movies-grid) {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 @media (min-width: 1024px) {
   :deep(.movies-grid) {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
@@ -156,19 +204,21 @@ const emit = defineEmits<{
   display: flex;
   justify-content: center;
   padding: 1rem;
+  color: var(--primary);
 }
+
 :deep(.p-scrollpanel-bar) {
-    background: var(--secondary);
-    border-radius: 999px;
-    width: 4px;
-    opacity: 1;
+  background: color-mix(in srgb, var(--text-subtle) 45%, transparent);
+  border-radius: 999px;
+  width: 6px;
+  opacity: 1;
 }
 
 :deep(.p-scrollpanel-bar-y) {
-    width: 4px;
+  width: 6px;
 }
 
 :deep(.p-scrollpanel-bar:hover) {
-    background: var(--primary);
+  background: var(--primary);
 }
 </style>

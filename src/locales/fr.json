@@ -191,7 +191,10 @@
     "fetchMoviesError": "Impossible de charger les films. Veuillez réessayer plus tard.",
     "profile": "Mon profil",
     "shortcuts": "Raccourcis",
-    "search": "Rechercher"
+    "search": "Rechercher",
+    "noMovies": "Plus de films pour le moment",
+    "tagline": "Swipez, notez et découvrez des films avec vos amis. Des recommandations qui apprennent de vous.",
+    "emailLabel": "E-mail"
   },
   "onboarding": {
     "step1": "Faisons une visite guidée rapide",
@@ -232,8 +235,12 @@
       "required": "Le nom d'utilisateur est requis",
       "maxLength": "Le nom d'utilisateur ne peut pas dépasser 15 caractères"
     },
-    "firstName": { "required": "Le prénom est requis" },
-    "lastName": { "required": "Le nom est requis" },
+    "firstName": {
+      "required": "Le prénom est requis"
+    },
+    "lastName": {
+      "required": "Le nom est requis"
+    },
     "email": {
       "required": "L'e-mail est requis",
       "invalid": "Adresse e-mail invalide"
@@ -256,9 +263,15 @@
       "samePasswordAs": "Le mot de passe ne peut pas être identique à votre {0}",
       "passwordSameAsEmail": "Le mot de passe ne peut pas être identique à votre e-mail"
     },
-    "forgotPasswordCode": { "required": "Le code de réinitialisation du mot de passe est requis" },
-    "listName": { "min": "Le nom est requis" },
-    "privacity": { "required": "Le paramètre de confidentialité est requis" }
+    "forgotPasswordCode": {
+      "required": "Le code de réinitialisation du mot de passe est requis"
+    },
+    "listName": {
+      "min": "Le nom est requis"
+    },
+    "privacity": {
+      "required": "Le paramètre de confidentialité est requis"
+    }
   },
   "checkEmail": {
     "title": "Vérifiez votre e-mail",
@@ -369,7 +382,8 @@
     "error": {
       "fetchingMovie": "Impossible de charger les détails du film. Veuillez réessayer plus tard.",
       "fetchingPerson": "Impossible de charger les détails de la personne. Veuillez réessayer plus tard."
-    }
+    },
+    "yourRating": "Votre note"
   },
   "review": {
     "addReview": "Ajouter un avis",
@@ -424,7 +438,9 @@
     "close": "Fermer",
     "confirm": "Confirmer",
     "seeMore": "Voir plus",
-    "seeLess": "Voir moins"
+    "seeLess": "Voir moins",
+    "accept": "Accepter",
+    "decline": "Refuser"
   },
   "list": {
     "noDescription": "Cette liste n'a pas de description.",
@@ -458,5 +474,8 @@
     "translate": "Traduire",
     "showOriginal": "Afficher l'original",
     "loading": "Traduction en cours..."
+  },
+  "reactions": {
+    "add": "Ajouter une réaction"
   }
 }

@@ -57,11 +57,10 @@ onUnmounted(() => {
       class="py-3" />
 
     <div class="mt-8 flex flex-col gap-2">
-      <p class="text-xs" style="color: var(--text); opacity: 0.5">
+      <p class="text-sm text-muted">
         {{ $t("verify.didntReceive") }}
       </p>
-      <button type="button" @click="emit('sendCode')" class="text-sm font-bold hover:underline"
-        style="color: var(--primary)">
+      <button type="button" @click="emit('sendCode')" class="resend-btn">
         {{ $t("verify.resend") }}
       </button>
     </div>
@@ -70,28 +69,36 @@ onUnmounted(() => {
 
 <style scoped>
 .custom-otp-input {
-  width: 42px;
-  height: 52px;
-  font-size: 1.25rem;
+  width: 46px;
+  height: 56px;
+  font-family: var(--font-display);
+  font-size: 1.375rem;
   font-weight: 700;
   text-align: center;
-  background-color: transparent;
+  background-color: var(--surface);
   color: var(--text);
-  border: 2px solid var(--secondary);
-  border-radius: 12px;
-  transition: all 0.2s ease;
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
   outline: none;
 }
 
 .custom-otp-input:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 1px var(--primary);
+  box-shadow: var(--focus-ring);
 }
 
-:deep(.p-button) {
-  background-color: var(--primary) !important;
-  border-color: var(--primary) !important;
-  color: white !important;
+.resend-btn {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.resend-btn:hover {
+  text-decoration: underline;
 }
 
 .p-message {

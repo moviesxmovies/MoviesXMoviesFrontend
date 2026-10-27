@@ -27,45 +27,41 @@ defineEmits<{
 
 <style scoped>
 .translate-btn {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
+    gap: 0.35rem;
     background: none;
     border: none;
-    padding: 0;
+    padding: 0.2rem 0;
     cursor: pointer;
     font-family: inherit;
-    font-size: 0.72rem;
+    font-size: 0.8125rem;
     font-weight: 600;
-    color: var(--gray);
-    opacity: 0.7;
-    transition: opacity 0.2s, color 0.2s;
+    color: var(--text-subtle);
+    transition: color 0.15s;
     align-self: flex-start;
     margin-top: 0.15rem;
 }
 
 .translate-btn:hover:not(:disabled) {
-    opacity: 1;
     color: var(--primary);
 }
 
 .translate-btn--active {
     color: var(--primary);
-    opacity: 1;
 }
 
 .translate-btn--loading {
-    opacity: 0.5;
-    cursor: not-allowed;
+    cursor: progress;
 }
 
 .translate-btn i {
-    font-size: 0.68rem;
+    font-size: 0.8125rem;
 }
 
 .translate-error {
-    font-size: 0.68rem;
-    color: var(--danger, #e74c3c);
+    font-size: 0.8125rem;
+    color: var(--danger);
     margin-top: 0.1rem;
 }
 </style>

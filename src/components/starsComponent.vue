@@ -68,10 +68,12 @@ watch(() => props.loading, (val) => {
 
 </script>
 <template>
-  <div ref="starsContainer" class="touch-none select-none flex justify-center transition-opacity duration-300 relative"
+  <div ref="starsContainer" role="group" class="touch-none select-none flex justify-center transition-opacity duration-300 relative"
     :class="loading ? 'opacity-40 pointer-events-none' : 'opacity-100'" @mouseleave="handleMouseLeave"
     @touchend.prevent="rateMovie(focusedRating)" @touchmove.prevent="handleTouchMove">
-    <i v-for="i in 5" :key="i" class="pi text-5xl mx-2 star-icon" :class="[
+    <i v-for="i in 5" :key="i" class="pi text-5xl mx-2 star-icon" role="button" :tabindex="loading ? -1 : 0"
+      :aria-label="`${i} / 5`" @keydown.enter.prevent="!loading && rateMovie(i)"
+      @keydown.space.prevent="!loading && rateMovie(i)" @focus="!loading && handleMouseEnter(i)" @blur="handleMouseLeave" :class="[
       (isActive(i) || poppingActive[i - 1]) ? 'pi-star-fill active' : 'pi-star',
       { 'cursor-pointer': !loading },
       { 'star-pop': poppingStars[i - 1] },
@@ -81,13 +83,19 @@ watch(() => props.loading, (val) => {
 <style scoped>
 .star-icon {
   transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s ease;
-  color: var(--primary);
+  color: var(--text-subtle);
+  border-radius: 999px;
+}
+
+.star-icon:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
 }
 
 .pi-star-fill.active {
-  color: var(--yellow);
-  transform: scale(1.15);
-  text-shadow: 0 0 12px color-mix(in srgb, var(--yellow) 60%, transparent);
+  color: var(--star-fill);
+  transform: scale(1.12);
+  text-shadow: 0 0 14px color-mix(in srgb, var(--star-fill) 45%, transparent);
 }
 
 .star-pop {
@@ -96,24 +104,23 @@ watch(() => props.loading, (val) => {
 
 @keyframes star-pop {
   0% {
-    transform: scale(1.15);
-    color: var(--yellow);
-
+    transform: scale(1.12);
+    color: var(--star-fill);
   }
 
   50% {
-    transform: scale(1.6);
+    transform: scale(1.5);
   }
 
   100% {
-    transform: scale(1.15);
+    transform: scale(1.12);
   }
 }
 
 @media (hover: hover) {
   .star-icon:hover {
-    transform: scale(1.2);
-    color: var(--yellow);
+    transform: scale(1.18);
+    color: var(--star-fill);
   }
 }
 

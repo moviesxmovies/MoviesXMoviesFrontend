@@ -71,15 +71,17 @@ const form = defineModel<{ title: string; content: string; isPositive: boolean }
             <div class="fields">
                 <!-- SENTIMENT -->
                 <div class="field">
-                    <label for="review-sentiment">{{ t('review.sentiment') }}</label>
-                    <div class="sentiment-toggle">
+                    <span id="review-sentiment" class="field-label">{{ t('review.sentiment') }}</span>
+                    <div class="sentiment-toggle" role="radiogroup" aria-labelledby="review-sentiment">
                         <button type="button" class="sentiment-btn"
+                            role="radio" :aria-checked="form.isPositive"
                             :class="{ active: form.isPositive, positive: form.isPositive }"
                             @click="form.isPositive = true">
                             <i class="pi pi-thumbs-up" />
                             {{ t('review.positive') }}
                         </button>
                         <button type="button" class="sentiment-btn"
+                            role="radio" :aria-checked="!form.isPositive"
                             :class="{ active: !form.isPositive, negative: !form.isPositive }"
                             @click="form.isPositive = false">
                             <i class="pi pi-thumbs-down" />
@@ -134,8 +136,69 @@ const form = defineModel<{ title: string; content: string; isPositive: boolean }
 .form {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-    padding: 0.5rem 0;
+    gap: 1.25rem;
+    padding: 0.25rem 0;
+}
+
+.fields {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+/* ── Formulario (patrón compartido, ver guía de estilos) ── */
+label,
+.field-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.input,
+.textarea {
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    padding: 0.65rem 0.9rem;
+    font-size: 0.9375rem;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    font-family: inherit;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.input:hover,
+.textarea:hover {
+    border-color: var(--text-subtle);
+}
+
+.input:focus,
+.textarea:focus {
+    border-color: var(--primary);
+    box-shadow: var(--focus-ring);
+}
+
+.input-error {
+    border-color: var(--danger) !important;
+}
+
+.textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.field-error {
+    font-size: 0.8125rem;
+    color: var(--danger);
+    font-weight: 500;
 }
 
 .server-errors {
@@ -143,11 +206,11 @@ const form = defineModel<{ title: string; content: string; isPositive: boolean }
     align-items: flex-start;
     gap: 0.6rem;
     padding: 0.75rem 1rem;
-    border-radius: 0.75rem;
-    background: color-mix(in srgb, var(--red) 10%, transparent);
-    border: 1px solid color-mix(in srgb, var(--red) 30%, transparent);
-    color: var(--red);
-    font-size: 0.82rem;
+    border-radius: var(--radius-md);
+    background: var(--danger-soft);
+    border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent);
+    color: var(--danger);
+    font-size: 0.875rem;
 }
 
 .server-errors i {
@@ -164,25 +227,70 @@ const form = defineModel<{ title: string; content: string; isPositive: boolean }
     gap: 0.2rem;
 }
 
-.fields {
+/* ── Botones del pie ── */
+.footer-actions {
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+    padding-top: 0.75rem;
+    width: 100%;
 }
 
-.field {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
+.btn-cancel,
+.btn-reset,
+.btn-save {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 2.5rem;
+    padding: 0.55rem 1.2rem;
+    border-radius: var(--radius-md);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s;
 }
 
-label {
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
+.btn-cancel {
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-muted);
+}
+
+.btn-cancel:hover:not(:disabled) {
+    background: var(--surface-hover);
     color: var(--text);
-    opacity: 0.6;
+}
+
+.btn-reset {
+    border: 1px solid var(--border-strong);
+    background: transparent;
+    color: var(--text);
+}
+
+.btn-reset:hover:not(:disabled) {
+    background: var(--surface-hover);
+}
+
+.btn-save {
+    border: 1px solid transparent;
+    background: var(--primary);
+    color: var(--on-primary);
+    font-weight: 700;
+}
+
+.btn-save:hover:not(:disabled) {
+    background: var(--primary-hover);
+}
+
+.btn-cancel:disabled,
+.btn-reset:disabled,
+.btn-save:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
 }
 
 /* SENTIMENT TOGGLE */
@@ -197,165 +305,57 @@ label {
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    min-height: 2.75rem;
     padding: 0.6rem 1rem;
-    border-radius: 0.75rem;
-    border: 1px solid color-mix(in srgb, var(--secondary) 50%, transparent);
-    background: color-mix(in srgb, var(--text) 5%, transparent);
-    color: var(--text);
-    font-size: 0.85rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-muted);
+    font-size: 0.9375rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s, border-color 0.2s, color 0.2s;
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s;
     font-family: inherit;
-    opacity: 0.5;
-}
-
-.sentiment-btn.active {
-    opacity: 1;
-}
-
-.sentiment-btn.positive {
-    border-color: color-mix(in srgb, var(--green, #22c55e) 60%, transparent);
-    background: color-mix(in srgb, var(--green, #22c55e) 12%, transparent);
-    color: var(--green, #22c55e);
-}
-
-.sentiment-btn.negative {
-    border-color: color-mix(in srgb, var(--red) 60%, transparent);
-    background: color-mix(in srgb, var(--red) 12%, transparent);
-    color: var(--red);
 }
 
 .sentiment-btn:not(.active):hover {
-    opacity: 0.75;
-    background: color-mix(in srgb, var(--text) 8%, transparent);
-}
-
-/* INPUTS */
-.input {
-    background: color-mix(in srgb, var(--text) 5%, transparent);
-    border: 1px solid color-mix(in srgb, var(--secondary) 50%, transparent);
-    border-radius: 0.75rem;
-    padding: 0.6rem 0.9rem;
-    font-size: 0.9rem;
+    border-color: var(--border-strong);
     color: var(--text);
-    outline: none;
-    transition: border-color 0.2s;
-    font-family: inherit;
-    width: 100%;
-    box-sizing: border-box;
 }
 
-.input:focus {
-    border-color: var(--primary);
+.sentiment-btn.positive {
+    border-color: var(--success);
+    background: var(--success-soft);
+    color: var(--success);
 }
 
-.input-error {
-    border-color: var(--red) !important;
-}
-
-.textarea {
-    resize: vertical;
-    min-height: 120px;
-}
-
-.field-error {
-    font-size: 0.75rem;
-    color: var(--red);
-    font-weight: 500;
-}
-
-/* FOOTER */
-.footer-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.75rem;
-    padding-top: 0.5rem;
-    width: 100%;
-}
-
-.btn-cancel {
-    padding: 0.5rem 1.2rem;
-    border-radius: 999px;
-    border: 1px solid color-mix(in srgb, var(--secondary) 60%, transparent);
-    background: transparent;
-    color: var(--text);
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-    font-family: inherit;
-}
-
-.btn-cancel:hover {
-    background: color-mix(in srgb, var(--secondary) 15%, transparent);
-}
-
-.btn-save {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.5rem 1.4rem;
-    border-radius: 999px;
-    border: none;
-    background: var(--primary);
-    color: var(--background);
-    font-size: 0.85rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: opacity 0.2s;
-    font-family: inherit;
-}
-
-.btn-save:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.btn-save:hover:not(:disabled) {
-    opacity: 0.85;
-}
-
-.btn-reset {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.5rem 1.4rem;
-    border-radius: 999px;
-    border: 1px solid color-mix(in srgb, var(--orange) 60%, transparent);
-    background: transparent;
-    color: var(--text);
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
-}
-
-.btn-reset:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.btn-reset:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--orange) 15%, transparent);
-    border-color: color-mix(in srgb, var(--orange) 80%, transparent);
+.sentiment-btn.negative {
+    border-color: var(--danger);
+    background: var(--danger-soft);
+    color: var(--danger);
 }
 
 /* MD EDITOR */
 :deep(.md-editor) {
-    border-radius: 0.75rem;
-    border: 1px solid color-mix(in srgb, var(--secondary) 50%, transparent);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-strong);
     --md-color: var(--text) !important;
     --md-hover-color: var(--primary) !important;
-    --md-bk-color: color-mix(in srgb, var(--text) 5%, transparent) !important;
-    --md-bk-color-outstand: color-mix(in srgb, var(--text) 8%, transparent) !important;
-    --md-border-color: color-mix(in srgb, var(--secondary) 40%, transparent) !important;
-    --md-color-disable: color-mix(in srgb, var(--text) 30%, transparent) !important;
+    --md-bk-color: var(--surface) !important;
+    --md-bk-color-outstand: var(--surface-2) !important;
+    --md-bk-hover-color: var(--surface-hover) !important;
+    --md-border-color: var(--border) !important;
+    --md-color-disable: var(--text-subtle) !important;
+}
+
+:deep(.md-editor:focus-within) {
+    border-color: var(--primary);
+    box-shadow: var(--focus-ring);
 }
 
 :deep(.md-editor-toolbar-wrapper) {
-    background: color-mix(in srgb, var(--text) 8%, transparent) !important;
-    border-radius: 0.75rem 0.75rem 0 0;
+    background: var(--surface-2) !important;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
 }
 
 :deep(.md-editor-content) {
@@ -370,15 +370,11 @@ label {
 }
 
 :deep(.md-editor-custom-scrollbar__track) {
-    background: color-mix(in srgb, var(--secondary) 20%, transparent) !important;
+    background: transparent !important;
 }
 
 :deep(.md-editor-custom-scrollbar__thumb) {
-    background: color-mix(in srgb, var(--secondary) 60%, transparent) !important;
+    background: color-mix(in srgb, var(--text-subtle) 45%, transparent) !important;
     border-radius: 999px;
-}
-
-:deep(.md-editor-custom-scrollbar__thumb:hover) {
-    background: var(--secondary) !important;
 }
 </style>

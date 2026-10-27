@@ -87,16 +87,25 @@ const emit = defineEmits([
   box-shadow: none !important;
 }
 
+:deep(.p-accordionheader) {
+  color: var(--text) !important;
+  font-family: var(--font-sans);
+}
+
 :deep(.p-accordionheader:hover),
 :deep(.p-accordionheader:focus-visible),
 :deep(.p-accordionpanel-active .p-accordionheader) {
   color: var(--text) !important;
 }
 
+:deep(.p-accordionheader-toggle-icon) {
+  color: var(--text-subtle);
+}
+
 .filters-content {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 
 .filter-group {
@@ -105,11 +114,15 @@ const emit = defineEmits([
   gap: 0.6rem;
 }
 
+.filter-group + .filter-group {
+  padding-top: 1.25rem !important;
+  border-top: 1px solid var(--border) !important;
+}
+
 .filter-label {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: color-mix(in srgb, var(--text) 40%, transparent);
+  letter-spacing: 0;
+  color: var(--text);
 }
 </style>

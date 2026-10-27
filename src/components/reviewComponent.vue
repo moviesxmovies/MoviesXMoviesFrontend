@@ -129,7 +129,7 @@ watch(loading, async (newVal) => {
         }">
         <template #header>
             <div class="confirm-header">
-                <div class="confirm-icon">
+                <div class="confirm-icon" aria-hidden="true">
                     <i class="pi pi-trash" />
                 </div>
                 <div>
@@ -187,24 +187,20 @@ watch(loading, async (newVal) => {
         <template v-else>
             <div class="review-main">
                 <div class="cover-col">
-                    <img class="movie-cover" :src="movie?.cover" :alt="movie?.title" @click="goToMovie(movie?.slug)" />
-                    <button class="action-btn action-btn--comment" @click="commentModalVisible = true">
-                        <i class="pi pi-comment" />
-                    </button>
-                    <div v-if="isSelf" class="review-actions">
-                        <button class="action-btn action-btn--edit" @click="editModalVisible = true">
-                            <i class="pi pi-pencil" />
-                        </button>
-                        <button class="action-btn action-btn--delete" @click="confirmDelete">
-                            <i class="pi pi-trash" />
-                        </button>
-                    </div>
+                    <img class="movie-cover" :src="movie?.cover" :alt="movie?.title" role="link" tabindex="0"
+                        @click="goToMovie(movie?.slug)" @keydown.enter="goToMovie(movie?.slug)" />
                 </div>
                 <div class="review-body">
                     <div class="review-header">
                         <div class="review-meta">
-                            <span class="movie-name" @click="goToMovie(movie?.slug)">{{ movie?.title }}</span>
-                            <span class="review-date">{{ formatRelativeTime(review.created_at) }}</span>
+                            <a class="movie-name" :href="`/movies/${movie?.slug}`"
+                                @click.prevent="goToMovie(movie?.slug)">{{ movie?.title }}</a>
+                            <span class="review-byline">
+                                <template v-if="user">
+                                    <RouterLink :to="`/users/${user.username}`" class="review-author">@{{ user.username }}</RouterLink>
+                                    <span aria-hidden="true"> · </span>
+                                </template><span class="review-date">{{ formatRelativeTime(review.created_at) }}</span>
+                            </span>
                         </div>
 
                     </div>
@@ -223,14 +219,33 @@ watch(loading, async (newVal) => {
                     <RouterLink v-if="user" :to="`/users/${user.username}`" class="user-avatar-link">
                         <img class="user-avatar" :src="user.picture" :alt="user.username" />
                     </RouterLink>
-                    <span class="badge" :class="review.is_positive ? 'badge-positive' : 'badge-negative'">
-                        <i :class="review.is_positive ? 'pi pi-thumbs-up' : 'pi pi-thumbs-down'" />
+                    <span class="badge" :class="review.is_positive ? 'badge-positive' : 'badge-negative'"
+                        :title="review.is_positive ? t('review.positive') : t('review.negative')"
+                        :aria-label="review.is_positive ? t('review.positive') : t('review.negative')">
+                        <i :class="review.is_positive ? 'pi pi-thumbs-up' : 'pi pi-thumbs-down'" aria-hidden="true" />
                     </span>
                 </div>
             </div>
 
-
-            <ReactionsComponent :reviewId="review.id" type="review" />
+            <div class="review-footer">
+                <ReactionsComponent :reviewId="review.id" type="review" />
+                <div class="review-actions">
+                    <button class="action-btn action-btn--comment" @click="commentModalVisible = true">
+                        <i class="pi pi-comment" aria-hidden="true" />
+                        <span>{{ t('commentsDialog.title') }}</span>
+                    </button>
+                    <template v-if="isSelf">
+                        <button class="action-btn action-btn--icon action-btn--edit" @click="editModalVisible = true"
+                            :aria-label="t('common.edit')" :title="t('common.edit')">
+                            <i class="pi pi-pencil" aria-hidden="true" />
+                        </button>
+                        <button class="action-btn action-btn--icon action-btn--delete" @click="confirmDelete"
+                            :aria-label="t('common.delete')" :title="t('common.delete')">
+                            <i class="pi pi-trash" aria-hidden="true" />
+                        </button>
+                    </template>
+                </div>
+            </div>
         </template>
     </div>
 </template>
@@ -239,14 +254,16 @@ watch(loading, async (newVal) => {
 .review {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
-    padding: 1rem;
-    border-radius: 1rem;
-    border: 1px solid var(--secondary);
-    background: var(--background);
-    --review-bg: var(--background);
-    transition: background 0.2s;
-    margin-bottom: 0.75rem;
+    gap: 0.875rem;
+    padding: 1rem 1.1rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    transition: border-color 0.2s;
+}
+
+.review:hover {
+    border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
 }
 
 .review-main {
@@ -255,29 +272,33 @@ watch(loading, async (newVal) => {
     gap: 1rem;
 }
 
-.review:hover {
-    --review-bg: var(--accent);
+.cover-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    flex-shrink: 0;
 }
 
 .movie-cover {
-    width: 4rem;
-    min-width: 4rem;
-    height: 6rem;
+    width: 4.25rem;
+    min-width: 4.25rem;
+    height: 6.375rem;
     object-fit: cover;
-    border-radius: 0.5rem;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
     cursor: pointer;
-    transition: opacity 0.2s, transform 0.2s;
+    transition: transform 0.2s;
 }
 
 .movie-cover:hover {
-    opacity: 0.85;
     transform: scale(1.03);
 }
 
 .review-body {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.4rem;
     flex: 1;
     min-width: 0;
 }
@@ -297,12 +318,11 @@ watch(loading, async (newVal) => {
 }
 
 .movie-name {
-    font-size: 0.75rem;
+    font-size: 0.875rem;
     font-weight: 700;
     color: var(--primary);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
     cursor: pointer;
+    text-decoration: none;
     overflow: hidden;
     text-overflow: ellipsis;
     word-break: break-word;
@@ -310,58 +330,52 @@ watch(loading, async (newVal) => {
 }
 
 .movie-name:hover {
-    opacity: 0.75;
+    text-decoration: underline;
 }
 
+.review-byline,
 .review-date {
-    font-size: 0.7rem;
-    color: var(--gray);
+    font-size: 0.8125rem;
+    color: var(--text-subtle);
 }
 
-/* RIGHT COLUMN */
+.review-author {
+    color: var(--text-muted);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.review-author:hover {
+    color: var(--primary);
+    text-decoration: underline;
+}
+
 .review-header-right {
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 0.5rem;
     align-self: flex-start;
     flex-shrink: 0;
 }
 
-
-.review-actions {
-    display: flex;
-    gap: 0.3rem;
-}
-
-
-.right-top {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.right-actions {
-    display: flex;
-    gap: 0.3rem;
-}
-
 .user-avatar-link {
     display: flex;
     flex-shrink: 0;
+    border-radius: 999px;
 }
 
 .user-avatar {
-    width: 2rem;
-    height: 2rem;
+    width: 2.25rem;
+    height: 2.25rem;
     border-radius: 50%;
     object-fit: cover;
-    border: 1.5px solid var(--secondary);
-    transition: border-color 0.2s, transform 0.2s;
+    border: 1px solid var(--border);
+    transition: box-shadow 0.15s;
 }
 
 .user-avatar-link:hover .user-avatar {
-    border-color: var(--primary);
-    transform: scale(1.08);
+    box-shadow: 0 0 0 2px var(--primary);
 }
 
 .badge {
@@ -371,58 +385,25 @@ watch(loading, async (newVal) => {
     width: 2rem;
     height: 2rem;
     border-radius: 50%;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     flex-shrink: 0;
 }
 
 .badge-positive {
-    background: rgba(34, 197, 94, 0.15);
-    color: #22c55e;
+    background: var(--success-soft);
+    color: var(--success);
 }
 
 .badge-negative {
-    background: rgba(239, 68, 68, 0.15);
-    color: #ef4444;
-}
-
-/* ACTIONS */
-.action-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2rem;
-    height: 2rem;
-    border-radius: 50%;
-    font-size: 0.72rem;
-    font-family: inherit;
-    cursor: pointer;
-    background: transparent;
-    transition: background 0.2s, color 0.2s, border-color 0.2s;
-}
-
-.action-btn--edit {
-    border: 1px solid color-mix(in srgb, var(--orange) 50%, transparent);
-    color: var(--orange);
-}
-
-.action-btn--edit:hover {
-    background: color-mix(in srgb, var(--orange) 12%, transparent);
-    border-color: var(--orange);
-}
-
-.action-btn--delete {
-    border: 1px solid color-mix(in srgb, var(--red) 50%, transparent);
-    color: var(--red);
-}
-
-.action-btn--delete:hover {
-    background: color-mix(in srgb, var(--red) 12%, transparent);
-    border-color: var(--red);
+    background: var(--danger-soft);
+    color: var(--danger);
 }
 
 .review-title {
-    font-size: 0.9rem;
-    font-weight: 700;
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.35;
     color: var(--text);
     margin: 0;
     word-break: break-word;
@@ -430,14 +411,72 @@ watch(loading, async (newVal) => {
 }
 
 .review-content {
-    font-size: 0.85rem;
-    line-height: 1.6;
-    font-weight: 300;
-    color: var(--text);
-    opacity: 0.8;
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    font-weight: 400;
+    color: var(--text-muted);
     margin: 0;
     word-break: break-word;
     overflow-wrap: break-word;
+}
+
+/* FOOTER */
+.review-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+}
+
+.review-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-left: auto;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    height: 2.125rem;
+    padding: 0 0.85rem;
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    color: var(--text-muted);
+    transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.action-btn--icon {
+    width: 2.125rem;
+    padding: 0;
+}
+
+.action-btn--comment:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--primary-soft);
+}
+
+.action-btn--edit:hover {
+    border-color: var(--text);
+    color: var(--text);
+    background: var(--surface-hover);
+}
+
+.action-btn--delete:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+    background: var(--danger-soft);
 }
 
 .reactions-skeleton {
@@ -459,23 +498,23 @@ watch(loading, async (newVal) => {
     width: 2.5rem;
     height: 2.5rem;
     border-radius: 50%;
-    background: color-mix(in srgb, var(--red) 12%, transparent);
-    border: 1px solid color-mix(in srgb, var(--red) 30%, transparent);
-    color: var(--red);
+    background: var(--danger-soft);
+    color: var(--danger);
     font-size: 1rem;
     flex-shrink: 0;
 }
 
 .confirm-title {
-    font-size: 1rem;
+    font-family: var(--font-display);
+    font-size: 1.125rem;
     font-weight: 700;
     color: var(--text);
     margin: 0;
 }
 
 .confirm-body {
-    font-size: 0.875rem;
-    color: var(--gray);
+    font-size: 0.9375rem;
+    color: var(--text-muted);
     line-height: 1.6;
     margin: 0;
     padding: 0.25rem 0;
@@ -484,50 +523,51 @@ watch(loading, async (newVal) => {
 .footer-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 0.75rem;
+    gap: 0.625rem;
     padding-top: 0.5rem;
     width: 100%;
 }
 
 .btn-cancel {
-    padding: 0.5rem 1.2rem;
-    border-radius: 999px;
-    border: 1px solid color-mix(in srgb, var(--secondary) 60%, transparent);
+    padding: 0.55rem 1.2rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-strong);
     background: transparent;
     color: var(--text);
-    font-size: 0.85rem;
+    font-size: 0.9375rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background-color 0.15s;
     font-family: inherit;
 }
 
 .btn-cancel:hover {
-    background: color-mix(in srgb, var(--secondary) 15%, transparent);
+    background: var(--surface-hover);
 }
 
 .btn-delete {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
-    padding: 0.5rem 1.4rem;
-    border-radius: 999px;
+    gap: 0.45rem;
+    padding: 0.55rem 1.3rem;
+    border-radius: var(--radius-md);
     border: none;
-    background: var(--red);
-    color: #fff;
-    font-size: 0.85rem;
+    background: #c42020;
+    color: #ffffff;
+    font-size: 0.9375rem;
     font-weight: 700;
     cursor: pointer;
-    transition: opacity 0.2s;
+    transition: background-color 0.15s;
     font-family: inherit;
 }
 
 .btn-delete:hover {
-    opacity: 0.85;
+    background: #a51b1b;
 }
 
+/* CONTENIDO LARGO */
 .review-content-wrapper {
-    max-height: 4.8rem;
+    max-height: 5rem;
     overflow: hidden;
     transition: max-height 0.3s ease;
     position: relative;
@@ -537,60 +577,36 @@ watch(loading, async (newVal) => {
     max-height: 1000px;
 }
 
-.review-content-wrapper::after,
-.review-content-wrapper::before {
+.review-content-wrapper::after {
     content: '';
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 4rem;
+    height: 2.5rem;
     pointer-events: none;
+    background: linear-gradient(to bottom, transparent 0%, var(--surface) 100%);
     transition: opacity 0.3s ease;
 }
 
-.review-content-wrapper::after {
-    background: linear-gradient(to bottom,
-            transparent 0%,
-            color-mix(in srgb, var(--background) 60%, transparent) 40%,
-            var(--background) 100%);
-    opacity: 1;
-}
-
-.review-content-wrapper::before {
-    background: linear-gradient(to bottom,
-            transparent 0%,
-            color-mix(in srgb, var(--background) 50%, transparent) 40%,
-            color-mix(in srgb, var(--background) 95%, transparent) 100%);
+.review-content-wrapper.expanded::after {
     opacity: 0;
-}
-
-.review:hover .review-content-wrapper::after {
-    opacity: 0;
-}
-
-.review:hover .review-content-wrapper::before {
-    opacity: 1;
-}
-
-.review-content-wrapper.expanded::after,
-.review-content-wrapper.expanded::before {
-    opacity: 0 !important;
 }
 
 .expand-btn {
-    font-size: 0.75rem;
+    align-self: flex-start;
+    font-size: 0.875rem;
+    font-weight: 600;
     color: var(--primary);
     background: none;
     border: none;
     cursor: pointer;
     padding: 0;
     font-family: inherit;
-    opacity: 0.8;
 }
 
 .expand-btn:hover {
-    opacity: 1;
+    text-decoration: underline;
 }
 
 .review-content :deep(p) {
@@ -599,6 +615,7 @@ watch(loading, async (newVal) => {
 
 .review-content :deep(strong) {
     font-weight: 600;
+    color: var(--text);
 }
 
 .review-content :deep(em) {
@@ -607,21 +624,22 @@ watch(loading, async (newVal) => {
 
 .review-content :deep(ol) {
     list-style-type: decimal;
-    margin: 1rem 0;
+    margin: 0.75rem 0;
     padding-left: 1.5rem;
 }
 
 .review-content :deep(ul) {
     list-style-type: disc;
-    margin: 1rem 0;
+    margin: 0.75rem 0;
     padding-left: 1.5rem;
 }
 
 .review-content :deep(code) {
-    font-family: monospace;
-    font-size: 0.8rem;
-    background: rgba(255, 255, 255, 0.08);
-    padding: 0.1rem 0.3rem;
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--surface-2);
+    color: var(--text);
+    padding: 0.1rem 0.35rem;
     border-radius: 4px;
 }
 
@@ -636,23 +654,19 @@ watch(loading, async (newVal) => {
 }
 
 .review-content :deep(h1) {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
 }
 
 .review-content :deep(h2) {
-    font-size: 1rem;
+    font-size: 1.05rem;
 }
 
 .review-content :deep(h3) {
-    font-size: 0.95rem;
+    font-size: 1rem;
 }
 
 .review-content :deep(h4) {
-    font-size: 0.9rem;
-}
-
-.review-content-wrapper.expanded::after {
-    opacity: 0;
+    font-size: 0.95rem;
 }
 
 .review-content :deep(li) {
@@ -661,13 +675,9 @@ watch(loading, async (newVal) => {
 }
 
 .review-content :deep(a) {
-    color: var(--accent);
+    color: var(--primary);
     text-decoration: underline;
     font-weight: 500;
-}
-
-.review-content :deep(a:hover) {
-    opacity: 0.8;
 }
 
 .review-content :deep(ul ul),
@@ -679,45 +689,41 @@ watch(loading, async (newVal) => {
 }
 
 .review-content :deep(pre) {
-    background: #1e1e1e;
-    color: #d4d4d4;
+    background: #15141f;
+    color: #ecebf5;
     padding: 1rem;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     overflow-x: auto;
-    margin: 1rem 0;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 0.75rem 0;
+    border: 1px solid var(--border);
     display: block;
     width: 0;
     min-width: 100%;
     box-sizing: border-box;
-    line-height: 1.4;
+    line-height: 1.45;
 }
 
 .review-content :deep(pre code) {
     background: transparent;
+    color: inherit;
     padding: 0;
     font-size: 0.85rem;
-    font-family: 'Fira Code', 'Cascadia Code', monospace;
     white-space: pre;
 }
 
-.cover-col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.4rem;
-    flex-shrink: 0;
-}
+@media (max-width: 480px) {
+    .review {
+        padding: 0.875rem;
+    }
 
-.action-btn--comment {
-    border: 1px solid color-mix(in srgb, var(--primary) 40%, transparent);
-    color: var(--primary);
-    width: 100%;
-    border-radius: 0.5rem;
-}
+    .review-main {
+        gap: 0.65rem;
+    }
 
-.action-btn--comment:hover {
-    background: color-mix(in srgb, var(--primary) 10%, transparent);
-    border-color: var(--primary);
+    .movie-cover {
+        width: 3.5rem;
+        min-width: 3.5rem;
+        height: 5.25rem;
+    }
 }
 </style>

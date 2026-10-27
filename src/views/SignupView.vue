@@ -88,89 +88,59 @@ defineExpose({ currentStep, formData, next, handleForm });
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6"
-    style="background-color: var(--background)">
-    <div class="w-full max-w-md my-4">
-      <div class="rounded-2xl border shadow-sm overflow-hidden"
-        style="background-color: var(--background); border-color: var(--secondary)">
-        <ProgressBar :aria-label="$t('signup.progress')" :value="(currentStep * 100) / Object.keys(steps).length"
-          class="custom-progress">
-          {{ }}
-        </ProgressBar>
+  <div class="auth-page">
+    <div class="auth-card signup-card">
+      <ProgressBar :aria-label="$t('signup.progress')" :value="(currentStep * 100) / Object.keys(steps).length"
+        :showValue="false" class="custom-progress" />
+      <p class="signup-step">{{ currentStep }} / {{ Object.keys(steps).length }}</p>
 
-        <div class="p-6 sm:p-8">
-          <keep-alive>
-            <component :is="steps[currentStep]" v-model="formData" :field-errors="fieldErrors" @next="next"
-              @back="currentStep--" />
-          </keep-alive>
-        </div>
-      </div>
+      <keep-alive>
+        <component :is="steps[currentStep]" v-model="formData" :field-errors="fieldErrors" @next="next"
+          @back="currentStep--" />
+      </keep-alive>
     </div>
   </div>
 </template>
 <style scoped>
+.signup-card {
+  position: relative;
+  overflow: hidden;
+  padding-top: 2.75rem !important;
+}
+
 .custom-progress {
-  height: 4px !important;
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px !important;
   border-radius: 0 !important;
-  background-color: rgba(var(--secondary-rgb), 0.1) !important;
+  background-color: var(--surface-2) !important;
   border: none !important;
 }
 
 :deep(.p-progressbar-value) {
-  background-color: var(--primary) !important;
+  background: var(--brand-gradient) !important;
   transition: width 0.4s ease-in-out;
 }
 
-:deep(.p-inputtext) {
-  background-color: var(--background) !important;
-  color: var(--text) !important;
-  border-color: var(--secondary) !important;
-  font-size: 16px !important;
-  padding: 0.75rem !important;
-}
-
-:deep(.p-inputtext:focus) {
-  border-color: var(--primary) !important;
-  box-shadow: 0 0 0 1px var(--primary) !important;
-}
-
-:deep(.p-password-input) {
-  background-color: var(--background) !important;
-  color: var(--text) !important;
-  border-color: var(--secondary) !important;
-}
-
-:deep(.p-password-input:focus) {
-  border-color: var(--primary) !important;
-  box-shadow: 0 0 0 1px var(--primary) !important;
-}
-
-:deep(.p-float-label label) {
-  color: var(--text);
-  opacity: 0.6;
-}
-
-:deep(.p-invalid .p-inputtext),
-:deep(.p-invalid.p-inputtext) {
-  border-color: #ef4444 !important;
-  box-shadow: 0 0 0 1px #ef4444 !important;
-}
-
-:deep(.p-valid .p-inputtext),
-:deep(.p-valid.p-inputtext) {
-  border-color: #22c55e !important;
-  box-shadow: 0 0 0 1px #22c55e !important;
-}
-
-:deep(.p-button) {
-  background-color: var(--primary) !important;
-  border-color: var(--primary) !important;
-  color: #fff !important;
-  padding: 0.85rem !important;
+.signup-step {
+  position: absolute;
+  top: 1rem;
+  right: 1.25rem;
+  margin: 0;
+  font-size: 0.8125rem;
   font-weight: 600;
+  color: var(--text-subtle);
 }
 
-:deep(.p-button:hover) {
-  opacity: 0.9;
+:deep(.form-alert) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  border-radius: var(--radius-md);
+  background: var(--danger-soft);
+  border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent);
 }
 </style>

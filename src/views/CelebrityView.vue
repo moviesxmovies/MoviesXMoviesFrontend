@@ -43,6 +43,13 @@ const genderIcon = computed(
   () => genderMap[user.value.gender]?.icon ?? "pi pi-question",
 );
 
+const genderForeground = computed(() => {
+  const bg = genderMap[user.value.gender]?.color ?? "var(--secondary)";
+  if (bg.includes("--primary")) return "var(--on-primary)";
+  if (bg.includes("--accent")) return "var(--on-accent)";
+  return "var(--text)";
+});
+
 const genderBackground = computed(() => {
   return genderMap[user.value.gender]?.color ?? "var(--secondary)";
 });
@@ -158,7 +165,7 @@ watch(
             <img :src="user.image" :alt="user.name" class="card-img" />
             <Tag :icon="genderIcon" class="gender-tag" :style="{
               background: `${genderBackground}`,
-              color: '#fff',
+              color: genderForeground,
               borderRadius: '8px',
             }" />
           </div>
@@ -167,12 +174,12 @@ watch(
             <h1 class="celebrity-name">{{ user.name }}</h1>
             <div class="dates">
               <div v-if="user.birthday" class="date-row">
-                <i class="pi pi-calendar accent-icon" />
+                <i class="pi pi-calendar accent-icon" aria-hidden="true" />
                 <span><b>{{ t("celebrity.birthday") }}:</b>
                   {{ formatRelativeTime(user.birthday) }}</span>
               </div>
               <div v-if="user.deathday" class="date-row">
-                <i class="pi pi-heart-fill death-icon" />
+                <i class="pi pi-heart-fill death-icon" aria-hidden="true" />
                 <span><b>{{ t("celebrity.deathday") }}:</b>
                   {{ formatRelativeTime(user.deathday) }}</span>
               </div>
@@ -181,10 +188,10 @@ watch(
         </div>
       </aside>
 
-      <Accordion value="0" class="content">
+      <Accordion :value="(['0', 1, 2] as any)" multiple class="content">
         <AccordionPanel value="0" class="section">
           <AccordionHeader class="section-header">
-            <i class="pi pi-book accent-icon" />
+            <span class="section-icon" aria-hidden="true"><i class="pi pi-book" /></span>
             <h2 class="section-title">{{ t("celebrity.biography") }}</h2>
           </AccordionHeader>
           <AccordionContent class="section-body">
@@ -212,86 +219,110 @@ watch(
 <style scoped>
 :deep(.p-accordionheader) {
   color: var(--text);
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+:deep(.p-accordionheader:hover) {
+  background: var(--surface-2) !important;
+}
+
+:deep(.p-accordionheader[aria-expanded="true"]) {
+  border-bottom: 1px solid var(--border) !important;
+}
+
+:deep(.p-accordionheader-toggle-icon) {
+  color: var(--text-subtle);
+}
+
+:deep(.p-accordionpanel) {
+  border: none;
 }
 
 :deep(.p-accordioncontent-content) {
   all: unset;
 }
 
-/* ── Page ──────────────────────────────────────────────── */
 .page {
   min-height: 100vh;
   background: var(--background);
   color: var(--text);
-  font-family: "Inter", sans-serif;
-  padding: 1rem;
+  padding: 5rem 1rem 2rem;
 }
 
 @media (min-width: 768px) {
   .page {
-    padding: 1.5rem;
+    padding: 5.25rem 1.5rem 2.5rem;
   }
 }
 
 @media (min-width: 1024px) {
   .page {
-    padding: 2.5rem;
+    padding: 5.5rem 2rem 3rem;
   }
 }
 
-/* ── Layout ────────────────────────────────────────────── */
 .layout {
-  max-width: 1600px;
+  max-width: 1440px;
   margin: 0 auto;
-  margin-top: 20px;
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.5rem;
+  align-items: start;
+}
+
+.sidebar {
+  width: 100%;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0;
 }
 
 @media (min-width: 768px) {
   .layout {
-    grid-template-columns: 1fr 3fr;
+    grid-template-columns: minmax(280px, 340px) 1fr;
   }
 
   .sidebar {
     order: 1;
+    grid-row: span 2;
   }
 
   .content {
     order: 2;
   }
-}
 
-@media (min-width: 1024px) {
-  .layout {
-    grid-template-columns: 1fr 3fr;
+  .content.cast-section {
+    order: 3;
   }
 }
 
-/* ── Sidebar ───────────────────────────────────────────── */
-.sidebar {
-  width: 100%;
+@media (min-width: 768px) {
+  .sidebar {
+    position: sticky;
+    top: 5rem;
+  }
 }
 
+/* CARD */
 .card {
-  border-radius: 1.5rem;
+  border-radius: var(--radius-xl);
   overflow: hidden;
-  border: 1px solid var(--secondary);
-  background: var(--background);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-}
-
-.sticky-card {
-  position: sticky;
-  top: 1.5rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
 }
 
 .card-image {
   position: relative;
   aspect-ratio: 2 / 3;
   overflow: hidden;
-  background: var(--secondary);
+  background: var(--surface-2);
 }
 
 .card-img {
@@ -301,66 +332,99 @@ watch(
   object-position: top;
 }
 
-.gender-tag {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  font-size: 10px !important;
-  font-weight: 900 !important;
-  padding: 0.25rem 0.75rem !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
 .card-body {
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  align-items: stretch;
+  gap: 1rem;
+  border-bottom: 1px solid var(--border);
 }
 
-.celebrity-name {
-  font-size: 1.1rem;
-  font-weight: 700;
-  line-height: 1.2;
-  color: var(--primary);
-  margin: 0;
-}
-
-.dates {
+.card-section {
+  padding: 1rem 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  font-size: 0.7rem;
-  color: var(--gray);
+  gap: 0.65rem;
+  border-bottom: 1px solid var(--border);
 }
 
-.date-row {
+.card-section:last-child {
+  border-bottom: none;
+}
+
+.card-section__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+.movie-info-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.movie-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.movie-year {
+  font-size: 0.875rem;
+  color: var(--text-subtle);
+}
+
+.btn-add-list {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  background: var(--primary);
+  color: var(--on-primary);
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    transform 0.1s;
+  white-space: nowrap;
 }
 
-.accent-icon {
-  color: var(--accent);
+.btn-add-list:hover {
+  background: var(--primary-hover);
 }
 
-.death-icon {
-  color: #ef4444;
+.btn-add-list:active {
+  transform: scale(0.98);
 }
 
-/* ── Main content ──────────────────────────────────────── */
-.content {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+.rating-stars {
+  justify-content: flex-start !important;
 }
 
-/* ── Section ───────────────────────────────────────────── */
+.rating-stars :deep(.star-icon) {
+  font-size: 2rem !important;
+  margin: 0 0.3rem 0 0 !important;
+}
+
+/* SECTION */
 .section {
-  border-radius: 1.5rem;
-  border: 1px solid var(--secondary);
-  background: var(--background);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
 }
 
@@ -368,36 +432,95 @@ watch(
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--secondary);
-  background: rgba(255, 255, 255, 0.05);
+  padding: 0.875rem 1.25rem !important;
+  min-height: 3.5rem;
+}
+
+.section-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-size: 0.95rem;
 }
 
 .section-title {
-  font-weight: 900;
-  font-size: 0.6rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  opacity: 0.7;
+  flex: 1;
+  text-align: left;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  color: var(--text);
   margin: 0;
 }
 
 .section-body {
-  padding: 1.5rem;
+  padding: 1.25rem;
 }
 
-/* ── Biography ─────────────────────────────────────────── */
+/* CELEBRITY */
+.gender-tag {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  box-shadow: var(--shadow-md);
+}
+
+.celebrity-name {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin: 0;
+  color: var(--text);
+}
+
+.dates {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.date-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+}
+
+.date-row b {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.accent-icon {
+  color: var(--primary);
+}
+
+.death-icon {
+  color: var(--text-subtle);
+}
+
 .biography {
-  font-size: 0.95rem;
+  font-size: 1rem;
   line-height: 1.75;
   white-space: pre-line;
-  font-weight: 300;
+  color: var(--text-muted);
   margin: 0;
+  max-width: 75ch;
 }
 
 .empty-text {
-  font-size: 0.875rem;
-  color: var(--gray);
+  font-size: 0.9375rem;
+  color: var(--text-subtle);
   font-style: italic;
   margin: 0;
 }

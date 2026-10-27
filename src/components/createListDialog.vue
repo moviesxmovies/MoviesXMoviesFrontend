@@ -165,20 +165,12 @@ watch(
       },
     }"
   >
-    <div class="p-2">
-      <div class="text-center mb-8">
-        <div
-          class="w-16 h-16 rounded-full flex items-center justify-center m-auto mb-4"
-          style="
-            background: color-mix(in srgb, var(--primary) 12%, transparent);
-          "
-        >
-          <i class="pi pi-list text-2xl" style="color: var(--primary)"></i>
+    <div class="pt-1">
+      <div class="dialog-intro">
+        <div class="dialog-intro-icon" aria-hidden="true">
+          <i class="pi pi-list"></i>
         </div>
-        <p
-          class="text-[10px] font-black uppercase tracking-[0.2em] opacity-60 mt-2 px-2"
-          style="color: var(--text)"
-        >
+        <p class="dialog-intro-text">
           {{
             props.movieList
               ? t("components.createList.descriptionUpdate")
@@ -232,7 +224,7 @@ watch(
                 :style="{
                   color:
                     $field?.invalid || fieldErrors.name?.length
-                      ? '#ef4444'
+                      ? 'var(--danger)'
                       : 'var(--primary)',
                 }"
               />
@@ -263,10 +255,7 @@ watch(
                 :class="{ 'p-invalid': fieldErrors.description?.length }"
                 @input="clearError('description')"
               />
-              <InputIcon
-                class="pi pi-pencil"
-                style="color: var(--primary); opacity: 0.5"
-              />
+              <InputIcon class="pi pi-pencil" style="color: var(--text-subtle)" />
             </IconField>
             <label for="description">{{
               t("components.createList.formDescription")
@@ -279,14 +268,7 @@ watch(
 
         <!-- INTELLIGENT filters -->
         <template v-if="intelligent && !props.movieList">
-          <div
-            class="flex flex-col gap-4 p-4 rounded-2xl"
-            style="
-              background: color-mix(in srgb, var(--secondary) 10%, transparent);
-              border: 1.5px solid
-                color-mix(in srgb, var(--secondary) 40%, transparent);
-            "
-          >
+          <div class="smart-filters">
             <SearchGenresComponent
               @filterGenres="(genres: string[]) => (selectedGenres = genres)"
             />
@@ -303,7 +285,8 @@ watch(
         >
           <div
             class="privacy-toggle"
-            :class="{ 'border-red-400': fieldErrors.privacity?.length }"
+            role="group"
+            :class="{ 'has-error': fieldErrors.privacity?.length }"
           >
             <button
               v-for="(option, key) in localizedPrivacyConfig"
@@ -311,6 +294,7 @@ watch(
               type="button"
               class="privacy-btn"
               :class="[option.class, { active: $field.value === option.value }]"
+              :aria-pressed="$field.value === option.value"
               @click="
                 () => {
                   $field.props.onChange({ target: { value: option.value } });
@@ -348,68 +332,104 @@ watch(
 </template>
 
 <style scoped>
+.dialog-intro {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  margin-bottom: 1.5rem;
+}
+
+.dialog-intro-icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-size: 1.15rem;
+}
+
+.dialog-intro-text {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.smart-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+
 :deep(.p-inputtext) {
-  background-color: var(--background) !important;
+  background-color: var(--surface) !important;
   color: var(--text) !important;
-  border-color: var(--secondary) !important;
-  font-size: 16px !important;
+  border-color: var(--border-strong) !important;
+  font-size: 1rem !important;
   padding: 0.75rem !important;
-  border-radius: 0.75rem !important;
+  border-radius: var(--radius-md) !important;
 }
 
 :deep(.p-inputtext:focus) {
   border-color: var(--primary) !important;
-  box-shadow: 0 0 0 1px var(--primary) !important;
+  box-shadow: var(--focus-ring) !important;
 }
 
-:deep(.p-float-label label) {
-  color: var(--text);
-  opacity: 0.6;
+:deep(.p-floatlabel label) {
+  color: var(--text-subtle);
 }
 
+:deep(.p-inputtext.p-invalid),
 :deep(.p-invalid .p-inputtext) {
-  border-color: #ef4444 !important;
-  box-shadow: 0 0 0 1px #ef4444 !important;
+  border-color: var(--danger) !important;
 }
 
 :deep(.p-button) {
   background-color: var(--primary) !important;
   border-color: var(--primary) !important;
-  color: #fff !important;
-  padding: 0.85rem !important;
+  color: var(--on-primary) !important;
+  padding: 0.8rem !important;
   font-weight: 700;
-  border-radius: 0.75rem !important;
+  border-radius: var(--radius-md) !important;
+}
+
+:deep(.p-button:hover) {
+  background-color: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
 }
 
 .cancel-btn {
   width: 100%;
-  padding: 0.75rem;
+  min-height: 2.75rem;
+  padding: 0.65rem;
   background: transparent;
-  border: none;
-  color: var(--primary);
-  font-size: 0.875rem;
-  font-weight: 700;
-  opacity: 0.8;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-size: 0.9375rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: background-color 0.15s, color 0.15s;
   text-align: center;
 }
 
 .cancel-btn:hover {
-  opacity: 1;
-  text-decoration: underline;
+  background: var(--surface-hover);
+  color: var(--text);
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.field-error {
+  font-size: 0.8125rem;
+  color: var(--danger);
+  font-weight: 500;
 }
 
 .server-errors {
@@ -417,11 +437,11 @@ watch(
   align-items: flex-start;
   gap: 0.6rem;
   padding: 0.75rem 1rem;
-  border-radius: 0.75rem;
-  background: color-mix(in srgb, var(--red) 10%, transparent);
-  border: 1px solid color-mix(in srgb, var(--red) 30%, transparent);
-  color: var(--red);
-  font-size: 0.82rem;
+  border-radius: var(--radius-md);
+  background: var(--danger-soft);
+  border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent);
+  color: var(--danger);
+  font-size: 0.875rem;
 }
 
 .server-errors i {
@@ -441,11 +461,15 @@ watch(
 .privacy-toggle {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
-  padding: 0.4rem;
-  border-radius: 1rem;
-  background: color-mix(in srgb, var(--secondary) 10%, transparent);
-  border: 1.5px solid color-mix(in srgb, var(--secondary) 40%, transparent);
+  gap: 0.35rem;
+  padding: 0.3rem;
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+
+.privacy-toggle.has-error {
+  border-color: var(--danger);
 }
 
 .privacy-btn {
@@ -453,58 +477,36 @@ watch(
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  padding: 0.6rem 0.5rem;
-  border-radius: 0.75rem;
+  min-height: 2.5rem;
+  padding: 0.5rem;
+  border-radius: var(--radius-sm);
   border: 1px solid transparent;
-  background: transparent;
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   transition:
-    background 0.2s,
-    border-color 0.2s,
-    color 0.2s,
-    opacity 0.2s;
+    background-color 0.15s,
+    border-color 0.15s,
+    color 0.15s;
   font-family: inherit;
-  opacity: 0.45;
   white-space: nowrap;
   min-width: 0;
   overflow: hidden;
 }
 
-.privacy-btn.active {
-  opacity: 1;
+/* Inactivo: neutro y legible; activo: color semántico (badge-*) */
+.privacy-btn:not(.active) {
+  background: transparent !important;
+  color: var(--text-muted) !important;
 }
 
 .privacy-btn:not(.active):hover {
-  opacity: 0.7;
-  background: color-mix(in srgb, var(--text) 6%, transparent);
+  background: var(--surface-hover) !important;
+  color: var(--text) !important;
 }
 
-/* Public */
-.privacy-btn.badge-public {
-  color: #309153;
-}
-.privacy-btn.badge-public.active {
-  border-color: color-mix(in srgb, #309153 60%, transparent);
-  background: rgba(34, 197, 94, 0.12);
-}
-
-/* Private */
-.privacy-btn.badge-private {
-  color: #b73b3b;
-}
-.privacy-btn.badge-private.active {
-  border-color: color-mix(in srgb, #b73b3b 60%, transparent);
-  background: rgba(239, 68, 68, 0.12);
-}
-
-/* Friends */
-.privacy-btn.badge-friends {
-  color: #4d57bd;
-}
-.privacy-btn.badge-friends.active {
-  border-color: color-mix(in srgb, #4d57bd 60%, transparent);
-  background: rgba(99, 102, 241, 0.12);
+.privacy-btn.active {
+  border-color: currentColor;
+  box-shadow: var(--shadow-sm);
 }
 </style>

@@ -32,27 +32,23 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col items-center justify-center px-4" style="background-color: var(--background)">
-    <div class="flex flex-col items-center gap-6 animate-fade-in">
-
+  <div class="auth-page">
+    <div class="flex flex-col items-center gap-6 animate-fade-in" role="status" aria-live="polite">
       <div class="relative flex items-center justify-center">
-        <ProgressSpinner style="width: 80px; height: 80px" strokeWidth="3" fill="transparent" animationDuration=".5s" />
-        <img src="/favicon.svg" alt="Logo" class="w-6 h-6 absolute opacity-50" />
+        <ProgressSpinner style="width: 80px; height: 80px" strokeWidth="3" fill="transparent" animationDuration=".8s" />
+        <img src="/favicon.svg" alt="" class="w-7 h-7 absolute" />
       </div>
 
       <div class="text-center">
-        <h2 class="text-xl font-bold tracking-tight" style="color: var(--text)">
-          {{ t('oauth.loading') }}
-        </h2>
-        <p class="text-sm mt-2" style="color: var(--text); opacity: 0.5">
-          {{ $t("login.subtitle") }} </p>
+        <h1 class="auth-title !text-xl">{{ t('oauth.loading') }}</h1>
+        <p class="auth-subtitle">{{ $t("login.subtitle") }}</p>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-:deep(.p-progress-spinner-circle) {
+:deep(.p-progressspinner-circle) {
   stroke: var(--primary) !important;
 }
 

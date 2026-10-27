@@ -157,14 +157,16 @@ watch(
 
             <div class="reactions-bar">
                 <button v-for="[emoji, count] in activeReactions()" :key="emoji" class="reaction-pill"
-                    :class="{ 'reacted': hasReacted(emoji) }" @click="toggleReaction(emoji)">
-                    <span class="reaction-emoji">{{ emoji }}</span>
+                    :class="{ 'reacted': hasReacted(emoji) }" :aria-pressed="hasReacted(emoji)" @click="toggleReaction(emoji)">
+                    <span class="reaction-emoji" aria-hidden="true">{{ emoji }}</span>
                     <span class="reaction-count">{{ count }}</span>
                 </button>
 
                 <!-- Picker Open -->
-                <button class="add-reaction-btn" @click="showPicker = !showPicker">
-                    <span>＋</span>
+                <button class="add-reaction-btn" @click="showPicker = !showPicker" :aria-expanded="showPicker"
+                    :title="$t('reactions.add')" :aria-label="$t('reactions.add')">
+                    <i class="pi pi-face-smile" aria-hidden="true" />
+                    <span aria-hidden="true">+</span>
                 </button>
             </div>
 
@@ -192,66 +194,75 @@ watch(
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.4rem;
 }
 
 .reaction-pill {
     display: flex;
     align-items: center;
-    gap: 0.3rem;
-    padding: 0.2rem 0.6rem;
+    gap: 0.35rem;
+    height: 1.9rem;
+    padding: 0 0.65rem;
     border-radius: 999px;
-    border: 1px solid var(--secondary);
-    background: transparent;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
     cursor: pointer;
-    font-size: 0.8rem;
-    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+    font-size: 0.875rem;
+    transition: background-color 0.15s, border-color 0.15s, transform 0.1s;
 }
 
 .reaction-pill:hover {
-    background: rgba(255, 255, 255, 0.08);
-    transform: scale(1.05);
+    border-color: var(--border-strong);
+    background: var(--surface-hover);
+}
+
+.reaction-pill:active {
+    transform: scale(0.96);
 }
 
 .reaction-pill.reacted {
-    background: color-mix(in srgb, var(--primary) 15%, transparent);
+    background: var(--primary-soft);
     border-color: var(--primary);
 }
 
+.reaction-pill.reacted .reaction-count {
+    color: var(--primary);
+}
+
 .reaction-emoji {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     line-height: 1;
 }
 
 .reaction-count {
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
     font-weight: 600;
-    color: var(--text);
-    opacity: 0.8;
+    color: var(--text-muted);
 }
 
 .add-reaction-btn {
     display: flex;
     align-items: center;
     gap: 0.2rem;
-    padding: 0.2rem 0.5rem;
+    height: 1.9rem;
+    padding: 0 0.6rem;
     border-radius: 999px;
-    border: 1px dashed var(--secondary);
+    border: 1px dashed var(--border-strong);
     background: transparent;
     cursor: pointer;
-    font-size: 0.75rem;
-    color: var(--text);
-    opacity: 0.5;
-    transition: opacity 0.15s, border-color 0.15s;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-subtle);
+    transition: color 0.15s, border-color 0.15s;
+}
+
+.add-reaction-btn i {
+    font-size: 0.85rem;
 }
 
 .add-reaction-btn:hover {
-    opacity: 1;
+    color: var(--primary);
     border-color: var(--primary);
-}
-
-.emoji-hint {
-    font-size: 0.85rem;
 }
 
 .emoji-picker {
@@ -261,13 +272,13 @@ watch(
     flex-wrap: wrap;
     gap: 0.25rem;
     padding: 0.6rem;
-    background: var(--background);
-    border: 1px solid var(--secondary);
-    border-radius: 1rem;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
     z-index: 10;
-    width: 280px;
-    max-width: 280px;
+    width: 288px;
+    max-width: 288px;
 }
 
 .picker-up {
@@ -282,22 +293,22 @@ watch(
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 2.2rem;
-    height: 2.2rem;
-    border-radius: 0.5rem;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--radius-sm);
     border: none;
     background: transparent;
     cursor: pointer;
-    font-size: 1.1rem;
-    transition: background 0.15s, transform 0.1s;
+    font-size: 1.15rem;
+    transition: background-color 0.15s, transform 0.1s;
 }
 
 .emoji-option:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: scale(1.2);
+    background: var(--surface-hover);
+    transform: scale(1.15);
 }
 
 .emoji-option.reacted {
-    background: color-mix(in srgb, var(--primary) 20%, transparent);
+    background: var(--primary-soft);
 }
 </style>

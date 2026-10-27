@@ -156,32 +156,32 @@ const rateMovie = async (rating: number) => {
 const shortcuts = [
   {
     label: t("shortcuts.alternateInfo"),
-    icon: "i-heroicons-information-circle-solid",
+    icon: "pi pi-info-circle",
     handler: () => (visibleDrawer.value = !visibleDrawer.value),
     shortcut: "space",
   },
   {
     label: t("shortcuts.addToList"),
-    icon: "i-heroicons-plus-solid",
+    icon: "pi pi-plus-circle",
     handler: () => (visibleDialog.value = !visibleDialog.value),
     shortcut: "w",
   },
   {
     label: t("shortcuts.markAsNotSeen"),
-    icon: "i-heroicons-eye-slash-solid",
+    icon: "pi pi-eye-slash",
     handler: markAsNotSeen,
     shortcut: "s",
   },
   {
     label: t("shortcuts.rateNStars", { n: 5 }),
-    icon: "i-heroicons-star-solid",
+    icon: "pi pi-star-fill",
     handler: () => rateMovie(5),
     shortcut: "d",
   },
   {
     label: t("shortcuts.rateNStars", { n: 1 }),
 
-    icon: "i-heroicons-thumb-down-solid",
+    icon: "pi pi-thumbs-down",
     handler: () => rateMovie(1),
     shortcut: "a",
   },
@@ -190,7 +190,7 @@ const shortcuts = [
 for (let i = 1; i <= 5; i++) {
   shortcuts.push({
     label: t("shortcuts.rateNStars", { n: i }),
-    icon: `i-heroicons-${i}-solid`,
+    icon: "pi pi-star",
     handler: () => rateMovie(i),
     shortcut: `${i}`,
   });
@@ -237,11 +237,18 @@ for (let i = 1; i <= 5; i++) {
       <div class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center mb-7 px-14 md:px-0">
         <div ref="glowEl" class="glow-container w-full max-w-sm aspect-[3/5] rounded-3xl" id="glow-container" />
       </div>
-      <div class="flex justify-center mt-4 relative z-">
+      <div class="flex justify-center mt-4 relative">
         <StarsComponent id="stars" :loading="loading" @rateMovie="rateMovie" ref="starsRef" />
       </div>
     </div>
-    <div v-else>No movies found.</div>
+    <div v-else class="home-empty">
+      <div class="home-empty__icon" aria-hidden="true"><i class="pi pi-video" /></div>
+      <p class="home-empty__title">{{ t("home.noMovies") }}</p>
+      <RouterLink to="/search" class="home-empty__cta">
+        <i class="pi pi-search" aria-hidden="true" />
+        {{ t("home.search") }}
+      </RouterLink>
+    </div>
   </div>
 </template>
 
@@ -276,10 +283,55 @@ for (let i = 1; i <= 5; i++) {
   opacity: 1 !important;
   transform: scale(1.4) translateZ(0);
   text-shadow:
-    0 0 10px var(--glow-color),
-    0 0 20px var(--glow-color),
-    0 1px 2px rgba(0, 0, 0, 0.2);
+    0 0 10px rgba(0, 0, 0, 0.6),
+    0 1px 2px rgba(0, 0, 0, 0.4);
   color: #ffffff;
+}
+
+.home-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: center;
+  padding: 2rem;
+}
+
+.home-empty__icon {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.home-empty__title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.home-empty__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius-md);
+  background: var(--primary);
+  color: var(--on-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.home-empty__cta:hover {
+  background: var(--primary-hover);
 }
 
 #mainSwipe.animate-boarding {
@@ -468,10 +520,10 @@ for (let i = 1; i <= 5; i++) {
 #stars.animate-boarding {
   position: relative;
   z-index: 1001;
-  background: rgba(var(--primary-rgb), 0.1);
+  background: var(--primary-soft);
   padding: 1.5rem;
   border-radius: 1rem;
-  border: 2px dashed var(--yellow);
+  border: 2px dashed var(--star-fill);
   display: flex;
   justify-content: center;
   min-height: 4rem;
@@ -581,14 +633,14 @@ for (let i = 1; i <= 5; i++) {
 
 .cell {
   display: flex;
-  color: var(--text);
+  color: #ffffff;
   font-size: 2rem;
   transition:
     transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
     opacity 0.3s ease,
     color 0.3s ease;
-  opacity: 0.15;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  opacity: 0.3;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
 }
 
 .cell.top {

@@ -205,7 +205,7 @@ watch(
   >
     <template #header>
       <div class="confirm-header">
-        <div class="confirm-icon">
+        <div class="confirm-icon" aria-hidden="true">
           <i class="pi pi-trash" />
         </div>
         <div>
@@ -263,7 +263,7 @@ watch(
   >
     <template #header>
       <div class="confirm-header">
-        <div class="confirm-icon">
+        <div class="confirm-icon" aria-hidden="true">
           <i class="pi pi-trash" />
         </div>
         <div>
@@ -362,7 +362,7 @@ watch(
             <div class="list-header">
               <h1 class="list-name">{{ movieList.name }}</h1>
               <span v-if="privacy" class="privacy-badge" :class="privacy.class">
-                <i :class="privacy.icon" />
+                <i :class="privacy.icon" aria-hidden="true" />
               </span>
             </div>
 
@@ -414,8 +414,8 @@ watch(
         class="empty-list-container"
       >
         <div class="empty-card">
-          <div class="icon-circle">
-            <i class="pi pi-video text-3xl" />
+          <div class="icon-circle" aria-hidden="true">
+            <i class="pi pi-video text-2xl" />
           </div>
           <h3 class="empty-title">
             {{ t("list.emptyTitle") }}
@@ -465,33 +465,39 @@ watch(
 .page {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 5.5rem 1rem 3rem;
 }
 
 .movie-list-info {
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
 }
 
 .info-card {
+  position: relative;
   display: flex;
   flex-direction: column;
-  background: var(--background);
-  border-radius: 1.5rem;
-  padding: 2rem;
-  gap: 2rem;
-  border: 1px solid var(--secondary);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  padding: 1.75rem;
+  gap: 1.75rem;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.info-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+  background: var(--brand-gradient);
 }
 
 @media (min-width: 768px) {
   .info-card {
     flex-direction: row;
+    padding: 2rem;
   }
-}
-
-.skeleton-wrapper :deep(.p-skeleton) {
-  background-color: var(--secondary);
-  opacity: 0.5;
 }
 
 .author-section {
@@ -499,36 +505,38 @@ watch(
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-width: 180px;
+  text-align: center;
+  min-width: 170px;
 }
 
 .avatar-wrapper {
-  padding: 4px;
-  background: var(--secondary);
+  padding: 3px;
+  background: var(--brand-gradient);
   border-radius: 50%;
-  margin-bottom: 1rem;
+  margin-bottom: 0.875rem;
   line-height: 0;
 }
 
 .author-img {
-  width: 120px;
-  height: 120px;
+  width: 104px;
+  height: 104px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--background);
+  border: 3px solid var(--surface);
 }
 
 .author-meta .label {
   display: block;
   font-size: 0.75rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  opacity: 0.6;
+  letter-spacing: 0.08em;
+  color: var(--text-subtle);
   margin-bottom: 0.25rem;
 }
 
 .username {
-  font-size: 1.1rem;
+  font-size: 1.0625rem;
   font-weight: 700;
   color: var(--primary);
   margin: 0;
@@ -536,8 +544,7 @@ watch(
 
 .divider {
   width: 1px;
-  background: var(--secondary);
-  margin: 0 1rem;
+  background: var(--border);
   display: none;
 }
 
@@ -549,42 +556,47 @@ watch(
 
 .list-content {
   flex: 1;
+  min-width: 0;
 }
 
 .list-header {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: 0.875rem;
+  margin-bottom: 0.75rem;
 }
 
 .list-name {
-  font-size: 2rem;
-  font-weight: 800;
+  font-family: var(--font-display);
+  font-size: clamp(1.625rem, 4vw, 2.25rem);
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: var(--text);
   margin: 0;
 }
 
 .list-description {
-  color: var(--gray);
+  color: var(--text-muted);
   font-size: 1rem;
-  line-height: 1.5;
-  margin-bottom: 1.5rem;
+  line-height: 1.6;
+  margin: 0 0 1.5rem;
+  max-width: 65ch;
 }
 
 .list-footer-stats {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 1.5rem;
+  gap: 0.75rem 1.5rem;
   padding-top: 1.25rem;
-  border-top: 1px solid var(--secondary);
+  border-top: 1px solid var(--border);
 }
 
 .actions-wrapper {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
   margin-left: auto;
 }
 
@@ -592,8 +604,8 @@ watch(
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.9rem;
-  opacity: 0.7;
+  font-size: 0.9375rem;
+  color: var(--text-muted);
 }
 
 .stat i {
@@ -604,72 +616,60 @@ watch(
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 1.8rem;
-  height: 1.8rem;
-  border-radius: 0.6rem;
-  font-size: 0.85rem;
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
 }
 
-.badge-public {
-  background: rgba(34, 197, 94, 0.2);
-  color: #309153;
-}
-
-.badge-private {
-  background: rgba(239, 68, 68, 0.2);
-  color: #b73b3b;
-}
-
-.badge-friends {
-  background: rgba(99, 102, 241, 0.2);
-  color: #4d57bd;
-}
-
-.btn-edit-list {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  border: 1px solid var(--orange);
-  background: transparent;
-  color: var(--orange);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-edit-list:hover {
-  background: var(--orange);
-  color: white;
-}
-
+.btn-edit-list,
 .btn-delete-list {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  min-height: 2.5rem;
   padding: 0.5rem 1rem;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  border: 1px solid #ef4444;
+  border-radius: var(--radius-md);
+  font-size: 0.9375rem;
+  font-weight: 600;
   background: transparent;
-  color: #ef4444;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.btn-edit-list {
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+}
+
+.btn-edit-list:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.btn-delete-list {
+  border: 1px solid transparent;
+  color: var(--danger);
 }
 
 .btn-delete-list:hover {
-  background: #ef4444;
-  color: white;
+  border-color: var(--danger);
+  background: var(--danger-soft);
 }
 
 .movies-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
   min-height: 200px;
+}
+
+@media (min-width: 640px) {
+  .movies-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 @media (min-width: 768px) {
@@ -698,23 +698,23 @@ watch(
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--red) 12%, transparent);
-  border: 1px solid color-mix(in srgb, var(--red) 30%, transparent);
-  color: var(--red);
+  background: var(--danger-soft);
+  color: var(--danger);
   font-size: 1rem;
   flex-shrink: 0;
 }
 
 .confirm-title {
-  font-size: 1rem;
+  font-family: var(--font-display);
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--text);
   margin: 0;
 }
 
 .confirm-body {
-  font-size: 0.875rem;
-  color: var(--gray);
+  font-size: 0.9375rem;
+  color: var(--text-muted);
   line-height: 1.6;
   margin: 0;
   padding: 0.25rem 0;
@@ -723,46 +723,46 @@ watch(
 .footer-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 0.75rem;
+  gap: 0.625rem;
   padding-top: 0.5rem;
   width: 100%;
 }
 
 .btn-cancel {
-  padding: 0.5rem 1.2rem;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--secondary) 60%, transparent);
+  padding: 0.55rem 1.2rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-strong);
   background: transparent;
   color: var(--text);
-  font-size: 0.85rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background-color 0.15s;
   font-family: inherit;
 }
 
 .btn-cancel:hover {
-  background: color-mix(in srgb, var(--secondary) 15%, transparent);
+  background: var(--surface-hover);
 }
 
 .btn-delete {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.5rem 1.4rem;
-  border-radius: 999px;
+  gap: 0.45rem;
+  padding: 0.55rem 1.3rem;
+  border-radius: var(--radius-md);
   border: none;
-  background: var(--red);
-  color: #fff;
-  font-size: 0.85rem;
+  background: #c42020;
+  color: #ffffff;
+  font-size: 0.9375rem;
   font-weight: 700;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: background-color 0.15s;
   font-family: inherit;
 }
 
 .btn-delete:hover {
-  opacity: 0.85;
+  background: #a51b1b;
 }
 
 .mb-4 {
@@ -770,10 +770,10 @@ watch(
 }
 
 .empty-card {
-  background: color-mix(in srgb, var(--background) 40%, transparent);
-  border-radius: 2rem;
-  padding: 4rem 2rem;
-  border: 2px dashed var(--secondary);
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  padding: 3.5rem 2rem;
+  border: 1.5px dashed var(--border-strong);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -782,23 +782,23 @@ watch(
 }
 
 .icon-circle {
-  width: 5rem;
-  height: 5rem;
-  color: color-mix(in srgb, var(--accent) 50%, transparent);
-  background: color-mix(in srgb, var(--secondary) 70%, transparent);
+  width: 4.5rem;
+  height: 4.5rem;
+  color: var(--primary);
+  background: var(--primary-soft);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .empty-title {
+  font-family: var(--font-display);
   font-size: 1.25rem;
   font-weight: 600;
-  opacity: 0.7;
   color: var(--text);
-  margin-bottom: 0.5rem;
+  margin: 0 0 0.5rem;
 }
 
 .empty-content {
@@ -809,10 +809,10 @@ watch(
 }
 
 .empty-description {
-  font-size: 0.875rem;
-  opacity: 0.5;
-  max-width: 300px;
-  margin: 0 auto 2rem;
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+  max-width: 320px;
+  margin: 0 auto 0.5rem;
   line-height: 1.6;
 }
 
@@ -820,25 +820,19 @@ watch(
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  padding: 0.8rem 1.5rem;
-  border-radius: 999px;
+  min-height: 2.75rem;
+  padding: 0.7rem 1.4rem;
+  border-radius: var(--radius-md);
   border: none;
   background: var(--primary);
-  color: white;
-  font-size: 0.9rem;
+  color: var(--on-primary);
+  font-size: 0.9375rem;
   font-weight: 700;
   cursor: pointer;
-  transition:
-    transform 0.2s,
-    opacity 0.2s;
+  transition: background-color 0.15s;
 }
 
 .btn-search-redirect:hover {
-  opacity: 0.9;
-  transform: translateY(-2px);
-}
-
-.btn-search-redirect:active {
-  transform: translateY(0);
+  background: var(--primary-hover);
 }
 </style>

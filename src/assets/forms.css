@@ -1,0 +1,232 @@
+/* =========================================================================
+   Páginas de autenticación y formularios PrimeVue (login, registro,
+   recuperación, verificación, onboarding). Ver docs/guia-de-estilos.pdf.
+   ========================================================================= */
+
+.auth-page {
+  position: relative;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5.5rem 1rem 2.5rem;
+  background:
+    radial-gradient(50rem 28rem at 50% -10%, color-mix(in srgb, var(--primary) 14%, transparent), transparent 70%),
+    var(--background);
+  color: var(--text);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 28rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: 2rem 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .auth-card {
+    padding: 2.5rem 2.25rem;
+  }
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.auth-logo {
+  width: 3.5rem;
+  height: 3.5rem;
+  margin: 0 auto 1rem;
+  padding: 0.6rem;
+  border-radius: var(--radius-lg);
+  background: var(--primary-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-logo img {
+  width: 100%;
+  height: 100%;
+}
+
+.auth-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  margin: 0 auto 1rem;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.auth-title {
+  font-family: var(--font-display);
+  font-size: 1.625rem;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin: 0;
+}
+
+.auth-subtitle {
+  margin: 0.5rem auto 0;
+  max-width: 22rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.auth-divider span {
+  font-size: 0.8125rem;
+  color: var(--text-subtle);
+  white-space: nowrap;
+}
+
+.auth-footer {
+  margin: 1.5rem 0 0;
+  text-align: center;
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--primary);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.link-btn:hover {
+  text-decoration: underline;
+}
+
+.link-btn--sm {
+  font-size: 0.875rem;
+}
+
+/* ---------- Campos PrimeVue dentro de formularios ---------- */
+.auth-card .p-inputtext,
+.auth-card .p-password-input,
+.form-surface .p-inputtext,
+.form-surface .p-password-input {
+  background-color: var(--surface) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: var(--radius-md) !important;
+  font-size: 1rem !important;
+  padding: 0.8rem 0.875rem !important;
+  box-shadow: none !important;
+}
+
+.auth-card .p-inputtext:hover,
+.form-surface .p-inputtext:hover {
+  border-color: var(--text-subtle) !important;
+}
+
+.auth-card .p-inputtext:focus,
+.auth-card .p-password-input:focus,
+.form-surface .p-inputtext:focus,
+.form-surface .p-password-input:focus {
+  border-color: var(--primary) !important;
+  box-shadow: var(--focus-ring) !important;
+}
+
+.auth-card .p-floatlabel label,
+.form-surface .p-floatlabel label {
+  color: var(--text-subtle);
+}
+
+.auth-card .p-floatlabel:has(input:focus) label,
+.form-surface .p-floatlabel:has(input:focus) label {
+  color: var(--primary);
+}
+
+.auth-card .p-invalid.p-inputtext,
+.auth-card .p-invalid .p-inputtext,
+.auth-card .p-invalid .p-password-input,
+.form-surface .p-invalid.p-inputtext,
+.form-surface .p-invalid .p-inputtext {
+  border-color: var(--danger) !important;
+}
+
+.auth-card .p-valid.p-inputtext,
+.form-surface .p-valid.p-inputtext {
+  border-color: var(--success) !important;
+}
+
+.auth-card .p-password-toggle-mask-icon,
+.auth-card .p-password .p-icon {
+  color: var(--text-subtle);
+}
+
+.auth-card .p-button:not(.p-button-text),
+.form-surface .p-button:not(.p-button-text) {
+  min-height: 3rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: var(--radius-md) !important;
+}
+
+/* Mensajes de validación (FieldMsg) */
+.field-msg {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  animation: field-msg-in 0.15s ease;
+}
+
+.field-msg.error {
+  color: var(--danger);
+}
+
+.field-msg.success {
+  color: var(--success);
+}
+
+.msg-icon {
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+@keyframes field-msg-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

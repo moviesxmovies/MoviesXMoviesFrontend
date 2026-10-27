@@ -149,7 +149,7 @@ watch(() => props.forceOpenRepliesId, (id) => {
         </div>
         <div class="comment-body">
             <div class="comment-header">
-                <span class="comment-username">{{ user.username }}</span>
+                <a class="comment-username" :href="`/users/${user.username}`">{{ user.username }}</a>
                 <span class="comment-date">{{ formatRelativeTime(comment.created_at) }}</span>
             </div>
             <p class="comment-content">{{ renderedContent }}</p>
@@ -165,7 +165,7 @@ watch(() => props.forceOpenRepliesId, (id) => {
             </div>
 
             <!-- TOGGLE REPLIES BUTTON -->
-            <button v-if="comment.has_replies" class="toggle-replies-btn" @click="toggleReplies">
+            <button v-if="comment.has_replies" class="toggle-replies-btn" @click="toggleReplies" :aria-expanded="repliesVisible">
                 <i :class="repliesVisible ? 'pi pi-chevron-up' : 'pi pi-chevron-down'" />
                 <span v-if="!repliesVisible">{{ $t('comment.showReplies') }}</span>
                 <span v-else>{{ $t('comment.hideReplies') }}</span>
@@ -227,8 +227,10 @@ watch(() => props.forceOpenRepliesId, (id) => {
 <style scoped>
 .actions {
     display: flex;
-    gap: 1rem;
-    margin-top: 0.25rem;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin-top: 0.35rem;
     position: relative;
     overflow: visible;
 }
@@ -236,13 +238,13 @@ watch(() => props.forceOpenRepliesId, (id) => {
 .comment {
     display: flex;
     gap: 0.75rem;
-    padding: 0.5rem 0;
-    border-radius: 0.75rem;
+    padding: 0.5rem 0.5rem;
+    border-radius: var(--radius-md);
 }
 
 @keyframes comment-flash {
     0% {
-        background: color-mix(in srgb, var(--primary) 20%, transparent);
+        background: color-mix(in srgb, var(--primary) 22%, transparent);
     }
 
     50% {
@@ -266,25 +268,21 @@ watch(() => props.forceOpenRepliesId, (id) => {
 }
 
 .comment-avatar {
-    width: 2rem;
-    height: 2rem;
+    width: 2.25rem;
+    height: 2.25rem;
     border-radius: 50%;
     object-fit: cover;
-    border: 1.5px solid color-mix(in srgb, var(--secondary) 60%, transparent);
+    border: 1px solid var(--border);
     flex-shrink: 0;
-}
-
-.reply-avatar {
-    width: 1.6rem;
-    height: 1.6rem;
 }
 
 .comment-thread-line {
     flex: 1;
-    width: 1.5px;
-    margin-top: 0.35rem;
-    background: color-mix(in srgb, var(--secondary) 30%, transparent);
+    width: 2px;
+    margin-top: 0.4rem;
+    background: var(--border);
     min-height: 0.5rem;
+    border-radius: 2px;
 }
 
 .comment-body {
@@ -300,88 +298,79 @@ watch(() => props.forceOpenRepliesId, (id) => {
 .comment-header {
     display: flex;
     align-items: baseline;
+    flex-wrap: wrap;
     gap: 0.5rem;
 }
 
 .comment-username {
-    font-size: 0.78rem;
+    font-size: 0.9375rem;
     font-weight: 700;
+    color: var(--text);
+    text-decoration: none;
+}
+
+.comment-username:hover {
     color: var(--primary);
+    text-decoration: underline;
 }
 
 .comment-date {
-    font-size: 0.68rem;
-    color: var(--gray);
+    font-size: 0.8125rem;
+    color: var(--text-subtle);
 }
 
 .comment-content {
-    font-size: 0.85rem;
-    line-height: 1.55;
+    font-size: 0.9375rem;
+    line-height: 1.6;
     color: var(--text);
-    opacity: 0.85;
     margin: 0;
     word-break: break-word;
     overflow-wrap: break-word;
 }
 
-.reply-btn {
-    display: flex;
+.reply-btn,
+.toggle-replies-btn {
+    display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
+    gap: 0.35rem;
     background: none;
     border: none;
-    padding: 0;
+    padding: 0.2rem 0;
     cursor: pointer;
     font-family: inherit;
-    font-size: 0.72rem;
+    font-size: 0.8125rem;
     font-weight: 600;
-    color: var(--gray);
-    opacity: 0.7;
-    transition: opacity 0.2s, color 0.2s;
+    transition: color 0.15s;
     align-self: flex-start;
-    margin-top: 0.15rem;
+}
+
+.reply-btn {
+    color: var(--text-subtle);
 }
 
 .reply-btn:hover {
-    opacity: 1;
     color: var(--primary);
-}
-
-.reply-btn i {
-    font-size: 0.68rem;
 }
 
 .toggle-replies-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 0.72rem;
-    font-weight: 700;
     color: var(--primary);
-    opacity: 0.75;
-    transition: opacity 0.2s;
     margin-top: 0.1rem;
-    align-self: flex-start;
 }
 
 .toggle-replies-btn:hover {
-    opacity: 1;
+    text-decoration: underline;
 }
 
+.reply-btn i,
 .toggle-replies-btn i {
-    font-size: 0.65rem;
+    font-size: 0.75rem;
 }
 
 .replies {
     display: flex;
     flex-direction: column;
-    margin-top: 0.25rem;
-    border-left: 1.5px solid color-mix(in srgb, var(--secondary) 35%, transparent);
+    margin-top: 0.35rem;
+    border-left: 2px solid var(--border);
     padding-left: 0.75rem;
 }
 
@@ -390,31 +379,29 @@ watch(() => props.forceOpenRepliesId, (id) => {
 }
 
 .load-more-btn {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    background: none;
-    border: 1px solid color-mix(in srgb, var(--secondary) 50%, transparent);
+    gap: 0.4rem;
+    background: transparent;
+    border: 1px solid var(--border-strong);
     border-radius: 999px;
-    padding: 0.3rem 0.85rem;
+    padding: 0.35rem 0.9rem;
     cursor: pointer;
     font-family: inherit;
-    font-size: 0.72rem;
+    font-size: 0.8125rem;
     font-weight: 600;
-    color: var(--text);
-    opacity: 0.6;
-    transition: opacity 0.2s, border-color 0.2s;
+    color: var(--text-muted);
+    transition: color 0.15s, border-color 0.15s;
     align-self: flex-start;
     margin-top: 0.25rem;
 }
 
 .load-more-btn:hover {
-    opacity: 1;
     border-color: var(--primary);
     color: var(--primary);
 }
 
 .load-more-btn i {
-    font-size: 0.65rem;
+    font-size: 0.7rem;
 }
 </style>

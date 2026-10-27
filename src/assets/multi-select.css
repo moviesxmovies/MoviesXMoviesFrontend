@@ -1,9 +1,16 @@
+/* =========================================================================
+   Controles compartidos de PrimeVue: MultiSelect, Select, diálogos.
+   Usa exclusivamente tokens de src/style.css.
+   ========================================================================= */
+
+/* ---------- MultiSelect ---------- */
 .p-multiselect {
-  background: color-mix(in srgb, var(--background) 95%, var(--text)) !important;
-  border: 1px solid color-mix(in srgb, var(--secondary) 20%, transparent) !important;
-  border-radius: 1.25rem !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: var(--radius-md) !important;
   color: var(--text) !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: none !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .p-multiselect:hover {
@@ -12,7 +19,7 @@
 
 .p-multiselect.p-focus {
   border-color: var(--primary) !important;
-  box-shadow: 0 0 0 1px var(--primary) !important;
+  box-shadow: var(--focus-ring) !important;
 }
 
 .p-multiselect-label {
@@ -20,114 +27,99 @@
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  padding: 6px 8px;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.9375rem;
   white-space: normal;
   height: auto !important;
 }
 
 .p-multiselect-label.p-placeholder {
-  color: color-mix(in srgb, var(--text) 35%, transparent) !important;
+  color: var(--text-subtle) !important;
+}
+
+.p-multiselect-dropdown {
+  color: var(--text-subtle) !important;
 }
 
 .p-chip {
-  background: color-mix(in srgb, var(--primary) 15%, transparent) !important;
+  background: var(--primary-soft) !important;
   color: var(--primary) !important;
-  border-radius: 2rem !important;
-  font-size: 0.7rem !important;
+  border-radius: 999px !important;
+  font-size: 0.8125rem !important;
   font-weight: 600 !important;
   padding: 2px 10px !important;
 }
 
 .p-chip-remove-icon {
   color: var(--primary) !important;
-  opacity: 0.7;
-}
-
-.p-chip-remove-icon:hover {
-  opacity: 1;
 }
 
 .p-multiselect-overlay {
-  background: var(--background) !important;
-  border: 1px solid color-mix(in srgb, var(--secondary) 20%, transparent) !important;
-  border-radius: 1.25rem !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-lg) !important;
   overflow: hidden;
 }
 
-.p-multiselect-filter-input {
-  background: color-mix(in srgb, var(--background) 95%, var(--text)) !important;
-  border: 1px solid color-mix(in srgb, var(--secondary) 20%, transparent) !important;
-  border-radius: 0.75rem !important;
+.p-multiselect-header {
+  background: transparent !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+.p-multiselect-filter,
+.p-multiselect-filter-input,
+.p-multiselect-filter-container input {
+  background: var(--background) !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: var(--radius-sm) !important;
   color: var(--text) !important;
 }
 
+.p-multiselect-filter:focus,
 .p-multiselect-filter-input:focus {
   border-color: var(--primary) !important;
-  box-shadow: 0 0 0 1px var(--primary) !important;
+  box-shadow: var(--focus-ring) !important;
 }
 
 .p-multiselect-overlay .p-checkbox .p-checkbox-box {
-  background: var(--background) !important;
-  border-color: color-mix(in srgb,
-      var(--secondary) 40%,
-      transparent) !important;
-  border-radius: 6px !important;
+  background: var(--surface) !important;
+  border: 1.5px solid var(--border-strong) !important;
+  border-radius: 5px !important;
 }
 
-.p-multiselect-overlay .p-checkbox .p-checkbox-box[data-p="checked"] {
-  background: var(--primary) !important;
-  border-color: var(--primary) !important;
-  color: white !important;
-}
-
-.p-multiselect-filter {
-  background: color-mix(in srgb, var(--background) 95%, var(--text)) !important;
-  border: 1px solid color-mix(in srgb, var(--secondary) 20%, transparent) !important;
-  border-radius: 0.75rem !important;
-  color: var(--text) !important;
-}
-
-.p-multiselect-filter:focus {
-  border-color: var(--primary) !important;
-  box-shadow: 0 0 0 1px var(--primary) !important;
-}
-
-.p-multiselect-filter-container input {
-  background: var(--background) !important;
-  color: var(--text) !important;
-}
-
-.p-multiselect-filter-container input::placeholder {
-  color: color-mix(in srgb, var(--text) 50%, transparent) !important;
-}
-
-.p-multiselect-option {
-  color: var(--text) !important;
-  border-radius: 0.5rem !important;
-  transition: all 0.2s ease;
-}
-
-.p-multiselect-option:hover,
-.p-multiselect-option.p-focus {
-  background: color-mix(in srgb, var(--primary) 10%, transparent) !important;
-}
-
-.p-multiselect-option.p-selected {
-  background: color-mix(in srgb, var(--primary) 15%, transparent) !important;
-  color: var(--primary) !important;
-}
-
+.p-multiselect-overlay .p-checkbox .p-checkbox-box[data-p="checked"],
+.p-multiselect-option.p-multiselect-option-selected .p-checkbox .p-checkbox-box,
 .p-multiselect-option.p-selected .p-checkbox .p-checkbox-box {
   background: var(--primary) !important;
   border-color: var(--primary) !important;
 }
 
-.p-multiselect-option.p-selected .p-checkbox .p-checkbox-box .p-checkbox-icon {
-  color: white !important;
+.p-multiselect-overlay .p-checkbox-icon {
+  color: var(--on-primary) !important;
 }
 
-.p-multiselect-label .p-multiselect-chip {
-  background: color-mix(in srgb, var(--primary) 15%, transparent) !important;
+.p-multiselect-option {
+  color: var(--text) !important;
+  border-radius: var(--radius-sm) !important;
+  font-size: 0.9375rem;
+  transition: background-color 0.1s ease;
+}
+
+.p-multiselect-option:hover,
+.p-multiselect-option.p-focus {
+  background: var(--surface-hover) !important;
+}
+
+.p-multiselect-option.p-multiselect-option-selected,
+.p-multiselect-option.p-selected {
+  background: var(--primary-soft) !important;
+  color: var(--primary) !important;
+}
+
+.p-multiselect-label .p-multiselect-chip,
+.p-multiselect-chip-item .p-chip {
+  background: var(--primary-soft) !important;
   color: var(--primary) !important;
   border: none !important;
 }
@@ -136,12 +128,113 @@
   color: var(--primary) !important;
 }
 
-.p-multiselect-chip-item .p-chip {
-  background: color-mix(in srgb, var(--primary) 15%, transparent) !important;
-  color: var(--primary) !important;
-  border: none !important;
-}
-
 .p-multiselect-chip-item .p-chip .p-chip-remove-icon {
   color: var(--primary) !important;
+}
+
+.p-multiselect-empty-message {
+  color: var(--text-muted) !important;
+}
+
+/* ---------- Diálogos (usar pt root: 'mxm-dialog', title: 'mxm-dialog-title') ---------- */
+.p-dialog.mxm-dialog,
+.p-dialog {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-xl) !important;
+  box-shadow: var(--shadow-lg) !important;
+  overflow: hidden;
+}
+
+.p-dialog .p-dialog-header,
+.p-dialog .p-dialog-content,
+.p-dialog .p-dialog-footer {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+}
+
+.p-dialog .p-dialog-header {
+  padding: 1.25rem 1.5rem 0.75rem;
+}
+
+.p-dialog .p-dialog-content {
+  padding: 0.5rem 1.5rem 1.5rem;
+}
+
+.p-dialog .p-dialog-title,
+.mxm-dialog-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.015em;
+  color: var(--text) !important;
+}
+
+.p-dialog .p-dialog-close-button,
+.p-dialog .p-dialog-header-icon {
+  color: var(--text-muted) !important;
+}
+
+.p-dialog .p-dialog-close-button:hover {
+  background: var(--surface-hover) !important;
+  color: var(--text) !important;
+}
+
+/* ---------- Botones PrimeVue ---------- */
+.p-button {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  border-radius: var(--radius-md);
+}
+
+.p-button:not(.p-button-text):not(.p-button-outlined):not(.p-button-secondary):not(.p-button-danger):not(.p-button-success):not(.p-button-link) {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--on-primary);
+}
+
+.p-button:not(.p-button-text):not(.p-button-outlined):not(.p-button-secondary):not(.p-button-danger):not(.p-button-success):not(.p-button-link):not(:disabled):hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+  color: var(--on-primary);
+}
+
+.p-button.p-button-secondary {
+  background: var(--surface-2);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.p-button.p-button-secondary:not(:disabled):hover {
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.p-button.p-button-text {
+  color: var(--primary);
+}
+
+.p-button.p-button-outlined {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.p-button.p-button-danger:not(.p-button-text):not(.p-button-outlined) {
+  background: #c42020;
+  border-color: #c42020;
+  color: #ffffff;
+}
+
+/* ---------- Select ---------- */
+.p-select-overlay {
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* ---------- ConfirmDialog ---------- */
+.p-confirmdialog .p-dialog-content {
+  gap: 0.75rem;
+  color: var(--text-muted) !important;
 }

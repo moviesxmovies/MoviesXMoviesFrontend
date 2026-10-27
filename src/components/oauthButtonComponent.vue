@@ -9,10 +9,9 @@ defineProps<{
 
 <template>
   <Button @click="loginWithGoogle" :loading="loading" :aria-label="$t('components.oauthButton', ['Google'])"
-    class="w-full flex items-center justify-center gap-3 py-2 px-4 bg-white border border-gray-300 hover:bg-gray-50 hover:-translate-y-1 hover:shadow-md hover:cursor-pointer transition-all duration-200 rounded-md shadow-sm"
-    unstyled>
+    class="oauth-btn" unstyled>
     <div class="flex items-center justify-center">
-      <svg xmlns="http://www.w3.org" width="18" height="18" viewBox="0 0 48 48">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
         <path fill="#EA4335"
           d="M24 9.5c3.54 0 6.71 1.22 9.21 3.22l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
         <path fill="#4285F4"
@@ -24,15 +23,41 @@ defineProps<{
       </svg>
     </div>
 
-    <span class="text-gray-700 font-semibold text-sm">
+    <span class="oauth-label">
       {{ $t("components.oauthButton", ["Google"]) }}
     </span>
   </Button>
 </template>
 
 <style scoped>
-button:active:not(:disabled) {
-  background-color: #f3f4f6;
+.oauth-btn {
+  width: 100%;
+  min-height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1rem;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.oauth-btn:hover {
+  background: var(--surface-hover);
+  border-color: var(--primary);
+}
+
+.oauth-btn:active:not(:disabled) {
   transform: translateY(1px);
+}
+
+.oauth-label {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--text);
 }
 </style>

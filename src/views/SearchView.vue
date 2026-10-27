@@ -67,15 +67,16 @@ watch(
   <div class="page">
     <div class="search-container">
       <div class="search-wrapper">
-        <i class="pi pi-search search-icon" />
+        <i class="pi pi-search search-icon" aria-hidden="true" />
         <InputText
           v-model="search"
           data-testid="search-input"
           :placeholder="$t('search.searchPlaceholder')"
           class="search-input"
+          :aria-label="$t('search.searchPlaceholder')"
           fluid
         />
-        <button v-if="search" class="clear-btn" @click="search = ''">
+        <button v-if="search" class="clear-btn" @click="search = ''" :aria-label="$t('common.close')">
           <i class="pi pi-times" />
         </button>
       </div>
@@ -102,30 +103,40 @@ watch(
 .page {
   min-height: 100vh;
   background: var(--background);
-  font-family: "Inter", sans-serif;
-  padding: 1rem;
+  padding: 5rem 1rem 2rem;
+}
+
+@media (min-width: 768px) {
+  .page {
+    padding: 5.5rem 1.5rem 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .page {
+    padding: 5.5rem 2rem 3rem;
+  }
 }
 
 .search-container {
-  margin: 40px 0 20px 0;
+  margin: 0.5rem 0 1.25rem;
   display: flex;
   justify-content: center;
   width: 100%;
-  animation: slideDown 0.5s ease-out;
 }
 
 .search-wrapper {
   position: relative;
   width: 100%;
-  max-width: 600px;
+  max-width: 640px;
   display: flex;
   align-items: center;
 }
 
 .search-icon {
   position: absolute;
-  left: 1.2rem;
-  color: color-mix(in srgb, var(--text) 40%, transparent);
+  left: 1.1rem;
+  color: var(--text-subtle);
   font-size: 1.1rem;
   z-index: 1;
   pointer-events: none;
@@ -133,63 +144,49 @@ watch(
 
 .search-input {
   width: 100%;
-  padding: 0.8rem 1rem 0.8rem 3rem !important;
-  background: color-mix(in srgb, var(--text) 5%, transparent) !important;
-  border: 1.5px solid rgba(47, 39, 206, 0.1) !important;
-  border-radius: 14px !important;
-  color: var(--text);
-  font-family: "DM Sans", sans-serif;
-  font-size: 1.1rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 3.25rem;
+  padding: 0 3rem 0 3rem !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: var(--radius-lg) !important;
+  color: var(--text) !important;
+  font-family: var(--font-sans);
+  font-size: 1.0625rem !important;
+  box-shadow: var(--shadow-sm) !important;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .search-input:focus {
-  background: color-mix(in srgb, var(--text) 2%, transparent) !important;
   border-color: var(--primary) !important;
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 15%, transparent) !important;
+  box-shadow: var(--focus-ring) !important;
   outline: none;
-}
-
-.search-input::placeholder {
-  color: color-mix(in srgb, var(--text) 30%, transparent);
 }
 
 .clear-btn {
   position: absolute;
-  right: 1rem;
+  right: 0.75rem;
+  width: 2rem;
+  height: 2rem;
   background: transparent;
   border: none;
-  color: color-mix(in srgb, var(--text) 40%, transparent);
+  color: var(--text-subtle);
   cursor: pointer;
-  padding: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  transition: all 0.2s ease;
+  transition: background-color 0.15s, color 0.15s;
 }
 
 .clear-btn:hover {
-  background: color-mix(in srgb, var(--text) 10%, transparent);
+  background: var(--surface-hover);
   color: var(--text);
 }
 
 @media (max-width: 640px) {
   .search-input {
-    font-size: 1rem;
-    padding: 0.7rem 1rem 0.7rem 2.8rem !important;
-  }
-}
-
-@media (min-width: 768px) {
-  .page {
-    padding: 1.5rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .page {
-    padding: 2.5rem;
+    height: 3rem;
+    font-size: 1rem !important;
   }
 }
 
@@ -197,39 +194,54 @@ watch(
   display: flex;
   justify-content: center;
   width: 100%;
-  margin-bottom: 1rem;
+  margin-bottom: 1.75rem;
+  overflow-x: auto;
+}
+
+:deep(.p-selectbutton) {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 999px !important;
+  padding: 4px;
+  gap: 2px;
+  box-shadow: var(--shadow-sm);
 }
 
 :deep(.p-selectbutton .p-togglebutton) {
-  background: transparent;
-  border: none;
-  border-radius: 10px;
-  color: color-mix(in srgb, var(--text) 50%, transparent);
-  font-family: "DM Sans", sans-serif;
-  font-size: 0.95rem;
-  padding: 0.5rem 1rem;
-  transition: all 0.2s ease;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 999px !important;
+  color: var(--text-muted) !important;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  padding: 0.5rem 1.1rem;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  box-shadow: none !important;
+}
+
+:deep(.p-selectbutton .p-togglebutton::before),
+:deep(.p-selectbutton .p-togglebutton-content) {
+  background: transparent !important;
   box-shadow: none !important;
 }
 
 :deep(.p-selectbutton .p-togglebutton:hover) {
-  background: color-mix(in srgb, var(--primary) 8%, transparent);
-  color: var(--text);
+  background: var(--surface-hover) !important;
+  color: var(--text) !important;
 }
 
 :deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked) {
   background: var(--primary) !important;
-  color: white !important;
-  font-weight: 500;
+  color: var(--on-primary) !important;
 }
 
-:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked:hover) {
-  background: var(--primary) !important;
-  opacity: 0.9;
+:deep(.p-selectbutton .p-togglebutton.p-togglebutton-checked .p-togglebutton-label) {
+  color: var(--on-primary) !important;
 }
 
-:deep(.p-selectbutton .p-togglebutton:focus) {
-  box-shadow: none !important;
-  outline: none;
+:deep(.p-selectbutton .p-togglebutton:focus-visible) {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 </style>

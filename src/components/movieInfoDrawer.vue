@@ -108,8 +108,8 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll();
     class="movie-drawer !w-full md:!w-[40rem]">
     <template #header>
       <div class="drawer-header-inner">
-        <img v-if="movie.cover" :src="movie.cover" :alt="movie.title" class="drawer-poster"
-          @click="goToMovie(movie.slug)" />
+        <img v-if="movie.cover" :src="movie.cover" :alt="movie.title" class="drawer-poster" role="link" tabindex="0"
+          @click="goToMovie(movie.slug)" @keydown.enter="goToMovie(movie.slug)" />
         <div class="drawer-title-block">
           <h2 class="drawer-title">{{ movie.title }}</h2>
           <span class="drawer-year">{{ formatRelativeTime(movie.release_date) }}</span>
@@ -260,18 +260,6 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll();
 </template>
 
 <style scoped>
-:deep(.movie-drawer__root) {
-  background: var(--mxm-bg) !important;
-  border-left: 1px solid rgba(232, 184, 75, 0.15);
-  box-shadow: -8px 0 40px rgba(0, 0, 0, 0.6);
-}
-
-:deep(.movie-drawer__header) {
-  background: var(--mxm-surface) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 1.25rem 1.5rem !important;
-}
-
 .drawer-header-inner {
   display: flex;
   align-items: center;
@@ -279,18 +267,18 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll();
 }
 
 .drawer-poster {
-  width: 52px;
-  height: 74px;
+  width: 56px;
+  height: 80px;
   object-fit: cover;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-md);
   cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .drawer-poster:hover {
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.7);
+  box-shadow: var(--shadow-lg);
   transform: translateY(-2px);
 }
 
@@ -301,47 +289,40 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll();
 }
 
 .drawer-title {
-  font-size: 1.25rem;
+  font-family: var(--font-display);
+  font-size: 1.375rem;
   font-weight: 700;
-  color: var(--mxm-text);
+  color: var(--text);
   line-height: 1.2;
   margin: 0;
   letter-spacing: -0.02em;
 }
 
 .drawer-year {
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   font-weight: 500;
-  color: var(--mxm-accent);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-:deep(.movie-drawer__content) {
-  background: var(--mxm-bg) !important;
-  padding: 1.5rem !important;
-  overflow-y: auto;
+  color: var(--text-subtle);
 }
 
 .drawer-section {
-  margin-bottom: 2rem;
+  margin-bottom: 1.75rem;
 }
 
 .drawer-section__title {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--mxm-accent);
+  color: var(--text-subtle);
   margin: 0 0 0.75rem 0;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid #2f27ce1d;
+  border-bottom: 1px solid var(--border);
 }
 
 .drawer-section__body {
-  font-size: 0.925rem;
+  font-size: 1rem;
   line-height: 1.7;
-  color: var(--mxm-text-muted);
+  color: var(--text-muted);
   margin: 0;
 }
 
@@ -351,13 +332,13 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll();
 }
 
 :deep(.horizontal-scroll-panel .p-scrollpanel-bar-x) {
-  background: rgba(232, 184, 75, 0.25) !important;
-  height: 3px !important;
+  background: color-mix(in srgb, var(--text-subtle) 45%, transparent) !important;
+  height: 4px !important;
   border-radius: 99px;
 }
 
 :deep(.horizontal-scroll-panel .p-scrollpanel-bar-x:hover) {
-  background: var(--mxm-accent) !important;
+  background: var(--primary) !important;
 }
 
 .inline-list {
@@ -373,8 +354,9 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll();
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  width: 76px;
+  width: 80px;
   flex-shrink: 0;
+  text-decoration: none;
 }
 
 .person-item__img {
@@ -382,27 +364,28 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll();
   height: 72px;
   border-radius: 50%;
   object-fit: cover;
-  background: #7f6e8b45;
-  border: 2px solid rgba(255, 255, 255, 0.06);
-  transition: border-color 0.2s;
+  background: var(--surface-2);
+  border: 2px solid var(--border);
+  transition: border-color 0.15s;
 }
 
-.person-item:hover .person-item__img {
-  border-color: #bb3dff;
+.person-item:hover .person-item__img,
+.person-item:focus-visible .person-item__img {
+  border-color: var(--primary);
 }
 
 .person-item__name {
-  font-size: 0.7rem;
+  font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--mxm-text-muted);
+  color: var(--text-muted);
   text-align: center;
   line-height: 1.3;
   word-break: break-word;
-  transition: color 0.2s;
+  transition: color 0.15s;
 }
 
 .person-item:hover .person-item__name {
-  color: var(--mxm-text);
+  color: var(--primary);
 }
 
 .platform-item {
@@ -416,18 +399,15 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll();
   width: 52px;
   height: 52px;
   object-fit: contain;
-  border-radius: 10px;
-  background: var(--mxm-surface);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
   padding: 6px;
-  transition:
-    border-color 0.2s,
-    background 0.2s;
+  transition: border-color 0.15s;
 }
 
 .platform-item:hover .platform-item__img {
-  border-color: #bb3dff;
-  background: var(--mxm-surface-2);
+  border-color: var(--primary);
 }
 
 .genre-list {
@@ -437,22 +417,21 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll();
 }
 
 .genre-tag {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--mxm-text-muted);
-  background: var(--mxm-surface);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
   border-radius: 99px;
-  padding: 0.25rem 0.75rem;
-  transition:
-    color 0.2s,
-    border-color 0.2s;
+  padding: 0.3rem 0.85rem;
+  text-decoration: none;
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
 }
 
 .genre-tag:hover {
-  color: var(--mxm-accent);
-  border-color: #bb3dff;
+  color: var(--primary);
+  border-color: var(--primary);
+  background: var(--primary-soft);
 }
 
 .scroll-container {

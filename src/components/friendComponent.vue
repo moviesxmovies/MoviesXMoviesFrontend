@@ -59,7 +59,7 @@ onMounted(() => {
                         class="profile-image cursor-pointer" @click="goToUser(user?.username)"
                         @load="loadingImage = false" />
                 </div>
-                <span class="username cursor-pointer" @click="goToUser(user?.username)">{{ user?.username }}</span>
+                <a class="username cursor-pointer" :href="`/users/${user?.username}`" @click.prevent="goToUser(user?.username)">{{ user?.username }}</a>
             </div>
 
             <div class="actions-slot">
@@ -75,11 +75,16 @@ onMounted(() => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.75rem 1rem;
-    border-radius: 1rem;
-    border: 1px solid var(--secondary);
-    background: var(--background);
-    transition: background 0.2s;
+    gap: 0.75rem;
+    padding: 0.75rem 0.875rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.friend-card:hover {
+    border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
 }
 
 .user-info {
@@ -93,6 +98,7 @@ onMounted(() => {
     position: relative;
     width: 2.5rem;
     height: 2.5rem;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -109,13 +115,20 @@ onMounted(() => {
     height: 2.5rem;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid var(--primary);
+    box-shadow: 0 0 0 2px var(--surface), 0 0 0 3.5px var(--primary);
     display: block;
 }
 
 .username {
-    font-size: 0.9rem;
+    font-size: 0.9375rem;
     font-weight: 600;
     color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.username:hover {
+    color: var(--primary);
 }
 </style>

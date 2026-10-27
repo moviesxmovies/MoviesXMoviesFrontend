@@ -16,8 +16,7 @@ const coverStyle = computed(() => ({
   <div class="movie-card flex items-center justify-center" :style="coverStyle">
 
     <div class="card-wrapper">
-      <div class="relative w-full max-w-sm aspect-[2/3] rounded-t-2xl overflow-hidden flex flex-col group"
-        style="background: #0a0a0a">
+      <div class="poster-frame relative w-full max-w-sm aspect-[2/3] rounded-t-2xl overflow-hidden flex flex-col group">
         <template v-if="loading">
           <Skeleton width="100%" height="100%" class="absolute inset-0" />
 
@@ -35,22 +34,18 @@ const coverStyle = computed(() => ({
           <img decoding="async" loading="eager" draggable="false" :src="movie.cover" :alt="movie.title"
             class="absolute inset-0 w-full h-full object-cover" />
 
-          <div class="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black to-transparent"></div>
-
-          <div class="relative p-4 text-center">
-            <span class="text-xl font-bold tracking-tight text-white drop-shadow-md">
-              {{ movie.title }}
-            </span>
-          </div>
-
-          <div
-            class="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black via-black/80 to-transparent flex flex-col justify-end p-6 gap-3">
-            <div v-for="platform in movie.platforms" :key="platform.id">
-              <image class="text-[14px] text-center font-bold text-white uppercase" :src="platform.image"
-                :alt="platform.name" :title="platform.name" />
+          <div class="poster-info">
+            <div v-if="movie.platforms?.length" class="poster-platforms">
+              <img v-for="platform in movie.platforms" :key="platform.id" :src="platform.image" :alt="platform.name"
+                :title="platform.name" class="poster-platform" draggable="false" />
             </div>
-            <p class="text-[14px] text-center font-bold text-white uppercase">
-              {{movie.genres.map((g) => g.name).join(" | ")}}
+            <h2 class="poster-title">{{ movie.title }}</h2>
+            <p class="poster-meta">
+              <span v-if="movie.release_date">{{ movie.release_date?.slice(0, 4) }}</span>
+              <template v-for="genre in movie.genres" :key="genre.id">
+                <span class="poster-dot" aria-hidden="true">·</span>
+                <span>{{ genre.name }}</span>
+              </template>
             </p>
           </div>
         </template>
@@ -60,10 +55,8 @@ const coverStyle = computed(() => ({
 </template>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;700&display=swap");
-
 .movie-card {
-  font-family: "DM Sans", sans-serif;
+  font-family: var(--font-sans);
   position: relative;
 }
 
@@ -71,6 +64,63 @@ const coverStyle = computed(() => ({
   position: relative;
   width: 100%;
   max-width: 24rem;
+}
+
+.poster-frame {
+  background: #0b0a12;
+}
+
+/* Gradiente inferior fijo (siempre oscuro) para garantizar contraste del texto blanco */
+.poster-info {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  padding: 6rem 1.25rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  background: linear-gradient(to top, rgba(8, 7, 14, 0.97) 0%, rgba(8, 7, 14, 0.9) 50%, rgba(8, 7, 14, 0) 100%);
+  color: #ffffff;
+}
+
+.poster-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.poster-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.poster-dot {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.poster-platforms {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.25rem;
+}
+
+.poster-platform {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.4rem;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
 }
 
 .card-wrapper::before {
@@ -81,6 +131,7 @@ const coverStyle = computed(() => ({
   background-size: cover;
   background-position: center;
   filter: blur(40px);
+  opacity: 0.7;
   contain: paint;
   pointer-events: none;
   z-index: -1;

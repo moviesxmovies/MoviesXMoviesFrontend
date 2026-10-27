@@ -52,36 +52,23 @@ const onFileSelect = (event: FileUploadSelectEvent) => {
 
 <template>
   <div class="flex flex-col gap-4 sm:gap-6">
-    <div class="text-center">
-      <h2 class="text-xl font-semibold" style="color: var(--text)">
-        {{ $t("signup.step2.title") }}
-      </h2>
-      <p class="text-xs sm:text-sm mt-1" style="color: var(--text); opacity: 0.5">
-        {{ $t("signup.step2.subtitle") }}
-      </p>
+    <div class="auth-header !mb-0">
+      <h1 class="auth-title">{{ $t("signup.step2.title") }}</h1>
+      <p class="auth-subtitle">{{ $t("signup.step2.subtitle") }}</p>
     </div>
 
     <div class="flex justify-center">
-      <div class="relative w-32 h-32 group cursor-pointer" @click="triggerUpload">
-        <div v-if="!imagePreview"
-          class="w-24 h-24 rounded-full flex flex-col items-center justify-center border-2 border-dashed transition-colors"
-          style="
-            border-color: var(--secondary);
-            background-color: var(--background);
-          ">
-          <i class="pi pi-camera text-xl" style="color: var(--primary)" />
-          <span class="text-xs mt-1" style="color: var(--text); opacity: 0.5">
-            {{ $t("signup.step2.image") }}
-          </span>
+      <div class="avatar-picker group" role="button" tabindex="0" :aria-label="$t('signup.step2.image')"
+        @click="triggerUpload" @keydown.enter.prevent="triggerUpload" @keydown.space.prevent="triggerUpload">
+        <div v-if="!imagePreview" class="avatar-empty">
+          <i class="pi pi-camera text-xl" aria-hidden="true" />
+          <span class="avatar-empty__label">{{ $t("signup.step2.image") }}</span>
         </div>
 
-        <img v-else :src="imagePreview" alt="Avatar" class="w-24 h-24 rounded-full object-cover border-2 m-auto"
-          style="border-color: var(--primary)" />
+        <img v-else :src="imagePreview" alt="Avatar" class="avatar-preview" />
 
-        <div v-if="imagePreview"
-          class="absolute inset-0 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-          style="background-color: rgba(0, 0, 0, 0.4)">
-          <i class="pi pi-pencil text-white text-lg" />
+        <div v-if="imagePreview" class="avatar-edit" aria-hidden="true">
+          <i class="pi pi-pencil" />
         </div>
       </div>
 
@@ -99,14 +86,13 @@ const onFileSelect = (event: FileUploadSelectEvent) => {
                 'p-valid': $field?.dirty && !$field?.invalid,
               }" />
               <InputIcon v-if="$field?.dirty" :class="$field?.invalid ? 'pi pi-times-circle' : 'pi pi-check-circle'
-                " :style="{ color: $field?.invalid ? '#ef4444' : '#22c55e' }" />
+                " :style="{ color: $field?.invalid ? 'var(--danger)' : 'var(--success)' }" />
             </IconField>
             <label for="first_name">{{ $t("signup.firstName") }}</label>
           </FloatLabel>
           <FieldMsg :field="$field" />
-          <div v-for="msg in (fieldErrors?.first_name ?? [])" :key="msg" class="flex items-center gap-1.5 text-xs"
-            style="color: #ef4444">
-            <i class="pi pi-times-circle text-xs" />
+          <div v-for="msg in (fieldErrors?.first_name ?? [])" :key="msg" class="field-msg error">
+          <i class="pi pi-times-circle msg-icon" />
             {{ msg }}
           </div>
         </FormField>
@@ -119,14 +105,13 @@ const onFileSelect = (event: FileUploadSelectEvent) => {
                 'p-valid': $field?.dirty && !$field?.invalid,
               }" />
               <InputIcon v-if="$field?.dirty" :class="$field?.invalid ? 'pi pi-times-circle' : 'pi pi-check-circle'
-                " :style="{ color: $field?.invalid ? '#ef4444' : '#22c55e' }" />
+                " :style="{ color: $field?.invalid ? 'var(--danger)' : 'var(--success)' }" />
             </IconField>
             <label for="last_name">{{ $t("signup.lastName") }}</label>
           </FloatLabel>
           <FieldMsg :field="$field" />
-          <div v-for="msg in (fieldErrors?.last_name ?? [])" :key="msg" class="flex items-center gap-1.5 text-xs"
-            style="color: #ef4444">
-            <i class="pi pi-times-circle text-xs" />
+          <div v-for="msg in (fieldErrors?.last_name ?? [])" :key="msg" class="field-msg error">
+          <i class="pi pi-times-circle msg-icon" />
             {{ msg }}
           </div>
         </FormField>
@@ -141,24 +126,63 @@ const onFileSelect = (event: FileUploadSelectEvent) => {
 </template>
 
 <style scoped>
-.field-msg {
+.avatar-picker {
+  position: relative;
+  width: 6.5rem;
+  height: 6.5rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.avatar-empty {
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  border: 2px dashed var(--border-strong);
+  background: var(--surface-2);
+  color: var(--primary);
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.avatar-picker:hover .avatar-empty {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.avatar-empty__label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.avatar-preview {
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  object-fit: cover;
+  box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--primary);
+}
+
+.avatar-edit {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 0.78rem;
-  animation: fadeIn 0.15s ease;
+  justify-content: center;
+  background: rgba(8, 7, 14, 0.55);
+  color: #ffffff;
+  opacity: 0;
+  transition: opacity 0.15s;
 }
 
-.field-msg.error {
-  color: #ef4444;
-}
-
-.field-msg.success {
-  color: #22c55e;
-}
-
-.msg-icon {
-  font-size: 0.85rem;
-  flex-shrink: 0;
+.avatar-picker:hover .avatar-edit,
+.avatar-picker:focus-visible .avatar-edit {
+  opacity: 1;
 }
 </style>

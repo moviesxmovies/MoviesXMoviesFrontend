@@ -200,9 +200,10 @@ watch(visible, (val) => {
         <div v-else class="form">
             <!-- Profile Picture -->
             <div class="avatar-section">
-                <div class="avatar-wrapper" @click="fileInput?.click()">
+                <div class="avatar-wrapper" role="button" tabindex="0" :aria-label="t('user.clickToChangePicture')"
+                    @click="fileInput?.click()" @keydown.enter.prevent="fileInput?.click()" @keydown.space.prevent="fileInput?.click()">
                     <img :src="picturePreview ?? ''" class="avatar-img" :alt="t('user.yourProfile')" />
-                    <div class="avatar-overlay">
+                    <div class="avatar-overlay" aria-hidden="true">
                         <i class="pi pi-camera" />
                     </div>
                 </div>
@@ -315,8 +316,8 @@ watch(visible, (val) => {
 .form {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-    padding: 0.5rem 0;
+    gap: 1.25rem;
+    padding: 0.25rem 0;
 }
 
 .avatar-section {
@@ -328,12 +329,12 @@ watch(visible, (val) => {
 
 .avatar-wrapper {
     position: relative;
-    width: 90px;
-    height: 90px;
+    width: 96px;
+    height: 96px;
     border-radius: 50%;
     cursor: pointer;
     overflow: hidden;
-    border: 3px solid var(--primary);
+    box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--primary);
 }
 
 .avatar-img {
@@ -345,24 +346,108 @@ watch(visible, (val) => {
 .avatar-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.45);
+    background: rgba(8, 7, 14, 0.55);
     display: flex;
     align-items: center;
     justify-content: center;
     opacity: 0;
     transition: opacity 0.2s;
-    color: #fff;
+    color: #ffffff;
     font-size: 1.3rem;
 }
 
-.avatar-wrapper:hover .avatar-overlay {
+.avatar-wrapper:hover .avatar-overlay,
+.avatar-wrapper:focus-visible .avatar-overlay {
     opacity: 1;
 }
 
 .avatar-hint {
-    font-size: 0.72rem;
-    opacity: 0.5;
+    font-size: 0.875rem;
+    color: var(--text-subtle);
+    margin: 0;
+}
+
+.fields {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+@media (max-width: 480px) {
+    .field-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.field-errors-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.hidden {
+    display: none;
+}
+
+/* ── Formulario (patrón compartido, ver guía de estilos) ── */
+label,
+.field-label {
+    font-size: 0.875rem;
+    font-weight: 600;
     color: var(--text);
+}
+
+.input,
+.textarea {
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    padding: 0.65rem 0.9rem;
+    font-size: 0.9375rem;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    font-family: inherit;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.input:hover,
+.textarea:hover {
+    border-color: var(--text-subtle);
+}
+
+.input:focus,
+.textarea:focus {
+    border-color: var(--primary);
+    box-shadow: var(--focus-ring);
+}
+
+.input-error {
+    border-color: var(--danger) !important;
+}
+
+.textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.field-error {
+    font-size: 0.8125rem;
+    color: var(--danger);
+    font-weight: 500;
 }
 
 .server-errors {
@@ -370,11 +455,11 @@ watch(visible, (val) => {
     align-items: flex-start;
     gap: 0.6rem;
     padding: 0.75rem 1rem;
-    border-radius: 0.75rem;
-    background: color-mix(in srgb, var(--red) 10%, transparent);
-    border: 1px solid color-mix(in srgb, var(--red) 30%, transparent);
-    color: var(--red);
-    font-size: 0.82rem;
+    border-radius: var(--radius-md);
+    background: var(--danger-soft);
+    border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent);
+    color: var(--danger);
+    font-size: 0.875rem;
 }
 
 .server-errors i {
@@ -391,146 +476,69 @@ watch(visible, (val) => {
     gap: 0.2rem;
 }
 
-.fields {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.field-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-}
-
-.field {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-}
-
-label {
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--text);
-    opacity: 0.6;
-}
-
-.input {
-    background: color-mix(in srgb, var(--text) 5%, transparent);
-    border: 1px solid color-mix(in srgb, var(--secondary) 50%, transparent);
-    border-radius: 0.75rem;
-    padding: 0.6rem 0.9rem;
-    font-size: 0.9rem;
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.2s;
-    font-family: inherit;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.input:focus {
-    border-color: var(--primary);
-}
-
-.input-error {
-    border-color: var(--red) !important;
-}
-
-.textarea {
-    resize: vertical;
-    min-height: 80px;
-}
-
-.field-error {
-    font-size: 0.75rem;
-    color: var(--red);
-    font-weight: 500;
-}
-
-.field-errors-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-}
-
-.hidden {
-    display: none;
-}
-
+/* ── Botones del pie ── */
 .footer-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 0.75rem;
-    padding-top: 0.5rem;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+    padding-top: 0.75rem;
     width: 100%;
 }
 
-.btn-cancel {
-    padding: 0.5rem 1.2rem;
-    border-radius: 999px;
-    border: 1px solid color-mix(in srgb, var(--secondary) 60%, transparent);
-    background: transparent;
-    color: var(--text);
-    font-size: 0.85rem;
+.btn-cancel,
+.btn-reset,
+.btn-save {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 2.5rem;
+    padding: 0.55rem 1.2rem;
+    border-radius: var(--radius-md);
+    font-size: 0.9375rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s;
+    font-family: inherit;
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s;
 }
 
-.btn-cancel:hover {
-    background: color-mix(in srgb, var(--secondary) 15%, transparent);
+.btn-cancel {
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-muted);
 }
 
-.btn-save {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.5rem 1.4rem;
-    border-radius: 999px;
-    border: none;
-    background: var(--primary);
-    color: var(--background);
-    font-size: 0.85rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: opacity 0.2s;
-}
-
-.btn-save:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.btn-save:hover:not(:disabled) {
-    opacity: 0.85;
+.btn-cancel:hover:not(:disabled) {
+    background: var(--surface-hover);
+    color: var(--text);
 }
 
 .btn-reset {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.5rem 1.4rem;
-    border-radius: 999px;
-    border: 1px solid color-mix(in srgb, var(--orange) 60%, transparent);
+    border: 1px solid var(--border-strong);
     background: transparent;
     color: var(--text);
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
-}
-
-.btn-reset:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
 }
 
 .btn-reset:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--orange) 15%, transparent);
-    border-color: color-mix(in srgb, var(--orange) 80%, transparent);
+    background: var(--surface-hover);
+}
+
+.btn-save {
+    border: 1px solid transparent;
+    background: var(--primary);
+    color: var(--on-primary);
+    font-weight: 700;
+}
+
+.btn-save:hover:not(:disabled) {
+    background: var(--primary-hover);
+}
+
+.btn-cancel:disabled,
+.btn-reset:disabled,
+.btn-save:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
 }
 </style>

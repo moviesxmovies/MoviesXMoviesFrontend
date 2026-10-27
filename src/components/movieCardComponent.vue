@@ -36,7 +36,8 @@ const emit = defineEmits<{
         <i class="pi pi-trash" />
       </button>
 
-      <div class="movie-card" @click="goToMovie(movie.slug)">
+      <div class="movie-card" role="link" tabindex="0" @click="goToMovie(movie.slug)"
+        @keydown.enter="goToMovie(movie.slug)">
         <div class="movie-poster-wrap">
           <Skeleton v-if="loadingImage" class="movie-poster-skeleton" border-radius="0" />
 
@@ -64,26 +65,24 @@ const emit = defineEmits<{
   top: 0.5rem;
   right: 0.5rem;
   z-index: 1;
-  width: 2rem;
-  height: 2rem;
+  width: 2.25rem;
+  height: 2.25rem;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(8, 7, 14, 0.72);
   backdrop-filter: blur(8px);
-  color: #f87171;
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.15s ease, transform 0.15s ease;
+  box-shadow: var(--shadow-md);
 }
 
 .delete-btn:hover {
-  background: #ef4444;
-  color: white;
-  transform: scale(1.1);
-  box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+  background: #c42020;
+  transform: scale(1.06);
 }
 
 .delete-btn i {
@@ -94,23 +93,26 @@ const emit = defineEmits<{
   height: 100%;
   display: flex;
   flex-direction: column;
-  border-radius: 1rem;
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  border: 1px solid var(--secondary);
+  border: 1px solid var(--border);
+  background: var(--surface);
   cursor: pointer;
   transition:
-    border-color 0.3s,
-    box-shadow 0.3s;
+    border-color 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s;
 }
 
-.movie-card:hover {
+.movie-card:hover,
+.movie-card:focus-visible {
   border-color: var(--primary);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-3px);
 }
 
 .movie-card:hover .movie-poster {
-  transform: scale(1.08);
-  filter: brightness(0.9);
+  transform: scale(1.05);
 }
 
 .movie-poster-wrap {
@@ -119,7 +121,7 @@ const emit = defineEmits<{
   aspect-ratio: 2 / 3;
   overflow: hidden;
   flex-shrink: 0;
-  background: var(--secondary);
+  background: var(--surface-2);
 }
 
 .movie-poster-skeleton {
@@ -135,27 +137,33 @@ const emit = defineEmits<{
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.5s;
+  transition: transform 0.4s;
 }
 
-
 .movie-info {
-  padding: 0.6rem 0.75rem;
-  height: 4.5rem;
+  padding: 0.7rem 0.85rem 0.8rem;
+  min-height: 4.25rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background: inherit;
+  gap: 0.15rem;
 }
 
 .movie-title {
-  font-size: 0.7rem;
-  font-weight: 700;
+  font-size: 0.9375rem;
+  line-height: 1.3;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .movie-year {
-  font-size: 0.65rem;
-  color: var(--gray);
+  font-size: 0.8125rem;
+  color: var(--text-subtle);
   font-weight: 500;
   margin: 0;
 }

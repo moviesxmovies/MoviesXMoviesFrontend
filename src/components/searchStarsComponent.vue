@@ -31,18 +31,18 @@ watch(
       :value="star"
       @change="emit('filterStars', selectedStars)"
     />
-    <label :for="String(star)" class="star-label">
-      <i v-for="n in Number(star)" :key="n" class="pi pi-star-fill" />
+    <label :for="String(star)" class="star-label" :aria-label="`${star} / 5`">
+      <i v-for="n in 5" :key="n" class="pi" :class="n <= Number(star) ? 'pi-star-fill' : 'pi-star star-empty'" aria-hidden="true" />
     </label>
   </div>
 </template>
 
 <style scoped>
 :deep(.p-checkbox-box) {
-  background: color-mix(in srgb, var(--background) 50%, transparent);
-  border-radius: 8px !important;
-  border: 2px solid var(--secondary) !important;
-  transition: all 0.2s ease;
+  background: var(--surface);
+  border-radius: 6px !important;
+  border: 1.5px solid var(--border-strong) !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 :deep(.p-checkbox-checked .p-checkbox-box) {
@@ -50,22 +50,30 @@ watch(
   border-color: var(--primary) !important;
 }
 
+:deep(.p-checkbox-checked .p-checkbox-icon) {
+  color: var(--on-primary) !important;
+}
+
 .star-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 4px 0;
+  gap: 10px;
+  padding: 6px 0;
 }
 
 .star-label {
   display: flex;
-  gap: 2px;
+  gap: 3px;
   cursor: pointer;
-  color: color-mix(in srgb, var(--text) 50%, transparent);
 }
 
-.star-label .pi-star-fill {
-  font-size: 0.75rem;
-  color: #f59e0b;
+.star-label .pi {
+  font-size: 0.875rem;
+  color: var(--star);
+}
+
+.star-label .star-empty {
+  color: var(--text-subtle);
+  opacity: 0.6;
 }
 </style>

@@ -146,7 +146,7 @@ watch(
           'bg-[var(--background)] border-t border-[var(--secondary)]',
       },
     }">
-    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--gray)] opacity-60 mb-6">
+    <p class="dialog-lead">
       {{ t("components.addToList.description", [props.movie.title]) }}
     </p>
 
@@ -154,10 +154,8 @@ watch(
       @remove="removeFromList" />
 
     <template #footer>
-      <div class="w-full pt-4">
-        <button
-          class="w-full py-4 rounded-xl flex items-center justify-center gap-2 text-sm font-bold text-[var(--accent)] hover:bg-[var(--accent)]/20 transition-all cursor-pointer"
-          @click="visibleCreateList = true">
+      <div class="w-full pt-3">
+        <button class="create-list-btn" @click="visibleCreateList = true">
           <i class="pi pi-plus-circle"></i>
           {{ t("components.addToList.createList") }}
         </button>
@@ -167,31 +165,43 @@ watch(
 </template>
 
 <style scoped>
+.dialog-lead {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin: 0 0 1.25rem;
+}
+
+.create-list-btn {
+  width: 100%;
+  min-height: 3rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border: 1px dashed color-mix(in srgb, var(--primary) 50%, transparent);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.create-list-btn:hover {
+  border-style: solid;
+  border-color: var(--primary);
+}
+
 :deep(.p-checkbox-box) {
-  border-radius: 8px !important;
-  border: 2px solid var(--secondary) !important;
-  transition: all 0.2s ease;
+  border-radius: 6px !important;
+  border: 1.5px solid var(--border-strong) !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 :deep(.p-checkbox-checked .p-checkbox-box) {
   background: var(--primary) !important;
   border-color: var(--primary) !important;
-}
-
-div[v-for] {
-  animation: slideIn 0.3s ease forwards;
-  opacity: 0;
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateY(10px);
-    opacity: 0;
-  }
-
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
 }
 </style>

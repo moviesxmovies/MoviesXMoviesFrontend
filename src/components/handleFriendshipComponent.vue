@@ -141,23 +141,23 @@ const confirmAction = async () => {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--red) 12%, transparent);
-  border: 1px solid color-mix(in srgb, var(--red) 30%, transparent);
-  color: var(--red);
+  background: var(--danger-soft);
+  color: var(--danger);
   font-size: 1rem;
   flex-shrink: 0;
 }
 
 .confirm-title {
-  font-size: 1rem;
+  font-family: var(--font-display);
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--text);
   margin: 0;
 }
 
 .confirm-body {
-  font-size: 0.875rem;
-  color: var(--gray);
+  font-size: 0.9375rem;
+  color: var(--text-muted);
   line-height: 1.6;
   margin: 0;
   padding: 0.25rem 0;
@@ -172,39 +172,39 @@ const confirmAction = async () => {
 }
 
 .btn-cancel {
-  padding: 0.5rem 1.2rem;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--secondary) 60%, transparent);
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-strong);
   background: transparent;
   color: var(--text);
-  font-size: 0.85rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background-color 0.15s;
   font-family: inherit;
 }
 
 .btn-cancel:hover {
-  background: color-mix(in srgb, var(--secondary) 15%, transparent);
+  background: var(--surface-hover);
 }
 
 .btn-remove {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.5rem 1.4rem;
-  border-radius: 999px;
+  gap: 0.45rem;
+  padding: 0.6rem 1.3rem;
+  border-radius: var(--radius-md);
   border: none;
-  background: var(--red);
-  color: #fff;
-  font-size: 0.85rem;
+  background: #c42020;
+  color: #ffffff;
+  font-size: 0.9375rem;
   font-weight: 700;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: background-color 0.15s;
   font-family: inherit;
 }
 
 .btn-remove:hover {
-  opacity: 0.85;
+  background: #a51b1b;
 }
 </style>

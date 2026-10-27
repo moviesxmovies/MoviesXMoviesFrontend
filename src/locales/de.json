@@ -191,7 +191,10 @@
     "fetchMoviesError": "Filme konnten nicht geladen werden. Bitte versuche es später erneut.",
     "profile": "Mein Profil",
     "shortcuts": "Tastenkürzel",
-    "search": "Suchen"
+    "search": "Suchen",
+    "noMovies": "Im Moment keine weiteren Filme",
+    "tagline": "Wische, bewerte und entdecke Filme mit deinen Freunden. Empfehlungen, die von dir lernen.",
+    "emailLabel": "E-Mail"
   },
   "onboarding": {
     "step1": "Lass uns mit einer kurzen Einführung beginnen",
@@ -379,7 +382,8 @@
     "error": {
       "fetchingMovie": "Fehler beim Laden der Filmdetails. Bitte versuche es später erneut.",
       "fetchingPerson": "Fehler beim Laden der Personendetails. Bitte versuche es später erneut."
-    }
+    },
+    "yourRating": "Deine Bewertung"
   },
   "review": {
     "addReview": "Bewertung hinzufügen",
@@ -434,7 +438,9 @@
     "close": "Schließen",
     "confirm": "Bestätigen",
     "seeMore": "Mehr anzeigen",
-    "seeLess": "Weniger anzeigen"
+    "seeLess": "Weniger anzeigen",
+    "accept": "Annehmen",
+    "decline": "Ablehnen"
   },
   "list": {
     "noDescription": "Diese Liste hat keine Beschreibung.",
@@ -468,5 +474,8 @@
     "translate": "Übersetzen",
     "showOriginal": "Original anzeigen",
     "loading": "Wird übersetzt..."
+  },
+  "reactions": {
+    "add": "Reaktion hinzufügen"
   }
 }

@@ -24,18 +24,12 @@ function handleKeydown(e: KeyboardEvent) {
 
 <template>
   <div class="page">
-    <div class="nav-spacer h-13"></div>
+    <div class="bg-glow" aria-hidden="true" />
 
-    <!-- HERO -->
     <main class="hero">
-      <!-- Decorative film strip top -->
-      <div class="film-strip film-strip--top" aria-hidden="true">
-        <span v-for="n in 18" :key="n" class="film-hole" />
-      </div>
-
-      <div class="hero-content">
+      <section class="hero-content">
         <div class="hero-badge">
-          <span class="badge-dot" />
+          <span class="badge-dot" aria-hidden="true" />
           {{ $t("home.badge") || "Now in public beta" }}
         </div>
 
@@ -43,18 +37,22 @@ function handleKeydown(e: KeyboardEvent) {
           Movies<span class="logo-x">×</span>Movies
         </h1>
 
+        <p class="hero-tagline">{{ $t("home.tagline") }}</p>
 
         <!-- SIGNUP CARD -->
         <div class="signup-card">
           <span class="signup-label">{{ $t("home.welcome") || "Get started — it's free" }}</span>
 
-          <div class="input-row">
-            <input v-model="email" class="email-input" :class="{ 'email-input--error': emailError }" type="email"
+          <form class="input-row" @submit.prevent="handleSignup" novalidate>
+            <label for="welcome-email" class="sr-only">{{ $t("home.emailLabel") }}</label>
+            <input id="welcome-email" v-model="email" class="email-input" :class="{ 'email-input--error': emailError }"
+              type="email" autocomplete="email" :aria-invalid="emailError"
               :placeholder="$t('home.emailPlaceholder') || 'Enter your email...'" @keydown="handleKeydown" />
-            <button class="btn-signup transition-all" @click="handleSignup">
+            <button type="button" class="btn-signup" @click="handleSignup">
               {{ $t("home.signupBtn") || "Sign up" }}
+              <i class="pi pi-arrow-right" aria-hidden="true" />
             </button>
-          </div>
+          </form>
 
           <div class="divider">
             <span class="divider-line" />
@@ -64,255 +62,242 @@ function handleKeydown(e: KeyboardEvent) {
 
           <OauthButtonComponent />
 
+          <p class="login-hint">
+            <RouterLink to="/login">{{ $t("home.login") }}</RouterLink>
+          </p>
         </div>
 
         <!-- FEATURES -->
         <ul class="features">
           <li class="feature-item">
-            <span class="feature-icon">
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                <path d="M2 5L4 7L8 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                  stroke-linejoin="round" />
-              </svg>
-            </span>
+            <span class="feature-icon" aria-hidden="true"><i class="pi pi-heart" /></span>
             {{ $t("home.feature1") || "Free forever plan" }}
           </li>
           <li class="feature-item">
-            <span class="feature-icon">
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                <path d="M2 5L4 7L8 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                  stroke-linejoin="round" />
-              </svg>
-            </span>
+            <span class="feature-icon" aria-hidden="true"><i class="pi pi-sparkles" /></span>
             {{ $t("home.feature2") || "No credit card required" }}
           </li>
           <li class="feature-item">
-            <span class="feature-icon">
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                <path d="M2 5L4 7L8 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                  stroke-linejoin="round" />
-              </svg>
-            </span>
+            <span class="feature-icon" aria-hidden="true"><i class="pi pi-list" /></span>
             {{ $t("home.feature3") || "10,000+ films catalogued" }}
           </li>
         </ul>
-      </div>
+      </section>
 
-      <!-- Decorative film strip bottom -->
-      <div class="film-strip film-strip--bottom" aria-hidden="true">
-        <span v-for="n in 18" :key="n" class="film-hole" />
+      <!-- Ilustración decorativa: pila de pósters -->
+      <div class="hero-visual" aria-hidden="true">
+        <div class="poster poster--back" />
+        <div class="poster poster--mid" />
+        <div class="poster poster--front">
+          <div class="poster-shine" />
+          <div class="poster-meta">
+            <span class="poster-line poster-line--lg" />
+            <span class="poster-line" />
+          </div>
+        </div>
+        <div class="rating-chip">
+          <i v-for="n in 5" :key="n" class="pi" :class="n <= 4 ? 'pi-star-fill' : 'pi-star'" />
+        </div>
+        <div class="swipe-chip swipe-chip--like"><i class="pi pi-thumbs-up-fill" /></div>
+        <div class="swipe-chip swipe-chip--nope"><i class="pi pi-times" /></div>
       </div>
     </main>
   </div>
 </template>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap');
-
-/* ── RESET ── */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
   padding: 0;
-}
-
-.logo-x {
-  color: var(--accent);
-  margin: 0 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 ul {
   list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-a {
-  color: var(--primary);
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
-/* ── PAGE ── */
 .page {
+  position: relative;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
   background: var(--background);
   color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-}
-
-
-/* ── FILM STRIPS ── */
-.film-strip {
-  display: flex;
-  width: 100%;
-  background: var(--primary);
-  padding: 6px 0;
-  gap: 0;
   overflow: hidden;
 }
 
-.film-strip--top {
-  border-bottom: 2px solid var(--accent);
-}
-
-.film-strip--bottom {
-  border-top: 2px solid var(--accent);
-}
-
-.film-hole {
-  flex: 1;
-  height: 14px;
-  background: var(--background);
-  border-radius: 3px;
-  margin: 0 6px;
-  max-width: 22px;
-  opacity: 0.85;
+.bg-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60rem 30rem at 15% 10%, color-mix(in srgb, var(--primary) 18%, transparent), transparent 70%),
+    radial-gradient(40rem 30rem at 90% 80%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%);
 }
 
 /* ── HERO ── */
 .hero {
+  position: relative;
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  gap: 3rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 6rem 1.5rem 3rem;
+}
+
+@media (min-width: 960px) {
+  .hero {
+    grid-template-columns: 1.1fr 0.9fr;
+    padding-top: 5rem;
+  }
 }
 
 .hero-content {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 3rem 1.5rem 3.5rem;
   text-align: center;
+}
+
+@media (min-width: 960px) {
+  .hero-content {
+    align-items: flex-start;
+    text-align: left;
+  }
 }
 
 .hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  background: var(--secondary);
+  gap: 8px;
+  background: var(--primary-soft);
+  border: 1px solid color-mix(in srgb, var(--primary) 25%, transparent);
   border-radius: 999px;
-  padding: 0.3rem 1rem;
-  font-size: 0.78rem;
-  font-weight: 500;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
   color: var(--primary);
-  margin-bottom: 1.8rem;
-  letter-spacing: 0.01em;
+  margin-bottom: 1.5rem;
 }
 
 .badge-dot {
-  width: 6px;
-  height: 6px;
-  background: var(--accent);
+  width: 8px;
+  height: 8px;
+  background: var(--success);
   border-radius: 50%;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--success) 25%, transparent);
   animation: pulse 2.2s ease-in-out infinite;
 }
 
 @keyframes pulse {
-
   0%,
   100% {
     opacity: 1;
-    transform: scale(1);
   }
 
   50% {
     opacity: 0.45;
-    transform: scale(0.65);
   }
 }
 
 .hero-title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(3.5rem, 9vw, 7rem);
-  font-weight: 400;
-  line-height: 0.95;
-  letter-spacing: 0.02em;
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 8vw, 5rem);
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.04em;
   color: var(--text);
-  margin-bottom: 1.1rem;
+  margin: 0;
 }
 
-.hero-title--accent {
-  color: var(--primary);
-  -webkit-text-stroke: 0.5px var(--accent);
+.logo-x {
+  background: var(--brand-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin: 0 0.02em;
 }
 
-.hero-subtitle {
-  font-size: 1rem;
-  font-weight: 300;
-  color: var(--text);
-  opacity: 0.6;
-  max-width: 420px;
-  line-height: 1.7;
-  margin-bottom: 2.5rem;
+.hero-tagline {
+  margin: 1.25rem 0 0;
+  max-width: 34rem;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: var(--text-muted);
 }
 
 /* ── SIGNUP CARD ── */
 .signup-card {
-  background: var(--background);
-  border: 0.5px solid rgba(47, 39, 206, 0.2);
-  border-radius: 16px;
-  padding: 1.8rem 2rem;
   width: 100%;
-  max-width: 420px;
-  box-shadow: 0 2px 24px rgba(47, 39, 206, 0.07);
+  max-width: 30rem;
+  margin-top: 2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: left;
 }
 
 .signup-label {
-  display: block;
-  font-size: 0.78rem;
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
   font-weight: 600;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--primary);
-  margin-bottom: 1rem;
+  color: var(--text);
 }
 
 .input-row {
   display: flex;
-  gap: 8px;
-  margin-bottom: 1rem;
+  gap: 0.5rem;
+}
+
+@media (max-width: 480px) {
+  .input-row {
+    flex-direction: column;
+  }
 }
 
 .email-input {
   flex: 1;
-  background: var(--background);
-  border: 0.5px solid rgba(47, 39, 206, 0.2);
-  border-radius: 8px;
-  padding: 0.65rem 1rem;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.9rem;
+  min-width: 0;
+  height: 3rem;
+  padding: 0 1rem;
+  font-family: inherit;
+  font-size: 1rem;
   color: var(--text);
+  background: var(--background);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
   outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;
-  min-width: 0;
-}
-
-.email-input::placeholder {
-  color: var(--text);
-  opacity: 0.4;
 }
 
 .email-input:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(47, 39, 206, 0.1);
+  box-shadow: var(--focus-ring);
 }
 
 .email-input--error {
-  border-color: var(--accent) !important;
-  box-shadow: 0 0 0 3px rgba(187, 61, 255, 0.12) !important;
-  animation: shake 0.35s ease;
+  border-color: var(--danger);
+  animation: shake 0.4s ease;
 }
 
 @keyframes shake {
-
   0%,
   100% {
     transform: translateX(0);
@@ -328,135 +313,231 @@ a:hover {
 }
 
 .btn-signup {
-  background: var(--primary);
+  height: 3rem;
+  padding: 0 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   border: none;
-  color: #f2f2f2;
-  padding: 0.65rem 1.3rem;
-  border-radius: 8px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.9rem;
-  font-weight: 600;
+  border-radius: var(--radius-md);
+  background: var(--primary);
+  color: var(--on-primary);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
+  transition: background-color 0.15s, transform 0.1s;
 }
 
 .btn-signup:hover {
-  opacity: 0.87;
-  transform: translateY(-1px);
+  background: var(--primary-hover);
 }
 
 .btn-signup:active {
   transform: scale(0.98);
 }
 
+.btn-signup i {
+  font-size: 0.85rem;
+}
+
 .divider {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin: 0.9rem 0;
+  gap: 0.75rem;
 }
 
 .divider-line {
   flex: 1;
-  height: 0.5px;
-  background: rgba(47, 39, 206, 0.15);
+  height: 1px;
+  background: var(--border);
 }
 
 .divider-text {
-  font-size: 0.78rem;
-  color: var(--text);
-  opacity: 0.5;
+  font-size: 0.8125rem;
+  color: var(--text-subtle);
   white-space: nowrap;
 }
 
-.social-btn {
-  width: 100%;
-  background: var(--background);
-  border: 0.5px solid rgba(47, 39, 206, 0.2);
-  border-radius: 8px;
-  padding: 0.6rem 1rem;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.875rem;
-  color: var(--text);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-weight: 400;
-  transition: background 0.15s, border-color 0.15s;
-}
-
-.social-btn:hover {
-  background: var(--secondary);
-  border-color: var(--primary);
-}
-
-.terms {
-  font-size: 0.74rem;
-  color: var(--text);
-  opacity: 0.5;
+.login-hint {
+  margin: 0;
   text-align: center;
-  margin-top: 1.1rem;
-  line-height: 1.6;
+  font-size: 0.9375rem;
+}
+
+.login-hint a {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.login-hint a:hover {
+  text-decoration: underline;
 }
 
 /* ── FEATURES ── */
 .features {
+  margin-top: 2rem;
   display: flex;
-  gap: 1.8rem;
-  justify-content: center;
   flex-wrap: wrap;
-  margin-top: 2.5rem;
+  justify-content: center;
+  gap: 0.75rem 1.5rem;
+}
+
+@media (min-width: 960px) {
+  .features {
+    justify-content: flex-start;
+  }
 }
 
 .feature-item {
   display: flex;
   align-items: center;
-  gap: 7px;
-  font-size: 0.82rem;
-  color: var(--text);
-  opacity: 0.55;
+  gap: 0.6rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-muted);
 }
 
 .feature-icon {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--secondary);
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--radius-sm);
+  background: var(--primary-soft);
   color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 0.8rem;
   flex-shrink: 0;
 }
 
-/* ── RESPONSIVE ── */
-@media (max-width: 480px) {
-  .nav {
-    padding: 0.9rem 1rem;
+/* ── VISUAL ── */
+.hero-visual {
+  position: relative;
+  display: none;
+  height: 30rem;
+}
+
+@media (min-width: 960px) {
+  .hero-visual {
+    display: block;
+  }
+}
+
+.poster {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 15rem;
+  aspect-ratio: 2 / 3;
+  border-radius: 1.25rem;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.poster--back {
+  transform: translate(-50%, -50%) translateX(-5.5rem) rotate(-12deg);
+  background: linear-gradient(160deg, #1d3557 0%, #0b0a12 80%);
+  opacity: 0.85;
+}
+
+.poster--mid {
+  transform: translate(-50%, -50%) translateX(5.5rem) rotate(10deg);
+  background: linear-gradient(160deg, #6b2d5c 0%, #0b0a12 85%);
+  opacity: 0.9;
+}
+
+.poster--front {
+  transform: translate(-50%, -50%) rotate(-2deg);
+  background:
+    radial-gradient(circle at 35% 32%, #ff7a5c 0 22%, transparent 23%),
+    linear-gradient(170deg, #3d34d6 0%, #1a1745 55%, #0b0a12 100%);
+  animation: float 6s ease-in-out infinite;
+}
+
+.poster-shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.12) 45%, transparent 60%);
+}
+
+.poster-meta {
+  position: absolute;
+  left: 1.25rem;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.poster-line {
+  display: block;
+  height: 0.5rem;
+  width: 55%;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.poster-line--lg {
+  height: 0.9rem;
+  width: 80%;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) rotate(-2deg);
   }
 
-  .hero-content {
-    padding: 2rem 1rem 2.5rem;
+  50% {
+    transform: translate(-50%, -52%) rotate(-1deg);
   }
+}
 
-  .signup-card {
-    padding: 1.4rem 1.2rem;
-  }
+.rating-chip {
+  position: absolute;
+  left: 50%;
+  bottom: 1.5rem;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.3rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  color: var(--star);
+  font-size: 1.1rem;
+}
 
-  .input-row {
-    flex-direction: column;
-  }
+.swipe-chip {
+  position: absolute;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
 
-  .btn-signup {
-    width: 100%;
-  }
+.swipe-chip--like {
+  right: 8%;
+  top: 22%;
+  color: var(--success);
+}
 
-  .features {
-    gap: 1rem;
-    flex-direction: column;
-    align-items: center;
-  }
+.swipe-chip--nope {
+  left: 8%;
+  top: 30%;
+  color: var(--danger);
 }
 </style>

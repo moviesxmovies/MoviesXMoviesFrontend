@@ -69,29 +69,26 @@ watch(
   >
     <!-- Loading state -->
     <template #empty>
-      <div
-        class="flex items-center justify-center gap-2 py-3"
-        style="color: var(--text); opacity: 0.6"
-      >
+      <div class="flex items-center justify-center gap-2 py-3 text-muted">
         <template v-if="showLoading">
           <i class="pi pi-spin pi-spinner" style="color: var(--primary)" />
           <span class="text-sm">{{ $t("loading") }}</span>
         </template>
         <template v-else>
-          <i class="pi pi-search opacity-40" />
+          <i class="pi pi-search" aria-hidden="true" />
           <span class="text-sm">{{ $t("search.empty") }}</span>
         </template>
       </div>
     </template>
 
     <template #emptyfilter>
-      <div class="flex items-center justify-center gap-2 py-3">
+      <div class="flex items-center justify-center gap-2 py-3 text-muted">
         <template v-if="showLoading">
           <i class="pi pi-spin pi-spinner" style="color: var(--primary)" />
           <span class="text-sm">{{ $t("loading") }}</span>
         </template>
         <template v-else>
-          <i class="pi pi-search opacity-40" />
+          <i class="pi pi-search" aria-hidden="true" />
           <span class="text-sm">{{ $t("search.empty") }}</span>
         </template>
       </div>
@@ -106,7 +103,7 @@ watch(
           :alt="type === 'person' ? option.name : option.username"
           class="w-8 h-8 rounded-full object-cover"
         />
-        <span class="text-sm font-medium" style="color: var(--text)">{{
+        <span class="text-sm font-medium">{{
           type === "person" ? option.name : option.username
         }}</span>
       </div>
@@ -114,25 +111,57 @@ watch(
 
     <!-- Chip -->
     <template #chip="{ value }">
-      <div
-        class="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold"
-        style="
-          background: color-mix(in srgb, var(--primary) 15%, transparent);
-          color: var(--primary);
-        "
-      >
+      <div class="people-chip">
         <img
           :src="type === 'person' ? value.image : value.picture"
           :alt="type === 'person' ? value.name : value.username"
           class="w-4 h-4 rounded-full object-cover"
         />
         {{ type === "person" ? value.name : value.username }}
-        <i
-          class="pi pi-times cursor-pointer ml-1"
-          style="font-size: 0.6rem; opacity: 0.7"
+        <button
+          type="button"
+          class="people-chip-remove"
+          :aria-label="$t('common.delete')"
           @click.stop="removeItem(value)"
-        />
+        >
+          <i class="pi pi-times" aria-hidden="true" />
+        </button>
       </div>
     </template>
   </MultiSelect>
 </template>
+
+<style scoped>
+.people-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.3rem 0.2rem 0.25rem;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.people-chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.people-chip-remove i {
+  font-size: 0.65rem;
+}
+
+.people-chip-remove:hover {
+  background: color-mix(in srgb, var(--primary) 20%, transparent);
+}
+</style>
