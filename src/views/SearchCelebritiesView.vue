@@ -112,7 +112,7 @@ watch(
 .celebs-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 0.85rem;
+    gap: 0.75rem;
     width: 100%;
 }
 
@@ -160,7 +160,7 @@ watch(
     background: linear-gradient(to top, rgba(0, 0, 0, 0.55) 0%, transparent 100%);
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
+    gap: 0.25rem;
     z-index: 2;
 }
 
@@ -185,14 +185,14 @@ watch(
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--primary);
+  color: var(--text-subtle);
   margin-bottom: 0.25rem;
 }
 
 .empty-title {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: 1.125rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text);
   margin: 0;
 }

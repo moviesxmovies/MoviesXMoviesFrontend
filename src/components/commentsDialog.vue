@@ -213,15 +213,15 @@ watch(() => props.visible, (val) => {
     height: 2.25rem;
     border-radius: var(--radius-sm);
     background: var(--primary-soft);
-    color: var(--primary);
-    font-size: 0.95rem;
+    color: var(--text-subtle);
+    font-size: 0.9375rem;
     flex-shrink: 0;
 }
 
 .header-text {
-    font-family: var(--font-display);
+    font-family: var(--font-sans);
     font-size: 1.125rem;
-    font-weight: 700;
+    font-weight: 500;
     color: var(--text);
 }
 
@@ -253,7 +253,7 @@ watch(() => props.visible, (val) => {
 
 .empty-icon {
     font-size: 1.75rem;
-    color: var(--primary);
+    color: var(--text-subtle);
     width: 3.25rem;
     height: 3.25rem;
     border-radius: 999px;
@@ -282,7 +282,7 @@ watch(() => props.visible, (val) => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.45rem 0.75rem;
+    padding: 0.5rem 0.75rem;
     border-radius: var(--radius-sm);
     background: var(--primary-soft);
     border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
@@ -293,23 +293,23 @@ watch(() => props.visible, (val) => {
 }
 
 .replying-banner:hover {
-    border-color: var(--primary);
+    border-color: var(--border-strong);
 }
 
 .replying-info {
     display: flex;
     align-items: center;
-    gap: 0.45rem;
+    gap: 0.5rem;
 }
 
 .replying-icon {
-    color: var(--primary);
-    font-size: 0.8rem;
+    color: var(--text-subtle);
+    font-size: 0.8125rem;
 }
 
 .replying-banner strong {
     color: var(--primary);
-    font-weight: 700;
+    font-weight: 500;
 }
 
 .cancel-reply-btn {
@@ -343,7 +343,7 @@ watch(() => props.visible, (val) => {
     background: var(--background);
     border: 1px solid var(--border-strong);
     border-radius: var(--radius-md);
-    padding: 0.65rem 0.9rem;
+    padding: 0.75rem 1rem;
     font-size: 0.9375rem;
     color: var(--text);
     font-family: inherit;
@@ -372,7 +372,7 @@ watch(() => props.visible, (val) => {
     border: none;
     background: var(--primary);
     color: var(--on-primary);
-    font-size: 0.95rem;
+    font-size: 0.9375rem;
     cursor: pointer;
     flex-shrink: 0;
     transition: background-color 0.15s, transform 0.15s;
@@ -390,7 +390,7 @@ watch(() => props.visible, (val) => {
 
 .slide-down-enter-active,
 .slide-down-leave-active {
-    transition: all 0.2s ease;
+    transition: background-color, border-color, color, opacity, transform 0.2s var(--ease);
 }
 
 .slide-down-enter-from,
@@ -407,7 +407,7 @@ watch(() => props.visible, (val) => {
 
 .comments-header {
     border-bottom: 1px solid var(--border) !important;
-    padding-bottom: 0.875rem !important;
+    padding-bottom: 1rem !important;
     flex-shrink: 0;
 }
 

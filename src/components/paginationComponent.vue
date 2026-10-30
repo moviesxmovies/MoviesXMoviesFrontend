@@ -41,12 +41,12 @@ const emit = defineEmits(["changePage"]);
   background: transparent;
   border: none;
   padding: 0.5rem;
-  gap: 6px;
+  gap: 8px;
   font-family: var(--font-sans);
 }
 
 :deep(.custom-paginator .p-paginator-pages) {
-  gap: 6px;
+  gap: 8px;
 }
 
 :deep(.custom-paginator .p-paginator-page),
@@ -60,8 +60,8 @@ const emit = defineEmits(["changePage"]);
   border: 1px solid var(--border);
   color: var(--text);
   border-radius: var(--radius-md);
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-  font-weight: 600;
+  transition: background-color 0.15s var(--ease), border-color 0.15s var(--ease), color 0.15s var(--ease);
+  font-weight: 500;
   font-size: 0.9375rem;
 }
 
@@ -72,7 +72,7 @@ const emit = defineEmits(["changePage"]);
 :deep(.custom-paginator .p-paginator-page:not(.p-highlight):hover),
 :deep(.custom-paginator button:not(.p-disabled):not(.p-highlight):hover) {
   background: var(--primary-soft) !important;
-  border-color: var(--primary) !important;
+  border-color: var(--border-strong) !important;
   color: var(--primary) !important;
 }
 

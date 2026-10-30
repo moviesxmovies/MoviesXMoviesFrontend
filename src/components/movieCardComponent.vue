@@ -69,24 +69,22 @@ const emit = defineEmits<{
   height: 2.25rem;
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(8, 7, 14, 0.72);
-  backdrop-filter: blur(8px);
+  background: rgba(12, 12, 11, 0.72);
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.15s ease, transform 0.15s ease;
+  transition: background-color 0.15s var(--ease), transform 0.15s var(--ease);
   box-shadow: var(--shadow-md);
 }
 
 .delete-btn:hover {
-  background: #c42020;
-  transform: scale(1.06);
+  background: var(--danger);
 }
 
 .delete-btn i {
-  font-size: 0.9rem;
+  font-size: 0.875rem;
 }
 
 .movie-card {
@@ -106,13 +104,11 @@ const emit = defineEmits<{
 
 .movie-card:hover,
 .movie-card:focus-visible {
-  border-color: var(--primary);
+  border-color: var(--border-strong);
   box-shadow: var(--shadow-lg);
-  transform: translateY(-3px);
 }
 
 .movie-card:hover .movie-poster {
-  transform: scale(1.05);
 }
 
 .movie-poster-wrap {
@@ -141,7 +137,7 @@ const emit = defineEmits<{
 }
 
 .movie-info {
-  padding: 0.7rem 0.85rem 0.8rem;
+  padding: 0.75rem 0.75rem 0.75rem;
   min-height: 4.25rem;
   display: flex;
   flex-direction: column;
@@ -152,7 +148,7 @@ const emit = defineEmits<{
 .movie-title {
   font-size: 0.9375rem;
   line-height: 1.3;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text);
   margin: 0;
   display: -webkit-box;

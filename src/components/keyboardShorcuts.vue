@@ -179,11 +179,10 @@ onUnmounted(() => {
     align-items: center;
     justify-content: center;
     box-shadow: var(--shadow-lg);
-    transition: transform 0.2s ease, background-color 0.2s ease;
+    transition: transform 0.2s var(--ease), background-color 0.2s var(--ease);
 }
 
 .fab-button:hover {
-    transform: translateY(-2px);
     background: var(--primary-hover);
 }
 
@@ -200,7 +199,7 @@ onUnmounted(() => {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    padding: 6px;
+    padding: 8px;
     min-width: 280px;
     box-shadow: var(--shadow-lg);
     display: flex;
@@ -209,24 +208,22 @@ onUnmounted(() => {
 }
 
 .menu-header {
-    padding: 8px 12px 6px;
+    padding: 8px 12px 8px;
     font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    font-weight: 500;
     color: var(--text-subtle);
 }
 
 .menu-item {
     display: flex;
     align-items: center;
-    padding: 8px 10px;
+    padding: 8px 12px;
     border-radius: var(--radius-sm);
     border: none;
     background: transparent;
     cursor: pointer;
     transition: background-color 0.15s;
-    min-height: 42px;
+    min-height: 44px;
     justify-content: space-between;
     gap: 12px;
     color: var(--text);
@@ -245,12 +242,12 @@ onUnmounted(() => {
 .item-content {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .item-icon {
-    color: var(--primary);
-    font-size: 0.9rem;
+    color: var(--text-subtle);
+    font-size: 0.875rem;
     width: 1rem;
     text-align: center;
 }
@@ -267,7 +264,7 @@ onUnmounted(() => {
 
 .fab-menu-enter-active,
 .fab-menu-leave-active {
-    transition: all 0.2s ease;
+    transition: background-color, border-color, color, opacity, transform 0.2s var(--ease);
 }
 
 .fab-menu-enter-from,
@@ -288,27 +285,26 @@ onUnmounted(() => {
     justify-content: center;
     min-width: 22px;
     height: 22px;
-    padding: 0 6px;
+    padding: 0 8px;
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 500;
     font-family: var(--font-mono);
-    text-transform: uppercase;
     background: var(--surface-2);
     color: var(--text);
     border: 1px solid var(--border);
     border-bottom-width: 2px;
-    border-radius: 5px;
+    border-radius: var(--radius-sm);
 }
 
 .kbd-space {
     min-width: 52px;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
 }
 
 .kbd-plus {
     font-size: 0.75rem;
     color: var(--text-subtle);
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .menu-item:hover .kbd-key {
@@ -318,7 +314,7 @@ onUnmounted(() => {
 .group-shortcuts {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
 }
 
 .shortcut-separator {

@@ -200,16 +200,14 @@ watch(() => profileStore.refreshKey, () => {
   top: 0;
   z-index: 10;
   width: 100%;
-  background: color-mix(in srgb, var(--background) 82%, transparent);
-  backdrop-filter: saturate(160%) blur(14px);
-  -webkit-backdrop-filter: saturate(160%) blur(14px);
+  background: var(--background);
   border-bottom: 1px solid var(--border);
 }
 
 .nav-logo {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   text-decoration: none;
   cursor: pointer;
 }
@@ -217,7 +215,7 @@ watch(() => profileStore.refreshKey, () => {
 .nav-right {
   display: flex;
   align-items: center;
-  gap: 0.625rem;
+  gap: 0.75rem;
   flex-grow: 1;
   justify-content: flex-end;
 }
@@ -225,16 +223,16 @@ watch(() => profileStore.refreshKey, () => {
 .btn-ghost,
 .btn-login {
   height: 2.5rem;
-  padding: 0 1.1rem;
+  padding: 0 1rem;
   display: flex;
   align-items: center;
   gap: 8px;
   border-radius: var(--radius-md);
   font-family: var(--font-sans);
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  transition: background-color 0.15s var(--ease), border-color 0.15s var(--ease), color 0.15s var(--ease);
 }
 
 .btn-ghost {
@@ -244,18 +242,18 @@ watch(() => profileStore.refreshKey, () => {
 }
 
 .btn-ghost:hover {
-  border-color: var(--primary);
+  border-color: var(--border-strong);
   background: var(--surface-hover);
 }
 
 .btn-login {
-  background: var(--primary);
-  color: var(--on-primary);
+  background: transparent;
+  color: var(--text-muted);
   border: 1px solid transparent;
 }
 
 .btn-login:hover {
-  background: var(--primary-hover);
+  color: var(--text);
 }
 
 .btn-profile {
@@ -269,12 +267,11 @@ watch(() => profileStore.refreshKey, () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
 }
 
 .btn-profile:hover {
-  border-color: var(--primary);
-  box-shadow: var(--focus-ring);
+  border-color: var(--border-strong);
 }
 
 .btn-profile img,
@@ -299,25 +296,25 @@ watch(() => profileStore.refreshKey, () => {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
-  padding: 6px;
+  padding: 8px;
   margin-top: 8px;
   min-width: 200px;
   font-family: var(--font-sans);
 }
 
 :deep(.profile-menu .p-menu-item-link) {
-  padding: 0.65rem 0.9rem;
+  padding: 0.75rem 1rem;
   border-radius: var(--radius-sm);
   color: var(--text);
   font-size: 0.9375rem;
   font-weight: 500;
-  transition: background-color 0.1s ease, color 0.1s ease;
-  gap: 10px;
+  transition: background-color 0.1s var(--ease), color 0.1s var(--ease);
+  gap: 12px;
 }
 
 :deep(.profile-menu .p-menu-item-link:hover) {
   background: var(--primary-soft);
-  color: var(--primary);
+  color: var(--text);
 }
 
 :deep(.profile-menu .p-menu-item-content:focus),
@@ -334,7 +331,7 @@ watch(() => profileStore.refreshKey, () => {
 
 :deep(.profile-menu .p-menu-item[data-p-active="true"] .p-menu-item-link),
 :deep(.profile-menu .p-menu-item-link:active) {
-  color: var(--primary) !important;
+  color: var(--text) !important;
 }
 
 :deep(.profile-menu .p-menu-item-link .p-menu-item-icon) {
@@ -348,31 +345,24 @@ watch(() => profileStore.refreshKey, () => {
 }
 
 .logo-icon {
-  width: 34px;
-  height: 34px;
-  background: var(--primary-soft);
-  border-radius: var(--radius-sm);
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  padding: 4px;
 }
 
 .logo-text {
   font-family: var(--font-display);
   font-size: 1.25rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 500;
   color: var(--text);
   line-height: 1;
 }
 
 .logo-x {
-  background: var(--brand-gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--primary);
   margin: 0 2px;
 }
 
@@ -386,14 +376,14 @@ watch(() => profileStore.refreshKey, () => {
   display: none;
   flex-direction: column;
   justify-content: center;
-  gap: 5px;
+  gap: 4px;
   width: 2.75rem;
   height: 2.75rem;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   cursor: pointer;
-  padding: 0.6rem;
+  padding: 0.5rem;
   flex-shrink: 0;
   position: relative;
   z-index: 101;
@@ -475,7 +465,7 @@ watch(() => profileStore.refreshKey, () => {
 
 .slide-enter-active,
 .slide-leave-active {
-  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.28s var(--var(--ease));
 }
 
 .slide-enter-from,
@@ -485,7 +475,7 @@ watch(() => profileStore.refreshKey, () => {
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.25s ease;
+  transition: opacity 0.25s var(--ease);
 }
 
 .fade-enter-from,
@@ -525,26 +515,26 @@ watch(() => profileStore.refreshKey, () => {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   height: 2.5rem;
-  padding: 0 0.875rem;
+  padding: 0 1rem;
   cursor: pointer;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  transition: border-color 0.15s var(--ease), background-color 0.15s var(--ease);
   min-width: 200px;
   gap: 12px;
 }
 
 .search-trigger:hover {
   background: var(--surface-hover);
-  border-color: var(--primary);
+  border-color: var(--border-strong);
 }
 
 .search-content {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .search-icon {
-  color: var(--primary);
+  color: var(--text-subtle);
 }
 
 .search-text {
@@ -565,14 +555,14 @@ watch(() => profileStore.refreshKey, () => {
   position: absolute;
   top: -6px;
   right: -6px;
-  background: #c42020;
+  background: var(--danger);
   color: #ffffff;
-  font-size: 0.6875rem;
-  font-weight: 700;
+  font-size: 0.75rem;
+  font-weight: 500;
   font-family: var(--font-sans);
   min-width: 18px;
   height: 18px;
-  border-radius: 999px;
+  border-radius: 9px;
   display: flex;
   align-items: center;
   justify-content: center;

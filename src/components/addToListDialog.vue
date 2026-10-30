@@ -181,23 +181,23 @@ watch(
   justify-content: center;
   gap: 0.5rem;
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--primary);
   background: var(--primary-soft);
   border: 1px dashed color-mix(in srgb, var(--primary) 50%, transparent);
   cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  transition: background-color 0.15s var(--ease), border-color 0.15s var(--ease);
 }
 
 .create-list-btn:hover {
   border-style: solid;
-  border-color: var(--primary);
+  border-color: var(--border-strong);
 }
 
 :deep(.p-checkbox-box) {
-  border-radius: 6px !important;
+  border-radius: var(--radius-sm) !important;
   border: 1.5px solid var(--border-strong) !important;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  transition: background-color 0.15s var(--ease), border-color 0.15s var(--ease);
 }
 
 :deep(.p-checkbox-checked .p-checkbox-box) {

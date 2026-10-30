@@ -55,12 +55,12 @@ watch(() => langStore.language, (newLang) => {
   border-radius: var(--radius-md) !important;
   height: 2.5rem !important;
   box-shadow: none !important;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  transition: border-color 0.15s var(--ease), background-color 0.15s var(--ease);
   font-family: var(--font-sans);
 }
 
 .lang-select:hover {
-  border-color: var(--primary) !important;
+  border-color: var(--border-strong) !important;
   background: var(--surface-hover) !important;
 }
 
@@ -74,7 +74,7 @@ watch(() => langStore.language, (newLang) => {
   display: flex;
   align-items: center;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text);
 }
 
@@ -85,8 +85,7 @@ watch(() => langStore.language, (newLang) => {
 
 .lang-code {
   font-size: 0.8125rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-weight: 500;
   color: var(--text);
 }
 
@@ -101,7 +100,7 @@ watch(() => langStore.language, (newLang) => {
 }
 
 .lang-select :deep(.p-select-option) {
-  padding: 0.6rem 0.9rem;
+  padding: 0.5rem 1rem;
   border-radius: var(--radius-sm);
   font-size: 0.9375rem;
   color: var(--text);
@@ -116,7 +115,7 @@ watch(() => langStore.language, (newLang) => {
 .lang-select :deep(.p-select-option-selected) {
   background: var(--surface-2) !important;
   color: var(--text) !important;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .lang-flag {

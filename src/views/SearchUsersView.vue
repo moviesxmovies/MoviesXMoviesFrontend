@@ -88,7 +88,7 @@ watch(
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 0.625rem;
+  gap: 0.75rem;
 }
 
 .state-box {
@@ -112,14 +112,14 @@ watch(
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--primary);
+  color: var(--text-subtle);
   margin-bottom: 0.25rem;
 }
 
 .empty-title {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: 1.125rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text);
   margin: 0;
 }

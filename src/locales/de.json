@@ -179,15 +179,15 @@
     "submit": "Passwort zurücksetzen"
   },
   "home": {
-    "welcome": "Willkommen bei MoviesXMovies!",
+    "welcome": "Erstelle dein Konto",
+    "headline": "Bewerte Filme mit einem Wisch und sieh, was deine Freunde denken",
     "login": "Anmelden",
     "emailPlaceholder": "E-Mail-Adresse eingeben",
     "signupBtn": "Registrieren",
     "orContinue": "oder weiter mit",
-    "badge": "Online",
     "feature1": "Teile deine Lieblingsfilme",
     "feature2": "Erhalte Filmempfehlungen",
-    "feature3": "Erstelle deine eigenen Filmlisten.",
+    "feature3": "Erstelle deine eigenen Filmlisten",
     "fetchMoviesError": "Filme konnten nicht geladen werden. Bitte versuche es später erneut.",
     "profile": "Mein Profil",
     "shortcuts": "Tastenkürzel",

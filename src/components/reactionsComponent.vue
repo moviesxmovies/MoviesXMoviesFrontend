@@ -187,23 +187,23 @@ watch(
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 0.5rem;
 }
 
 .reactions-bar {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.5rem;
 }
 
 .reaction-pill {
     display: flex;
     align-items: center;
-    gap: 0.35rem;
-    height: 1.9rem;
-    padding: 0 0.65rem;
-    border-radius: 999px;
+    gap: 0.25rem;
+    height: 2rem;
+    padding: 0 0.75rem;
+    border-radius: var(--radius-md);
     border: 1px solid var(--border);
     background: var(--surface-2);
     cursor: pointer;
@@ -226,43 +226,43 @@ watch(
 }
 
 .reaction-pill.reacted .reaction-count {
-    color: var(--primary);
+    color: var(--text);
 }
 
 .reaction-emoji {
-    font-size: 0.95rem;
+    font-size: 0.9375rem;
     line-height: 1;
 }
 
 .reaction-count {
     font-size: 0.8125rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-muted);
 }
 
 .add-reaction-btn {
     display: flex;
     align-items: center;
-    gap: 0.2rem;
-    height: 1.9rem;
-    padding: 0 0.6rem;
-    border-radius: 999px;
+    gap: 0.25rem;
+    height: 2rem;
+    padding: 0 0.5rem;
+    border-radius: var(--radius-md);
     border: 1px dashed var(--border-strong);
     background: transparent;
     cursor: pointer;
     font-size: 0.8125rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-subtle);
     transition: color 0.15s, border-color 0.15s;
 }
 
 .add-reaction-btn i {
-    font-size: 0.85rem;
+    font-size: 0.875rem;
 }
 
 .add-reaction-btn:hover {
     color: var(--primary);
-    border-color: var(--primary);
+    border-color: var(--border-strong);
 }
 
 .emoji-picker {
@@ -271,7 +271,7 @@ watch(
     display: flex;
     flex-wrap: wrap;
     gap: 0.25rem;
-    padding: 0.6rem;
+    padding: 0.5rem;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
@@ -299,13 +299,12 @@ watch(
     border: none;
     background: transparent;
     cursor: pointer;
-    font-size: 1.15rem;
+    font-size: 1.125rem;
     transition: background-color 0.15s, transform 0.1s;
 }
 
 .emoji-option:hover {
     background: var(--surface-hover);
-    transform: scale(1.15);
 }
 
 .emoji-option.reacted {

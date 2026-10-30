@@ -105,7 +105,7 @@ const emit = defineEmits<{
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.875rem 1.25rem !important;
+  padding: 1rem 1.25rem !important;
   min-height: 3.5rem;
 }
 
@@ -118,17 +118,16 @@ const emit = defineEmits<{
   flex-shrink: 0;
   border-radius: var(--radius-sm);
   background: var(--primary-soft);
-  color: var(--primary);
-  font-size: 0.95rem;
+  color: var(--text-subtle);
+  font-size: 0.9375rem;
 }
 
 .section-title {
   flex: 1;
   text-align: left;
-  font-family: var(--font-display);
-  font-weight: 600;
+  font-family: var(--font-sans);
+  font-weight: 500;
   font-size: 1rem;
-  letter-spacing: -0.01em;
   color: var(--text);
   margin: 0;
 }
@@ -154,16 +153,16 @@ const emit = defineEmits<{
   height: 3.5rem;
   border-radius: 999px;
   background: var(--primary-soft);
-  color: var(--primary);
+  color: var(--text-subtle);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4rem;
+  font-size: 1.5rem;
 }
 
 .empty-title {
-  font-size: 1.0625rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 500;
   color: var(--text);
   margin: 0;
 }
@@ -209,7 +208,7 @@ const emit = defineEmits<{
 
 :deep(.p-scrollpanel-bar) {
   background: color-mix(in srgb, var(--text-subtle) 45%, transparent);
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   width: 6px;
   opacity: 1;
 }

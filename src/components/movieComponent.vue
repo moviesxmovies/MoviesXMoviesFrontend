@@ -16,7 +16,7 @@ const coverStyle = computed(() => ({
   <div class="movie-card flex items-center justify-center" :style="coverStyle">
 
     <div class="card-wrapper">
-      <div class="poster-frame relative w-full max-w-sm aspect-[2/3] rounded-t-2xl overflow-hidden flex flex-col group">
+      <div class="poster-frame relative w-full max-w-sm aspect-[2/3] rounded-t-xl overflow-hidden flex flex-col group">
         <template v-if="loading">
           <Skeleton width="100%" height="100%" class="absolute inset-0" />
 
@@ -67,7 +67,7 @@ const coverStyle = computed(() => ({
 }
 
 .poster-frame {
-  background: #0b0a12;
+  background: #121211;
 }
 
 /* Gradiente inferior fijo (siempre oscuro) para garantizar contraste del texto blanco */
@@ -78,17 +78,16 @@ const coverStyle = computed(() => ({
   padding: 6rem 1.25rem 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  background: linear-gradient(to top, rgba(8, 7, 14, 0.97) 0%, rgba(8, 7, 14, 0.9) 50%, rgba(8, 7, 14, 0) 100%);
+  gap: 0.5rem;
+  background: linear-gradient(to top, rgba(12, 12, 11, 0.97) 0%, rgba(12, 12, 11, 0.9) 50%, rgba(12, 12, 11, 0) 100%);
   color: #ffffff;
 }
 
 .poster-title {
   font-family: var(--font-display);
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   line-height: 1.15;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 500;
   color: #ffffff;
   margin: 0;
   text-wrap: balance;
@@ -98,7 +97,7 @@ const coverStyle = computed(() => ({
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.25rem;
   margin: 0;
   font-size: 0.875rem;
   font-weight: 500;
@@ -111,14 +110,14 @@ const coverStyle = computed(() => ({
 
 .poster-platforms {
   display: flex;
-  gap: 0.4rem;
+  gap: 0.5rem;
   margin-bottom: 0.25rem;
 }
 
 .poster-platform {
   width: 1.75rem;
   height: 1.75rem;
-  border-radius: 0.4rem;
+  border-radius: var(--radius-md);
   object-fit: cover;
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
 }
@@ -131,12 +130,12 @@ const coverStyle = computed(() => ({
   background-size: cover;
   background-position: center;
   filter: blur(40px);
-  opacity: 0.7;
+  opacity: 0.32;
   contain: paint;
   pointer-events: none;
   z-index: -1;
-  border-radius: 1rem;
-  transition: opacity 0.8s ease;
+  border-radius: var(--radius-xl);
+  transition: opacity 0.4s var(--ease);
 }
 
 .z-50 .card-wrapper::before {

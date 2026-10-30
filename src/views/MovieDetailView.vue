@@ -198,7 +198,7 @@ watch(
             <div class="card-image">
               <img :src="movie.cover" :alt="movie.title" class="card-img" />
             </div>
-            <div class="card-body">
+            <div class="card-body ticket-tear">
               <div class="movie-info-group">
                 <h1 class="movie-title">{{ movie.title }}</h1>
                 <span class="movie-year">
@@ -449,7 +449,7 @@ watch(
   padding: 1rem 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.75rem;
   border-bottom: 1px solid var(--border);
 }
 
@@ -459,9 +459,7 @@ watch(
 
 .card-section__label {
   font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-weight: 500;
   color: var(--text-subtle);
 }
 
@@ -475,8 +473,7 @@ watch(
   font-family: var(--font-display);
   font-size: 1.5rem;
   line-height: 1.2;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 500;
   margin: 0;
   text-wrap: balance;
 }
@@ -492,10 +489,10 @@ watch(
   justify-content: center;
   gap: 0.5rem;
   min-height: 2.75rem;
-  padding: 0.6rem 1rem;
+  padding: 0.5rem 1rem;
   border-radius: var(--radius-md);
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   border: 1px solid transparent;
   background: var(--primary);
   color: var(--on-primary);
@@ -520,7 +517,7 @@ watch(
 
 .rating-stars :deep(.star-icon) {
   font-size: 2rem !important;
-  margin: 0 0.3rem 0 0 !important;
+  margin: 0 0.25rem 0 0 !important;
 }
 
 /* SECTION */
@@ -536,7 +533,7 @@ watch(
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.875rem 1.25rem !important;
+  padding: 1rem 1.25rem !important;
   min-height: 3.5rem;
 }
 
@@ -549,17 +546,16 @@ watch(
   flex-shrink: 0;
   border-radius: var(--radius-sm);
   background: var(--primary-soft);
-  color: var(--primary);
-  font-size: 0.95rem;
+  color: var(--text-subtle);
+  font-size: 0.9375rem;
 }
 
 .section-title {
   flex: 1;
   text-align: left;
-  font-family: var(--font-display);
-  font-weight: 600;
+  font-family: var(--font-sans);
+  font-weight: 500;
   font-size: 1rem;
-  letter-spacing: -0.01em;
   color: var(--text);
   margin: 0;
 }
@@ -581,7 +577,6 @@ watch(
 .empty-text {
   font-size: 0.9375rem;
   color: var(--text-subtle);
-  font-style: italic;
   margin: 0;
 }
 
@@ -597,7 +592,7 @@ watch(
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
   text-decoration: none;
 }
 
@@ -608,12 +603,12 @@ watch(
   border-radius: var(--radius-md);
   background: var(--surface-2);
   border: 1px solid var(--border);
-  padding: 6px;
+  padding: 8px;
   transition: border-color 0.15s;
 }
 
 .platform-item:hover .platform-item__img {
-  border-color: var(--primary);
+  border-color: var(--border-strong);
 }
 
 .platform-item__name {
@@ -639,19 +634,19 @@ watch(
 
 .genre-tag {
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text);
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 99px;
-  padding: 0.3rem 0.85rem;
+  border-radius: var(--radius-xl);
+  padding: 0.25rem 0.75rem;
   text-decoration: none;
   transition: color 0.15s, border-color 0.15s, background-color 0.15s;
 }
 
 .genre-tag:hover {
   color: var(--primary);
-  border-color: var(--primary);
+  border-color: var(--border-strong);
   background: var(--primary-soft);
 }
 
@@ -684,7 +679,7 @@ watch(
 }
 
 .person-item:hover .person-item__avatar {
-  border-color: var(--primary);
+  border-color: var(--border-strong);
 }
 
 .person-item__img {

@@ -485,14 +485,6 @@ watch(
   overflow: hidden;
 }
 
-.info-card::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 4px;
-  background: var(--brand-gradient);
-}
-
 @media (min-width: 768px) {
   .info-card {
     flex-direction: row;
@@ -510,10 +502,8 @@ watch(
 }
 
 .avatar-wrapper {
-  padding: 3px;
-  background: var(--brand-gradient);
   border-radius: 50%;
-  margin-bottom: 0.875rem;
+  margin-bottom: 1rem;
   line-height: 0;
 }
 
@@ -522,23 +512,21 @@ watch(
   height: 104px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid var(--surface);
+  border: 1px solid var(--border);
 }
 
 .author-meta .label {
   display: block;
   font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-weight: 500;
   color: var(--text-subtle);
   margin-bottom: 0.25rem;
 }
 
 .username {
-  font-size: 1.0625rem;
-  font-weight: 700;
-  color: var(--primary);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text);
   margin: 0;
 }
 
@@ -562,16 +550,15 @@ watch(
 .list-header {
   display: flex;
   align-items: center;
-  gap: 0.875rem;
+  gap: 1rem;
   margin-bottom: 0.75rem;
 }
 
 .list-name {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: clamp(1.625rem, 4vw, 2.25rem);
   line-height: 1.15;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 500;
   color: var(--text);
   margin: 0;
 }
@@ -609,7 +596,7 @@ watch(
 }
 
 .stat i {
-  color: var(--primary);
+  color: var(--text-subtle);
 }
 
 .privacy-badge {
@@ -620,7 +607,7 @@ watch(
   height: 2rem;
   flex-shrink: 0;
   border-radius: var(--radius-sm);
-  font-size: 0.9rem;
+  font-size: 0.875rem;
 }
 
 .btn-edit-list,
@@ -632,7 +619,7 @@ watch(
   padding: 0.5rem 1rem;
   border-radius: var(--radius-md);
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   background: transparent;
   cursor: pointer;
   transition: background-color 0.15s, color 0.15s, border-color 0.15s;
@@ -644,7 +631,7 @@ watch(
 }
 
 .btn-edit-list:hover {
-  border-color: var(--primary);
+  border-color: var(--border-strong);
   color: var(--primary);
   background: var(--primary-soft);
 }
@@ -705,9 +692,9 @@ watch(
 }
 
 .confirm-title {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: 1.125rem;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text);
   margin: 0;
 }
@@ -723,19 +710,19 @@ watch(
 .footer-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 0.625rem;
+  gap: 0.75rem;
   padding-top: 0.5rem;
   width: 100%;
 }
 
 .btn-cancel {
-  padding: 0.55rem 1.2rem;
+  padding: 0.5rem 1.25rem;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-strong);
   background: transparent;
   color: var(--text);
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.15s;
   font-family: inherit;
@@ -748,21 +735,21 @@ watch(
 .btn-delete {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
-  padding: 0.55rem 1.3rem;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
   border-radius: var(--radius-md);
   border: none;
-  background: #c42020;
+  background: var(--danger);
   color: #ffffff;
   font-size: 0.9375rem;
-  font-weight: 700;
+  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.15s;
   font-family: inherit;
 }
 
 .btn-delete:hover {
-  background: #a51b1b;
+  background: var(--danger);
 }
 
 .mb-4 {
@@ -784,7 +771,7 @@ watch(
 .icon-circle {
   width: 4.5rem;
   height: 4.5rem;
-  color: var(--primary);
+  color: var(--text-subtle);
   background: var(--primary-soft);
   border-radius: 50%;
   display: flex;
@@ -796,7 +783,7 @@ watch(
 .empty-title {
   font-family: var(--font-display);
   font-size: 1.25rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text);
   margin: 0 0 0.5rem;
 }
@@ -819,15 +806,15 @@ watch(
 .btn-search-redirect {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.5rem;
   min-height: 2.75rem;
-  padding: 0.7rem 1.4rem;
+  padding: 0.75rem 1.5rem;
   border-radius: var(--radius-md);
   border: none;
   background: var(--primary);
   color: var(--on-primary);
   font-size: 0.9375rem;
-  font-weight: 700;
+  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.15s;
 }

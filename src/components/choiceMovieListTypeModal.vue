@@ -79,8 +79,7 @@ const closeAllModals = () => {
 
 .list-type-btn:hover {
     background: var(--primary-soft);
-    border-color: var(--primary);
-    transform: translateY(-2px);
+    border-color: var(--border-strong);
 }
 
 @media (max-width: 480px) {
@@ -115,7 +114,7 @@ const closeAllModals = () => {
 
 .list-type-btn__label {
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 500;
     text-align: center;
     line-height: 1.35;
     color: var(--text);

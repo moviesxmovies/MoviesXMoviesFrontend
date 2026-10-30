@@ -111,7 +111,7 @@ const emit = defineEmits([
 .filter-group {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.5rem;
 }
 
 .filter-group + .filter-group {
@@ -121,8 +121,7 @@ const emit = defineEmits([
 
 .filter-label {
   font-size: 0.875rem;
-  font-weight: 600;
-  letter-spacing: 0;
+  font-weight: 500;
   color: var(--text);
 }
 </style>

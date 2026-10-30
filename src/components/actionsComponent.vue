@@ -7,7 +7,7 @@ const props = defineProps<{
 
 <template>
   <div class="flex justify-center">
-    <div class="action-bar inline-flex w-full max-w-sm overflow-hidden rounded-2xl">
+    <div class="action-bar ticket-tear inline-flex w-full max-w-sm ">
       <button
         id="more-info"
         :disabled="loading"
@@ -52,10 +52,8 @@ const props = defineProps<{
 .action-bar {
   border: 1px solid var(--border);
   border-top: none;
-  border-radius: 0 0 1.5rem 1.5rem;
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
   background: var(--surface);
-  box-shadow: var(--shadow-md);
-  overflow: hidden;
   transform: translateZ(0);
 }
 
@@ -67,12 +65,11 @@ const props = defineProps<{
   align-items: center;
   justify-content: center;
   border: none;
-  border-right: 1px solid var(--border);
-  background: transparent;
+    background: transparent;
   color: var(--text);
   font-size: 1.25rem;
-  font-weight: 600;
-  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  font-weight: 500;
+  transition: background-color 0.15s var(--ease), color 0.15s var(--ease), transform 0.15s var(--var(--ease));
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -86,7 +83,7 @@ const props = defineProps<{
 }
 
 .action-btn:active {
-  transform: scale(0.92);
+  transform: scale(0.97);
 }
 
 .action-btn:disabled {
@@ -94,14 +91,12 @@ const props = defineProps<{
   pointer-events: none;
 }
 
-.accent-btn { color: var(--accent); }
-.neutral-btn { color: var(--text-muted); }
-.primary-btn { color: var(--primary); }
+.accent-btn,
+.neutral-btn,
+.primary-btn { color: var(--text-muted); }
 
 @media (hover: hover) {
-  .accent-btn:hover { background: var(--accent); color: var(--on-accent); }
-  .neutral-btn:hover { background: var(--surface-hover); color: var(--text); }
-  .primary-btn:hover { background: var(--primary); color: var(--on-primary); }
+  .action-btn:hover { background: var(--surface-hover); color: var(--text); }
 }
 
 #more-info.animate-boarding,
@@ -109,19 +104,8 @@ const props = defineProps<{
 #add-to-list-button.animate-boarding {
   position: relative;
   z-index: 1001;
-  animation: button-cinematic-pop 1.5s infinite;
+  outline: 2px solid var(--primary);
+  outline-offset: -4px;
 }
 
-#more-info.animate-boarding { background: var(--accent); color: var(--on-accent); }
-#unseen-button.animate-boarding { background: var(--surface-hover); color: var(--text); }
-#add-to-list-button.animate-boarding { background: var(--primary); color: var(--on-primary); }
-
-@keyframes button-cinematic-pop {
-  0%, 100% {
-    transform: scale(1) translateZ(0);
-  }
-  50% {
-    transform: scale(1.08) translateZ(0);
-  }
-}
 </style>

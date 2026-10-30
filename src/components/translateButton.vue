@@ -29,14 +29,14 @@ defineEmits<{
 .translate-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.25rem;
     background: none;
     border: none;
-    padding: 0.2rem 0;
+    padding: 0.25rem 0;
     cursor: pointer;
     font-family: inherit;
     font-size: 0.8125rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-subtle);
     transition: color 0.15s;
     align-self: flex-start;

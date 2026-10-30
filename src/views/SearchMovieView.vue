@@ -262,13 +262,13 @@ watch(
   align-items: center;
   justify-content: center;
   font-size: 1.25rem;
-  color: var(--primary);
+  color: var(--text-subtle);
   margin-bottom: 0.25rem;
 }
 
 .empty-state p {
-  font-family: var(--font-display);
-  font-weight: 600;
+  font-family: var(--font-sans);
+  font-weight: 500;
   color: var(--text);
   font-size: 1.125rem;
   margin: 0;
@@ -331,26 +331,26 @@ watch(
   align-items: center;
   gap: 8px;
   min-height: 2.75rem;
-  padding: 0.6rem 1.1rem;
+  padding: 0.5rem 1rem;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-strong);
   background: var(--surface);
   color: var(--text);
   font-family: var(--font-sans);
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: border-color 0.15s, background-color 0.15s;
   margin-bottom: 1rem;
 }
 
 .filters-toggle:hover {
-  border-color: var(--primary);
+  border-color: var(--border-strong);
   background: var(--primary-soft);
 }
 
 .filters-toggle .pi-sliders-h {
-  color: var(--primary);
+  color: var(--text-subtle);
   font-size: 1rem;
 }
 
@@ -361,11 +361,11 @@ watch(
   background: var(--primary);
   color: var(--on-primary);
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 500;
   min-width: 1.375rem;
-  height: 1.375rem;
-  border-radius: 999px;
-  padding: 0 6px;
+  height: 1.5rem;
+  border-radius: var(--radius-md);
+  padding: 0 8px;
 }
 
 .filters-sidebar {
@@ -404,7 +404,7 @@ watch(
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   color: var(--text-muted);
-  padding: 0.5rem 0.875rem;
+  padding: 0.5rem 1rem;
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s, background-color 0.15s;
 }
@@ -414,16 +414,16 @@ watch(
   align-items: center;
   gap: 8px;
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .btn-content i {
-  color: var(--primary);
-  font-size: 0.9rem;
+  color: var(--text-subtle);
+  font-size: 0.875rem;
 }
 
 .btn-clear-filters:hover {
-  border-color: var(--primary);
+  border-color: var(--border-strong);
   color: var(--text);
   background: var(--primary-soft);
 }

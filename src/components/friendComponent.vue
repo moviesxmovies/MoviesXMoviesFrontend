@@ -76,11 +76,11 @@ onMounted(() => {
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
-    padding: 0.75rem 0.875rem;
+    padding: 0.75rem 1rem;
     border-radius: var(--radius-lg);
     border: 1px solid var(--border);
     background: var(--surface);
-    transition: border-color 0.15s ease, background-color 0.15s ease;
+    transition: border-color 0.15s var(--ease), background-color 0.15s var(--ease);
 }
 
 .friend-card:hover {
@@ -115,13 +115,12 @@ onMounted(() => {
     height: 2.5rem;
     border-radius: 50%;
     object-fit: cover;
-    box-shadow: 0 0 0 2px var(--surface), 0 0 0 3.5px var(--primary);
     display: block;
 }
 
 .username {
     font-size: 0.9375rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text);
     overflow: hidden;
     text-overflow: ellipsis;

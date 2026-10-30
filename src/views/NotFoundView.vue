@@ -32,20 +32,16 @@ const router = useRouter();
 
 <style scoped>
 .nf-title {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: clamp(6rem, 22vw, 11rem);
-  font-weight: 800;
+  font-weight: 500;
   line-height: 1;
-  letter-spacing: -0.05em;
   color: var(--text);
   margin: 0 0 1rem;
 }
 
 .nf-x {
-  background: var(--brand-gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--primary);
 }
 
 .nf-card {
@@ -55,7 +51,7 @@ const router = useRouter();
 .nf-heading {
   font-family: var(--font-display);
   font-size: 1.25rem;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text);
   margin: 0;
 }
@@ -72,7 +68,7 @@ const router = useRouter();
   background: var(--primary);
   color: var(--on-primary);
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.15s;
 }

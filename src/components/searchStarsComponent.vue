@@ -40,9 +40,9 @@ watch(
 <style scoped>
 :deep(.p-checkbox-box) {
   background: var(--surface);
-  border-radius: 6px !important;
+  border-radius: var(--radius-sm) !important;
   border: 1.5px solid var(--border-strong) !important;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  transition: background-color 0.15s var(--ease), border-color 0.15s var(--ease);
 }
 
 :deep(.p-checkbox-checked .p-checkbox-box) {
@@ -57,13 +57,13 @@ watch(
 .star-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 6px 0;
+  gap: 12px;
+  padding: 8px 0;
 }
 
 .star-label {
   display: flex;
-  gap: 3px;
+  gap: 4px;
   cursor: pointer;
 }
 

@@ -32,9 +32,8 @@ const router = useRouter();
   align-items: center;
   justify-content: center;
   background: var(--primary-soft);
-  color: var(--primary);
+  color: var(--text-subtle);
   font-size: 2.5rem;
-  box-shadow: 0 0 0 10px color-mix(in srgb, var(--primary) 8%, transparent);
 }
 
 .primary-btn {
@@ -49,7 +48,7 @@ const router = useRouter();
   background: var(--primary);
   color: var(--on-primary);
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.15s;
 }

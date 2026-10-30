@@ -82,9 +82,9 @@ watch(() => props.loading, (val) => {
 </template>
 <style scoped>
 .star-icon {
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s ease;
+  transition: transform 0.2s var(--var(--ease)), color 0.2s var(--ease);
   color: var(--text-subtle);
-  border-radius: 999px;
+  border-radius: var(--radius-md);
 }
 
 .star-icon:focus-visible {
@@ -95,11 +95,10 @@ watch(() => props.loading, (val) => {
 .pi-star-fill.active {
   color: var(--star-fill);
   transform: scale(1.12);
-  text-shadow: 0 0 14px color-mix(in srgb, var(--star-fill) 45%, transparent);
 }
 
 .star-pop {
-  animation: star-pop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  animation: star-pop 0.35s var(--ease) forwards;
 }
 
 @keyframes star-pop {
@@ -109,7 +108,7 @@ watch(() => props.loading, (val) => {
   }
 
   50% {
-    transform: scale(1.5);
+    transform: scale(1.3);
   }
 
   100% {
@@ -119,12 +118,10 @@ watch(() => props.loading, (val) => {
 
 @media (hover: hover) {
   .star-icon:hover {
-    transform: scale(1.18);
     color: var(--star-fill);
   }
 }
 
 :deep(.animate-boarding) .star-icon {
-  text-shadow: none;
 }
 </style>

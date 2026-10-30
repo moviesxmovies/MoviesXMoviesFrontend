@@ -127,7 +127,7 @@ const updateGlow = (dir: string) => {
   const color = PREDICTED_COLORS[dir];
   el.style.setProperty('--glow-color', color ?? 'transparent');
   el.style.setProperty('--glow-opacity', '1');
-  el.style.transform = 'scale(1.04)';
+  el.style.transform = 'scale(1.02)';
 };
 
 
@@ -235,7 +235,7 @@ for (let i = 1; i <= 5; i++) {
         </div>
       </div>
       <div class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center mb-7 px-14 md:px-0">
-        <div ref="glowEl" class="glow-container w-full max-w-sm aspect-[3/5] rounded-3xl" id="glow-container" />
+        <div ref="glowEl" class="glow-container w-full max-w-sm aspect-[3/5] rounded-2xl" id="glow-container" />
       </div>
       <div class="flex justify-center mt-4 relative">
         <StarsComponent id="stars" :loading="loading" @rateMovie="rateMovie" ref="starsRef" />
@@ -266,14 +266,10 @@ for (let i = 1; i <= 5; i++) {
   --glow-opacity: 0;
 
   position: absolute;
-  background: radial-gradient(circle,
-      transparent 10%,
-      color-mix(in srgb, var(--glow-color) 25%, transparent) 100%);
-  border: 3px solid var(--glow-color);
-  box-shadow: inset 0 0 15px color-mix(in srgb, var(--glow-color) 40%, transparent);
+  border: 2px solid var(--glow-color);
   opacity: var(--glow-opacity);
   transform: scale(0.95);
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+  transition: transform 0.2s var(--var(--ease)),
     opacity 0.3s ease-in;
   will-change: auto;
   contain: paint;
@@ -281,7 +277,7 @@ for (let i = 1; i <= 5; i++) {
 
 .active-icon {
   opacity: 1 !important;
-  transform: scale(1.4) translateZ(0);
+  transform: scale(1.2) translateZ(0);
   text-shadow:
     0 0 10px rgba(0, 0, 0, 0.6),
     0 1px 2px rgba(0, 0, 0, 0.4);
@@ -302,7 +298,7 @@ for (let i = 1; i <= 5; i++) {
   height: 4rem;
   border-radius: 999px;
   background: var(--primary-soft);
-  color: var(--primary);
+  color: var(--text-subtle);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -312,7 +308,7 @@ for (let i = 1; i <= 5; i++) {
 .home-empty__title {
   font-family: var(--font-display);
   font-size: 1.25rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text);
   margin: 0;
 }
@@ -322,11 +318,11 @@ for (let i = 1; i <= 5; i++) {
   align-items: center;
   gap: 0.5rem;
   margin-top: 0.25rem;
-  padding: 0.65rem 1.25rem;
+  padding: 0.75rem 1.25rem;
   border-radius: var(--radius-md);
   background: var(--primary);
   color: var(--on-primary);
-  font-weight: 600;
+  font-weight: 500;
   text-decoration: none;
 }
 
@@ -385,7 +381,6 @@ for (let i = 1; i <= 5; i++) {
 
 .overflow-visible:has(#mainSwipe.animate-boarding) #glow-container {
   animation: glow-tutorial 8s ease-in-out infinite !important;
-  filter: blur(1px);
 }
 
 @keyframes glow-tutorial {
@@ -401,47 +396,39 @@ for (let i = 1; i <= 5; i++) {
   100% {
     opacity: 0;
     transform: scale(0.95);
-    border: 3px solid transparent;
+    border: 2px solid transparent;
   }
 
   /* Like - Yellow */
   15%,
   25% {
     opacity: 0.7;
-    transform: scale(1.04);
-    background: radial-gradient(circle, transparent 10%, color-mix(in srgb, var(--yellow) 25%, transparent) 100%);
-    border: 3px solid var(--yellow);
-    box-shadow: 0 0 15px var(--yellow);
+    transform: scale(1.02);
+    border: 2px solid var(--yellow);
   }
 
   /* Dislike - Red */
   40%,
   50% {
     opacity: 0.7;
-    transform: scale(1.04);
-    background: radial-gradient(circle, transparent 10%, color-mix(in srgb, var(--red) 25%, transparent) 100%);
-    border: 3px solid var(--red);
-    box-shadow: 0 0 15px var(--red);
+    transform: scale(1.02);
+    border: 2px solid var(--red);
   }
 
   /* Up - Azul/Primary */
   65%,
   75% {
     opacity: 0.7;
-    transform: scale(1.04);
-    background: radial-gradient(circle, transparent 10%, color-mix(in srgb, var(--primary) 25%, transparent) 100%);
-    border: 3px solid var(--primary);
-    box-shadow: 0 0 15px var(--primary);
+    transform: scale(1.02);
+    border: 2px solid var(--primary);
   }
 
   /* Down - Gris */
   90%,
   98% {
     opacity: 0.7;
-    transform: scale(1.04);
-    background: radial-gradient(circle, transparent 10%, color-mix(in srgb, var(--gray) 25%, transparent) 100%);
-    border: 3px solid var(--gray);
-    box-shadow: 0 0 15px var(--gray);
+    transform: scale(1.02);
+    border: 2px solid var(--gray);
   }
 }
 
@@ -450,7 +437,7 @@ for (let i = 1; i <= 5; i++) {
   15%,
   25% {
     opacity: 1;
-    transform: scale(1.4);
+    transform: scale(1.2);
     color: var(--text);
   }
 
@@ -468,7 +455,7 @@ for (let i = 1; i <= 5; i++) {
   40%,
   50% {
     opacity: 1;
-    transform: scale(1.4);
+    transform: scale(1.2);
     color: var(--text);
   }
 
@@ -486,7 +473,7 @@ for (let i = 1; i <= 5; i++) {
   65%,
   75% {
     opacity: 1;
-    transform: scale(1.4);
+    transform: scale(1.2);
     color: var(--text);
   }
 
@@ -504,7 +491,7 @@ for (let i = 1; i <= 5; i++) {
   90%,
   98% {
     opacity: 1;
-    transform: scale(1.4);
+    transform: scale(1.2);
     color: var(--text);
   }
 
@@ -520,10 +507,10 @@ for (let i = 1; i <= 5; i++) {
 #stars.animate-boarding {
   position: relative;
   z-index: 1001;
-  background: var(--primary-soft);
+  background: var(--surface);
   padding: 1.5rem;
-  border-radius: 1rem;
-  border: 2px dashed var(--star-fill);
+  border-radius: var(--radius-xl);
+  border: 1px dashed var(--border-strong);
   display: flex;
   justify-content: center;
   min-height: 4rem;
@@ -531,7 +518,7 @@ for (let i = 1; i <= 5; i++) {
 
 .animate-boarding .star-icon {
   display: inline-block !important;
-  color: var(--primary);
+  color: var(--text-subtle);
   animation: star-fill-sweep 2.5s alternate infinite ease-in-out !important;
 }
 
@@ -627,8 +614,8 @@ for (let i = 1; i <= 5; i++) {
   width: 85vw;
   max-width: 24rem;
   aspect-ratio: 3 / 5;
-  border-radius: 1.5rem;
-  transition: transform 0.5s ease-out;
+  border-radius: var(--radius-xl);
+  transition: transform 0.5s var(--ease);
 }
 
 .cell {

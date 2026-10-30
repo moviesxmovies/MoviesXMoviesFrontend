@@ -229,10 +229,9 @@ onUnmounted(() => { if (bubbleTimer) clearInterval(bubbleTimer); });
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.4rem 0.75rem 0.4rem 0.4rem;
-    border-radius: 999px;
+    padding: 0.5rem 0.75rem 0.5rem 0.5rem;
+    border-radius: var(--radius-md);
     background: color-mix(in srgb, var(--surface) 92%, transparent);
-    backdrop-filter: blur(12px);
     border: 1px solid color-mix(in srgb, var(--bubble-color) 45%, var(--border));
     box-shadow: var(--shadow-md);
     white-space: nowrap;
@@ -265,10 +264,9 @@ onUnmounted(() => { if (bubbleTimer) clearInterval(bubbleTimer); });
 }
 
 .avatar-initials {
-    font-size: 0.7rem;
-    font-weight: 700;
+    font-size: 0.75rem;
+    font-weight: 500;
     color: var(--text);
-    letter-spacing: 0.02em;
 }
 
 .bubble-info {
@@ -280,7 +278,7 @@ onUnmounted(() => { if (bubbleTimer) clearInterval(bubbleTimer); });
 
 .bubble-user {
     font-size: 0.8125rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -293,7 +291,7 @@ onUnmounted(() => { if (bubbleTimer) clearInterval(bubbleTimer); });
 }
 
 .bubble-stars .pi {
-    font-size: 0.65rem;
+    font-size: 0.75rem;
     color: var(--bubble-color);
 }
 
@@ -302,7 +300,7 @@ onUnmounted(() => { if (bubbleTimer) clearInterval(bubbleTimer); });
 }
 
 .bubble-leave-active {
-    transition: opacity 0.4s ease;
+    transition: opacity 0.4s var(--ease);
 }
 
 .bubble-leave-to {
@@ -345,8 +343,8 @@ onUnmounted(() => { if (bubbleTimer) clearInterval(bubbleTimer); });
         right: unset;
         top: var(--x-offset, 30%);
         max-width: 240px;
-        padding: 0.35rem 0.65rem 0.35rem 0.35rem;
-        gap: 0.4rem;
+        padding: 0.25rem 0.75rem 0.25rem 0.25rem;
+        gap: 0.5rem;
         animation: float-right 6s ease-in forwards;
         transform-origin: left center;
     }
@@ -357,7 +355,7 @@ onUnmounted(() => { if (bubbleTimer) clearInterval(bubbleTimer); });
     }
 
     .avatar-initials {
-        font-size: 0.65rem;
+        font-size: 0.75rem;
     }
 
     .bubble-user {
@@ -365,7 +363,7 @@ onUnmounted(() => { if (bubbleTimer) clearInterval(bubbleTimer); });
     }
 
     .bubble-stars .pi {
-        font-size: 0.6rem;
+        font-size: 0.75rem;
     }
 
     .bubble-enter-active {

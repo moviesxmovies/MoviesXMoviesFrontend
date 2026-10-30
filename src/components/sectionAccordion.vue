@@ -139,7 +139,7 @@ watch(() => [props.isEmpty, props.defaultOpen], () => {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 0.875rem 1.25rem !important;
+    padding: 1rem 1.25rem !important;
     min-height: 3.5rem;
 }
 
@@ -156,22 +156,21 @@ watch(() => [props.isEmpty, props.defaultOpen], () => {
     flex-shrink: 0;
     border-radius: var(--radius-sm);
     background: var(--primary-soft);
-    color: var(--primary);
-    font-size: 0.95rem;
+    color: var(--text-subtle);
+    font-size: 0.9375rem;
 }
 
 .section-icon :deep(i),
 .section-icon i {
-    color: var(--primary) !important;
+    color: var(--text-subtle) !important;
 }
 
 .section-title {
     flex: 1;
     text-align: left;
-    font-family: var(--font-display);
-    font-weight: 600;
+    font-family: var(--font-sans);
+    font-weight: 500;
     font-size: 1rem;
-    letter-spacing: -0.01em;
     color: var(--text);
     margin: 0;
 }
@@ -183,18 +182,19 @@ watch(() => [props.isEmpty, props.defaultOpen], () => {
 .dialog-button {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.5rem;
     margin-right: 0.5rem;
     font-family: var(--font-sans);
     font-size: 0.8125rem;
-    padding: 0.4rem 0.85rem;
-    border-radius: 999px;
-    font-weight: 600;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-weight: 500;
     border: 1px solid transparent;
-    background: var(--primary);
-    color: var(--on-primary);
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1px solid var(--border);
     cursor: pointer;
-    transition: background-color 0.15s ease;
+    transition: background-color 0.15s var(--ease);
     white-space: nowrap;
 }
 
@@ -203,7 +203,7 @@ watch(() => [props.isEmpty, props.defaultOpen], () => {
 }
 
 .dialog-button:hover {
-    background: var(--primary-hover);
+    background: var(--surface-hover);
 }
 
 @media (max-width: 480px) {
@@ -221,7 +221,7 @@ watch(() => [props.isEmpty, props.defaultOpen], () => {
 }
 
 .primary-icon {
-    color: var(--primary);
+    color: var(--text-subtle);
 }
 
 .loading-footer {
@@ -244,7 +244,7 @@ watch(() => [props.isEmpty, props.defaultOpen], () => {
 
 :deep(.p-scrollpanel-bar) {
     background: color-mix(in srgb, var(--text-subtle) 45%, transparent);
-    border-radius: 999px;
+    border-radius: var(--radius-md);
     width: 6px;
     opacity: 1;
 }
@@ -275,17 +275,17 @@ watch(() => [props.isEmpty, props.defaultOpen], () => {
     height: 3.5rem;
     border-radius: 999px;
     background: var(--primary-soft);
-    color: var(--primary);
+    color: var(--text-subtle);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     margin-bottom: 0.25rem;
 }
 
 .empty-title {
-    font-size: 1.0625rem;
-    font-weight: 600;
+    font-size: 1rem;
+    font-weight: 500;
     color: var(--text);
     margin: 0;
 }

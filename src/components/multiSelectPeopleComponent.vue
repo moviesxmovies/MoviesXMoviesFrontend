@@ -135,11 +135,11 @@ watch(
 .people-chip {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.2rem 0.3rem 0.2rem 0.25rem;
-  border-radius: 999px;
+  gap: 0.5rem;
+  padding: 0.25rem 0.25rem 0.25rem 0.25rem;
+  border-radius: var(--radius-md);
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 500;
   background: var(--primary-soft);
   color: var(--primary);
 }
@@ -158,7 +158,7 @@ watch(
 }
 
 .people-chip-remove i {
-  font-size: 0.65rem;
+  font-size: 0.75rem;
 }
 
 .people-chip-remove:hover {

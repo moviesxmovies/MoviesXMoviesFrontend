@@ -179,15 +179,15 @@
     "submit": "Restablecer contraseña"
   },
   "home": {
-    "welcome": "¡Bienvenido a MoviesXMovies!",
+    "welcome": "Crea tu cuenta",
+    "headline": "Puntúa películas con un gesto y mira qué opinan tus amigos",
     "login": "Iniciar sesión",
     "emailPlaceholder": "Introduce tu correo electrónico",
     "signupBtn": "Registrarse",
     "orContinue": "o continuar con",
-    "badge": "En línea",
     "feature1": "Comparte tus películas favoritas",
     "feature2": "Obtén recomendaciones de películas",
-    "feature3": "Crea tus propias listas de películas.",
+    "feature3": "Crea tus propias listas de películas",
     "fetchMoviesError": "Error al cargar las películas. Por favor, inténtalo más tarde.",
     "profile": "Mi perfil",
     "shortcuts": "Atajos",

@@ -69,29 +69,29 @@ const emit = defineEmits(["filterUnseen", "filterReviewed"]);
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 0.75rem 0.875rem;
+  padding: 0.75rem 1rem;
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background: var(--surface-2);
   cursor: pointer;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  transition: border-color 0.15s var(--ease), background-color 0.15s var(--ease);
 }
 
 .preference-item:hover {
-  border-color: var(--primary);
+  border-color: var(--border-strong);
   background: var(--primary-soft);
 }
 
 .preference-info {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   cursor: pointer;
 }
 
 .preference-icon {
-  font-size: 0.95rem;
-  color: var(--primary);
+  font-size: 0.9375rem;
+  color: var(--text-subtle);
 }
 
 .preference-label {
@@ -104,8 +104,8 @@ const emit = defineEmits(["filterUnseen", "filterReviewed"]);
 /* ToggleSwitch */
 :deep(.p-toggleswitch-slider) {
   background: var(--border-strong) !important;
-  border-radius: 2rem !important;
-  transition: background 0.2s ease !important;
+  border-radius: var(--radius-xl) !important;
+  transition: background 0.2s var(--ease) !important;
 }
 
 :deep(.p-toggleswitch-handle) {
