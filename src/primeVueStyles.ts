@@ -7,19 +7,19 @@ import Aura from "@primeuix/themes/aura";
  * (ver docs/guia-de-estilos.pdf). Si cambias uno, cambia el otro.
  */
 
-// Ámbar de marquesina
-const amber = {
-  50: "#fbf3e4",
-  100: "#f6e4c4",
-  200: "#f5c77e",
-  300: "#f0b55c",
-  400: "#e8a33d",
-  500: "#c9861f",
-  600: "#ad6e12",
-  700: "#96580a",
-  800: "#7d4907",
-  900: "#663b05",
-  950: "#3a2103",
+// Índigo de marca
+const indigo = {
+  50: "#f0efff",
+  100: "#e3e1ff",
+  200: "#cac6ff",
+  300: "#aba5ff",
+  400: "#8b83ff",
+  500: "#6c62f5",
+  600: "#5248e6",
+  700: "#3d34d6",
+  800: "#3029ad",
+  900: "#282487",
+  950: "#18154f",
 };
 
 // Grafito neutro con un punto cálido
@@ -50,7 +50,7 @@ const MyPreset = definePreset(Aura, {
     },
   },
   semantic: {
-    primary: amber,
+    primary: indigo,
     focusRing: {
       width: "2px",
       style: "solid",
@@ -115,7 +115,7 @@ const MyPreset = definePreset(Aura, {
         surface: graphite,
         primary: {
           color: "{primary.400}",
-          contrastColor: "#1a1206",
+          contrastColor: "#0f0e17",
           hoverColor: "{primary.300}",
           activeColor: "{primary.200}",
         },

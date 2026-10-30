@@ -72,11 +72,11 @@
   --text-muted: #55534d;  /*  7.1:1 */
   --text-subtle: #6b6963; /*  5.1:1 – mínimo para texto */
 
-  /* Acento: ámbar de marquesina, el mismo tono que las estrellas */
-  --primary: #96580a;       /* 5.3:1 sobre fondo */
-  --primary-hover: #7d4907;
-  --primary-active: #663b05;
-  --on-primary: #ffffff;
+  /* Marca */
+  --primary: #3d34d6;       /* 7.3:1 sobre fondo */
+  --primary-hover: #3029ad;
+  --primary-active: #282487;
+  --on-primary: #ffffff;    /* 7.9:1 sobre primary */
   --primary-soft: #f0efeb;  /* fondo neutro de estados seleccionados */
   --accent: #1c1b18;
   --on-accent: #ffffff;
@@ -143,10 +143,10 @@
   --text-muted: #a9a7a1;  /*  7.8:1 */
   --text-subtle: #908e88; /*  5.7:1 */
 
-  --primary: #e8a33d;       /* 8.7:1 */
-  --primary-hover: #f0b55c;
-  --primary-active: #f5c77e;
-  --on-primary: #1a1206;    /* 8.6:1 sobre primary */
+  --primary: #8b83ff;       /* 6.1:1 */
+  --primary-hover: #a39dff;
+  --primary-active: #bdb8ff;
+  --on-primary: #0f0e17;    /* 6.2:1 sobre primary */
   --primary-soft: #232321;
   --accent: #edebe6;
   --on-accent: #121211;

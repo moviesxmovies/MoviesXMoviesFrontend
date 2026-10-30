@@ -11,7 +11,7 @@
     <div class="deck-poster deck-poster--mid">
       <svg viewBox="0 0 240 360" preserveAspectRatio="xMidYMid slice">
         <rect width="240" height="360" fill="#6e2a2f" />
-        <circle cx="76" cy="128" r="56" fill="#d9825a" />
+        <circle cx="76" cy="128" r="56" fill="#e0c9a0" />
         <rect y="230" width="240" height="130" fill="#3a1518" />
         <path d="M48 230h144l-20 34H70z" fill="#1f0b0d" />
       </svg>
@@ -21,10 +21,10 @@
       <div class="deck-poster--front">
         <svg viewBox="0 0 288 400" preserveAspectRatio="xMidYMid slice">
           <rect width="288" height="400" fill="#0e0d0c" />
-          <path d="M144 400 32 136h224z" fill="#e8a33d" opacity=".1" />
+          <path d="M144 400 32 136h224z" fill="#8b83ff" opacity=".1" />
           <rect x="32" y="40" width="224" height="124" rx="2" fill="#f4ecdf" />
-          <path d="M32 164V124l64-34 42 28 50-40 68 46v40z" fill="#c9861f" />
-          <circle cx="204" cy="76" r="14" fill="#e8a33d" />
+          <path d="M32 164V124l64-34 42 28 50-40 68 46v40z" fill="#3d34d6" />
+          <circle cx="204" cy="76" r="14" fill="#8b83ff" />
           <g fill="#1d1a16">
             <path d="M0 300c0-18 14-30 32-30s32 12 32 30v100H0z" />
             <path d="M72 300c0-18 14-30 32-30s32 12 32 30v100H72z" />
