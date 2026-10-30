@@ -230,7 +230,7 @@ watch(() => props.forceOpenRepliesId, (id) => {
     flex-wrap: wrap;
     align-items: center;
     gap: 0.5rem 1rem;
-    margin-top: 0.35rem;
+    margin-top: 0.25rem;
     position: relative;
     overflow: visible;
 }
@@ -279,7 +279,7 @@ watch(() => props.forceOpenRepliesId, (id) => {
 .comment-thread-line {
     flex: 1;
     width: 2px;
-    margin-top: 0.4rem;
+    margin-top: 0.5rem;
     background: var(--border);
     min-height: 0.5rem;
     border-radius: 2px;
@@ -304,7 +304,7 @@ watch(() => props.forceOpenRepliesId, (id) => {
 
 .comment-username {
     font-size: 0.9375rem;
-    font-weight: 700;
+    font-weight: 500;
     color: var(--text);
     text-decoration: none;
 }
@@ -332,14 +332,14 @@ watch(() => props.forceOpenRepliesId, (id) => {
 .toggle-replies-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.25rem;
     background: none;
     border: none;
-    padding: 0.2rem 0;
+    padding: 0.25rem 0;
     cursor: pointer;
     font-family: inherit;
     font-size: 0.8125rem;
-    font-weight: 600;
+    font-weight: 500;
     transition: color 0.15s;
     align-self: flex-start;
 }
@@ -369,27 +369,27 @@ watch(() => props.forceOpenRepliesId, (id) => {
 .replies {
     display: flex;
     flex-direction: column;
-    margin-top: 0.35rem;
+    margin-top: 0.25rem;
     border-left: 2px solid var(--border);
     padding-left: 0.75rem;
 }
 
 .reply-indent {
-    padding: 0.3rem 0;
+    padding: 0.25rem 0;
 }
 
 .load-more-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.5rem;
     background: transparent;
     border: 1px solid var(--border-strong);
-    border-radius: 999px;
-    padding: 0.35rem 0.9rem;
+    border-radius: var(--radius-md);
+    padding: 0.25rem 1rem;
     cursor: pointer;
     font-family: inherit;
     font-size: 0.8125rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-muted);
     transition: color 0.15s, border-color 0.15s;
     align-self: flex-start;
@@ -397,11 +397,11 @@ watch(() => props.forceOpenRepliesId, (id) => {
 }
 
 .load-more-btn:hover {
-    border-color: var(--primary);
+    border-color: var(--border-strong);
     color: var(--primary);
 }
 
 .load-more-btn i {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
 }
 </style>

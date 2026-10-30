@@ -152,14 +152,14 @@ watch(
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--primary);
+  color: var(--text-subtle);
   margin-bottom: 0.25rem;
 }
 
 .empty-title {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: 1.125rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text);
   margin: 0;
 }
@@ -171,7 +171,7 @@ watch(
 
 .skeleton-card {
   aspect-ratio: 4 / 5;
-  border-radius: 1rem;
+  border-radius: var(--radius-xl);
   overflow: hidden;
 }
 </style>

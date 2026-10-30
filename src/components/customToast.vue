@@ -101,7 +101,7 @@ onMounted(() => {
     z-index: 9999;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
     pointer-events: none;
     width: 360px;
     max-width: calc(100vw - 2rem);
@@ -117,7 +117,7 @@ onMounted(() => {
     display: flex;
     align-items: flex-start;
     gap: 12px;
-    padding: 0.9rem 1rem 1.15rem 1.1rem;
+    padding: 1rem 1rem 1.25rem 1rem;
     overflow: hidden;
     pointer-events: all;
     font-family: var(--font-sans);
@@ -157,7 +157,7 @@ onMounted(() => {
 
 .toast-summary {
     font-size: 0.9375rem;
-    font-weight: 700;
+    font-weight: 500;
     color: var(--text);
     line-height: 1.35;
 }
@@ -223,11 +223,11 @@ onMounted(() => {
 
 /* ── TRANSITIONS ── */
 .toast-enter-active {
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.3s var(--var(--ease));
 }
 
 .toast-leave-active {
-    transition: all 0.2s ease-in;
+    transition: background-color, border-color, color, opacity, transform 0.2s var(--ease);
 }
 
 .toast-enter-from {

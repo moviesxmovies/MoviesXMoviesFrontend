@@ -179,15 +179,15 @@
     "submit": "Réinitialiser le mot de passe"
   },
   "home": {
-    "welcome": "Bienvenue sur MoviesXMovies !",
+    "welcome": "Créez votre compte",
+    "headline": "Notez des films d'un geste et voyez ce qu'en pensent vos amis",
     "login": "Se connecter",
     "emailPlaceholder": "Entrez votre e-mail",
     "signupBtn": "S'inscrire",
     "orContinue": "ou continuer avec",
-    "badge": "En ligne",
     "feature1": "Partagez vos films préférés",
     "feature2": "Obtenez des recommandations de films",
-    "feature3": "Créez vos propres listes de films.",
+    "feature3": "Créez vos propres listes de films",
     "fetchMoviesError": "Impossible de charger les films. Veuillez réessayer plus tard.",
     "profile": "Mon profil",
     "shortcuts": "Raccourcis",

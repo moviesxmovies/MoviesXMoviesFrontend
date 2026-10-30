@@ -102,12 +102,12 @@ const localizedPrivacyConfig = computed(() => {
   background: var(--surface-2);
   border: 1px solid var(--border);
   cursor: pointer;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  transition: border-color 0.15s var(--ease), background-color 0.15s var(--ease);
   position: relative;
 }
 
 .list-item:hover {
-  border-color: var(--primary);
+  border-color: var(--border-strong);
   background: var(--surface-hover);
 }
 
@@ -134,7 +134,7 @@ const localizedPrivacyConfig = computed(() => {
 }
 
 .main-icon {
-  color: var(--primary);
+  color: var(--text-subtle);
   font-size: 1rem;
 }
 
@@ -144,35 +144,35 @@ const localizedPrivacyConfig = computed(() => {
 
 .list-name {
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text);
 }
 
 .privacity-badge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   padding: 1px 8px;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 500;
   width: fit-content;
 }
 
 .privacity-badge i {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
 }
 
 .check-indicator {
   width: 1.375rem;
-  height: 1.375rem;
-  border-radius: 6px;
+  height: 1.5rem;
+  border-radius: var(--radius-sm);
   border: 1.5px solid var(--border-strong);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
 }
 
 .item-selected .check-indicator {
@@ -198,12 +198,12 @@ const localizedPrivacyConfig = computed(() => {
   align-items: center;
   justify-content: center;
   margin-bottom: 0.75rem;
-  font-size: 1.4rem;
-  color: var(--primary);
+  font-size: 1.5rem;
+  color: var(--text-subtle);
 }
 
 .empty-title {
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text);
 }
 

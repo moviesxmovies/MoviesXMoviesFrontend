@@ -179,15 +179,15 @@
     "submit": "Reset Password"
   },
   "home": {
-    "welcome": "Welcome to MoviesXMovies!",
+    "welcome": "Create your account",
+    "headline": "Rate films with a swipe and see what your friends thought",
     "login": "Login",
     "emailPlaceholder": "Enter your email",
     "signupBtn": "Sign up",
     "orContinue": "or continue with",
-    "badge": "Online",
     "feature1": "Share your favorite movies",
     "feature2": "Get movie recommendations",
-    "feature3": "Create your own movie lists.",
+    "feature3": "Create your own movie lists",
     "fetchMoviesError": "Failed to fetch movies. Please try again later.",
     "profile": "My Profile",
     "shortcuts": "Shortcuts",

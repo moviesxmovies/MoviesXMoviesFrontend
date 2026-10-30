@@ -254,8 +254,8 @@ watch(loading, async (newVal) => {
 .review {
     display: flex;
     flex-direction: column;
-    gap: 0.875rem;
-    padding: 1rem 1.1rem;
+    gap: 1rem;
+    padding: 1rem 1rem;
     border-radius: var(--radius-lg);
     border: 1px solid var(--border);
     background: var(--surface);
@@ -276,14 +276,14 @@ watch(loading, async (newVal) => {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.5rem;
     flex-shrink: 0;
 }
 
 .movie-cover {
     width: 4.25rem;
     min-width: 4.25rem;
-    height: 6.375rem;
+    height: 6.5rem;
     object-fit: cover;
     border-radius: var(--radius-sm);
     box-shadow: var(--shadow-sm);
@@ -292,13 +292,12 @@ watch(loading, async (newVal) => {
 }
 
 .movie-cover:hover {
-    transform: scale(1.03);
 }
 
 .review-body {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 0.5rem;
     flex: 1;
     min-width: 0;
 }
@@ -319,8 +318,8 @@ watch(loading, async (newVal) => {
 
 .movie-name {
     font-size: 0.875rem;
-    font-weight: 700;
-    color: var(--primary);
+    font-weight: 500;
+    color: var(--text);
     cursor: pointer;
     text-decoration: none;
     overflow: hidden;
@@ -341,7 +340,7 @@ watch(loading, async (newVal) => {
 
 .review-author {
     color: var(--text-muted);
-    font-weight: 600;
+    font-weight: 500;
     text-decoration: none;
 }
 
@@ -362,7 +361,7 @@ watch(loading, async (newVal) => {
 .user-avatar-link {
     display: flex;
     flex-shrink: 0;
-    border-radius: 999px;
+    border-radius: var(--radius-md);
 }
 
 .user-avatar {
@@ -375,7 +374,6 @@ watch(loading, async (newVal) => {
 }
 
 .user-avatar-link:hover .user-avatar {
-    box-shadow: 0 0 0 2px var(--primary);
 }
 
 .badge {
@@ -385,7 +383,7 @@ watch(loading, async (newVal) => {
     width: 2rem;
     height: 2rem;
     border-radius: 50%;
-    font-size: 0.85rem;
+    font-size: 0.875rem;
     flex-shrink: 0;
 }
 
@@ -400,9 +398,9 @@ watch(loading, async (newVal) => {
 }
 
 .review-title {
-    font-family: var(--font-display);
-    font-size: 1.0625rem;
-    font-weight: 600;
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    font-weight: 500;
     line-height: 1.35;
     color: var(--text);
     margin: 0;
@@ -434,7 +432,7 @@ watch(loading, async (newVal) => {
 .review-actions {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.5rem;
     margin-left: auto;
 }
 
@@ -442,12 +440,12 @@ watch(loading, async (newVal) => {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.4rem;
-    height: 2.125rem;
-    padding: 0 0.85rem;
-    border-radius: 999px;
+    gap: 0.5rem;
+    height: 2.25rem;
+    padding: 0 0.75rem;
+    border-radius: var(--radius-md);
     font-size: 0.8125rem;
-    font-weight: 600;
+    font-weight: 500;
     font-family: inherit;
     cursor: pointer;
     background: transparent;
@@ -462,7 +460,7 @@ watch(loading, async (newVal) => {
 }
 
 .action-btn--comment:hover {
-    border-color: var(--primary);
+    border-color: var(--border-strong);
     color: var(--primary);
     background: var(--primary-soft);
 }
@@ -505,9 +503,9 @@ watch(loading, async (newVal) => {
 }
 
 .confirm-title {
-    font-family: var(--font-display);
+    font-family: var(--font-sans);
     font-size: 1.125rem;
-    font-weight: 700;
+    font-weight: 500;
     color: var(--text);
     margin: 0;
 }
@@ -523,19 +521,19 @@ watch(loading, async (newVal) => {
 .footer-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 0.625rem;
+    gap: 0.75rem;
     padding-top: 0.5rem;
     width: 100%;
 }
 
 .btn-cancel {
-    padding: 0.55rem 1.2rem;
+    padding: 0.5rem 1.25rem;
     border-radius: var(--radius-md);
     border: 1px solid var(--border-strong);
     background: transparent;
     color: var(--text);
     font-size: 0.9375rem;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
     transition: background-color 0.15s;
     font-family: inherit;
@@ -548,28 +546,28 @@ watch(loading, async (newVal) => {
 .btn-delete {
     display: flex;
     align-items: center;
-    gap: 0.45rem;
-    padding: 0.55rem 1.3rem;
+    gap: 0.5rem;
+    padding: 0.5rem 1.25rem;
     border-radius: var(--radius-md);
     border: none;
-    background: #c42020;
+    background: var(--danger);
     color: #ffffff;
     font-size: 0.9375rem;
-    font-weight: 700;
+    font-weight: 500;
     cursor: pointer;
     transition: background-color 0.15s;
     font-family: inherit;
 }
 
 .btn-delete:hover {
-    background: #a51b1b;
+    background: var(--danger);
 }
 
 /* CONTENIDO LARGO */
 .review-content-wrapper {
     max-height: 5rem;
     overflow: hidden;
-    transition: max-height 0.3s ease;
+    transition: max-height 0.3s var(--ease);
     position: relative;
 }
 
@@ -586,7 +584,7 @@ watch(loading, async (newVal) => {
     height: 2.5rem;
     pointer-events: none;
     background: linear-gradient(to bottom, transparent 0%, var(--surface) 100%);
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s var(--ease);
 }
 
 .review-content-wrapper.expanded::after {
@@ -596,7 +594,7 @@ watch(loading, async (newVal) => {
 .expand-btn {
     align-self: flex-start;
     font-size: 0.875rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--primary);
     background: none;
     border: none;
@@ -614,12 +612,11 @@ watch(loading, async (newVal) => {
 }
 
 .review-content :deep(strong) {
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text);
 }
 
 .review-content :deep(em) {
-    font-style: italic;
 }
 
 .review-content :deep(ol) {
@@ -639,26 +636,26 @@ watch(loading, async (newVal) => {
     font-size: 0.85em;
     background: var(--surface-2);
     color: var(--text);
-    padding: 0.1rem 0.35rem;
-    border-radius: 4px;
+    padding: 0.1rem 0.25rem;
+    border-radius: var(--radius-sm);
 }
 
 .review-content :deep(h1),
 .review-content :deep(h2),
 .review-content :deep(h3),
 .review-content :deep(h4) {
-    font-weight: 600;
+    font-weight: 500;
     line-height: 1.3;
     margin: 0.75rem 0 0.25rem;
     color: var(--text);
 }
 
 .review-content :deep(h1) {
-    font-size: 1.15rem;
+    font-size: 1.125rem;
 }
 
 .review-content :deep(h2) {
-    font-size: 1.05rem;
+    font-size: 1rem;
 }
 
 .review-content :deep(h3) {
@@ -666,7 +663,7 @@ watch(loading, async (newVal) => {
 }
 
 .review-content :deep(h4) {
-    font-size: 0.95rem;
+    font-size: 0.9375rem;
 }
 
 .review-content :deep(li) {
@@ -689,8 +686,8 @@ watch(loading, async (newVal) => {
 }
 
 .review-content :deep(pre) {
-    background: #15141f;
-    color: #ecebf5;
+    background: var(--text);
+    color: var(--background);
     padding: 1rem;
     border-radius: var(--radius-sm);
     overflow-x: auto;
@@ -707,17 +704,17 @@ watch(loading, async (newVal) => {
     background: transparent;
     color: inherit;
     padding: 0;
-    font-size: 0.85rem;
+    font-size: 0.875rem;
     white-space: pre;
 }
 
 @media (max-width: 480px) {
     .review {
-        padding: 0.875rem;
+        padding: 1rem;
     }
 
     .review-main {
-        gap: 0.65rem;
+        gap: 0.75rem;
     }
 
     .movie-cover {

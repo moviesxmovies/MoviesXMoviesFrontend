@@ -72,14 +72,14 @@ onUnmounted(() => {
   width: 46px;
   height: 56px;
   font-family: var(--font-display);
-  font-size: 1.375rem;
-  font-weight: 700;
+  font-size: 1.25rem;
+  font-weight: 500;
   text-align: center;
   background-color: var(--surface);
   color: var(--text);
   border: 1.5px solid var(--border-strong);
   border-radius: var(--radius-md);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
   outline: none;
 }
 
@@ -90,7 +90,7 @@ onUnmounted(() => {
 
 .resend-btn {
   font-size: 0.9375rem;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--primary);
   background: none;
   border: none;

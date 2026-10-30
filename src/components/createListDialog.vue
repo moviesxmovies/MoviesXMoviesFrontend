@@ -335,7 +335,7 @@ watch(
 .dialog-intro {
   display: flex;
   align-items: center;
-  gap: 0.875rem;
+  gap: 1rem;
   margin-bottom: 1.5rem;
 }
 
@@ -348,8 +348,8 @@ watch(
   align-items: center;
   justify-content: center;
   background: var(--primary-soft);
-  color: var(--primary);
-  font-size: 1.15rem;
+  color: var(--text-subtle);
+  font-size: 1.125rem;
 }
 
 .dialog-intro-text {
@@ -362,7 +362,7 @@ watch(
 .smart-filters {
   display: flex;
   flex-direction: column;
-  gap: 0.875rem;
+  gap: 1rem;
   padding: 1rem;
   border-radius: var(--radius-lg);
   background: var(--surface-2);
@@ -396,8 +396,8 @@ watch(
   background-color: var(--primary) !important;
   border-color: var(--primary) !important;
   color: var(--on-primary) !important;
-  padding: 0.8rem !important;
-  font-weight: 700;
+  padding: 0.75rem !important;
+  font-weight: 500;
   border-radius: var(--radius-md) !important;
 }
 
@@ -409,13 +409,13 @@ watch(
 .cancel-btn {
   width: 100%;
   min-height: 2.75rem;
-  padding: 0.65rem;
+  padding: 0.75rem;
   background: transparent;
   border: 1px solid transparent;
   border-radius: var(--radius-md);
   color: var(--text-muted);
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.15s, color 0.15s;
   text-align: center;
@@ -435,7 +435,7 @@ watch(
 .server-errors {
   display: flex;
   align-items: flex-start;
-  gap: 0.6rem;
+  gap: 0.5rem;
   padding: 0.75rem 1rem;
   border-radius: var(--radius-md);
   background: var(--danger-soft);
@@ -455,14 +455,14 @@ watch(
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.25rem;
 }
 
 .privacy-toggle {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.35rem;
-  padding: 0.3rem;
+  gap: 0.25rem;
+  padding: 0.25rem;
   border-radius: var(--radius-md);
   background: var(--surface-2);
   border: 1px solid var(--border);
@@ -476,13 +476,13 @@ watch(
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
   min-height: 2.5rem;
   padding: 0.5rem;
   border-radius: var(--radius-sm);
   border: 1px solid transparent;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition:
     background-color 0.15s,

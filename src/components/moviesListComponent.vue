@@ -97,13 +97,12 @@ onMounted(() => {
   background: var(--surface);
   cursor: pointer;
   overflow: hidden;
-  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.2s var(--ease), transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
 }
 
 .movie-list:hover,
 .movie-list:focus-visible {
-  border-color: var(--primary);
-  transform: translateY(-3px);
+  border-color: var(--border-strong);
   box-shadow: var(--shadow-lg);
 }
 
@@ -180,30 +179,30 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   width: 1.9rem;
-  height: 1.9rem;
+  height: 2rem;
   border-radius: var(--radius-sm);
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   box-shadow: var(--shadow-sm);
 }
 
 .movie-list-content {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
-  padding: 0.85rem 0.95rem 0.95rem;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem 1rem;
   flex: 1;
 }
 
 .movie-list-body {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.25rem;
 }
 
 .movie-list-name {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text);
   line-height: 1.25;
 }
@@ -230,16 +229,16 @@ onMounted(() => {
 
 .movie-list-count {
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-muted);
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.25rem;
 }
 
 .movie-list-count i {
   font-size: 0.75rem;
-  color: var(--primary);
+  color: var(--text-subtle);
 }
 
 .movie-list-date {

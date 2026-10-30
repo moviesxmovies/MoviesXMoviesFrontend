@@ -279,7 +279,6 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll();
 
 .drawer-poster:hover {
   box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
 }
 
 .drawer-title-block {
@@ -290,12 +289,11 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll();
 
 .drawer-title {
   font-family: var(--font-display);
-  font-size: 1.375rem;
-  font-weight: 700;
+  font-size: 1.25rem;
+  font-weight: 500;
   color: var(--text);
   line-height: 1.2;
   margin: 0;
-  letter-spacing: -0.02em;
 }
 
 .drawer-year {
@@ -310,9 +308,7 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll();
 
 .drawer-section__title {
   font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-weight: 500;
   color: var(--text-subtle);
   margin: 0 0 0.75rem 0;
   padding-bottom: 0.5rem;
@@ -334,7 +330,7 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll();
 :deep(.horizontal-scroll-panel .p-scrollpanel-bar-x) {
   background: color-mix(in srgb, var(--text-subtle) 45%, transparent) !important;
   height: 4px !important;
-  border-radius: 99px;
+  border-radius: var(--radius-xl);
 }
 
 :deep(.horizontal-scroll-panel .p-scrollpanel-bar-x:hover) {
@@ -371,7 +367,7 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll();
 
 .person-item:hover .person-item__img,
 .person-item:focus-visible .person-item__img {
-  border-color: var(--primary);
+  border-color: var(--border-strong);
 }
 
 .person-item__name {
@@ -402,12 +398,12 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll();
   border-radius: var(--radius-md);
   background: var(--surface-2);
   border: 1px solid var(--border);
-  padding: 6px;
+  padding: 8px;
   transition: border-color 0.15s;
 }
 
 .platform-item:hover .platform-item__img {
-  border-color: var(--primary);
+  border-color: var(--border-strong);
 }
 
 .genre-list {
@@ -418,19 +414,19 @@ const { onMouseDown, onMouseMove, onMouseUp, onClick } = useDragScroll();
 
 .genre-tag {
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text);
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 99px;
-  padding: 0.3rem 0.85rem;
+  border-radius: var(--radius-xl);
+  padding: 0.25rem 0.75rem;
   text-decoration: none;
   transition: color 0.15s, border-color 0.15s, background-color 0.15s;
 }
 
 .genre-tag:hover {
   color: var(--primary);
-  border-color: var(--primary);
+  border-color: var(--border-strong);
   background: var(--primary-soft);
 }
 

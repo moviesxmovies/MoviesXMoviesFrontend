@@ -120,8 +120,8 @@ defineExpose({ currentStep, formData, next, handleForm });
 }
 
 :deep(.p-progressbar-value) {
-  background: var(--brand-gradient) !important;
-  transition: width 0.4s ease-in-out;
+  background: var(--primary) !important;
+  transition: width 0.4s var(--ease);
 }
 
 .signup-step {
@@ -130,7 +130,7 @@ defineExpose({ currentStep, formData, next, handleForm });
   right: 1.25rem;
   margin: 0;
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-subtle);
 }
 

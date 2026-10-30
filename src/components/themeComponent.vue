@@ -38,7 +38,7 @@ const isDark = computed(() => themeStore.theme === "dark");
   cursor: pointer;
   background: var(--surface);
   border: 1px solid var(--border);
-  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.1s ease;
+  transition: border-color 0.15s var(--ease), background-color 0.15s var(--ease), transform 0.1s var(--ease);
   color: var(--text);
   overflow: hidden;
 }
@@ -56,13 +56,13 @@ const isDark = computed(() => themeStore.theme === "dark");
   position: absolute;
   width: 1.25rem;
   height: 1.25rem;
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+  transition: transform 0.5s var(--var(--ease)),
     opacity 0.5s ease;
   color: var(--star);
 }
 
 .moon-icon {
-  color: var(--primary);
+  color: var(--text-subtle);
 }
 
 .hidden-icon {
@@ -71,7 +71,7 @@ const isDark = computed(() => themeStore.theme === "dark");
 }
 
 .theme-btn:hover {
-  border-color: var(--primary);
+  border-color: var(--border-strong);
   background: var(--surface-hover);
 }
 

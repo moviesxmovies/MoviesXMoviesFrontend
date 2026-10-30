@@ -137,7 +137,7 @@ watch(
   position: absolute;
   left: 1.1rem;
   color: var(--text-subtle);
-  font-size: 1.1rem;
+  font-size: 1.125rem;
   z-index: 1;
   pointer-events: none;
 }
@@ -151,7 +151,7 @@ watch(
   border-radius: var(--radius-lg) !important;
   color: var(--text) !important;
   font-family: var(--font-sans);
-  font-size: 1.0625rem !important;
+  font-size: 1rem !important;
   box-shadow: var(--shadow-sm) !important;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
@@ -201,7 +201,7 @@ watch(
 :deep(.p-selectbutton) {
   background: var(--surface) !important;
   border: 1px solid var(--border) !important;
-  border-radius: 999px !important;
+  border-radius: var(--radius-md);
   padding: 4px;
   gap: 2px;
   box-shadow: var(--shadow-sm);
@@ -210,13 +210,13 @@ watch(
 :deep(.p-selectbutton .p-togglebutton) {
   background: transparent !important;
   border: none !important;
-  border-radius: 999px !important;
+  border-radius: var(--radius-md);
   color: var(--text-muted) !important;
   font-family: var(--font-sans);
   font-size: 0.9375rem;
-  font-weight: 600;
-  padding: 0.5rem 1.1rem;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  transition: background-color 0.15s var(--ease), color 0.15s var(--ease);
   box-shadow: none !important;
 }
 

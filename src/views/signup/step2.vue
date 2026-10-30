@@ -150,13 +150,13 @@ const onFileSelect = (event: FileUploadSelectEvent) => {
 }
 
 .avatar-picker:hover .avatar-empty {
-  border-color: var(--primary);
+  border-color: var(--border-strong);
   background: var(--primary-soft);
 }
 
 .avatar-empty__label {
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-muted);
 }
 
@@ -165,17 +165,16 @@ const onFileSelect = (event: FileUploadSelectEvent) => {
   height: 100%;
   border-radius: 999px;
   object-fit: cover;
-  box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--primary);
 }
 
 .avatar-edit {
   position: absolute;
   inset: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(8, 7, 14, 0.55);
+  background: rgba(12, 12, 11, 0.55);
   color: #ffffff;
   opacity: 0;
   transition: opacity 0.15s;

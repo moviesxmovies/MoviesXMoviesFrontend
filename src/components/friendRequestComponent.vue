@@ -39,7 +39,7 @@ const emit = defineEmits(['accept', 'decline']);
     border-radius: 999px;
     border: 1px solid transparent;
     cursor: pointer;
-    transition: background-color 0.15s ease, border-color 0.15s ease;
+    transition: background-color 0.15s var(--ease), border-color 0.15s var(--ease);
 }
 
 .btn-accept {

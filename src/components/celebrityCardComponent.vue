@@ -101,9 +101,8 @@ const hideTooltip = () => {
 
 .celeb-card:hover,
 .celeb-card:focus-visible {
-    transform: translateY(-3px);
     box-shadow: var(--shadow-lg);
-    border-color: var(--primary);
+    border-color: var(--border-strong);
 }
 
 .celeb-card:active {
@@ -147,7 +146,7 @@ const hideTooltip = () => {
     object-position: top;
     display: block;
     opacity: 0;
-    transition: transform 0.35s ease, opacity 0.3s ease;
+    transition: transform 0.35s var(--ease), opacity 0.3s var(--ease);
     z-index: 2;
 }
 
@@ -156,7 +155,6 @@ const hideTooltip = () => {
 }
 
 .celeb-card:hover .cover-img {
-    transform: scale(1.04);
 }
 
 .gender-badge {
@@ -184,8 +182,8 @@ const hideTooltip = () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.7rem;
-    background: rgba(8, 7, 14, 0.78);
+    font-size: 0.75rem;
+    background: rgba(12, 12, 11, 0.78);
     color: #ffffff;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
     cursor: default;
@@ -198,17 +196,17 @@ const hideTooltip = () => {
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 2.5rem 0.8rem 0.8rem;
-    background: linear-gradient(to top, rgba(8, 7, 14, 0.94) 0%, rgba(8, 7, 14, 0.7) 55%, transparent 100%);
+    padding: 2.5rem 0.75rem 0.75rem;
+    background: linear-gradient(to top, rgba(12, 12, 11, 0.94) 0%, rgba(12, 12, 11, 0.7) 55%, transparent 100%);
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
+    gap: 0.25rem;
     z-index: 3;
 }
 
 .name {
     font-size: 0.9375rem;
-    font-weight: 700;
+    font-weight: 500;
     color: #ffffff;
     margin: 0;
     white-space: nowrap;
@@ -220,7 +218,7 @@ const hideTooltip = () => {
 .birthday {
     display: flex;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.25rem;
     font-size: 0.8125rem;
     color: rgba(255, 255, 255, 0.85);
 }
@@ -240,8 +238,8 @@ const hideTooltip = () => {
     font-size: 0.8125rem;
     font-weight: 500;
     white-space: nowrap;
-    padding: 4px 9px;
-    border-radius: 6px;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
     pointer-events: none;
     z-index: 9999;
     animation: fade-in 0.15s ease;

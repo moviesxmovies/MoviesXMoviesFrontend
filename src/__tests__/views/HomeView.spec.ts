@@ -68,7 +68,7 @@ describe("HomeView", () => {
 
       expect((glowEl.element as HTMLElement).style.getPropertyValue("--glow-color")).toBe("var(--yellow)");
       expect((glowEl.element as HTMLElement).style.getPropertyValue("--glow-opacity")).toBe("1");
-      expect((glowEl.element as HTMLElement).style.transform).toBe("scale(1.04)");
+      expect((glowEl.element as HTMLElement).style.transform).toBe("scale(1.02)");
     });
 
     it("sets correct color when direction is 'left'", async () => {

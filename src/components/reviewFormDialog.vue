@@ -143,20 +143,20 @@ const form = defineModel<{ title: string; content: string; isPositive: boolean }
 .fields {
     display: flex;
     flex-direction: column;
-    gap: 1.1rem;
+    gap: 1rem;
 }
 
 .field {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 0.5rem;
 }
 
 /* ── Formulario (patrón compartido, ver guía de estilos) ── */
 label,
 .field-label {
     font-size: 0.875rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text);
 }
 
@@ -165,7 +165,7 @@ label,
     background: var(--surface);
     border: 1px solid var(--border-strong);
     border-radius: var(--radius-md);
-    padding: 0.65rem 0.9rem;
+    padding: 0.75rem 1rem;
     font-size: 0.9375rem;
     color: var(--text);
     outline: none;
@@ -204,7 +204,7 @@ label,
 .server-errors {
     display: flex;
     align-items: flex-start;
-    gap: 0.6rem;
+    gap: 0.5rem;
     padding: 0.75rem 1rem;
     border-radius: var(--radius-md);
     background: var(--danger-soft);
@@ -224,7 +224,7 @@ label,
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: 0.25rem;
 }
 
 /* ── Botones del pie ── */
@@ -232,7 +232,7 @@ label,
     display: flex;
     justify-content: flex-end;
     flex-wrap: wrap;
-    gap: 0.625rem;
+    gap: 0.75rem;
     padding-top: 0.75rem;
     width: 100%;
 }
@@ -243,12 +243,12 @@ label,
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.45rem;
+    gap: 0.5rem;
     min-height: 2.5rem;
-    padding: 0.55rem 1.2rem;
+    padding: 0.5rem 1.25rem;
     border-radius: var(--radius-md);
     font-size: 0.9375rem;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
     font-family: inherit;
     transition: background-color 0.15s, border-color 0.15s, color 0.15s;
@@ -279,7 +279,7 @@ label,
     border: 1px solid transparent;
     background: var(--primary);
     color: var(--on-primary);
-    font-weight: 700;
+    font-weight: 500;
 }
 
 .btn-save:hover:not(:disabled) {
@@ -306,13 +306,13 @@ label,
     justify-content: center;
     gap: 0.5rem;
     min-height: 2.75rem;
-    padding: 0.6rem 1rem;
+    padding: 0.5rem 1rem;
     border-radius: var(--radius-md);
     border: 1px solid var(--border);
     background: var(--surface-2);
     color: var(--text-muted);
     font-size: 0.9375rem;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
     transition: background-color 0.15s, border-color 0.15s, color 0.15s;
     font-family: inherit;
@@ -375,6 +375,6 @@ label,
 
 :deep(.md-editor-custom-scrollbar__thumb) {
     background: color-mix(in srgb, var(--text-subtle) 45%, transparent) !important;
-    border-radius: 999px;
+    border-radius: var(--radius-md);
 }
 </style>

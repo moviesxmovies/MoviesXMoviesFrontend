@@ -135,7 +135,7 @@ const handleFriends = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   transition:
     background-color 0.15s,
     color 0.15s,
@@ -153,7 +153,7 @@ const handleFriends = () => {
 }
 
 .status-info {
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   display: flex;
   align-items: center;
   justify-content: center;

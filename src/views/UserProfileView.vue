@@ -762,7 +762,7 @@ watch(
   padding: 1rem 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.75rem;
   border-bottom: 1px solid var(--border);
 }
 
@@ -772,9 +772,7 @@ watch(
 
 .card-section__label {
   font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-weight: 500;
   color: var(--text-subtle);
 }
 
@@ -788,8 +786,7 @@ watch(
   font-family: var(--font-display);
   font-size: 1.5rem;
   line-height: 1.2;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 500;
   margin: 0;
   text-wrap: balance;
 }
@@ -805,10 +802,10 @@ watch(
   justify-content: center;
   gap: 0.5rem;
   min-height: 2.75rem;
-  padding: 0.6rem 1rem;
+  padding: 0.5rem 1rem;
   border-radius: var(--radius-md);
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   border: 1px solid transparent;
   background: var(--primary);
   color: var(--on-primary);
@@ -833,7 +830,7 @@ watch(
 
 .rating-stars :deep(.star-icon) {
   font-size: 2rem !important;
-  margin: 0 0.3rem 0 0 !important;
+  margin: 0 0.25rem 0 0 !important;
 }
 
 /* SECTION */
@@ -849,7 +846,7 @@ watch(
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.875rem 1.25rem !important;
+  padding: 1rem 1.25rem !important;
   min-height: 3.5rem;
 }
 
@@ -862,17 +859,16 @@ watch(
   flex-shrink: 0;
   border-radius: var(--radius-sm);
   background: var(--primary-soft);
-  color: var(--primary);
-  font-size: 0.95rem;
+  color: var(--text-subtle);
+  font-size: 0.9375rem;
 }
 
 .section-title {
   flex: 1;
   text-align: left;
-  font-family: var(--font-display);
-  font-weight: 600;
+  font-family: var(--font-sans);
+  font-weight: 500;
   font-size: 1rem;
-  letter-spacing: -0.01em;
   color: var(--text);
   margin: 0;
 }
@@ -892,8 +888,7 @@ watch(
 .user-name {
   font-family: var(--font-display);
   font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 500;
   line-height: 1.2;
   color: var(--text);
   margin: 0;
@@ -923,7 +918,6 @@ watch(
 .empty-text {
   font-size: 0.9375rem;
   color: var(--text-subtle);
-  font-style: italic;
   margin: 0;
 }
 
@@ -944,10 +938,10 @@ watch(
   justify-content: center;
   gap: 0.5rem;
   min-height: 2.75rem;
-  padding: 0.6rem 1rem;
+  padding: 0.5rem 1rem;
   border-radius: var(--radius-md);
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.15s, color 0.15s, border-color 0.15s;
   white-space: nowrap;
@@ -960,7 +954,7 @@ watch(
 }
 
 .btn-edit:hover {
-  border-color: var(--primary);
+  border-color: var(--border-strong);
   color: var(--primary);
   background: var(--primary-soft);
 }
@@ -996,9 +990,9 @@ watch(
 }
 
 .confirm-title {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: 1.125rem;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text);
   margin: 0;
 }
@@ -1014,19 +1008,19 @@ watch(
 .footer-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 0.625rem;
+  gap: 0.75rem;
   padding-top: 0.5rem;
   width: 100%;
 }
 
 .btn-cancel {
-  padding: 0.55rem 1.2rem;
+  padding: 0.5rem 1.25rem;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-strong);
   background: transparent;
   color: var(--text);
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.15s;
   font-family: inherit;
@@ -1039,20 +1033,20 @@ watch(
 .btn-danger {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
-  padding: 0.55rem 1.3rem;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
   border-radius: var(--radius-md);
   border: none;
-  background: #c42020;
+  background: var(--danger);
   color: #ffffff;
   font-size: 0.9375rem;
-  font-weight: 700;
+  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.15s;
   font-family: inherit;
 }
 
 .btn-danger:hover {
-  background: #a51b1b;
+  background: var(--danger);
 }
 </style>

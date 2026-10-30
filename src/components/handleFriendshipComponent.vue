@@ -148,9 +148,9 @@ const confirmAction = async () => {
 }
 
 .confirm-title {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: 1.125rem;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text);
   margin: 0;
 }
@@ -172,13 +172,13 @@ const confirmAction = async () => {
 }
 
 .btn-cancel {
-  padding: 0.6rem 1.2rem;
+  padding: 0.5rem 1.25rem;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-strong);
   background: transparent;
   color: var(--text);
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.15s;
   font-family: inherit;
@@ -191,20 +191,20 @@ const confirmAction = async () => {
 .btn-remove {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
-  padding: 0.6rem 1.3rem;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
   border-radius: var(--radius-md);
   border: none;
-  background: #c42020;
+  background: var(--danger);
   color: #ffffff;
   font-size: 0.9375rem;
-  font-weight: 700;
+  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.15s;
   font-family: inherit;
 }
 
 .btn-remove:hover {
-  background: #a51b1b;
+  background: var(--danger);
 }
 </style>

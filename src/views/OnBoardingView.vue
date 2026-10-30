@@ -113,7 +113,7 @@ const steps = [
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
-    transition: opacity 0.25s ease, transform 0.25s ease;
+    transition: opacity 0.25s var(--ease), transform 0.25s var(--ease);
 }
 
 .fade-enter-from {
@@ -148,9 +148,9 @@ const steps = [
     gap: 8px;
     font-family: var(--font-sans);
     font-size: 0.875rem;
-    font-weight: 600;
+    font-weight: 500;
     padding: 0.5rem 1rem;
-    border-radius: 999px;
+    border-radius: var(--radius-md);
     cursor: pointer;
     transition: border-color 0.15s, color 0.15s;
     z-index: 20;
@@ -165,7 +165,7 @@ const steps = [
 }
 
 .skip-button:hover {
-    border-color: var(--primary);
+    border-color: var(--border-strong);
     color: var(--primary);
 }
 
@@ -173,7 +173,7 @@ const steps = [
     position: absolute;
     pointer-events: none;
     z-index: 15;
-    transition: top 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    transition: top 0.4s var(--var(--ease)),
         left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
         transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
@@ -188,14 +188,14 @@ const steps = [
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-xl);
-    padding: 1.5rem 1.6rem 1.3rem;
+    padding: 1.5rem 1.5rem 1.25rem;
     width: 360px;
     max-width: 90vw;
     box-shadow: var(--shadow-lg);
     display: flex;
     flex-direction: column;
     pointer-events: auto;
-    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: opacity 0.4s var(--var(--ease));
     overflow: hidden;
 }
 
@@ -212,10 +212,10 @@ const steps = [
     gap: 8px;
     background: var(--primary-soft);
     color: var(--primary);
-    border-radius: 999px;
+    border-radius: var(--radius-md);
     padding: 4px 12px;
     font-size: 0.8125rem;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .badge-dot {
@@ -223,7 +223,6 @@ const steps = [
     height: 7px;
     background: var(--primary);
     border-radius: 50%;
-    animation: pulse 2.2s ease-in-out infinite;
 }
 
 @keyframes pulse {
@@ -242,7 +241,7 @@ const steps = [
 .card-eyebrow {
     font-family: var(--font-sans);
     font-size: 0.8125rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-subtle);
 }
 
@@ -258,7 +257,7 @@ const steps = [
 .step-indicator {
     display: flex;
     justify-content: center;
-    gap: 6px;
+    gap: 8px;
     margin-bottom: 1rem;
 }
 
@@ -287,7 +286,7 @@ const steps = [
     font-size: 0.8125rem;
     color: var(--text-subtle);
     text-align: center;
-    margin-top: 0.85rem;
+    margin-top: 0.75rem;
     margin-bottom: 0;
 }
 
@@ -296,10 +295,10 @@ const steps = [
     border: none !important;
     border-radius: var(--radius-md) !important;
     min-height: 2.75rem;
-    padding: 0.65rem 1.3rem !important;
+    padding: 0.75rem 1.25rem !important;
     font-family: var(--font-sans) !important;
     font-size: 0.9375rem !important;
-    font-weight: 700 !important;
+    font-weight: 500 !important;
     color: var(--on-primary) !important;
     width: 100% !important;
 }

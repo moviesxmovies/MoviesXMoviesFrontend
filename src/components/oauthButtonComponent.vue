@@ -37,18 +37,18 @@ defineProps<{
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  padding: 0.6rem 1rem;
+  padding: 0.5rem 1rem;
   background: var(--surface);
   color: var(--text);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  transition: background-color 0.15s var(--ease), border-color 0.15s var(--ease);
 }
 
 .oauth-btn:hover {
   background: var(--surface-hover);
-  border-color: var(--primary);
+  border-color: var(--border-strong);
 }
 
 .oauth-btn:active:not(:disabled) {
@@ -56,7 +56,7 @@ defineProps<{
 }
 
 .oauth-label {
-  font-weight: 600;
+  font-weight: 500;
   font-size: 0.9375rem;
   color: var(--text);
 }

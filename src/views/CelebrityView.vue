@@ -345,7 +345,7 @@ watch(
   padding: 1rem 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.75rem;
   border-bottom: 1px solid var(--border);
 }
 
@@ -355,9 +355,7 @@ watch(
 
 .card-section__label {
   font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-weight: 500;
   color: var(--text-subtle);
 }
 
@@ -371,8 +369,7 @@ watch(
   font-family: var(--font-display);
   font-size: 1.5rem;
   line-height: 1.2;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 500;
   margin: 0;
   text-wrap: balance;
 }
@@ -388,10 +385,10 @@ watch(
   justify-content: center;
   gap: 0.5rem;
   min-height: 2.75rem;
-  padding: 0.6rem 1rem;
+  padding: 0.5rem 1rem;
   border-radius: var(--radius-md);
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   border: 1px solid transparent;
   background: var(--primary);
   color: var(--on-primary);
@@ -416,7 +413,7 @@ watch(
 
 .rating-stars :deep(.star-icon) {
   font-size: 2rem !important;
-  margin: 0 0.3rem 0 0 !important;
+  margin: 0 0.25rem 0 0 !important;
 }
 
 /* SECTION */
@@ -432,7 +429,7 @@ watch(
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.875rem 1.25rem !important;
+  padding: 1rem 1.25rem !important;
   min-height: 3.5rem;
 }
 
@@ -445,17 +442,16 @@ watch(
   flex-shrink: 0;
   border-radius: var(--radius-sm);
   background: var(--primary-soft);
-  color: var(--primary);
-  font-size: 0.95rem;
+  color: var(--text-subtle);
+  font-size: 0.9375rem;
 }
 
 .section-title {
   flex: 1;
   text-align: left;
-  font-family: var(--font-display);
-  font-weight: 600;
+  font-family: var(--font-sans);
+  font-weight: 500;
   font-size: 1rem;
-  letter-spacing: -0.01em;
   color: var(--text);
   margin: 0;
 }
@@ -475,8 +471,7 @@ watch(
 .celebrity-name {
   font-family: var(--font-display);
   font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 500;
   line-height: 1.2;
   margin: 0;
   color: var(--text);
@@ -498,11 +493,11 @@ watch(
 
 .date-row b {
   color: var(--text);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .accent-icon {
-  color: var(--primary);
+  color: var(--text-subtle);
 }
 
 .death-icon {
@@ -521,7 +516,6 @@ watch(
 .empty-text {
   font-size: 0.9375rem;
   color: var(--text-subtle);
-  font-style: italic;
   margin: 0;
 }
 </style>
